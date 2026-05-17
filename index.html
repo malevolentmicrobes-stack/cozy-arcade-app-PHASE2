@@ -383,7 +383,7 @@
 }
 </style>
 
-</head><body><button id="homeTopBtn" class="homeTopBtn" title="Home">⌂</button><button id="gearBtn" class="settingsGear" title="Settings">⚙</button><div id="home" class="screen"><div class="homeWrap"><section class="hero"><div class="heroIcon">⚔️</div><div class="heroTitle">COZY ARCADE BOARD PREP-MEDICINE</div><div class="heroSub">BLANK HTML LIMITLESS</div></section><section class="modeGrid"><button id="startSolo" class="modeCard"><span class="modeIcon">⚔️</span><h2 class="modeTitle">Solo Studying</h2><p class="modeCaption">Game 1 · runner lanes</p></button><button id="startDomain" class="modeCard"><span class="modeIcon">🌀</span><h2 class="modeTitle">Knowledge Expansion</h2><p class="modeCaption">Game 2 · swipe/orb select</p></button></section><div class="controls"><button id="spacedBtn" class="btn">Spaced Repetition</button><button id="settingsBtn" class="btn">Import / Settings</button><button id="exportBtn" class="btn">Export Session</button></div><div class="kpis"><div class="kpi"><b id="cardCount">0</b><span>Cards</span></div><div class="kpi"><b id="reviewedCount">0</b><span>Reviewed</span></div><div class="kpi"><b id="dueCount">0</b><span>Due</span></div><div class="kpi"><b id="pinCount">0</b><span>Pinned</span></div></div></div></div><div id="solo" class="game solo hidden"><div class="hud"><div class="hudGroup"><div class="hudPill">HP <div class="hpWrap"><div id="hpFill" class="hpFill"></div></div></div><div class="hudPill">Score <span id="soloScore">0</span></div><div class="hudPill">Streak <span id="soloStreak">0</span></div><div class="hudPill">Gate <span id="soloGate">1</span></div></div><div class="hudGroup"><button id="soloPause" class="hudPill">Pause</button><button class="hudPill" data-home>Exit</button></div></div><div class="promptBox"><span id="soloSystem" class="systemBadge"></span><div id="soloQuestion" class="promptText"></div><div class="timer"><div id="soloTimerFill" class="timerFill"></div></div></div><div class="soloTrack"><div id="choiceRow" class="choiceRow"></div><div id="runner" class="hunter lane0"><i class="hair"></i><i class="head"></i><i class="coat"></i><i class="arm l"></i><i class="arm r"></i><i class="leg l"></i><i class="leg r"></i><i class="blade"></i></div><div id="groundGlow"></div><div id="gateComplete" class="gateBanner hidden">GATE COMPLETED</div><div class="soloHint">← / → move • 1–4 select • timer auto-locks selected answer</div></div><div id="soloReveal" class="reveal hidden"><h2 id="soloRevealTitle"></h2><div id="soloRevealDx" class="dx"></div><div id="soloTrigger" class="trigger"></div><div id="soloRevealRatings"></div><div class="controls" style="justify-content:center"><button id="soloFull" class="btn primary">Full Card</button></div></div><div class="mobileControls"><button id="leftBtn" class="btn">←</button><button id="selectBtn" class="btn primary">Select</button><button id="rightBtn" class="btn">→</button></div></div><div id="domain" class="game domain hidden"><div id="cursorGlow" class="cursorGlow"></div><div class="domainTitle">Knowledge Expansion</div><div class="hud"><div class="hudGroup"><div class="hudPill">Round <span id="domainRound">1</span></div><div class="hudPill">Score <span id="domainScore">0</span></div><div class="hudPill">Streak <span id="domainStreak">0</span></div></div><div class="hudGroup"><button id="domainPause" class="hudPill">Pause</button><button class="hudPill" data-home>Exit</button></div></div><div class="promptBox"><span id="domainSystem" class="systemBadge"></span><div id="domainQuestion" class="promptText"></div><div class="timer"><div class="timerFill" id="domainTimerFill"></div></div></div><div id="orbArena" class="orbArena"></div><div id="domainReveal" class="reveal hidden"><h2 id="domainRevealTitle"></h2><div id="domainDx" class="dx"></div><div id="domainObj" class="trigger"></div><div id="domainRevealRatings"></div><div class="controls" style="justify-content:center"><button id="domainFull" class="btn primary">Full Card</button></div></div></div><div id="review" class="screen settings hidden"><div class="box"><h1>Spaced Repetition</h1><div class="controls"><button class="btn" data-home>Home</button><button id="clearBtn" class="btn red">Clear Local State</button></div><div id="reviewList"></div></div></div><div id="settings" class="screen settings hidden"><div class="box"><h1>Import / Settings</h1><div class="grid2"><div class="field"><label>Deck mode</label><select id="deckMode"><option value="sequential">Sequential</option><option value="random">Random</option><option value="due">Due + pinned first</option><option value="pinned">Pinned only</option></select></div><div class="field"><label>Prompt field</label><select id="promptField"><option value="quick">Quick recall</option><option value="presentation" selected>Presentation</option><option value="objective">Educational objective</option></select></div><div class="field"><label>Solo timer seconds</label><input id="soloTimerInput" type="number" min="4" max="40" value="7"></div><div class="field"><label>Import JSON deck</label><input id="deckFile" type="file" accept=".json,application/json"></div><div class="field"><label><input id="autoSelect" type="checkbox" checked> Timer auto-selects</label></div><div class="field"><label><input id="bionicToggle" type="checkbox"> Bionic emphasis</label></div><div class="field"><label><input id="spacedToggle" type="checkbox"> Spaced Repetition after answers</label></div></div><div class="controls"><button id="applyBtn" class="btn primary">Apply</button><button class="btn" data-home>Home</button></div></div></div><div id="notify" class="notification hidden"><div class="notifyBox"><div class="notifyLabel">NOTIFICATION</div><div id="notifyBody" class="notifyBody"></div><div class="controls" style="justify-content:center"><button id="notifyContinue" class="btn primary">Continue</button><span id="notifyTimer" class="btn">5s</span></div></div></div><div id="pause" class="pause hidden"><div class="pauseBox"><div class="notifyLabel">PAUSED</div><div id="pauseBody" class="notifyBody"></div><div class="controls" style="justify-content:center"><button id="pauseResume" class="btn primary">Resume</button><button id="pauseExport" class="btn">Export Session</button><button id="pauseHome" class="btn">Exit to Home</button></div></div></div><div id="end" class="end hidden"><div class="endBox"><h1 id="endTitle"></h1><p id="endBody"></p><div class="controls" style="justify-content:center"><button id="endRestart" class="btn primary">Restart</button><button id="endHome" class="btn">Home</button></div></div></div><div id="modal" class="modal hidden"><div class="modalBox"><h2 id="modalTitle"></h2><pre id="modalText"></pre><button id="modalClose" class="btn primary">Close</button></div></div><div id="fx" class="fx"></div><div id="toast" class="toast hidden"></div><script>
+</head><body><button id="homeTopBtn" class="homeTopBtn" title="Home">⌂</button><button id="gearBtn" class="settingsGear" title="Settings">⚙</button><div id="home" class="screen"><div class="homeWrap"><section class="hero"><div class="heroIcon">⚔️</div><div class="heroTitle">COZY ARCADE BOARD PREP-MEDICINE</div><div class="heroSub">BLANK HTML LIMITLESS</div></section><section class="modeGrid"><button id="startSolo" class="modeCard"><span class="modeIcon">⚔️</span><h2 class="modeTitle">Solo Studying</h2><p class="modeCaption">Game 1 · runner lanes</p></button><button id="startDomain" class="modeCard"><span class="modeIcon">🌀</span><h2 class="modeTitle">Knowledge Expansion</h2><p class="modeCaption">Game 2 · swipe/orb select</p></button></section><div class="controls"><button id="spacedBtn" class="btn">Spaced Repetition</button><button id="settingsBtn" class="btn">Import / Settings</button><button id="exportBtn" class="btn">Export Session</button></div><div id="limitlessHomeImport" class="limitlessHomeControls" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;align-items:center"><label class="btn primary" for="limitlessHomeDeckFile">Upload JSON Deck</label><input id="limitlessHomeDeckFile" type="file" accept=".json,.csv,application/json,text/csv" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0"><button id="limitlessExampleDeck" class="btn" type="button">Download Example JSON</button><span class="btn" id="limitlessImportStatus">Local deck storage</span></div><div class="kpis"><div class="kpi"><b id="cardCount">0</b><span>Cards</span></div><div class="kpi"><b id="reviewedCount">0</b><span>Reviewed</span></div><div class="kpi"><b id="dueCount">0</b><span>Due</span></div><div class="kpi"><b id="pinCount">0</b><span>Pinned</span></div></div></div></div><div id="solo" class="game solo hidden"><div class="hud"><div class="hudGroup"><div class="hudPill">HP <div class="hpWrap"><div id="hpFill" class="hpFill"></div></div></div><div class="hudPill">Score <span id="soloScore">0</span></div><div class="hudPill">Streak <span id="soloStreak">0</span></div><div class="hudPill">Gate <span id="soloGate">1</span></div></div><div class="hudGroup"><button id="soloPause" class="hudPill">Pause</button><button class="hudPill" data-home>Exit</button></div></div><div class="promptBox"><span id="soloSystem" class="systemBadge"></span><div id="soloQuestion" class="promptText"></div><div class="timer"><div id="soloTimerFill" class="timerFill"></div></div></div><div class="soloTrack"><div id="choiceRow" class="choiceRow"></div><div id="runner" class="hunter lane0"><i class="hair"></i><i class="head"></i><i class="coat"></i><i class="arm l"></i><i class="arm r"></i><i class="leg l"></i><i class="leg r"></i><i class="blade"></i></div><div id="groundGlow"></div><div id="gateComplete" class="gateBanner hidden">GATE COMPLETED</div><div class="soloHint">← / → move • 1–4 select • timer auto-locks selected answer</div></div><div id="soloReveal" class="reveal hidden"><h2 id="soloRevealTitle"></h2><div id="soloRevealDx" class="dx"></div><div id="soloTrigger" class="trigger"></div><div id="soloRevealRatings"></div><div class="controls" style="justify-content:center"><button id="soloFull" class="btn primary">Full Card</button></div></div><div class="mobileControls"><button id="leftBtn" class="btn">←</button><button id="selectBtn" class="btn primary">Select</button><button id="rightBtn" class="btn">→</button></div></div><div id="domain" class="game domain hidden"><div id="cursorGlow" class="cursorGlow"></div><div class="domainTitle">Knowledge Expansion</div><div class="hud"><div class="hudGroup"><div class="hudPill">Round <span id="domainRound">1</span></div><div class="hudPill">Score <span id="domainScore">0</span></div><div class="hudPill">Streak <span id="domainStreak">0</span></div></div><div class="hudGroup"><button id="domainPause" class="hudPill">Pause</button><button class="hudPill" data-home>Exit</button></div></div><div class="promptBox"><span id="domainSystem" class="systemBadge"></span><div id="domainQuestion" class="promptText"></div><div class="timer"><div class="timerFill" id="domainTimerFill"></div></div></div><div id="orbArena" class="orbArena"></div><div id="domainReveal" class="reveal hidden"><h2 id="domainRevealTitle"></h2><div id="domainDx" class="dx"></div><div id="domainObj" class="trigger"></div><div id="domainRevealRatings"></div><div class="controls" style="justify-content:center"><button id="domainFull" class="btn primary">Full Card</button></div></div></div><div id="review" class="screen settings hidden"><div class="box"><h1>Spaced Repetition</h1><div class="controls"><button class="btn" data-home>Home</button><button id="clearBtn" class="btn red">Clear Local State</button></div><div id="reviewList"></div></div></div><div id="settings" class="screen settings hidden"><div class="box"><h1>Import / Settings</h1><div class="grid2"><div class="field"><label>Deck mode</label><select id="deckMode"><option value="sequential">Sequential</option><option value="random">Random</option><option value="due">Due + pinned first</option><option value="pinned">Pinned only</option></select></div><div class="field"><label>Prompt field</label><select id="promptField"><option value="quick">Quick recall</option><option value="presentation" selected>Presentation</option><option value="objective">Educational objective</option></select></div><div class="field"><label>Solo timer seconds</label><input id="soloTimerInput" type="number" min="4" max="40" value="7"></div><div class="field"><label>Import JSON deck</label><input id="deckFile" type="file" accept=".json,application/json"></div><div class="field"><label><input id="autoSelect" type="checkbox" checked> Timer auto-selects</label></div><div class="field"><label><input id="bionicToggle" type="checkbox"> Bionic emphasis</label></div><div class="field"><label><input id="spacedToggle" type="checkbox"> Spaced Repetition after answers</label></div></div><div class="controls"><button id="applyBtn" class="btn primary">Apply</button><button class="btn" data-home>Home</button></div></div></div><div id="notify" class="notification hidden"><div class="notifyBox"><div class="notifyLabel">NOTIFICATION</div><div id="notifyBody" class="notifyBody"></div><div class="controls" style="justify-content:center"><button id="notifyContinue" class="btn primary">Continue</button><span id="notifyTimer" class="btn">5s</span></div></div></div><div id="pause" class="pause hidden"><div class="pauseBox"><div class="notifyLabel">PAUSED</div><div id="pauseBody" class="notifyBody"></div><div class="controls" style="justify-content:center"><button id="pauseResume" class="btn primary">Resume</button><button id="pauseExport" class="btn">Export Session</button><button id="pauseHome" class="btn">Exit to Home</button></div></div></div><div id="end" class="end hidden"><div class="endBox"><h1 id="endTitle"></h1><p id="endBody"></p><div class="controls" style="justify-content:center"><button id="endRestart" class="btn primary">Restart</button><button id="endHome" class="btn">Home</button></div></div></div><div id="modal" class="modal hidden"><div class="modalBox"><h2 id="modalTitle"></h2><pre id="modalText"></pre><button id="modalClose" class="btn primary">Close</button></div></div><div id="fx" class="fx"></div><div id="toast" class="toast hidden"></div><script>
 const DATA={"metadata":{"app":"Cozy Arcade Board Prep Medicine","title":"COZY ARCADE BOARD PREP-MEDICINE LIMITLESS","version":"v3.5.3 LIMITLESS card-id-repaired","rescue_base":"v3.5.3 ABIM413_1250 good-spec shell","deck_label":"BLANK HTML LIMITLESS","limitless_text":"BLANK HTML LIMITLESS","created_at":"2026-05-17T00:36:59.356Z","mapping":"LIMITLESS: Card ID*, Card ID, card_id, cardId, json_id, id, qid_unique, qid, original_qid, legacy_id preserved; card_type/source/input/output retained.","cards_embedded":0,"import_ready":true},"cards":[]};
 let cards=(DATA.cards||[]), state=loadState(), deckMode='sequential', promptField='quick', autoSelect=true, bionicOn=true;
 let mode=null, current=null, choices=[], selected=0, timer=0, timerMax=9, ticker=null, index=0, score=0, streak=0, hp=100, gate=1, paused=false, domainRound=1, orbData=[], cursor={x:innerWidth/2,y:innerHeight/2};
@@ -6193,7 +6193,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     }).join('');
   };
   const safeBionic=v=>bionicHTML351(v);
-  const cardKey=c=>String((c&&(c.qid||c.id||c.original_qid||c.diagnosis))||'');
+  const cardKey=c=>String((c&&(c['Card ID*']||c['Card ID']||c.card_id||c.cardId||c.json_id||c.id||c.qid_unique||c.qid||c.original_qid||c.legacy_id||c.diagnosis))||'');
   const answer=c=>{try{return typeof answerOf==='function'?answerOf(c):clean(c&&c.diagnosis||c&&c.answer||'Unknown');}catch(e){return clean(c&&c.diagnosis||c&&c.answer||'Unknown');}};
   const prompt=c=>{try{return typeof getPrompt==='function'?getPrompt(c):(c&&c.presentation||c&&c.prompt||'');}catch(e){return c&&c.presentation||'';}};
   const full=c=>{try{return typeof fullText==='function'?fullText(c):JSON.stringify(c,null,2);}catch(e){return JSON.stringify(c,null,2);}};
@@ -6462,6 +6462,8 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
         arr=(activeTag&&activeTag!=='all')?arr.filter(c=>tagsOf(c).includes(activeTag)):arr.filter(c=>tagsOf(c).length);
       }
       if(scope==='inorder') arr=[...arr].sort((a,b)=>(Number(a.id)||0)-(Number(b.id)||0));
+      const strictScopes=['review','wrong','hard','pinned','tagged'];
+      if(!arr.length && strictScopes.includes(scope)) return [];
       if(!arr.length) arr=(cards||[]).filter(c=>clean(answer(c))&&clean(prompt(c)));
       return arr.length?arr:(cards||[]);
     };
@@ -6522,7 +6524,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     hub=document.createElement('div');
     hub.id='gameplayHub351';
     hub.className='screen settings hidden';
-    hub.innerHTML='<div class="box gameplayPanel351"><div class="controls"><button class="btn" id="gameplayHome351">Home</button><button class="btn primary" id="openImport351">Import / Export</button><button class="btn primary" id="applyGameplay351">Apply</button><button class="btn" id="closeGameplay351">Close Settings</button></div><div class="gameplayCard351"><h2>Settings and Game Play</h2><label>Gameplay</label><select id="gameplayMode351"><option>Solo Studying controls</option><option>Knowledge Expansion controls</option><option>Shadow Dungeon: 5 Second Grind</option><option>Answer card controls</option><option>Import / export workflow</option></select><div class="inlineSettings351"><label class="toggleLine351"><input id="gameplayBionic351" type="checkbox"> Toggle Bionic Reading</label><div><label>Game timing</label><select id="questionTime351"><option value="3">3 seconds</option><option value="4">4 seconds</option><option value="5">5 seconds</option><option value="6">6 seconds</option><option value="7">7 seconds</option><option value="8">8 seconds</option><option value="9">9 seconds</option><option value="10">10 seconds</option></select></div></div><p><span class="kbd351">Enter</span><span class="kbd351">Right</span> continue. <span class="kbd351">1</span> Weak Signal, <span class="kbd351">2</span> Moderate, <span class="kbd351">3</span> Strong, <span class="kbd351">4</span> Anchored. <span class="kbd351">Down</span> opens Full Card. <span class="kbd351">Up</span> closes Full Card.</p><p>Timing controls the review pace across games. Knowledge Expansion arrows map to top, right, bottom, left; Enter, slash, or click selects after the brief prompt lock.</p></div><div class="gameplayGrid351"><div class="gameplayCard351"><h3>Prompt AI</h3><p>Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade card schema, then upload or seed to Supabase.</p><textarea class="promptBox351" readonly>Convert the uploaded deck into Cozy Arcade Board Prep Medicine JSON using the current DB mapping: old presentation maps to current prompt / presentation_CLEAN; old educational_objective maps to current answer / reveal; diagnosis remains the answer choice; board_trigger remains board_trigger; tags/system map to current tags and sys. Preserve one_thing, level_1_presentation, level_2_three_second_exposure, quick_recall, treatment, next_step, and explanation when present. Return valid JSON with { metadata, cards } only. Do not rewrite medical content.</textarea></div><div class="gameplayCard351"><h3>Import / Export</h3><p>Input CSV / JSON / APKG / flashcard text. Export JSON or CSV. Use the converted JSON for local upload or Supabase seeding.</p><div class="controls"><label class="btn primary" for="deckUpload351">Upload Deck JSON/CSV</label><input id="deckUpload351" class="hiddenFile351" type="file" accept=".json,.csv,application/json,text/csv"><button class="btn" id="openSettings351">Open import settings</button><button class="btn" id="exportJson351">Export JSON</button><button class="btn" id="exportCsv351">Export CSV</button><button class="btn" id="mergeProgress351">Merge Progress</button></div></div></div></div>';
+    hub.innerHTML='<div class="box gameplayPanel351"><div class="controls"><button class="btn" id="gameplayHome351">Home</button><button class="btn primary" id="openImport351">Import / Export</button><button class="btn primary" id="applyGameplay351">Apply</button><button class="btn" id="closeGameplay351">Close Settings</button></div><div class="gameplayCard351"><h2>Settings and Game Play</h2><label>Gameplay</label><select id="gameplayMode351"><option>Solo Studying controls</option><option>Knowledge Expansion controls</option><option>Shadow Dungeon: 5 Second Grind</option><option>Answer card controls</option><option>Import / export workflow</option></select><div class="inlineSettings351"><label class="toggleLine351"><input id="gameplayBionic351" type="checkbox"> Toggle Bionic Reading</label><div><label>Game timing</label><select id="questionTime351"><option value="3">3 seconds</option><option value="4">4 seconds</option><option value="5">5 seconds</option><option value="6">6 seconds</option><option value="7">7 seconds</option><option value="8">8 seconds</option><option value="9">9 seconds</option><option value="10">10 seconds</option></select></div></div><p><span class="kbd351">Enter</span><span class="kbd351">Right</span> continue. <span class="kbd351">1</span> Weak Signal, <span class="kbd351">2</span> Moderate, <span class="kbd351">3</span> Strong, <span class="kbd351">4</span> Anchored. <span class="kbd351">Down</span> opens Full Card. <span class="kbd351">Up</span> closes Full Card.</p><p>Timing controls the review pace across games. Knowledge Expansion arrows map to top, right, bottom, left; Enter, slash, or click selects after the brief prompt lock.</p></div><div class="gameplayGrid351"><div class="gameplayCard351"><h3>Prompt AI</h3><p>Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade card schema, then upload locally or export for GitHub.</p><textarea class="promptBox351" readonly>Convert the uploaded deck into Cozy Arcade Board Prep Medicine JSON using the current DB mapping: old presentation maps to current prompt / presentation_CLEAN; old educational_objective maps to current answer / reveal; diagnosis remains the answer choice; board_trigger remains board_trigger; tags/system map to current tags and sys. Preserve one_thing, level_1_presentation, level_2_three_second_exposure, quick_recall, treatment, next_step, and explanation when present. Return valid JSON with { metadata, cards } only. Do not rewrite medical content.</textarea></div><div class="gameplayCard351"><h3>Import / Export</h3><p>Input CSV / JSON / APKG / flashcard text. Export JSON or CSV. Use the converted JSON for local upload, GitHub Pages, or offline study.</p><div class="controls"><label class="btn primary" for="deckUpload351">Upload Deck JSON/CSV</label><input id="deckUpload351" class="hiddenFile351" type="file" accept=".json,.csv,application/json,text/csv"><button class="btn" id="openSettings351">Open import settings</button><button class="btn" id="exportJson351">Export JSON</button><button class="btn" id="exportCsv351">Export CSV</button><button class="btn" id="mergeProgress351">Merge Progress</button></div></div></div></div>';
     document.body.appendChild(hub);
     $('gameplayHome351').onclick=()=>{hub.classList.add('hidden'); try{show('home');}catch(e){} try{paused=false;}catch(e){}};
     $('closeGameplay351').onclick=()=>closeGameplayHub351();
@@ -6599,6 +6601,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       const pauseOpen=$('pause')&&!$('pause').classList.contains('hidden');
       const wasPaused=!!paused;
       gameplayReturnScreen351=(pauseOpen||wasPaused)?'pause':((mode==='solo'||mode==='domain'||mode==='review')?mode:'home');
+      window.__cozySettingsReturn352=gameplayReturnScreen351;
     }catch(e){gameplayReturnScreen351='home';}
     ['home','solo','domain','review','settings'].forEach(id=>{$(id)?.classList.add('hidden');});
     hub.classList.remove('hidden');
@@ -6639,13 +6642,26 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     }
     return false;
   }
+  function settingsSurfaceOpen351(){
+    const hub=$('gameplayHub351');
+    const settings=$('settings');
+    return !!((hub&&!hub.classList.contains('hidden'))||(settings&&!settings.classList.contains('hidden')));
+  }
+  function toggleSettingsGear351(e){
+    if(e){e.preventDefault(); e.stopPropagation(); if(e.stopImmediatePropagation) e.stopImmediatePropagation();}
+    if(settingsSurfaceOpen351()){
+      try{ if(typeof returnFromSettings352==='function') return returnFromSettings352(); }catch(err){}
+      return closeOpenSettings351();
+    }
+    return openGameplayHub();
+  }
   function wireGearButtons(){
     document.querySelectorAll('button').forEach(btn=>{
       const txt=(btn.textContent||'').trim();
       if((txt==='⚙'||txt==='⚙️'||btn.id==='gearBtn')&&!btn.dataset.gear351){
         btn.dataset.gear351='1';
-        btn.onclick=e=>{e.preventDefault(); e.stopPropagation(); openGameplayHub();};
-        btn.addEventListener('click',e=>{e.preventDefault(); e.stopPropagation(); nativeStopImmediate.call(e); openGameplayHub();},true);
+        btn.onclick=toggleSettingsGear351;
+        btn.addEventListener('click',toggleSettingsGear351,true);
       }
     });
   }
@@ -7723,11 +7739,17 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     }catch(_){}
   }
   function keyFor(card){
-    return String(card && (card.id || card.qid || card.original_qid || card.legacy_id || card.diagnosis || card.answer || card.prompt || Math.random()));
+    return String(card && (card['Card ID*'] || card['Card ID'] || card.card_id || card.cardId || card.json_id || card.id || card.qid_unique || card.qid || card.original_qid || card.legacy_id || card.diagnosis || card.answer || card.prompt || Math.random()));
   }
   function candidateKeys(card){
     return [
+      card && card['Card ID*'],
+      card && card['Card ID'],
+      card && card.card_id,
+      card && card.cardId,
+      card && card.json_id,
       card && card.id,
+      card && card.qid_unique,
       card && card.qid,
       card && card.original_qid,
       card && card.legacy_id,
@@ -8589,29 +8611,44 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 <script id="limitless-card-id-import-patch">
 (function(){
   const LIMITLESS_LABEL="BLANK HTML LIMITLESS";
+  const LIMITLESS_STORAGE_KEY="cozy_arcade_limitless_cards_v1";
+  const LIMITLESS_META_KEY="cozy_arcade_limitless_meta_v1";
   const clean=v=>String(v==null?'':v).replace(/\s+/g,' ').trim();
   const first=(...xs)=>xs.find(x=>clean(x));
   const cardId=c=>c&&(c['Card ID*']||c['Card ID']||c.card_id||c.cardId||c.json_id||c.id||c.qid_unique||c.qid||c.original_qid||c.legacy_id);
+  function appData(){ try{return DATA;}catch(e){return window.DATA||null;} }
+  function appCards(){ try{return Array.isArray(cards)?cards:[];}catch(e){return Array.isArray(window.cards)?window.cards:[];} }
+  function setAppCards(nextCards){
+    try{ cards=nextCards; }catch(e){ window.cards=nextCards; }
+    try{ window.cards=nextCards; }catch(e){}
+    const data=appData();
+    if(data) try{ data.cards=nextCards; window.DATA=data; }catch(e){}
+  }
+  function exposeAppData(){
+    const data=appData();
+    if(data) try{ window.DATA=data; }catch(e){}
+    try{ window.cards=appCards(); }catch(e){}
+  }
   function normalizeLimitlessCard(card,i){
     const c=Object.assign({},card||{});
     const sourceId=clean(first(cardId(c),i+1));
     const qid=clean(first(c.qid_unique,c.qid,c.original_qid,c['Card ID*'],c['Card ID'],c.json_id,c.card_id,c.cardId,sourceId));
     const system=clean(first(c.sys,c.system,c.subject,'Imported'));
-    const presentation=first(c.presentation,c.prompt,c.presentation_CLEAN,c.clinical_vignette,c.clinical_vignette_summary,c.level_1,c.level_1_presentation,c.input,'');
+    const presentation=first(c.presentation,c.prompt,c.front,c.question,c.presentation_CLEAN,c.clinical_vignette,c.clinical_vignette_summary,c.level_1,c.level_1_presentation,c.input,'');
     const clinical=first(c.clinical_vignette,c.clinical_vignette_summary,c.level_1_presentation,c.level_1,presentation,'');
-    const reveal=first(c.answer,c.educational_objective,c.educational_obj,c.level_2_three_second,c.level_2_three_second_exposure,c.level_3_quick_recall,c.quick_recall,c.board_trigger,c.output,c.diagnosis,'');
+    const reveal=first(c.back,c.answer,c.one_thing,c.educational_objective,c.educational_obj,c.level_2_three_second,c.level_2_three_second_exposure,c.level_3_quick_recall,c.quick_recall,c.board_trigger,c.output,c.diagnosis,'');
     const quick=first(c.quick_recall,c.level_3_quick_recall,c.level_3_recall,reveal,presentation,'');
     const tags=Array.isArray(c.tags)?c.tags.join('; '):clean(first(c.tags,[system,c.test,c.diagnosis].filter(Boolean).join('; ')));
-    const cardType=clean(first(c.card_type,c.cardType,c.type,'ABIM'));
+    const cardType=clean(first(c.card_type,c.cardType,c.type,'Imported'));
     const source=clean(first(c.source,c.source_file,c.source_sheet,c.bundle_namespace,'Imported deck'));
     Object.assign(c,{
       id:sourceId, card_id:clean(first(c.card_id,sourceId)), json_id:first(c.json_id,sourceId),
       qid_unique:qid, qid, original_qid:qid, legacy_id:clean(first(c.legacy_id,sourceId)),
       card_type:cardType, type:clean(first(c.type,cardType)), source,
-      input:first(c.input,presentation,clinical,''), output:first(c.output,c.answer,c.educational_objective,c.board_trigger,reveal,''),
+      input:first(c.input,c.front,presentation,clinical,''), output:first(c.output,c.back,c.answer,c.one_thing,c.educational_objective,c.board_trigger,reveal,''),
       sys:system, system, subject:clean(first(c.subject,system)),
-      diagnosis:first(c.diagnosis,c.answer_choice,c.dx,reveal,'Unknown'),
-      tags, prompt:first(c.prompt,presentation,''), one_thing:first(c.one_thing,c.answer,c.educational_objective,quick,''),
+      diagnosis:first(c.diagnosis,c.title,c.topic,c.answer_choice,c.dx,reveal,'Unknown'),
+      tags, prompt:first(c.prompt,c.front,presentation,''), one_thing:first(c.one_thing,c.back,c.answer,c.educational_objective,quick,''),
       presentation, clinical_vignette:clinical, clinical_vignette_summary:first(c.clinical_vignette_summary,clinical,''),
       level_1:first(c.level_1,c.level_1_presentation,clinical,presentation,''), level_1_presentation:first(c.level_1_presentation,c.level_1,clinical,presentation,''),
       level_2:first(c.level_2,c.level_2_three_second,c.level_2_three_second_exposure,reveal,''), level_2_three_second:first(c.level_2_three_second,c.level_2_three_second_exposure,c.level_2,reveal,''), level_2_three_second_exposure:first(c.level_2_three_second_exposure,c.level_2_three_second,c.level_2,reveal,''),
@@ -8626,10 +8663,44 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     return c;
   }
   window.normalizeLimitlessCard=normalizeLimitlessCard;
+  function readStoredDeck(){
+    try{
+      const raw=localStorage.getItem(LIMITLESS_STORAGE_KEY);
+      if(!raw) return null;
+      const parsed=JSON.parse(raw);
+      const storedCards=Array.isArray(parsed)?parsed:(parsed&&Array.isArray(parsed.cards)?parsed.cards:[]);
+      if(!storedCards.length) return null;
+      return {metadata:(parsed&&parsed.metadata)||{},cards:storedCards.map(normalizeLimitlessCard)};
+    }catch(e){ return null; }
+  }
+  function storeDeck(cardsToStore,metadata){
+    try{
+      const payload={metadata:Object.assign({deck_label:LIMITLESS_LABEL,stored_at:new Date().toISOString()},metadata||{}),cards:cardsToStore||[]};
+      localStorage.setItem(LIMITLESS_STORAGE_KEY,JSON.stringify(payload));
+      localStorage.setItem(LIMITLESS_META_KEY,JSON.stringify(payload.metadata));
+    }catch(e){}
+  }
   function normalizeDeck(){
-    try{ if(window.DATA&&Array.isArray(DATA.cards)) DATA.cards=DATA.cards.map(normalizeLimitlessCard); }catch(e){}
-    try{ if(Array.isArray(cards)) cards=cards.map(normalizeLimitlessCard); }catch(e){}
-    try{ if(window.DATA&&DATA.metadata){ DATA.metadata.deck_label=LIMITLESS_LABEL; DATA.metadata.limitless_text=LIMITLESS_LABEL; DATA.metadata.cards_embedded=(DATA.cards||[]).length; } }catch(e){}
+    exposeAppData();
+    try{
+      const data=appData();
+      const embedded=(data&&Array.isArray(data.cards))?data.cards:[];
+      const stored=(!embedded.length)&&readStoredDeck();
+      if(stored&&stored.cards.length){
+        setAppCards(stored.cards);
+        if(data) data.metadata=Object.assign({},data.metadata||{},stored.metadata,{deck_label:stored.metadata.deck_label||LIMITLESS_LABEL,limitless_text:LIMITLESS_LABEL,cards_embedded:stored.cards.length,restored_from_localStorage:true});
+      }
+    }catch(e){}
+    try{
+      const data=appData();
+      if(data&&Array.isArray(data.cards)) setAppCards(data.cards.map(normalizeLimitlessCard));
+    }catch(e){}
+    try{ if(Array.isArray(cards)) setAppCards(cards.map(normalizeLimitlessCard)); }catch(e){}
+    try{
+      const data=appData();
+      if(data&&data.metadata){ data.metadata.deck_label=LIMITLESS_LABEL; data.metadata.limitless_text=LIMITLESS_LABEL; data.metadata.cards_embedded=(data.cards||[]).length; }
+      exposeAppData();
+    }catch(e){}
     try{ const sub=document.querySelector('.heroSub'); if(sub && !/LIMITLESS/.test(sub.textContent)) sub.textContent=LIMITLESS_LABEL; }catch(e){}
     try{ if(typeof updateKpis==='function') updateKpis(); }catch(e){}
   }
@@ -8641,12 +8712,12 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     const header=rows[0].map(h=>clean(h).toLowerCase().replace(/[^a-z0-9]+/g,''));
     const get=(r,names)=>{ for(const name of names){ const idx=header.indexOf(String(name).toLowerCase().replace(/[^a-z0-9]+/g,'')); if(idx>=0 && clean(r[idx])) return r[idx]; } return ''; };
     return rows.slice(1).map((r,i)=>normalizeLimitlessCard({
-      card_id:get(r,['Card ID*','Card ID','card_id','json_id','id']),
+      card_id:get(r,['Card ID*','Card ID','card_id','cardId','json_id','id','legacy_id']),
       qid_unique:get(r,['qid_unique','qid','original_qid']),
       sys:get(r,['sys','system','subject']),
-      diagnosis:get(r,['diagnosis','answer_choice','answer','dx']),
-      presentation:get(r,['presentation','prompt','input','clinical_vignette']),
-      answer:get(r,['answer','educational_objective','output']),
+      diagnosis:get(r,['diagnosis','title','topic','answer_choice','answer','dx']),
+      presentation:get(r,['front','presentation','prompt','input','question','clinical_vignette']),
+      answer:get(r,['back','answer','one_thing','educational_objective','output']),
       board_trigger:get(r,['board_trigger']),
       tags:get(r,['tags']),
       source:get(r,['source','source_sheet']),
@@ -8657,13 +8728,16 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     const raw=Array.isArray(obj)?obj:(obj&&Array.isArray(obj.cards)?obj.cards:(obj&&Array.isArray(obj.data)?obj.data:[]));
     const incoming=raw.map(normalizeLimitlessCard);
     if(!incoming.length) throw new Error('No cards found');
-    try{ cards=incoming; }catch(e){ window.cards=incoming; }
-    try{ DATA.cards=incoming; DATA.metadata=Object.assign({},DATA.metadata||{},{deck_label:label||LIMITLESS_LABEL,limitless_text:LIMITLESS_LABEL,imported_at:new Date().toISOString(),cards_embedded:incoming.length}); }catch(e){}
+    const metadata=Object.assign({},(obj&&(obj.metadata||obj.meta))||{},{deck_label:label||LIMITLESS_LABEL,limitless_text:LIMITLESS_LABEL,imported_at:new Date().toISOString(),cards_embedded:incoming.length});
+    setAppCards(incoming);
+    try{ const data=appData(); if(data) data.metadata=Object.assign({},data.metadata||{},metadata); exposeAppData(); }catch(e){}
+    storeDeck(incoming,metadata);
     try{ index=0; current=null; choices=[]; selected=0; }catch(e){}
-    try{ if(typeof patchStudyOptions==='function') patchStudyOptions(); if(typeof installHomeActions==='function') installHomeActions(); if(typeof updateKpis==='function') updateKpis(); }catch(e){}
+    try{ if(typeof patchStudyOptions==='function') patchStudyOptions(); if(typeof installHomeActions==='function') installHomeActions(); ensureHomeImport(); if(typeof updateKpis==='function') updateKpis(); }catch(e){}
     try{ toast('LIMITLESS imported '+incoming.length+' cards'); }catch(e){}
     return incoming.length;
   }
+  window.importLimitlessDeck=importObject;
   function importFile(file){
     if(!file) return;
     const reader=new FileReader();
@@ -8676,9 +8750,64 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     };
     reader.readAsText(file);
   }
+  window.importLimitlessFile=importFile;
+  function downloadExampleDeck(){
+    const example={
+      meta:{schema:"cozy-arcade-v1",version:"public-example",total:2},
+      cards:[{
+        id:"demo-001",
+        sys:"CV",
+        diagnosis:"Myocardial infarction",
+        prompt:"Patient with crushing chest pain, diaphoresis, and ST elevation in contiguous leads.",
+        one_thing:"STEMI needs emergent PCI.",
+        board_trigger:"IF ischemic chest pain plus ST elevation -> activate cath lab",
+        level_1:"Recognize STEMI quickly.",
+        level_2:"Do not wait for troponin if ECG is diagnostic.",
+        level_3_recall:"Aspirin, anticoagulation, P2Y12 inhibitor, high-intensity statin, and emergent PCI.",
+        level_3_treatment:"Activate cath lab for PCI when available.",
+        level_3_next_step:"Give aspirin and call interventional cardiology.",
+        tags:"public demo, cardiology"
+      },{
+        id:"demo-002",
+        sys:"Pulm",
+        diagnosis:"Tension pneumothorax",
+        prompt:"Trauma patient with hypotension, unilateral absent breath sounds, and tracheal deviation.",
+        one_thing:"Treat tension pneumothorax before confirmatory imaging.",
+        board_trigger:"IF shock plus unilateral absent breath sounds -> needle decompression",
+        level_1:"This is an obstructive shock emergency.",
+        level_2:"Clinical diagnosis comes before chest x-ray.",
+        level_3_recall:"Immediate needle decompression followed by chest tube.",
+        level_3_treatment:"Needle decompression, then tube thoracostomy.",
+        level_3_next_step:"Decompress immediately.",
+        tags:"public demo, pulmonary, emergency"
+      }]
+    };
+    const blob=new Blob([JSON.stringify(example,null,2)],{type:"application/json"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download="example_deck_template.json";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+  }
+  function ensureHomeImport(){
+    const home=document.querySelector("#home .homeWrap");
+    if(!home||document.getElementById("limitlessHomeImport")) return;
+    const panel=document.createElement("div");
+    panel.id="limitlessHomeImport";
+    panel.className="limitlessHomeControls";
+    panel.style.cssText="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;align-items:center";
+    panel.innerHTML='<label class="btn primary" for="limitlessHomeDeckFile">Upload JSON Deck</label><input id="limitlessHomeDeckFile" type="file" accept=".json,.csv,application/json,text/csv" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0"><button id="limitlessExampleDeck" class="btn" type="button">Download Example JSON</button><span class="btn" id="limitlessImportStatus">Local deck storage</span>';
+    const anchor=home.querySelector(".kpis")||home.lastElementChild;
+    if(anchor) home.insertBefore(panel,anchor);
+    else home.appendChild(panel);
+    const example=document.getElementById("limitlessExampleDeck");
+    if(example) example.onclick=downloadExampleDeck;
+  }
   function wire(){
     normalizeDeck();
-    ['deckUpload351','deckFile','deckFile2','menuImportReplace175159','menuImportMerge175159'].forEach(id=>{
+    ensureHomeImport();
+    ['limitlessHomeDeckFile','deckUpload351','deckFile','deckFile2','menuImportReplace175159','menuImportMerge175159'].forEach(id=>{
       const el=document.getElementById(id);
       if(!el || el.__limitlessImportPatch) return;
       el.__limitlessImportPatch=true;
@@ -8688,11 +8817,14 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
         event.preventDefault();
         event.stopImmediatePropagation();
         importFile(file);
+        try{ event.target.value=''; }catch(e){}
       },true);
     });
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wire); else wire();
   setTimeout(wire,250);
+  setTimeout(wire,1000);
+  setTimeout(wire,2500);
 })();
 </script>
 </body></html>
