@@ -1,0 +1,57 @@
+{
+  "meta": {
+    "schema": "cozy-arcade-v1",
+    "version": "public-example",
+    "description": "Public example deck with two demo cards. Replace these with your own content before studying.",
+    "total": 2,
+    "required_fields": [
+      "id",
+      "sys",
+      "diagnosis",
+      "prompt",
+      "one_thing"
+    ],
+    "optional_fields": [
+      "board_trigger",
+      "level_1",
+      "level_2",
+      "level_3_recall",
+      "level_3_treatment",
+      "level_3_next_step",
+      "tags",
+      "image_url"
+    ]
+  },
+  "cards": [
+    {
+      "id": "demo-001",
+      "sys": "CV",
+      "diagnosis": "Myocardial infarction",
+      "prompt": "Patient with crushing chest pain, diaphoresis, and ST elevation in contiguous leads.",
+      "one_thing": "STEMI needs emergent PCI.",
+      "board_trigger": "IF ischemic chest pain plus ST elevation -> activate cath lab",
+      "level_1": "Recognize STEMI quickly.",
+      "level_2": "Do not wait for troponin if ECG is diagnostic.",
+      "level_3_recall": "Aspirin, anticoagulation, P2Y12 inhibitor, high-intensity statin, and emergent PCI.",
+      "level_3_treatment": "Activate cath lab for PCI when available.",
+      "level_3_next_step": "Give aspirin and call interventional cardiology.",
+      "tags": "public demo, cardiology",
+      "image_url": null
+    },
+    {
+      "id": "demo-002",
+      "sys": "Pulm",
+      "diagnosis": "Tension pneumothorax",
+      "prompt": "Trauma patient with hypotension, unilateral absent breath sounds, and tracheal deviation.",
+      "one_thing": "Treat tension pneumothorax before confirmatory imaging.",
+      "board_trigger": "IF shock plus unilateral absent breath sounds -> needle decompression",
+      "level_1": "This is an obstructive shock emergency.",
+      "level_2": "Clinical diagnosis comes before chest x-ray.",
+      "level_3_recall": "Immediate needle decompression followed by chest tube.",
+      "level_3_treatment": "Needle decompression, then tube thoracostomy.",
+      "level_3_next_step": "Decompress immediately.",
+      "tags": "public demo, pulmonary, emergency",
+      "image_url": null
+    }
+  ]
+}

@@ -1,1 +1,60 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Editors / IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Node / Python
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+__pycache__/
+*.py[cod]
+*.pyo
+venv/
+.venv/
+
+# Secrets / local environment
+.env
+.env.local
+.env.*.local
+secrets.*
+
+# Private decks and source databases - keep these off public branches
+mgh_whitebook_cards_v17_index.json
+abim_cards_v17_index.json
+ABIM_DATABASE_v17_upload.json
 ABIM_JSON_SCHEMA_REFERENCE.txt
+*SOURCE_OF_TRUTH*
+*SOURCE_ABIM*
+*ABIM*
+*MGH*
+COZY_ARCADE_BOARD_PREP_MEDICINE_WEB_v3_5_3_ABIM*.html
+COZY_ARCADE_MGH*.html
+
+# Backups, temp, and app exports
+*.bak
+*.bak_card_id_*
+*.tmp
+*.swp
+*~
+*_entire_bundle_*.json
+*_progress_patch_*.json
+*_cards_only_*.json
+*_shadow_dungeon_subset_*.json
+solo_studying_*.json
+
+# Logs
+*.log
