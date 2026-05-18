@@ -8765,43 +8765,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
         return;
       }
     }catch(e){}
-    const example={
-      meta:{schema:"cozy-arcade-v1",version:"public-example",total:2},
-      cards:[{
-        id:"demo-001",
-        sys:"CV",
-        diagnosis:"Myocardial infarction",
-        prompt:"Patient with crushing chest pain, diaphoresis, and ST elevation in contiguous leads.",
-        one_thing:"STEMI needs emergent PCI.",
-        board_trigger:"IF ischemic chest pain plus ST elevation -> activate cath lab",
-        level_1:"Recognize STEMI quickly.",
-        level_2:"Do not wait for troponin if ECG is diagnostic.",
-        level_3_recall:"Aspirin, anticoagulation, P2Y12 inhibitor, high-intensity statin, and emergent PCI.",
-        level_3_treatment:"Activate cath lab for PCI when available.",
-        level_3_next_step:"Give aspirin and call interventional cardiology.",
-        tags:"public demo, cardiology"
-      },{
-        id:"demo-002",
-        sys:"Pulm",
-        diagnosis:"Tension pneumothorax",
-        prompt:"Trauma patient with hypotension, unilateral absent breath sounds, and tracheal deviation.",
-        one_thing:"Treat tension pneumothorax before confirmatory imaging.",
-        board_trigger:"IF shock plus unilateral absent breath sounds -> needle decompression",
-        level_1:"This is an obstructive shock emergency.",
-        level_2:"Clinical diagnosis comes before chest x-ray.",
-        level_3_recall:"Immediate needle decompression followed by chest tube.",
-        level_3_treatment:"Needle decompression, then tube thoracostomy.",
-        level_3_next_step:"Decompress immediately.",
-        tags:"public demo, pulmonary, emergency"
-      }]
-    };
-    const blob=new Blob([JSON.stringify(example,null,2)],{type:"application/json"});
-    const a=document.createElement("a");
-    a.href=URL.createObjectURL(blob);
-    a.download="example_deck_template.json";
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+    try{toast('Example template unavailable');}catch(e){}
   }
   function ensureHomeImport(){
     const home=document.querySelector("#home .homeWrap");
@@ -8994,12 +8958,10 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     reader.onload=()=>{try{const text=String(reader.result||''); const obj=/\.csv$/i.test(file.name)?{cards:parseCsv(text)}:JSON.parse(text); importObject(obj,file.name);}catch(err){try{toast('Import failed: '+(err&&err.message?err.message:'check file'));}catch(e){}}};
     reader.readAsText(file);
   }
-  function exampleDeck(){
-    return {metadata:{schema:'cozy-arcade-v1',version:'public-example',total:2},cards:[{id:'demo-001',sys:'CV',diagnosis:'Myocardial infarction',prompt:'Patient with crushing chest pain, diaphoresis, and ST elevation in contiguous leads.',educational_objective:'ST-elevation myocardial infarction requires immediate reperfusion therapy.',board_trigger:'IF ischemic chest pain plus ST elevation -> activate cath lab',one_thing:'STEMI needs emergent PCI.',level_1:'Recognize STEMI quickly.',level_2:'Do not wait for troponin if ECG is diagnostic.',quick_recall:'Aspirin, anticoagulation, P2Y12 inhibitor, high-intensity statin, and emergent PCI.',treatment:'Activate cath lab for PCI when available.',next_step:'Give aspirin and call interventional cardiology.',explanation:'Reperfusion is time-sensitive; biomarkers should not delay treatment.',tags:'public demo, cardiology'},{id:'demo-002',sys:'Pulm',diagnosis:'Tension pneumothorax',prompt:'Trauma patient with hypotension, unilateral absent breath sounds, and tracheal deviation.',educational_objective:'Tension pneumothorax is a clinical diagnosis treated before confirmatory imaging.',board_trigger:'IF shock plus unilateral absent breath sounds -> needle decompression',one_thing:'Treat tension pneumothorax before confirmatory imaging.',level_1:'This is an obstructive shock emergency.',level_2:'Clinical diagnosis comes before chest x-ray.',quick_recall:'Immediate needle decompression followed by chest tube.',treatment:'Needle decompression, then tube thoracostomy.',next_step:'Decompress immediately.',explanation:'Waiting for imaging can be fatal in an unstable patient.',tags:'public demo, pulmonary, emergency'}]};
-  }
   function downloadJson(){
     const active=appCards();
-    const payload=active.length?{metadata:Object.assign({},(appData()&&appData().metadata)||{},{exported_at:new Date().toISOString(),cards_embedded:active.length}),cards:active}:exampleDeck();
+    if(!active.length){ downloadExampleDeck(); return; }
+    const payload={metadata:Object.assign({},(appData()&&appData().metadata)||{},{exported_at:new Date().toISOString(),cards_embedded:active.length}),cards:active};
     const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=active.length?'cozy_arcade_deck_export.json':'example_deck_template.json'; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
   }
@@ -9083,18 +9045,30 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   setInterval(()=>{cleanHero(); updateImportButtons(); patchPromptAi(); const active=(!document.getElementById('soloReveal')?.classList.contains('hidden'))?'solo':(!document.getElementById('domainReveal')?.classList.contains('hidden')?'domain':''); if(active) renderRevealSections(active);},900);
 })();
 </script>
-<style id="cozy-review-one-thing-ux-20260518">
-#limitlessHomeImport{order:5!important;margin-top:22px!important}
-#home .kpis{order:6!important}
-#gameplay351.btn.primary.homeBig351{background:linear-gradient(180deg,rgba(15,19,38,.96),rgba(8,10,24,.96))!important;border:1px solid rgba(103,232,249,.22)!important;color:#f4f7ff!important;box-shadow:0 0 28px rgba(103,232,249,.06)!important}
-#gameplay351.btn.primary.homeBig351 small{color:#aeb8cf!important}
-#limitlessHomeImport .btn:nth-child(3),#limitlessLocalDeckStorage{background:rgba(255,255,255,.045)!important;color:#edf7ff!important}
-.gameplayDataDetails351{border:1px solid rgba(103,232,249,.18);border-radius:18px;background:rgba(255,255,255,.035);padding:0;margin-top:14px;overflow:hidden}
-.gameplayDataDetails351 summary{cursor:pointer;list-style:none;padding:18px 22px;font-family:Orbitron,monospace;font-size:clamp(16px,1.5vw,26px);font-weight:950;letter-spacing:.18em;text-transform:uppercase;color:#f4f7ff;display:flex;justify-content:space-between;align-items:center}
-.gameplayDataDetails351 summary::-webkit-details-marker{display:none}
-.gameplayDataDetails351 summary:after{content:'⌄';color:#aeb8cf;font-size:22px}
-.gameplayDataDetails351[open] summary:after{content:'⌃'}
-.gameplayDataBody351{padding:0 18px 18px}
+<style id="cozy-public-v18-drawer-css">
+#cozySettingsDrawer351{position:fixed;right:0;top:0;bottom:0;width:min(440px,100vw);background:var(--panel);border-left:2px solid rgba(103,232,249,.35);box-shadow:-30px 0 80px rgba(0,0,0,.70);z-index:99999;transform:translateX(100%);transition:transform .22s cubic-bezier(.32,.72,0,1);display:flex;flex-direction:column;color:#f5f7ff;overflow:hidden}
+#cozySettingsDrawer351.open{transform:translateX(0)}
+#cozySettingsDrawer351 *{box-sizing:border-box}
+.drawerHead351{padding:20px 24px;border-bottom:1px solid rgba(103,232,249,.25);background:var(--panel2);display:flex;justify-content:space-between;align-items:center}
+.drawerHead351 h2{margin:0;font-family:Orbitron,'DM Sans',system-ui,sans-serif;font-size:20px;letter-spacing:.10em;color:#67e8f9;font-weight:950;text-transform:uppercase}
+#closeDrawer351{background:rgba(255,255,255,.055);border:1px solid rgba(103,232,249,.24);border-radius:999px;color:#67e8f9;font-size:24px;line-height:1;width:40px;height:40px;cursor:pointer}
+.drawerBody351{flex:1;padding:20px;overflow-y:auto}
+.drawerPanel351{background:rgba(103,232,249,.055);border:1px solid rgba(103,232,249,.26);border-radius:16px;padding:16px;margin-bottom:16px}
+.drawerPanel351 h3,.drawerPanel351 summary{margin:0 0 12px;font-family:Orbitron,'DM Sans',system-ui,sans-serif;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#8ff5ff;font-weight:950}
+.drawerPanel351 summary{cursor:pointer;margin:0}
+.drawerPanel351[open] summary{margin-bottom:12px}
+.drawerPanel351 label{display:block;margin:10px 0 6px;color:#dce8ff;font-weight:900}
+.drawerPanel351 select,.drawerPanel351 textarea{width:100%;border-radius:12px;border:1px solid rgba(103,232,249,.24);background:#040816;color:#fff;padding:10px 12px;font-weight:800}
+.drawerPanel351 textarea{min-height:170px;resize:vertical;font-size:12px;line-height:1.42;white-space:pre;overflow:auto}
+.drawerToggle351{display:flex!important;align-items:center;gap:12px;cursor:pointer;margin:0!important;color:#67e8f9!important;letter-spacing:.05em}
+.drawerToggle351 input{width:20px;height:20px;accent-color:#67e8f9;flex:0 0 auto}
+.drawerStats351{margin-top:12px;font-size:13px;line-height:1.5;color:#aeb8cf}
+.drawerStats351.isHidden351{display:none}
+.drawerStats351 b{color:#67e8f9}
+.drawerActions351{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.drawerActions351 .btn,.drawerFileLabel351{border-radius:999px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.14);color:#edf7ff;padding:9px 12px;font-weight:950;font-size:13px;display:inline-flex;align-items:center;justify-content:center;min-height:38px}
+.drawerActions351 .primary,.drawerFileLabel351{background:linear-gradient(135deg,#0f2843,#164f68);border-color:rgba(103,232,249,.38);color:#eafbff}
+.drawerFooter351{padding:14px 18px;border-top:1px solid rgba(103,232,249,.20);font-size:12px;color:#9ba5bc;text-align:center;letter-spacing:.05em}
 .oneThing350.oneThingUx351{position:relative;padding:18px 16px!important;min-height:70px}
 .oneThing350.oneThingEmpty351{border:1.5px dashed rgba(255,209,102,.72)!important;background:rgba(38,28,8,.38)!important}
 .oneThingAdd351{width:100%;min-height:54px;border:0;background:transparent;color:#ffd166;font-family:Orbitron,monospace;font-weight:950;letter-spacing:.16em;text-align:center}
@@ -9104,130 +9078,371 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 .oneThingEditBtns351{display:flex;justify-content:flex-end;gap:10px;margin-top:10px}
 .oneThingEditBtns351 button{border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#edf7ff;padding:8px 12px;font-weight:950}
 .oneThingEditBtns351 button[data-one-thing-action="save"]{background:linear-gradient(135deg,#facc15,#ffd166);color:#1d1400;border-color:transparent}
+@media(min-width:761px){body.cozyDrawerOpen351 #home,body.cozyDrawerOpen351 #solo,body.cozyDrawerOpen351 #domain,body.cozyDrawerOpen351 #review{right:440px!important;transition:right .22s cubic-bezier(.32,.72,0,1)}body.cozyDrawerOpen351 #solo .promptBox,body.cozyDrawerOpen351 #domain .promptBox{width:min(760px,calc(100vw - 520px))!important;max-width:calc(100vw - 520px)!important}}
+@media(max-width:760px){#cozySettingsDrawer351{width:100vw;border-left:0}.drawerHead351{padding:16px 18px}.drawerBody351{padding:16px}.drawerHead351 h2{font-size:16px}}
 </style>
-<script>
-// === FINAL COZY ARCADE v17 LIMITLESS PATCH — 2026-05-18 ===
+<script id="cozy-public-v18-drawer-js">
+// === FINAL COZY ARCADE PUBLIC v18 - BLANK LIMITLESS DRAWER + TEST MODE ===
 (() => {
-  const KEY = 'cozyUserOneThingMap351';
-  const map = () => {
-    try { return JSON.parse(localStorage.getItem(KEY) || '{}'); }
-    catch(e) { return {}; }
-  };
-  const saveMap = m => { try { localStorage.setItem(KEY, JSON.stringify(m)); } catch(e){} };
+  const ONE_THING_KEY = 'cozyUserOneThingMap351';
+  const PUBLIC_DECK_KEYS = ['cozy_arcade_limitless_cards_v1','cozy_arcade_limitless_meta_v1'];
+  const q = id => document.getElementById(id);
+  const esc = value => String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  const clean = value => String(value == null ? '' : value).replace(/\s+/g,' ').trim();
 
-  // 1. AUTHORITATIVE v17 NORMALIZER
-  window.normalizeLimitlessCard = function(c) {
-    if (!c) return c;
-    const norm = { ...c };
-    // v17 → internal prompt mapping
-    norm.prompt = c.presentation || c.presentation_CLEAN || c.prompt || c.clinical_vignette || '';
-    norm.educational_objective = c.educational_objective || c.one_thing || ''; // NEVER overwrite with diagnosis
-    norm.one_thing = c.one_thing || c.userOneThing || '';
-    norm.answer = c.diagnosis || c.answer || ''; // title only
+  window.normalizeLimitlessCard = c => {
+    if(!c) return c;
+    const norm = {...c};
+    norm.prompt = c.presentation || c.presentation_CLEAN || c.prompt || c.front || c.question || c.clinical_vignette || '';
+    norm.educational_objective = c.educational_objective || c.educational_obj || c.reveal || c.back || c.output || '';
+    norm.one_thing = c.one_thing || c.userOneThing || c.takeaway || '';
+    norm.answer = c.diagnosis || c.answer || c.title || c.topic || '';
+    norm.diagnosis = norm.diagnosis || norm.answer || 'Imported card';
+    norm.sys = norm.sys || norm.system || norm.subject || 'Imported';
+    norm.system = norm.system || norm.sys;
     return norm;
   };
 
-  // 2. One Thing UX — 3-state + localStorage
-  function userValue(c) {
-    const m = map();
-    return m[c?.qid_unique || c?.id || c?.json_id] || c?.one_thing || '';
-  }
-  function setUserValue(c, val) {
-    const m = map();
-    const k = c?.qid_unique || c?.id || c?.json_id;
-    if (val && val.trim()) m[k] = val.trim();
-    else delete m[k];
-    saveMap(m);
+  function appCards351(){
+    try{ if(Array.isArray(cards)) return cards; }catch(_){}
+    try{ if(Array.isArray(window.cards)) return window.cards; }catch(_){}
+    try{ if(window.DATA && Array.isArray(window.DATA.cards)) return window.DATA.cards; }catch(_){}
+    return [];
   }
 
-  function renderOneThing(el, c, editing = false) {
-    if (!el || !c) return;
-    const value = userValue(c);
-    el.classList.toggle('oneThingEmpty351', !value && !editing);
-    if (editing) {
-      el.innerHTML = `<div class="oneThingEdit351"><textarea>${escapeHTML(value)}</textarea><div class="oneThingEditBtns351"><button data-one-thing-action="cancel">Cancel</button><button data-one-thing-action="save">Save ↑</button></div></div>`;
-      bindOneThingButtons(el, c);
-      setTimeout(() => el.querySelector('textarea').focus(), 10);
-      return;
+  function currentCard351(){
+    try{ if(typeof current !== 'undefined' && current) return current; }catch(_){}
+    try{ if(window.getCurrent) return window.getCurrent(); }catch(_){}
+    return appCards351()[0] || null;
+  }
+
+  function setCards351(nextCards, meta){
+    const normalized = (nextCards || []).map(window.normalizeLimitlessCard);
+    try{ cards = normalized; }catch(_){ window.cards = normalized; }
+    window.cards = normalized;
+    try{
+      if(window.DATA) window.DATA.cards = normalized;
+      if(typeof DATA !== 'undefined') DATA.cards = normalized;
+      const data = window.DATA || (typeof DATA !== 'undefined' ? DATA : null);
+      if(data) data.metadata = Object.assign({}, data.metadata || {}, meta || {}, { cards_embedded: normalized.length });
+    }catch(_){}
+    try{ index = 0; current = null; choices = []; selected = 0; }catch(_){}
+    try{ if(typeof updateKpis === 'function') updateKpis(); }catch(_){}
+    updateDrawer351();
+    return normalized.length;
+  }
+
+  function enforceBlankPublic351(){
+    if(window.__cozyPublicBlankEnforced351) return;
+    window.__cozyPublicBlankEnforced351 = true;
+    PUBLIC_DECK_KEYS.forEach(key => { try{ localStorage.removeItem(key); }catch(_){} });
+    try{
+      cards = [];
+      window.cards = cards;
+      if(typeof DATA !== 'undefined'){
+        DATA.cards = [];
+        DATA.metadata = Object.assign({}, DATA.metadata || {}, {
+          deck_label: 'BLANK HTML LIMITLESS',
+          limitless_text: 'BLANK HTML LIMITLESS',
+          cards_embedded: 0,
+          import_ready: true,
+          restored_from_localStorage: false
+        });
+        window.DATA = DATA;
+      }else if(window.DATA){
+        window.DATA.cards = [];
+        window.DATA.metadata = Object.assign({}, window.DATA.metadata || {}, {
+          deck_label: 'BLANK HTML LIMITLESS',
+          limitless_text: 'BLANK HTML LIMITLESS',
+          cards_embedded: 0,
+          import_ready: true,
+          restored_from_localStorage: false
+        });
+      }
+      try{ index = 0; current = null; choices = []; selected = 0; }catch(_){}
+      try{ if(typeof updateKpis === 'function') updateKpis(); }catch(_){}
+    }catch(_){}
+  }
+
+  function importDeckObject351(obj, label){
+    const raw = Array.isArray(obj) ? obj : (Array.isArray(obj?.cards) ? obj.cards : (Array.isArray(obj?.data) ? obj.data : []));
+    if(!raw.length) throw new Error('No cards found');
+    const count = setCards351(raw, Object.assign({}, obj?.metadata || obj?.meta || {}, { deck_label: label || 'Uploaded public deck', imported_at: new Date().toISOString() }));
+    try{ if(window.importLimitlessDeck && window.importLimitlessDeck !== importDeckObject351) window.importLimitlessDeck(obj, label); }catch(_){}
+    try{ if(typeof toast === 'function') toast('Deck imported: ' + count + ' cards'); }catch(_){}
+    return count;
+  }
+
+  function importFile351(file){
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try{
+        const text = String(reader.result || '');
+        const parsed = /\.csv$/i.test(file.name) && typeof parseCsv === 'function' ? { cards: parseCsv(text) } : JSON.parse(text);
+        importDeckObject351(parsed, file.name);
+      }catch(err){
+        try{ if(window.importLimitlessFile && window.importLimitlessFile !== importFile351) return window.importLimitlessFile(file); }catch(_){}
+        try{ if(typeof toast === 'function') toast('Import failed: ' + (err?.message || 'check file')); }catch(_){}
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  async function downloadExample351(){
+    try{
+      const res = await fetch('example_deck_template.json', { cache:'no-store' });
+      if(!res.ok) throw new Error('template fetch failed');
+      const blob = await res.blob();
+      downloadBlob351(blob, 'example_deck_template.json');
+    }catch(_){
+      try{ if(typeof toast === 'function') toast('Example template unavailable'); }catch(__){}
     }
-    el.innerHTML = value
-      ? `<div class="oneThingText351">${escapeHTML(value)}</div><button class="oneThingUpdate351" data-one-thing-action="edit">UPDATE ↑</button>`
-      : `<button class="oneThingAdd351" data-one-thing-action="edit">ADD YOUR ONE THING +</button>`;
-    bindOneThingButtons(el, c);
   }
 
-  function bindOneThingButtons(el, c) {
-    el.querySelectorAll('[data-one-thing-action]').forEach(btn => {
-      btn.onclick = e => {
-        e.preventDefault(); e.stopImmediatePropagation();
-        const action = btn.dataset.oneThingAction;
-        if (action === 'save') {
-          const ta = el.querySelector('textarea');
-          setUserValue(c, ta ? ta.value : '');
-          renderOneThing(el, c, false);
-        } else if (action === 'cancel') {
-          renderOneThing(el, c, false);
-        } else if (action === 'edit') {
-          renderOneThing(el, c, true);
-        }
-      };
+  function downloadBlob351(blob, filename){
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  }
+
+  function exportDeck351(){
+    const active = appCards351();
+    if(!active.length) return downloadExample351();
+    const data = (window.DATA || (typeof DATA !== 'undefined' ? DATA : {}));
+    const payload = { metadata: Object.assign({}, data.metadata || {}, { exported_at: new Date().toISOString(), cards_embedded: active.length }), cards: active };
+    downloadBlob351(new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' }), 'cozy_arcade_deck_export.json');
+  }
+
+  function getMap351(){ try{ return JSON.parse(localStorage.getItem(ONE_THING_KEY) || '{}'); }catch(_){ return {}; } }
+  function saveMap351(map){ try{ localStorage.setItem(ONE_THING_KEY, JSON.stringify(map)); }catch(_){} }
+  function cardKey351(card){ return card && (card.qid_unique || card.card_id || card.id || card.json_id || card.qid || card.diagnosis || card.answer) || ''; }
+  function oneThingValue351(card){ const key = cardKey351(card); const map = getMap351(); return (key && map[key]) || card?.one_thing || ''; }
+  function setOneThingValue351(card, value){ const key = cardKey351(card); if(!key) return; const map = getMap351(); const next = String(value || '').trim(); if(next) map[key] = next; else delete map[key]; saveMap351(map); }
+
+  function renderOneThing351(el, card, editing = false){
+    if(!el || !card) return;
+    const value = oneThingValue351(card);
+    el.style.display = 'block';
+    el.classList.add('oneThingUx351');
+    el.classList.toggle('oneThingEmpty351', !value && !editing);
+    if(editing){
+      el.innerHTML = '<div class="oneThingEdit351"><textarea>' + esc(value) + '</textarea><div class="oneThingEditBtns351"><button data-one-thing-action="cancel" type="button">Cancel</button><button data-one-thing-action="save" type="button">Save</button></div></div>';
+    }else{
+      el.innerHTML = value
+        ? '<div class="oneThingText351">' + esc(value) + '</div><button class="oneThingUpdate351" data-one-thing-action="edit" type="button">UPDATE</button>'
+        : '<button class="oneThingAdd351" data-one-thing-action="edit" type="button">ADD YOUR ONE THING +</button>';
+    }
+  }
+
+  document.addEventListener('click', ev => {
+    const btn = ev.target?.closest?.('.oneThing350 [data-one-thing-action]');
+    if(!btn) return;
+    const el = btn.closest('.oneThing350');
+    const card = currentCard351();
+    if(!el || !card) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    ev.stopImmediatePropagation?.();
+    const action = btn.dataset.oneThingAction;
+    if(action === 'edit') renderOneThing351(el, card, true);
+    if(action === 'cancel') renderOneThing351(el, card, false);
+    if(action === 'save'){
+      setOneThingValue351(card, el.querySelector('textarea')?.value || '');
+      renderOneThing351(el, card, false);
+      try{ if(typeof toast === 'function') toast('One Thing saved'); }catch(_){}
+      updateDrawer351();
+    }
+  }, true);
+
+  function syncOneThing351(){
+    const card = currentCard351();
+    if(!card) return;
+    document.querySelectorAll('.oneThing350').forEach(el => {
+      if(el.querySelector('textarea')) return;
+      renderOneThing351(el, card, false);
     });
   }
 
-  function escapeHTML(str) {
-    return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]);
+  function applyDrawer351(){
+    const bionic = q('drawerBionic351');
+    const timing = q('drawerQuestionTime351');
+    if(bionic){
+      try{ bionicOn = !!bionic.checked; }catch(_){}
+      try{ localStorage.setItem('cozyBionic351', bionic.checked ? '1' : '0'); }catch(_){}
+      try{ localStorage.setItem('bionicOn_v1751523', bionic.checked ? '1' : '0'); }catch(_){}
+      const legacy = q('bionicToggle');
+      if(legacy) legacy.checked = bionic.checked;
+    }
+    if(timing){
+      try{ localStorage.setItem('cozyQuestionSeconds351', timing.value); }catch(_){}
+      const legacyTimer = q('soloTimerInput');
+      if(legacyTimer) legacyTimer.value = timing.value;
+    }
+    try{ if(typeof toast === 'function') toast('Settings applied'); }catch(_){}
+    updateDrawer351();
   }
 
-  // 3. Fix flashing title + controls placement
-  function boot() {
-    // Title flash kill
-    if (document.title !== 'COZY ARCADE BOARD PREP-MEDICINE LIMITLESS') {
-      document.title = 'COZY ARCADE BOARD PREP-MEDICINE LIMITLESS';
-    }
-    // Force home controls to bottom (Image 2)
-    const homeActions = document.getElementById('homeActions351') || document.querySelector('.controls');
-    if (homeActions) homeActions.style.order = '999';
+  function preview351(){
+    const cardsNow = appCards351();
+    const card = currentCard351() || cardsNow[0];
+    const payload = card ? {
+      id: cardKey351(card),
+      system: card.sys || card.system || '',
+      answer: card.diagnosis || card.answer || '',
+      prompt: card.prompt || card.presentation || '',
+      one_thing: oneThingValue351(card)
+    } : { metadata: { app: 'Cozy Arcade public blank', cards_embedded: 0 }, cards: [] };
+    return JSON.stringify(payload, null, 2);
+  }
 
-    // Settings dropdown + dark theme
-    const settingsBtn = document.getElementById('gameplay351');
-    if (settingsBtn) {
-      settingsBtn.classList.remove('primary'); // remove blue bleed
-      settingsBtn.onclick = () => setTimeout(() => {
-        const hub = document.getElementById('gameplayHub351');
-        if (hub) hub.style.background = 'var(--panel)';
-      }, 50);
-    }
+  function createDrawer351(){
+    if(q('cozySettingsDrawer351')) return q('cozySettingsDrawer351');
+    const drawer = document.createElement('aside');
+    drawer.id = 'cozySettingsDrawer351';
+    drawer.setAttribute('aria-hidden','true');
+    drawer.innerHTML = `
+      <div class="drawerHead351"><h2>Settings &amp; Gameplay</h2><button id="closeDrawer351" type="button" aria-label="Close settings">x</button></div>
+      <div class="drawerBody351">
+        <section class="drawerPanel351">
+          <label class="drawerToggle351"><input type="checkbox" id="testModeToggle351"> TEST MODE - Live Side Screen</label>
+          <div id="testModeInfo351" class="drawerStats351 isHidden351">
+            <div>Cards loaded: <b id="liveCardCount351">0</b></div>
+            <div>Schema: <b>public_blank_limitless</b></div>
+            <div>One Thing storage: <b id="storageStatus351">none</b></div>
+          </div>
+        </section>
+        <details class="drawerPanel351" open>
+          <summary>Card Data - Import / Export / Merge</summary>
+          <div id="drawerDataStatus351" class="drawerStats351"></div>
+          <div class="drawerActions351">
+            <label class="drawerFileLabel351" for="drawerDeckUpload351">Upload JSON Deck</label>
+            <input id="drawerDeckUpload351" type="file" accept=".json,.csv,application/json,text/csv" style="display:none">
+            <button class="btn primary" id="drawerExample351" type="button">Download Example JSON</button>
+            <button class="btn" id="drawerExport351" type="button">Export JSON</button>
+          </div>
+        </details>
+        <section class="drawerPanel351">
+          <h3>Gameplay Controls</h3>
+          <label>Game timing</label>
+          <select id="drawerQuestionTime351"><option value="3">3 seconds</option><option value="4">4 seconds</option><option value="5">5 seconds</option><option value="6">6 seconds</option><option value="7">7 seconds</option><option value="8">8 seconds</option><option value="9">9 seconds</option><option value="10">10 seconds</option></select>
+          <label class="drawerToggle351" style="margin-top:14px!important"><input id="drawerBionic351" type="checkbox"> Bionic Reading</label>
+          <div class="drawerActions351"><button class="btn primary" id="drawerApply351" type="button">Apply</button><button class="btn" id="drawerFullSettings351" type="button">Full Import Settings</button></div>
+        </section>
+        <section class="drawerPanel351"><h3>Live JSON Preview</h3><textarea id="drawerJsonPreview351" readonly></textarea></section>
+      </div>
+      <div class="drawerFooter351">Cozy Arcade Board Prep - LIMITLESS - Public Blank - v18</div>`;
+    document.body.appendChild(drawer);
+    q('closeDrawer351').onclick = closeDrawer351;
+    q('testModeToggle351').onchange = updateDrawer351;
+    q('drawerDeckUpload351').onchange = ev => { const file = ev.target.files?.[0]; importFile351(file); try{ ev.target.value = ''; }catch(_){} setTimeout(updateDrawer351, 500); };
+    q('drawerExample351').onclick = downloadExample351;
+    q('drawerExport351').onclick = exportDeck351;
+    q('drawerApply351').onclick = applyDrawer351;
+    q('drawerFullSettings351').onclick = () => { closeDrawer351(); try{ if(typeof show === 'function') show('settings'); else q('settings')?.classList.remove('hidden'); }catch(_){ q('settings')?.classList.remove('hidden'); } };
+    return drawer;
+  }
 
-    // Local Deck Storage → Review Deck with current session
-    const localBtn = document.getElementById('limitlessLocalDeckStorage');
-    if (localBtn) {
-      localBtn.onclick = () => {
-        document.documentElement.dataset.cozyLaunchScope = 'all';
-        if (typeof showReview === 'function') showReview();
-        else if (typeof window.show === 'function') window.show('review');
-      };
+  function updateDrawer351(){
+    const cardsNow = appCards351();
+    const info = q('testModeInfo351');
+    const checked = !!q('testModeToggle351')?.checked;
+    if(info) info.classList.toggle('isHidden351', !checked);
+    if(q('liveCardCount351')) q('liveCardCount351').textContent = String(cardsNow.length);
+    if(q('storageStatus351')) q('storageStatus351').textContent = localStorage.getItem(ONE_THING_KEY) ? 'saved' : 'none';
+    if(q('drawerDataStatus351')) q('drawerDataStatus351').innerHTML = '<div>Loaded: <b>' + cardsNow.length + '</b> cards</div><div>Source: <b>' + (cardsNow.length ? 'uploaded/local' : 'blank public app') + '</b></div>';
+    if(q('drawerJsonPreview351')) q('drawerJsonPreview351').value = preview351();
+    if(q('drawerQuestionTime351')){
+      const saved = localStorage.getItem('cozyQuestionSeconds351') || q('soloTimerInput')?.value || '7';
+      q('drawerQuestionTime351').value = q('drawerQuestionTime351').querySelector('option[value="' + saved + '"]') ? saved : '7';
     }
+    if(q('drawerBionic351')){
+      q('drawerBionic351').checked = localStorage.getItem('cozyBionic351') === '1' || localStorage.getItem('bionicOn_v1751523') === '1' || !!q('bionicToggle')?.checked;
+    }
+  }
 
-    // Re-render One Thing on every reveal
-    const priorReveal = window.reveal;
-    window.reveal = function(which, ok) {
-      const out = priorReveal ? priorReveal.apply(this, arguments) : null;
-      setTimeout(() => {
-        document.querySelectorAll('.oneThing350').forEach(el => {
-          const c = window.getCurrent ? window.getCurrent() : null;
-          if (c) renderOneThing(el, c);
-        });
-      }, 80);
+  function openDrawer351(ev){
+    ev?.preventDefault?.();
+    ev?.stopPropagation?.();
+    ev?.stopImmediatePropagation?.();
+    q('settings')?.classList.add('hidden');
+    q('gameplayHub351')?.classList.add('hidden');
+    const drawer = createDrawer351();
+    updateDrawer351();
+    requestAnimationFrame(() => {
+      document.body.classList.add('cozyDrawerOpen351');
+      document.querySelectorAll('#solo .promptBox,#domain .promptBox').forEach(box => {
+        box.style.setProperty('width','min(760px, calc(100vw - 520px))','important');
+        box.style.setProperty('max-width','calc(100vw - 520px)','important');
+      });
+      drawer.classList.add('open');
+      drawer.setAttribute('aria-hidden','false');
+    });
+  }
+
+  function closeDrawer351(ev){
+    ev?.preventDefault?.();
+    ev?.stopPropagation?.();
+    const drawer = q('cozySettingsDrawer351');
+    if(drawer){
+      drawer.classList.remove('open');
+      drawer.setAttribute('aria-hidden','true');
+    }
+    document.querySelectorAll('#solo .promptBox,#domain .promptBox').forEach(box => {
+      box.style.removeProperty('width');
+      box.style.removeProperty('max-width');
+    });
+    document.body.classList.remove('cozyDrawerOpen351');
+  }
+
+  function bindTriggers351(){
+    ['gameplay351','gearBtn','settingsBtn'].forEach(id => {
+      const el = q(id);
+      if(!el) return;
+      el.classList.remove('primary');
+      el.onclick = openDrawer351;
+    });
+    const homeExample = q('limitlessExampleDeck');
+    if(homeExample) homeExample.onclick = downloadExample351;
+  }
+
+  document.addEventListener('click', ev => {
+    const trigger = ev.target?.closest?.('#gameplay351,#gearBtn,#settingsBtn');
+    if(trigger) openDrawer351(ev);
+  }, true);
+  document.addEventListener('keydown', ev => {
+    if(ev.key === 'Escape' && q('cozySettingsDrawer351')?.classList.contains('open')) closeDrawer351(ev);
+  }, true);
+
+  const priorReveal351 = window.reveal;
+  if(typeof priorReveal351 === 'function'){
+    window.reveal = reveal = function(which, ok){
+      const out = priorReveal351.apply(this, arguments);
+      setTimeout(syncOneThing351, 80);
+      setTimeout(updateDrawer351, 120);
       return out;
     };
-
-    console.log('%c✅ Cozy Arcade v17 LIMITLESS boot complete — all bugs fixed', 'color:#67e8f9;font-weight:950');
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
-  } else boot();
-  setTimeout(boot, 300); setTimeout(boot, 1200);
+  function boot351(){
+    enforceBlankPublic351();
+    bindTriggers351();
+    syncOneThing351();
+    if(q('cozySettingsDrawer351')?.classList.contains('open')) updateDrawer351();
+    console.log('%cPublic v18 blank drawer loaded', 'color:#67e8f9;font-weight:950');
+  }
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot351);
+  else boot351();
+  setTimeout(boot351, 300);
+  setTimeout(boot351, 1200);
+  setInterval(boot351, 1000);
+  setInterval(() => { if(q('cozySettingsDrawer351')?.classList.contains('open')) updateDrawer351(); }, 700);
+  window.openCozySettingsDrawer351 = openDrawer351;
+  window.closeCozySettingsDrawer351 = closeDrawer351;
 })();
 </script>
 </body></html>
