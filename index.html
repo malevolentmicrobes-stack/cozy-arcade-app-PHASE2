@@ -10372,11 +10372,27 @@ function fixStableOneThingDropdown351() {
       if (toggle) toggle.remove();
       delete store[key];
     }
+    el.dataset.oneThingOverflowSignature = el.textContent.trim();
   });
 }
 
 // Hook: run after One Thing render mutations so the dropdown stays expanded through v18/v24 sync passes.
 (() => {
+  if (!window.__cozyOneThingDropdownWrappedOverflow351 && typeof window.fixCozyV24SigilsAndOneThingOverflow === 'function') {
+    window.__cozyOneThingDropdownWrappedOverflow351 = true;
+    const priorOverflow = window.fixCozyV24SigilsAndOneThingOverflow;
+    window.fixCozyV24SigilsAndOneThingOverflow = function() {
+      const out = priorOverflow.apply(this, arguments);
+      document.querySelectorAll('.oneThing350.oneThingDropdown351').forEach(el => {
+        const key = el.dataset.oneThingStableKey || '';
+        const saved = key && window.__cozyOneThingExpandedState351 && window.__cozyOneThingExpandedState351[key] === '1';
+        if (saved) el.classList.add('expanded');
+        el.dataset.oneThingOverflowSignature = el.textContent.trim();
+      });
+      return out;
+    };
+    try { fixCozyV24SigilsAndOneThingOverflow = window.fixCozyV24SigilsAndOneThingOverflow; } catch (_) {}
+  }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fixStableOneThingDropdown351);
   else fixStableOneThingDropdown351();
   setTimeout(fixStableOneThingDropdown351, 250);
