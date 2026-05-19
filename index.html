@@ -9445,4 +9445,551 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   window.closeCozySettingsDrawer351 = closeDrawer351;
 })();
 </script>
+<style id="cozy-v24-patch-css">
+.domainTitle {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 14px !important;
+  white-space: normal !important;
+}
+.domainTitle::before,
+.domainTitle::after {
+  content: '';
+  width: 72px;
+  height: 72px;
+  flex: 0 0 72px;
+  background-image: url('./DNAHELIX_ORB_SIGAL.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 0 16px rgba(124,58,237,.85)) drop-shadow(0 0 20px rgba(103,232,249,.40));
+  opacity: .92;
+}
+.domainTitle::after {
+  transform: scaleX(-1);
+}
+#runner.hunter {
+  background-image: url('./4_POINT_RUNNER_SPRITE.png') !important;
+  background-repeat: no-repeat !important;
+  background-size: 400% 100% !important;
+  animation: runnerSprint 420ms steps(4) infinite,
+    narutoSpriteBob .34s ease-in-out infinite alternate !important;
+}
+@keyframes runnerSprint {
+  0% { background-position: 0% 50%; }
+  25% { background-position: 33.333% 50%; }
+  50% { background-position: 66.666% 50%; }
+  75% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+#runner.hunter.rank-e {
+  filter: drop-shadow(0 0 14px rgba(103,232,249,.48)) drop-shadow(0 18px 24px rgba(0,0,0,.42)) !important;
+}
+#runner.hunter.rank-d {
+  filter: drop-shadow(0 0 20px rgba(167,139,250,.60)) drop-shadow(0 0 32px rgba(103,232,249,.35)) drop-shadow(0 18px 24px rgba(0,0,0,.42)) !important;
+}
+#runner.hunter.rank-b {
+  filter: drop-shadow(0 0 26px rgba(124,58,237,.80)) drop-shadow(0 0 44px rgba(103,232,249,.50)) drop-shadow(0 20px 28px rgba(0,0,0,.45)) !important;
+}
+#runner.hunter.rank-a {
+  filter: drop-shadow(0 0 28px rgba(255,209,102,.75)) drop-shadow(0 0 48px rgba(124,58,237,.45)) drop-shadow(0 20px 28px rgba(0,0,0,.42)) !important;
+}
+#runner.hunter.rank-s {
+  filter: drop-shadow(0 0 30px rgba(251,88,118,.70)) drop-shadow(0 0 52px rgba(255,209,102,.40)) drop-shadow(0 20px 32px rgba(0,0,0,.50)) !important;
+}
+#runner.hunter.rank-apex {
+  filter: drop-shadow(0 0 36px rgba(103,232,249,.90)) drop-shadow(0 0 56px rgba(124,58,237,.65)) drop-shadow(0 0 72px rgba(255,209,102,.45)) drop-shadow(0 22px 36px rgba(0,0,0,.52)) !important;
+}
+#runner.hunter.rank-monarch {
+  filter: drop-shadow(0 0 40px rgba(255,255,255,.90)) drop-shadow(0 0 70px rgba(255,209,102,.65)) drop-shadow(0 0 100px rgba(124,58,237,.55)) drop-shadow(0 24px 40px rgba(0,0,0,.55)) !important;
+}
+#spriteLevelPill {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: Orbitron, monospace;
+  font-size: 10px;
+  letter-spacing: .14em;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 35;
+  text-shadow: 0 0 10px currentColor;
+}
+#spriteLevelPill.rank-e {
+  color: #67e8f9;
+}
+#spriteLevelPill.rank-d {
+  color: #a78bfa;
+}
+#spriteLevelPill.rank-b {
+  color: #7c3aed;
+}
+#spriteLevelPill.rank-a {
+  color: #ffd166;
+}
+#spriteLevelPill.rank-s {
+  color: #fb5876;
+}
+#spriteLevelPill.rank-apex {
+  color: #b2f5ff;
+}
+#spriteLevelPill.rank-monarch {
+  color: #ffffff;
+}
+#promptAiPanel351 {
+  background: rgba(103,232,249,.06);
+  border: 1px solid rgba(103,232,249,.30);
+  border-radius: 16px;
+  padding: 16px;
+  margin-top: 14px;
+}
+#promptAiPanel351 h3 {
+  margin: 0 0 8px;
+  color: #67e8f9;
+  font-family: Orbitron, monospace;
+  font-size: 12px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+#promptAiPanel351 textarea {
+  width: 100%;
+  min-height: 200px;
+  resize: vertical;
+  color: #e9f8ff;
+  background: rgba(2,9,21,.72);
+  border: 1px solid rgba(103,232,249,.22);
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 12px;
+  line-height: 1.42;
+  white-space: pre-wrap;
+}
+@media (max-width: 760px) {
+  .domainTitle::before,
+  .domainTitle::after {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+  }
+}
+</style>
+<script id="cozy-v24-patch-js">
+(() => {
+  if (window.__cozyV24Patch) return;
+  window.__cozyV24Patch = true;
+
+  const XP_KEY = 'cozyCorrect351';
+  const RANKS = ['rank-e','rank-d','rank-b','rank-a','rank-s','rank-apex','rank-monarch'];
+  const PROMPT_TEXT = `Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade
+card schema. Preserve one_thing, level_1_presentation,
+level_2_three_second_exposure, quick_recall, treatment, next_step, and
+explanation when present. Return valid JSON with { metadata, cards } only.
+Do not rewrite medical content. Map sys/system fields to card.sys.`;
+  const RUNNER_ANIMATION = 'runnerSprint 420ms steps(4) infinite, narutoSpriteBob .34s ease-in-out infinite alternate';
+
+  function activateV24Style() {
+    const style = document.getElementById('cozy-v24-patch-css');
+    if (style && document.body) document.body.appendChild(style);
+  }
+
+  function enforceRunnerSprite() {
+    const runner = document.getElementById('runner');
+    if (!runner) return;
+    const prior = runner.getAttribute('style') || '';
+    const cleaned = prior
+      .replace(/animation:[^;]+;?/gi, '')
+      .replace(/background-image:[^;]+;?/gi, '')
+      .replace(/background-repeat:[^;]+;?/gi, '')
+      .replace(/background-size:[^;]+;?/gi, '')
+      .trim();
+    runner.setAttribute('style', `${cleaned}; background-image: url("./4_POINT_RUNNER_SPRITE.png") !important; background-repeat: no-repeat !important; background-size: 400% 100% !important; animation: ${RUNNER_ANIMATION} !important;`);
+  }
+
+  function getLevel() {
+    return Math.max(0, parseInt(localStorage.getItem(XP_KEY) || '0', 10) || 0);
+  }
+
+  function setLevel(lv) {
+    localStorage.setItem(XP_KEY, String(Math.max(0, lv)));
+  }
+
+  function addXP() {
+    const next = getLevel() + 1;
+    setLevel(next);
+    return next;
+  }
+
+  function rankFor(lv) {
+    if (lv <= 9) return 'rank-e';
+    if (lv <= 29) return 'rank-d';
+    if (lv <= 59) return 'rank-b';
+    if (lv === 60) return 'rank-a';
+    if (lv <= 89) return 'rank-s';
+    if (lv <= 119) return 'rank-apex';
+    return 'rank-monarch';
+  }
+
+  function labelFor(lv, rank) {
+    if (rank === 'rank-d') return `LV ${lv} · D`;
+    if (rank === 'rank-b') return `LV ${lv} · B`;
+    if (rank === 'rank-a') return 'LV 60 · A';
+    if (rank === 'rank-s') return `LV ${lv} · S`;
+    if (rank === 'rank-apex') return `LV ${lv} · APEX`;
+    if (rank === 'rank-monarch') return `LV ${lv} · MONARCH`;
+    return `LV ${lv}`;
+  }
+
+  function ensureLevelPill() {
+    const runner = document.getElementById('runner');
+    if (!runner || !runner.parentNode) return null;
+    let pill = document.getElementById('spriteLevelPill');
+    if (!pill) {
+      pill = document.createElement('div');
+      pill.id = 'spriteLevelPill';
+      runner.parentNode.insertBefore(pill, runner);
+    }
+    return pill;
+  }
+
+  window.__updateSpriteLvl = function() {
+    const lv = getLevel();
+    const rank = rankFor(lv);
+    const runner = document.getElementById('runner');
+    const pill = ensureLevelPill();
+
+    if (runner) {
+      runner.classList.remove(...RANKS);
+      runner.classList.add(rank);
+    }
+    if (pill) {
+      pill.classList.remove(...RANKS);
+      pill.classList.add(rank);
+      pill.textContent = labelFor(lv, rank);
+    }
+  };
+
+  function addPromptAIPanel() {
+    if (document.getElementById('promptAiPanel351')) return;
+    const body = document.querySelector('#cozySettingsDrawer351 .drawerBody351');
+    if (!body) return;
+
+    const panel = document.createElement('div');
+    panel.id = 'promptAiPanel351';
+
+    const title = document.createElement('h3');
+    title.textContent = 'PROMPT AI';
+
+    const textarea = document.createElement('textarea');
+    textarea.className = 'drawerPanel351';
+    textarea.readOnly = true;
+    textarea.value = PROMPT_TEXT;
+
+    panel.appendChild(title);
+    panel.appendChild(textarea);
+    body.appendChild(panel);
+  }
+
+  function injectIfDrawerOpen() {
+    const drawer = document.getElementById('cozySettingsDrawer351');
+    if (drawer?.classList.contains('open')) addPromptAIPanel();
+  }
+
+  function watchDrawer() {
+    const drawer = document.getElementById('cozySettingsDrawer351');
+    if (!drawer || drawer.__v24PromptObserver) return;
+    drawer.__v24PromptObserver = true;
+    new MutationObserver(injectIfDrawerOpen).observe(drawer, { attributes: true, attributeFilter: ['class'] });
+  }
+
+  function watchDrawerCreation() {
+    if (document.body.__v24DrawerCreationObserver) return;
+    document.body.__v24DrawerCreationObserver = true;
+    new MutationObserver(() => {
+      watchDrawer();
+      injectIfDrawerOpen();
+    }).observe(document.body, { childList: true, subtree: true });
+  }
+
+  function stabilizeOneThingFlash() {
+    document.querySelectorAll('.oneThing350').forEach(one => {
+      if (one.querySelector('textarea')) return;
+      if (!one.querySelector('[data-one-thing-action]')) {
+        const value = one.textContent.trim();
+        one.classList.add('oneThingUx351');
+        one.innerHTML = value
+          ? `<div class="oneThingText351">${value}</div><button class="oneThingUpdate351" data-one-thing-action="edit" type="button">UPDATE</button>`
+          : '<button class="oneThingAdd351" data-one-thing-action="edit" type="button">ADD YOUR ONE THING +</button>';
+      }
+    });
+  }
+
+  if (!window.__v24RevealWrapped) {
+    window.__v24RevealWrapped = true;
+    const _prior = window.reveal;
+    if (typeof _prior === 'function') {
+      window.reveal = reveal = function(which, ok) {
+        const out = _prior.apply(this, arguments);
+        if (ok === true) {
+          addXP();
+          window.__updateSpriteLvl();
+        }
+        return out;
+      };
+    }
+  }
+
+  document.addEventListener('click', ev => {
+    if (ev.target?.closest?.('#gameplay351,#gearBtn,#settingsBtn')) {
+      setTimeout(() => {
+        watchDrawer();
+        injectIfDrawerOpen();
+      }, 280);
+    }
+  }, true);
+
+  function boot() {
+    activateV24Style();
+    enforceRunnerSprite();
+    ensureLevelPill();
+    window.__updateSpriteLvl();
+    watchDrawerCreation();
+    watchDrawer();
+    injectIfDrawerOpen();
+    stabilizeOneThingFlash();
+    console.log('%cCozy v24 patch loaded: sprite, sigils, leveling, prompt AI', 'color:#67e8f9;font-weight:950');
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+  setTimeout(boot, 500);
+})();
+</script>
+<style id="settings-text-fix">
+#settings .box h1,
+#settings .box h2,
+#settings .box h3,
+#settings .box .shadowDungeonTitle,
+#settings .box .v175153-minihead,
+#settings .box .v175152-panel > summary,
+#settings .box details > summary {
+  color: #f0f2ff !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+  -webkit-text-fill-color: unset !important;
+}
+#settings .field label,
+#settings .field > label,
+#settings .box label:not(.drawerFileLabel351):not(.btn) {
+  color: #c8d0e2 !important;
+  -webkit-text-fill-color: unset !important;
+}
+#settings .box p,
+#settings .v175152-hint,
+#settings .v175152-file,
+#settings .shadowDungeonSub,
+#settings .box small,
+#settings .box .v1751511-subline,
+#settings .box .v1751512-subline,
+#settings .box .dropTitle175153,
+#settings .box .dropTitle1751511,
+#settings .box .dropTitle1751512,
+#settings .box .mappingNote1751523,
+#settings .box .mappingNote17528 {
+  color: #b8c4d8 !important;
+  -webkit-text-fill-color: unset !important;
+}
+#settings .shadowStat b {
+  color: #e8f0ff !important;
+}
+#settings .shadowStat span {
+  color: #9ca3af !important;
+}
+#settings .field input:not([type="checkbox"]):not([type="file"]),
+#settings .field select,
+#settings .shadowFilters select,
+#settings .shadowFilters input,
+#settings .reviewFilters select,
+#settings .reviewFilters input {
+  color: #f0f2ff !important;
+  background: #090d1b !important;
+}
+#cozySettingsDrawer351 .drawerHead351 h2 {
+  color: #67e8f9 !important;
+}
+#cozySettingsDrawer351 .drawerPanel351 h3,
+#cozySettingsDrawer351 .drawerPanel351 summary {
+  color: #8ff5ff !important;
+}
+#cozySettingsDrawer351 .drawerPanel351 label:not(.drawerToggle351) {
+  color: #dce8ff !important;
+}
+#cozySettingsDrawer351 .drawerStats351 {
+  color: #aeb8cf !important;
+}
+#cozySettingsDrawer351 .drawerStats351 b {
+  color: #67e8f9 !important;
+}
+#cozySettingsDrawer351 .drawerFooter351 {
+  color: #6b7580 !important;
+}
+#review .box h1 {
+  color: #f0f2ff !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+  -webkit-text-fill-color: unset !important;
+}
+#review .shadowDungeonTitle {
+  color: #f0f2ff !important;
+}
+#review .shadowDungeonSub {
+  color: #b0bcd4 !important;
+}
+#review .shadowTab {
+  color: #e7e8ff !important;
+}
+#review .shadowTab.active {
+  color: #020611 !important;
+}
+#review .empty {
+  color: #9ba5bc !important;
+}
+</style>
+<style id="cozy-v24-sigil-one-thing-fix-css">
+.domainTitle {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 14px !important;
+  white-space: normal !important;
+}
+.domainTitle::before,
+.domainTitle::after {
+  content: '' !important;
+  width: 72px !important;
+  height: 72px !important;
+  flex: 0 0 72px !important;
+  background-image: url('./DNAHELIX_ORB_SIGAL.png') !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  filter: drop-shadow(0 0 16px rgba(124,58,237,.85)) drop-shadow(0 0 20px rgba(103,232,249,.40)) !important;
+  opacity: .92 !important;
+}
+.domainTitle::after {
+  transform: scaleX(-1) !important;
+}
+.hero::before,
+.hero::after {
+  background-image: url('./EXPANSION%20SIGAL.png') !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+}
+.cozyHeroSigil350 {
+  content: url('./EXPANSION%20SIGAL.png') !important;
+}
+#startDomain .modeIcon {
+  background-image: url('./MODE%20PURPLE%20SIGIL.png') !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+}
+#startDomain .modeIcon img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  content: url('./MODE%20PURPLE%20SIGIL.png') !important;
+}
+.oneThing350.oneThingUx351.oneThingLong351 {
+  max-height: 5.6em !important;
+  overflow: hidden !important;
+  position: relative !important;
+  transition: max-height .25s ease !important;
+  cursor: pointer !important;
+}
+.oneThing350.oneThingUx351.oneThingLong351.expanded {
+  max-height: 600px !important;
+}
+.oneThing350.oneThingUx351.oneThingLong351.expanded .oneThingFade351 {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+.oneThingFade351 {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 32px;
+  background: linear-gradient(transparent, rgba(30,20,5,.92));
+  transition: opacity .2s;
+  pointer-events: none;
+}
+@media (max-width: 760px) {
+  .domainTitle::before,
+  .domainTitle::after {
+    width: 38px !important;
+    height: 38px !important;
+    flex: 0 0 38px !important;
+  }
+}
+</style>
+<script id="cozy-v24-sigil-one-thing-fix-js">
+function fixCozyV24SigilsAndOneThingOverflow() {
+  const heroSigil = './EXPANSION SIGAL.png';
+  const modeSigil = './MODE PURPLE SIGIL.png';
+
+  document.querySelectorAll('.cozyHeroSigil350').forEach(img => {
+    if (img.getAttribute('src') !== heroSigil) img.setAttribute('src', heroSigil);
+  });
+
+  document.querySelectorAll('#startDomain .modeIcon img').forEach(img => {
+    if (img.getAttribute('src') !== modeSigil) img.setAttribute('src', modeSigil);
+  });
+
+  document.querySelectorAll('.oneThing350').forEach(el => {
+    if (el.querySelector('textarea')) return;
+    const signature = el.textContent.trim();
+    const isLong = el.scrollHeight > 90 || signature.length > 180;
+    const changed = el.dataset.oneThingOverflowSignature !== signature;
+    el.dataset.oneThingOverflowSignature = signature;
+    el.classList.toggle('oneThingLong351', isLong);
+    if (changed) el.classList.toggle('expanded', !isLong);
+    if (isLong && !el.querySelector('.oneThingFade351')) {
+      const fade = document.createElement('div');
+      fade.className = 'oneThingFade351';
+      fade.title = 'Click to expand';
+      el.appendChild(fade);
+    }
+    if (!isLong) {
+      el.classList.add('expanded');
+      el.querySelector('.oneThingFade351')?.remove();
+    }
+  });
+}
+
+// Hook: run after render/reveal updates and keep the additive layer idempotent.
+(() => {
+  if (window.__cozyV24SigilOneThingFix) return;
+  window.__cozyV24SigilOneThingFix = true;
+
+  const run = () => fixCozyV24SigilsAndOneThingOverflow();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+  else run();
+  setTimeout(run, 250);
+  setTimeout(run, 900);
+
+  document.addEventListener('click', ev => {
+    const one = ev.target?.closest?.('.oneThing350');
+    if (!one) return;
+    if (ev.target.closest('[data-one-thing-action],button,textarea,input,a')) return;
+    if (one.classList.contains('oneThingLong351')) one.classList.toggle('expanded');
+  });
+
+  new MutationObserver(run).observe(document.body, { childList: true, subtree: true });
+})();
+</script>
 </body></html>
