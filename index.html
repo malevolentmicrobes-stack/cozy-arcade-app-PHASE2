@@ -10248,6 +10248,55 @@ function fixOneThingEditorOverflow351() {
   }).observe(document.body, { childList: true, subtree: true });
 })();
 </script>
+<script id="cozy-canonical-display-title-js">
+function fixCanonicalDisplayTitle351() {
+  const canonical = 'COZY ARCADE BOARD PREP-MEDICINE';
+  const heroTitle = document.querySelector('#home .heroTitle');
+  const heroSub = document.querySelector('#home .heroSub');
+  if (heroTitle && heroTitle.textContent !== 'COZY ARCADE') heroTitle.textContent = 'COZY ARCADE';
+  if (heroSub && heroSub.textContent !== 'BOARD PREP-MEDICINE') heroSub.textContent = 'BOARD PREP-MEDICINE';
+  if (document.title !== canonical) document.title = canonical;
+  document.querySelectorAll('head title').forEach(title => {
+    if (title.textContent !== canonical) title.textContent = canonical;
+  });
+}
+
+// Hook: run after legacy title patches so public LIMITLESS metadata cannot churn the visible app title.
+(() => {
+  const canonical = 'COZY ARCADE BOARD PREP-MEDICINE';
+  if (!window.__cozyCanonicalDisplayTitle351) {
+    window.__cozyCanonicalDisplayTitle351 = true;
+    try {
+      let proto = document;
+      let desc = null;
+      while (proto && !desc) {
+        proto = Object.getPrototypeOf(proto);
+        desc = proto && Object.getOwnPropertyDescriptor(proto, 'title');
+      }
+      if (desc && desc.get && desc.set) {
+        Object.defineProperty(document, 'title', {
+          configurable: true,
+          get() { return desc.get.call(document); },
+          set(value) {
+            const normalized = /LIMITLESS|BLANK HTML/i.test(String(value || '')) ? canonical : String(value || canonical);
+            desc.set.call(document, normalized || canonical);
+          }
+        });
+      }
+    } catch (_) {}
+    const run = () => fixCanonicalDisplayTitle351();
+    try {
+      const titleNode = document.querySelector('head title');
+      if (titleNode) new MutationObserver(run).observe(titleNode, { childList: true, characterData: true, subtree: true });
+    } catch (_) {}
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+    else run();
+    setTimeout(run, 50);
+    setTimeout(run, 500);
+    setInterval(run, 500);
+  }
+})();
+</script>
 <style id="cozy-one-thing-stable-dropdown-css">
 .oneThing350.oneThingUx351.oneThingLong351.oneThingDropdown351 {
   max-height: none !important;
