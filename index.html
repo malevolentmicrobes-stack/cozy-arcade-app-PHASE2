@@ -10248,4 +10248,126 @@ function fixOneThingEditorOverflow351() {
   }).observe(document.body, { childList: true, subtree: true });
 })();
 </script>
+<style id="cozy-one-thing-stable-dropdown-css">
+.oneThing350.oneThingUx351.oneThingLong351.oneThingDropdown351 {
+  max-height: none !important;
+  overflow: visible !important;
+  cursor: auto !important;
+  padding-bottom: 46px !important;
+}
+.oneThing350.oneThingDropdown351 .oneThingText351 {
+  transition: max-height .22s ease !important;
+}
+.oneThing350.oneThingDropdown351.oneThingLong351:not(.expanded) .oneThingText351 {
+  max-height: 4.65em !important;
+  overflow: hidden !important;
+}
+.oneThing350.oneThingDropdown351.oneThingLong351.expanded .oneThingText351 {
+  max-height: none !important;
+  overflow: visible !important;
+}
+.oneThing350.oneThingDropdown351 .oneThingFade351 {
+  display: none !important;
+}
+.oneThingToggle351 {
+  position: absolute;
+  left: 16px;
+  bottom: 10px;
+  border: 1px solid rgba(255,209,102,.42);
+  border-radius: 999px;
+  background: rgba(255,209,102,.12);
+  color: #fff4c7;
+  padding: 7px 12px;
+  font-family: Orbitron, monospace;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: .08em;
+  cursor: pointer;
+}
+.oneThing350.oneThingDropdown351:not(.oneThingLong351) .oneThingToggle351,
+.oneThing350.oneThingEditing351 .oneThingToggle351 {
+  display: none !important;
+}
+</style>
+<script id="cozy-one-thing-stable-dropdown-js">
+function fixStableOneThingDropdown351() {
+  const store = window.__cozyOneThingExpandedState351 || (window.__cozyOneThingExpandedState351 = {});
+  const clean = value => String(value == null ? '' : value).replace(/\s+/g, ' ').trim();
+  const cardKey = () => {
+    try {
+      const c = typeof current !== 'undefined' ? current : null;
+      return clean(c && (c.qid_unique || c.card_id || c.id || c.json_id || c.qid || c.diagnosis || c.answer));
+    } catch (_) {
+      return '';
+    }
+  };
+  const schedule = () => {
+    cancelAnimationFrame(window.__cozyOneThingDropdownFrame351 || 0);
+    window.__cozyOneThingDropdownFrame351 = requestAnimationFrame(fixStableOneThingDropdown351);
+  };
+
+  if (!window.__cozyOneThingDropdownHook351) {
+    window.__cozyOneThingDropdownHook351 = true;
+    document.addEventListener('click', ev => {
+      const toggle = ev.target?.closest?.('.oneThingToggle351');
+      if (!toggle) return;
+      const el = toggle.closest('.oneThing350');
+      if (!el) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      ev.stopImmediatePropagation?.();
+      const key = el.dataset.oneThingStableKey || clean(el.querySelector('.oneThingText351')?.textContent).slice(0, 180);
+      const expanded = !el.classList.contains('expanded');
+      el.classList.toggle('expanded', expanded);
+      if (key) store[key] = expanded ? '1' : '0';
+      fixStableOneThingDropdown351();
+    }, true);
+    if (document.body) new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true });
+    setInterval(fixStableOneThingDropdown351, 500);
+  }
+
+  document.querySelectorAll('.oneThing350').forEach(el => {
+    const editing = !!el.querySelector('textarea,.oneThingEdit351');
+    el.classList.toggle('oneThingDropdown351', !editing);
+    if (editing) return;
+
+    const text = el.querySelector('.oneThingText351');
+    if (!text) return;
+    const raw = clean(text.textContent);
+    if (!raw) return;
+
+    const key = cardKey() || raw.slice(0, 180);
+    el.dataset.oneThingStableKey = key;
+    const lineHeight = parseFloat(getComputedStyle(text).lineHeight) || 24;
+    const longEnough = raw.length > 160 || text.scrollHeight > (lineHeight * 3.35);
+    el.classList.toggle('oneThingLong351', longEnough);
+
+    let toggle = el.querySelector('.oneThingToggle351');
+    if (longEnough) {
+      const expanded = store[key] === '1';
+      el.classList.toggle('expanded', expanded);
+      if (!toggle) {
+        toggle = document.createElement('button');
+        toggle.type = 'button';
+        toggle.className = 'oneThingToggle351';
+        el.appendChild(toggle);
+      }
+      toggle.textContent = expanded ? 'Show less ▲' : 'Show more ▼';
+      toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    } else {
+      el.classList.add('expanded');
+      if (toggle) toggle.remove();
+      delete store[key];
+    }
+  });
+}
+
+// Hook: run after One Thing render mutations so the dropdown stays expanded through v18/v24 sync passes.
+(() => {
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fixStableOneThingDropdown351);
+  else fixStableOneThingDropdown351();
+  setTimeout(fixStableOneThingDropdown351, 250);
+  setTimeout(fixStableOneThingDropdown351, 1000);
+})();
+</script>
 </body></html>
