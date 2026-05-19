@@ -9992,4 +9992,260 @@ function fixCozyV24SigilsAndOneThingOverflow() {
   new MutationObserver(run).observe(document.body, { childList: true, subtree: true });
 })();
 </script>
+<style id="cozy-v24-random-one-thing-hotfix-css">
+.oneThing350.oneThingEditing351 {
+  max-height: none !important;
+  overflow: visible !important;
+  cursor: auto !important;
+}
+.oneThing350.oneThingEditing351 .oneThingFade351 {
+  display: none !important;
+}
+</style>
+<script id="cozy-v24-random-one-thing-hotfix-js">
+function applyDeckMode() {
+  if (window.__cozyApplyDeckMode351) return window.__cozyApplyDeckMode351();
+}
+
+function fixOneThingEditorOverflow351() {
+  document.querySelectorAll('.oneThing350').forEach(el => {
+    const editing = !!el.querySelector('textarea,.oneThingEdit351');
+    el.classList.toggle('oneThingEditing351', editing);
+    if (editing) {
+      el.classList.remove('oneThingLong351');
+      el.classList.add('expanded');
+      el.querySelector('.oneThingFade351')?.remove();
+      el.style.maxHeight = 'none';
+      el.style.overflow = 'visible';
+    } else {
+      el.style.maxHeight = '';
+      el.style.overflow = '';
+    }
+  });
+}
+
+// Hook: call after scope changes, game start, and One Thing render mutations.
+(() => {
+  if (window.__cozyV24RandomOneThingHotfix) return;
+  window.__cozyV24RandomOneThingHotfix = true;
+
+  const q = id => document.getElementById(id);
+  const cleanValue = value => String(value == null ? '' : value).replace(/\s+/g, ' ').trim();
+  const answerFor = card => cleanValue(card && (card.diagnosis || card.answer || card.dx));
+  const promptFor = card => {
+    try { if (typeof getPrompt === 'function') return cleanValue(getPrompt(card)); } catch (_) {}
+    return cleanValue(card && (card.prompt || card.presentation || card.clinical_vignette_summary || card.quick_recall || card.educational_objective || card.level_1));
+  };
+  const keyFor = card => cleanValue(card && (card.qid_unique || card.card_id || card.id || card.json_id || card.qid || card.diagnosis || card.answer));
+  const stateForCard = card => {
+    try { if (typeof cardState === 'function') return cardState(card) || {}; } catch (_) {}
+    const keys = [card?.qid_unique, card?.card_id, card?.id, card?.json_id, card?.qid, card?.diagnosis, card?.answer].map(cleanValue).filter(Boolean);
+    try {
+      for (const key of keys) if (state && state[key]) return state[key];
+    } catch (_) {}
+    return {};
+  };
+  const tagsOf = card => {
+    let tags = card?.tags || [];
+    if (typeof tags === 'string') tags = tags.split(/[|,;]/);
+    return Array.isArray(tags) ? tags.map(cleanValue).filter(Boolean) : [];
+  };
+  const systemOf = card => cleanValue(card && (card.system || card.sys || card.subject || card.subspecialty || ''));
+  const isBuried = card => {
+    const st = stateForCard(card);
+    return !!(st.buried || st.suspended || st.apkg_status === 'suspended' || st.rating === 'bury');
+  };
+  const isSeen = card => {
+    const st = stateForCard(card);
+    return !!(st.seen || st.reviewed || st.last || st.last_rating_at || st.rating || st.correct || st.incorrect);
+  };
+  const dueScoreHot = card => {
+    try { if (typeof dueScore352 === 'function') return dueScore352(card); } catch (_) {}
+    try { if (typeof dueScore350 === 'function') return dueScore350(card); } catch (_) {}
+    try { if (typeof dueScore === 'function') return dueScore(card); } catch (_) {}
+    const st = stateForCard(card);
+    return (st.pinned ? 1000 : 0) + (st.rating === 'again' ? 500 : 0) + (st.rating === 'hard' ? 250 : 0) + (isSeen(card) ? 0 : 100);
+  };
+  const shuffleStable = arr => {
+    const out = [...arr];
+    const rand = () => {
+      try {
+        const data = new Uint32Array(1);
+        crypto.getRandomValues(data);
+        return data[0] / 4294967296;
+      } catch (_) {
+        return Math.random();
+      }
+    };
+    for (let i = out.length - 1; i > 0; i--) {
+      const j = Math.floor(rand() * (i + 1));
+      [out[i], out[j]] = [out[j], out[i]];
+    }
+    if (out.length > 1 && keyFor(out[0]) === keyFor(arr[0])) {
+      const shift = 1 + Math.floor(rand() * (out.length - 1));
+      out.push(...out.splice(0, shift));
+    }
+    return out;
+  };
+
+  function selectedScope() {
+    const explicit = document.documentElement.dataset.cozyLaunchScope || '';
+    const browse = q('browseScope351')?.value || q('homeScope175155')?.value || q('reviewScope17526')?.value || '';
+    const settings = q('deckMode')?.value || '';
+    let globalMode = '';
+    try { globalMode = typeof deckMode !== 'undefined' ? deckMode : ''; } catch (_) {}
+    const value = explicit || browse || settings || globalMode || 'all';
+    if (value === 'sequential') return 'all';
+    if (value === 'inorder') return 'all';
+    return value;
+  }
+
+  function selectedSystem() {
+    return document.documentElement.dataset.cozyLaunchSystem || q('browseSystem351')?.value || q('homeSystem175155')?.value || q('reviewSystem352')?.value || 'all';
+  }
+
+  function selectedTag() {
+    return document.documentElement.dataset.cozyLaunchTag || q('browseTag351')?.value || q('homeTag175155')?.value || q('reviewTagOverlay17527')?.value || 'all';
+  }
+
+  function baseCards() {
+    let source = [];
+    try { if (Array.isArray(cards)) source = cards; } catch (_) {}
+    try { if (!source.length && window.DATA && Array.isArray(window.DATA.cards)) source = window.DATA.cards; } catch (_) {}
+    return source.filter(card => answerFor(card) && promptFor(card) && !isBuried(card));
+  }
+
+  function buildPool() {
+    const scope = selectedScope();
+    const sys = selectedSystem();
+    const tag = selectedTag();
+    let arr = baseCards();
+
+    if (sys && sys !== 'all') arr = arr.filter(card => systemOf(card) === sys);
+    if (tag && tag !== 'all') arr = arr.filter(card => tagsOf(card).includes(tag));
+
+    if (scope === 'new') arr = arr.filter(card => !isSeen(card));
+    else if (scope === 'random-new') arr = shuffleStable(arr.filter(card => !isSeen(card)));
+    else if (scope === 'random') arr = shuffleStable(arr);
+    else if (scope === 'pinned') arr = arr.filter(card => !!stateForCard(card).pinned);
+    else if (scope === 'hard') arr = arr.filter(card => stateForCard(card).rating === 'hard');
+    else if (scope === 'review' || scope === 'wrong') {
+      arr = arr.filter(card => {
+        const st = stateForCard(card);
+        return !!(st.pinned || st.rating === 'again' || st.rating === 'hard' || st.wrong || st.missed || st.flagged || st.lastCorrect === false);
+      });
+    } else if (scope === 'due') {
+      arr = [...arr].sort((a, b) => dueScoreHot(b) - dueScoreHot(a));
+    } else if (scope === 'tagged') {
+      arr = tag && tag !== 'all' ? arr.filter(card => tagsOf(card).includes(tag)) : arr.filter(card => tagsOf(card).length);
+    }
+
+    if (!arr.length && (scope === 'random-new' || scope === 'new')) arr = baseCards();
+    return arr.length ? arr : baseCards();
+  }
+
+  let sessionKey = '';
+  let sessionPool = [];
+  function scopeKey() {
+    let count = 0;
+    try { count = Array.isArray(cards) ? cards.length : 0; } catch (_) {}
+    return [selectedScope(), selectedSystem(), selectedTag(), count].join('|');
+  }
+
+  window.__cozyApplyDeckMode351 = function() {
+    const scope = selectedScope();
+    try { if (typeof deckMode !== 'undefined') deckMode = scope === 'random-new' ? 'random' : scope; } catch (_) {}
+    document.documentElement.dataset.cozyLaunchScope = scope;
+    sessionKey = '';
+    sessionPool = [];
+    try { index = 0; } catch (_) {}
+    return scope;
+  };
+
+  function sessionCards() {
+    const key = scopeKey();
+    if (!sessionPool.length || sessionKey !== key) {
+      sessionPool = buildPool();
+      sessionKey = key;
+      try { index = 0; } catch (_) {}
+      window.__cozyLastDeckSession351 = {
+        key,
+        scope: selectedScope(),
+        first: sessionPool[0] && (sessionPool[0].id || sessionPool[0].qid_unique || sessionPool[0].diagnosis),
+        count: sessionPool.length
+      };
+    }
+    return sessionPool;
+  }
+
+  const patchGameFlow = () => {
+    if (typeof nextCard === 'function' && !nextCard.__cozyStableRandom351) {
+      const patchedNext = function() {
+        const pool = sessionCards();
+        if (!pool.length) {
+          try { if (typeof toast === 'function') toast('No cards available for this filter'); } catch (_) {}
+          try { if (typeof home === 'function') home(); } catch (_) {}
+          return;
+        }
+        try {
+          current = pool[index % pool.length];
+          index += 1;
+          if (typeof makeChoices === 'function') makeChoices();
+        } catch (_) {}
+      };
+      patchedNext.__cozyStableRandom351 = true;
+      window.nextCard = nextCard = patchedNext;
+    }
+    if (typeof cardPool === 'function' && !cardPool.__cozyStableRandom351) {
+      const patchedPool = function() { return sessionCards(); };
+      patchedPool.__cozyStableRandom351 = true;
+      window.cardPool = cardPool = patchedPool;
+    }
+    if (typeof resetRun === 'function' && !resetRun.__cozyStableRandom351) {
+      const priorReset = resetRun;
+      const patchedReset = function() {
+        window.__cozyApplyDeckMode351();
+        return priorReset.apply(this, arguments);
+      };
+      patchedReset.__cozyStableRandom351 = true;
+      window.resetRun = resetRun = patchedReset;
+    }
+  };
+
+  document.addEventListener('change', ev => {
+    const target = ev.target;
+    if (!target || !['browseScope351','homeScope175155','reviewScope17526','deckMode','browseSystem351','homeSystem175155','reviewSystem352','browseTag351','homeTag175155','reviewTagOverlay17527'].includes(target.id)) return;
+    if (target.id === 'browseScope351' || target.id === 'homeScope175155' || target.id === 'reviewScope17526' || target.id === 'deckMode') {
+      document.documentElement.dataset.cozyLaunchScope = target.value || 'all';
+    }
+    if (target.id.includes('System')) document.documentElement.dataset.cozyLaunchSystem = target.value || 'all';
+    if (target.id.includes('Tag')) document.documentElement.dataset.cozyLaunchTag = target.value || 'all';
+    window.__cozyApplyDeckMode351();
+  }, true);
+
+  document.addEventListener('click', ev => {
+    if (ev.target?.closest?.('#startSolo,#startDomain,#browseReview351,#reviewStartNow17527,#shadowStart351')) {
+      window.__cozyApplyDeckMode351();
+      patchGameFlow();
+    }
+    if (ev.target?.closest?.('.oneThing350 [data-one-thing-action]')) {
+      setTimeout(fixOneThingEditorOverflow351, 0);
+      setTimeout(fixOneThingEditorOverflow351, 80);
+    }
+  }, true);
+
+  const run = () => {
+    patchGameFlow();
+    fixOneThingEditorOverflow351();
+  };
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+  else run();
+  setTimeout(run, 300);
+  setTimeout(run, 1000);
+  new MutationObserver(() => {
+    fixOneThingEditorOverflow351();
+  }).observe(document.body, { childList: true, subtree: true });
+})();
+</script>
 </body></html>
