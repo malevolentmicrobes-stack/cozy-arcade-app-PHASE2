@@ -10253,9 +10253,10 @@ function fixOneThingEditorOverflow351() {
   max-height: none !important;
   overflow: visible !important;
   cursor: auto !important;
-  padding-bottom: 46px !important;
+  padding-top: 46px !important;
 }
 .oneThing350.oneThingDropdown351 .oneThingText351 {
+  padding-right: 0 !important;
   transition: max-height .22s ease !important;
 }
 .oneThing350.oneThingDropdown351.oneThingLong351:not(.expanded) .oneThingText351 {
@@ -10271,8 +10272,8 @@ function fixOneThingEditorOverflow351() {
 }
 .oneThingToggle351 {
   position: absolute;
-  left: 16px;
-  bottom: 10px;
+  right: 112px;
+  top: 10px;
   border: 1px solid rgba(255,209,102,.42);
   border-radius: 999px;
   background: rgba(255,209,102,.12);
@@ -10283,6 +10284,16 @@ function fixOneThingEditorOverflow351() {
   font-weight: 950;
   letter-spacing: .08em;
   cursor: pointer;
+}
+@media (max-width: 760px) {
+  .oneThingToggle351 {
+    left: 16px;
+    right: auto;
+    top: 38px;
+  }
+  .oneThing350.oneThingUx351.oneThingLong351.oneThingDropdown351 {
+    padding-top: 76px !important;
+  }
 }
 .oneThing350.oneThingDropdown351:not(.oneThingLong351) .oneThingToggle351,
 .oneThing350.oneThingEditing351 .oneThingToggle351 {
@@ -10310,8 +10321,10 @@ function fixStableOneThingDropdown351() {
     window.__cozyOneThingDropdownHook351 = true;
     document.addEventListener('click', ev => {
       const toggle = ev.target?.closest?.('.oneThingToggle351');
-      if (!toggle) return;
-      const el = toggle.closest('.oneThing350');
+      const body = ev.target?.closest?.('.oneThing350.oneThingLong351.oneThingDropdown351');
+      const blocked = ev.target?.closest?.('[data-one-thing-action],button,textarea,input,a');
+      if (!toggle && (!body || blocked)) return;
+      const el = toggle ? toggle.closest('.oneThing350') : body;
       if (!el) return;
       ev.preventDefault();
       ev.stopPropagation();
