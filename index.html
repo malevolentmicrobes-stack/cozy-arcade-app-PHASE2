@@ -1275,9 +1275,16 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
 </style>
 <script id="v175152-shadow-settings-js">
 (function(){
-  const q=id=>document.getElementById(id);
-  const cleanText=v=>String(v||'').replace(/\s+/g,' ').trim();
-  const keyOf=c=>c && (c.id || c.qid || c.original_qid);
+	  const q=id=>document.getElementById(id);
+	  const cleanText=v=>String(v||'').replace(/\s+/g,' ').trim();
+	  const keyOf=c=>c && (c.id || c.qid || c.original_qid);
+	  function parseJsonLoose175152(text){
+	    try{return JSON.parse(text);}
+	    catch(err){
+	      const cleaned=String(text||'').replace(/:\s*NaN(\s*[,}])/g,': null$1').replace(/:\s*Infinity(\s*[,}])/g,': null$1').replace(/:\s*-Infinity(\s*[,}])/g,': null$1');
+	      return JSON.parse(cleaned);
+	    }
+	  }
   function downloadJSON(obj,name){
     const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'});
     const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();URL.revokeObjectURL(a.href);
@@ -1288,12 +1295,12 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
   function systems(){return [...new Set(getCards().map(c=>cleanText(c.system||c.sys)).filter(Boolean))].sort();}
   function allTags(){return [...new Set(getCards().flatMap(c=>Array.isArray(c.tags)?c.tags:[]).map(cleanText).filter(Boolean))].sort();}
   function normalizeCard(c){c.diagnosis=c.diagnosis||c.answer||'Unknown';c.presentation=c.presentation||c.clinical_vignette_summary||c.prompt||'';c.quick_recall=c.quick_recall||c.educational_objective||c.presentation;c.system=c.system||c.sys||'';return c;}
-  function importDeckFile(file,merge){
-    const r=new FileReader();r.onload=()=>{try{let d=JSON.parse(r.result);let incoming=d.cards||d;if(!Array.isArray(incoming))throw Error('No cards array');incoming=incoming.map(normalizeCard);if(merge){const m=new Map(getCards().map(c=>[String(keyOf(c)),c]));incoming.forEach(c=>m.set(String(keyOf(c)),c));cards=[...m.values()];}else{cards=incoming;}try{updateKpis()}catch(e){};try{toast((merge?'Merged ':'Loaded ')+incoming.length+' cards')}catch(e){alert((merge?'Merged ':'Loaded ')+incoming.length+' cards')}}catch(e){try{toast('Import failed')}catch(_){alert('Import failed')}}};r.readAsText(file);
-  }
-  function importProgressFile(file){
-    const r=new FileReader();r.onload=()=>{try{let d=JSON.parse(r.result);let inc=d.state||d.cards||{};if(!inc||typeof inc!=='object')throw Error('No progress state');state=Object.assign({}, currentState(), inc);try{saveState();updateKpis();renderShadowDungeonList()}catch(e){};try{toast('Progress merged')}catch(e){alert('Progress merged')}}catch(e){try{toast('Progress import failed')}catch(_){alert('Progress import failed')}}};r.readAsText(file);
-  }
+	  function importDeckFile(file,merge){
+	    const r=new FileReader();r.onload=()=>{try{let d=parseJsonLoose175152(r.result);let incoming=d.cards||d;if(!Array.isArray(incoming))throw Error('No cards array');incoming=incoming.map(normalizeCard);if(merge){const m=new Map(getCards().map(c=>[String(keyOf(c)),c]));incoming.forEach(c=>m.set(String(keyOf(c)),c));cards=[...m.values()];}else{cards=incoming;}if(d&&d.state&&typeof d.state==='object') state=Object.assign({},currentState(),d.state);try{saveState();updateKpis()}catch(e){};try{toast((merge?'Merged ':'Loaded ')+incoming.length+' cards')}catch(e){alert((merge?'Merged ':'Loaded ')+incoming.length+' cards')}}catch(e){try{toast('Import failed')}catch(_){alert('Import failed')}}};r.readAsText(file);
+	  }
+	  function importProgressFile(file){
+	    const r=new FileReader();r.onload=()=>{try{let d=parseJsonLoose175152(r.result);let inc=d.state||d.cards||{};if(!inc||typeof inc!=='object')throw Error('No progress state');state=Object.assign({}, currentState(), inc);try{saveState();updateKpis();renderShadowDungeonList()}catch(e){};try{toast('Progress merged')}catch(e){alert('Progress merged')}}catch(e){try{toast('Progress import failed')}catch(_){alert('Progress import failed')}}};r.readAsText(file);
+	  }
   function enhanceHome(){
     const controls=document.querySelector('#home .controls');
     if(controls && !q('shadowBtn')){const b=document.createElement('button');b.id='shadowBtn';b.className='btn';b.textContent='Shadow Dungeon';b.onclick=showShadowDungeon;controls.insertBefore(b,controls.firstChild);}
@@ -1309,7 +1316,7 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
     q('deckFile2').onchange=e=>{const f=e.target.files[0];if(f)importDeckFile(f,false)};
     q('mergeFile2').onchange=e=>{const f=e.target.files[0];if(f)importDeckFile(f,true)};
     q('progressFile2').onchange=e=>{const f=e.target.files[0];if(f)importProgressFile(f)};
-    q('exportCardsOnly2').onclick=()=>downloadJSON({metadata:{app:'Solo Studying',version:'v17.5.15.2',exportedAt:new Date().toISOString(),type:'cards_only'},cards:getCards()},'solo_studying_cards_only_v17_5_15_2.json');
+	    q('exportCardsOnly2').onclick=()=>downloadJSON({metadata:{app:'Solo Studying',version:'v17.5.15.2',exportedAt:new Date().toISOString(),type:'cards_with_progress'},cards:getCards(),state:currentState()},'solo_studying_cards_with_progress_v17_5_15_2.json');
     q('exportProgress2').onclick=()=>downloadJSON({metadata:{app:'Solo Studying',version:'v17.5.15.2',exportedAt:new Date().toISOString(),type:'progress_patch'},state:currentState()},'solo_studying_progress_patch_v17_5_15_2.json');
     q('exportMergeInfo2').onclick=()=>downloadJSON({metadata:{app:'Solo Studying',version:'v17.5.15.2',exportedAt:new Date().toISOString(),cards:getCards().length,progressRecords:Object.keys(currentState()).length,mergeRule:'cards by id/qid; progress state merged by key; pins union-safe'}},'solo_studying_merge_info_v17_5_15_2.json');
     q('exportEntire2').onclick=()=>downloadJSON({metadata:{app:'Solo Studying',version:'v17.5.15.2',exportedAt:new Date().toISOString(),type:'entire_bundle'},cards:getCards(),state:currentState()},'solo_studying_entire_bundle_v17_5_15_2.json');
@@ -6799,19 +6806,27 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     }).filter(c=>clean(c.diagnosis)&&clean(c.presentation||c.educational_objective));
   }
 
-  function cardsFromImport351(obj){
-    if(Array.isArray(obj)) return obj;
-    if(obj&&Array.isArray(obj.cards)) return obj.cards;
-    if(obj&&Array.isArray(obj.notes)) return obj.notes;
-    return [];
-  }
+	  function cardsFromImport351(obj){
+	    if(Array.isArray(obj)) return obj;
+	    if(obj&&Array.isArray(obj.cards)) return obj.cards;
+	    if(obj&&Array.isArray(obj.notes)) return obj.notes;
+	    return [];
+	  }
+	  function parseJsonLoose351(text){
+	    try{return JSON.parse(text);}
+	    catch(err){
+	      const cleaned=String(text||'').replace(/:\s*NaN(\s*[,}])/g,': null$1').replace(/:\s*Infinity(\s*[,}])/g,': null$1').replace(/:\s*-Infinity(\s*[,}])/g,': null$1');
+	      return JSON.parse(cleaned);
+	    }
+	  }
 
   function importCardsObject351(obj,label){
-    const incoming=cardsFromImport351(obj).map((c,i)=>Object.assign({id:i+1},c||{}));
-    if(!incoming.length) throw new Error('No cards found');
-    cards=incoming;
-    try{DATA.cards=incoming; DATA.metadata=Object.assign({},DATA.metadata||{},{deck_label:label||'Imported deck',imported_at:new Date().toISOString()});}catch(e){}
-    index=0; current=null; choices=[]; selected=0;
+	    const incoming=cardsFromImport351(obj).map((c,i)=>Object.assign({id:i+1},c||{}));
+	    if(!incoming.length) throw new Error('No cards found');
+	    cards=incoming;
+	    try{DATA.cards=incoming; DATA.metadata=Object.assign({},DATA.metadata||{},{deck_label:label||'Imported deck',imported_at:new Date().toISOString()});}catch(e){}
+	    if(obj&&obj.state&&typeof obj.state==='object') mergeProgressObject351(obj);
+	    index=0; current=null; choices=[]; selected=0;
     try{patchStudyOptions(); installHomeActions(); updateKpis();}catch(e){}
     try{toast('Imported '+incoming.length+' cards');}catch(e){}
     return incoming.length;
@@ -6823,7 +6838,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     reader.onload=()=>{
       try{
         const text=String(reader.result||'');
-        const obj=/.csv$/i.test(file.name)?{cards:cardsFromCsv351(text)}:JSON.parse(text);
+	        const obj=/.csv$/i.test(file.name)?{cards:cardsFromCsv351(text)}:parseJsonLoose351(text);
         importCardsObject351(obj,file.name);
       }catch(err){try{toast('Import failed: '+(err&&err.message?err.message:'check file'));}catch(e){}}
     };
@@ -6833,7 +6848,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   function exportDeckJson351(){
     let label='cozy-arcade-cards';
     try{label=(DATA.metadata&&DATA.metadata.deck_label)||label;}catch(e){}
-    const payload={metadata:Object.assign({},DATA&&DATA.metadata?DATA.metadata:{},{exported_at:new Date().toISOString()}),cards:cards||[]};
+	    const payload={metadata:Object.assign({},DATA&&DATA.metadata?DATA.metadata:{},{exported_at:new Date().toISOString(),type:'deck_with_progress'}),cards:cards||[],state:JSON.parse(JSON.stringify(state||{}))};
     downloadJson351(label.replace(/[^a-z0-9_-]+/gi,'-')+'.json',payload);
     try{toast('Deck JSON exported');}catch(e){}
   }
@@ -6859,16 +6874,17 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       state[k]=Object.assign({},state[k]||{},incoming[k]||{});
       merged+=1;
     });
-    try{saveState(); updateKpis();}catch(e){}
-    try{toast('Merged progress for '+merged+' cards');}catch(e){}
-    return merged;
-  }
+	    try{saveState(); updateKpis();}catch(e){}
+	    try{toast('Merged progress for '+merged+' cards');}catch(e){}
+	    return merged;
+	  }
+	  try{window.cozyProgressPayload351=progressPayload351; window.mergeProgressObject351=mergeProgressObject351; window.cozyParseJson351=parseJsonLoose351;}catch(e){}
 
-  function mergeProgress351(file){
+	  function mergeProgress351(file){
     if(!file) return;
     const reader=new FileReader();
     reader.onload=()=>{
-      try{mergeProgressObject351(JSON.parse(reader.result||'{}'));}
+	      try{mergeProgressObject351(parseJsonLoose351(reader.result||'{}'));}
       catch(err){try{toast('Progress merge failed');}catch(e){}}
     };
     reader.readAsText(file);
@@ -8173,7 +8189,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     });
     return {total:cards.length,pinned,suspended,hard,missed,reviewed};
   }
-  function reviewMatches352(card, scope, query){
+	  function reviewMatches352(card, scope, query){
     const st = cardState(card);
     const q = cleanText352(query || '').toLowerCase();
     if(q){
@@ -8188,12 +8204,35 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     if(scope === 'buried' || scope === 'suspended') return isBuried(card);
     if(scope === 'pinned') return !!st.pinned;
     if(scope === 'hard') return st.rating === 'hard';
-    if(scope === 'missed' || scope === 'wrong') return !!(st.rating === 'again' || st.wrong || st.missed || st.lastCorrect === false);
-    if(scope === 'new') return isNewCard352(card);
-    if(scope === 'review' || !scope) return !!(st.pinned || st.rating === 'again' || st.rating === 'hard' || st.wrong || st.missed || st.flagged || st.lastCorrect === false || isBuried(card));
-    return true;
-  }
-  function sortReviewCards352(arr, sort){
+	    if(scope === 'missed' || scope === 'wrong') return !!(st.rating === 'again' || st.wrong || st.missed || st.lastCorrect === false);
+	    if(scope === 'new') return isNewCard352(card);
+	    if(scope === 'random-new') return isNewCard352(card);
+	    if(scope === 'random') return true;
+	    if(scope === 'review' || !scope) return !!(st.pinned || st.rating === 'again' || st.rating === 'hard' || st.wrong || st.missed || st.flagged || st.lastCorrect === false || isBuried(card));
+	    return true;
+	  }
+	  let reviewRandomKey352 = '';
+	  let reviewRandomEntries352 = [];
+	  function shuffleReview352(arr){
+	    const out = [...arr];
+	    const rand = () => {
+	      try{const buf = new Uint32Array(1); crypto.getRandomValues(buf); return buf[0] / 4294967296;}
+	      catch(_){return Math.random();}
+	    };
+	    for(let i=out.length-1;i>0;i--){const j=Math.floor(rand()*(i+1)); [out[i],out[j]]=[out[j],out[i]];}
+	    if(out.length>1 && (out[0].id || out[0].qid_unique || out[0].diagnosis) === (arr[0].id || arr[0].qid_unique || arr[0].diagnosis)){
+	      out.push(...out.splice(0,1));
+	    }
+	    return out;
+	  }
+	  function randomReviewEntries352(entries, key){
+	    if(reviewRandomKey352 !== key || !reviewRandomEntries352.length){
+	      reviewRandomKey352 = key;
+	      reviewRandomEntries352 = shuffleReview352(entries);
+	    }
+	    return reviewRandomEntries352;
+	  }
+	  function sortReviewCards352(arr, sort){
     const val = card => {
       const st = cardState(card);
       if(sort === 'system') return systemOf352(card) + ' ' + cleanText352(answerFor352(card));
@@ -8237,9 +8276,11 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       tools.id = 'reviewTools352';
       tools.className = 'reviewTools352';
       tools.innerHTML =
-        '<div><label>Review Set</label><select id="reviewScope352">' +
-        '<option value="review">Pinned / missed / hard / suspended</option>' +
-        '<option value="buried">Suspended / buried</option>' +
+	        '<div><label>Review Set</label><select id="reviewScope352">' +
+	        '<option value="review">Pinned / missed / hard / suspended</option>' +
+	        '<option value="random">Random - all cards</option>' +
+	        '<option value="random-new">Random - new cards</option>' +
+	        '<option value="buried">Suspended / buried</option>' +
         '<option value="pinned">Pinned only</option>' +
         '<option value="hard">Hard only</option>' +
         '<option value="missed">Missed only</option>' +
@@ -8266,7 +8307,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     const search = $('reviewSearch352');
     populateSystemFilters352();
     if(scopeSel && (!scopeSel.dataset.initialized352 || window.__reviewRefreshScope352)){
-      scopeSel.value = ['buried','pinned','hard','new','all'].includes(preferred) ? preferred : 'review';
+	      scopeSel.value = ['buried','pinned','hard','new','all','random','random-new'].includes(preferred) ? preferred : 'review';
       scopeSel.dataset.initialized352 = '1';
       window.__reviewRefreshScope352 = false;
     }
@@ -8277,7 +8318,8 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     const counts = stateCounts352();
     let entries = allCards352().filter(card => reviewMatches352(card, scope, query));
     if(system && system !== 'all') entries = entries.filter(card => systemOf352(card) === system);
-    entries = sortReviewCards352(entries, sort).slice(0, 250);
+	    const randomKey = [scope, system, query, entries.length, entries.slice(0,50).map(card => card.id || card.qid_unique || card.diagnosis).join('|')].join('::');
+	    entries = (scope === 'random' || scope === 'random-new') ? randomReviewEntries352(entries, randomKey).slice(0, 250) : sortReviewCards352(entries, sort).slice(0, 250);
     list.innerHTML =
       '<div class="reviewSummary352">' +
       '<span class="chip352">Shown ' + entries.length + '</span>' +
@@ -8704,14 +8746,14 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     try{ const sub=document.querySelector('.heroSub'); if(sub) sub.textContent='BOARD PREP-MEDICINE'; }catch(e){}
     try{ if(typeof updateKpis==='function') updateKpis(); }catch(e){}
   }
-  function parseCsv(text){
+	  function parseCsv(text){
     const rows=[]; let row=[], cell='', q=false;
     for(let i=0;i<text.length;i++){ const ch=text[i], nx=text[i+1]; if(q){ if(ch==='"'&&nx==='"'){cell+='"';i++;} else if(ch==='"') q=false; else cell+=ch; } else { if(ch==='"') q=true; else if(ch===','){row.push(cell);cell='';} else if(ch==='\n'){row.push(cell);rows.push(row);row=[];cell='';} else if(ch!=='\r') cell+=ch; } }
     row.push(cell); if(row.some(x=>clean(x))) rows.push(row);
     if(!rows.length) return [];
     const header=rows[0].map(h=>clean(h).toLowerCase().replace(/[^a-z0-9]+/g,''));
     const get=(r,names)=>{ for(const name of names){ const idx=header.indexOf(String(name).toLowerCase().replace(/[^a-z0-9]+/g,'')); if(idx>=0 && clean(r[idx])) return r[idx]; } return ''; };
-    return rows.slice(1).map((r,i)=>normalizeLimitlessCard({
+	    return rows.slice(1).map((r,i)=>normalizeLimitlessCard({
       card_id:get(r,['Card ID*','Card ID','card_id','cardId','json_id','id','legacy_id']),
       qid_unique:get(r,['qid_unique','qid','original_qid']),
       sys:get(r,['sys','system','subject']),
@@ -8722,15 +8764,34 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       tags:get(r,['tags']),
       source:get(r,['source','source_sheet']),
       card_type:get(r,['card_type','type'])
-    },i));
-  }
-  function importObject(obj,label){
+	    },i));
+	  }
+	  function parseJsonText(text){
+	    try{return JSON.parse(text);}
+	    catch(err){
+	      const cleaned=String(text||'').replace(/:\s*NaN(\s*[,}])/g,': null$1').replace(/:\s*Infinity(\s*[,}])/g,': null$1').replace(/:\s*-Infinity(\s*[,}])/g,': null$1');
+	      return JSON.parse(cleaned);
+	    }
+	  }
+	  function mergeProgressFromObject(obj){
+	    const incoming=(obj&&obj.state)||(obj&&obj.progress)||{};
+	    if(!incoming||typeof incoming!=='object') return 0;
+	    let merged=0;
+	    try{
+	      Object.keys(incoming).forEach(k=>{if(!k) return; state[k]=Object.assign({},state[k]||{},incoming[k]||{}); merged+=1;});
+	      saveState();
+	      if(typeof updateKpis==='function') updateKpis();
+	    }catch(e){}
+	    return merged;
+	  }
+	  function importObject(obj,label){
     const raw=Array.isArray(obj)?obj:(obj&&Array.isArray(obj.cards)?obj.cards:(obj&&Array.isArray(obj.data)?obj.data:[]));
     const incoming=raw.map(normalizeLimitlessCard);
     if(!incoming.length) throw new Error('No cards found');
     const metadata=Object.assign({},(obj&&(obj.metadata||obj.meta))||{},{deck_label:label||LIMITLESS_LABEL,limitless_text:LIMITLESS_LABEL,imported_at:new Date().toISOString(),cards_embedded:incoming.length});
-    setAppCards(incoming);
-    try{ const data=appData(); if(data) data.metadata=Object.assign({},data.metadata||{},metadata); exposeAppData(); }catch(e){}
+	    setAppCards(incoming);
+	    mergeProgressFromObject(obj);
+	    try{ const data=appData(); if(data) data.metadata=Object.assign({},data.metadata||{},metadata); exposeAppData(); }catch(e){}
     storeDeck(incoming,metadata);
     try{ index=0; current=null; choices=[]; selected=0; }catch(e){}
     try{ if(typeof patchStudyOptions==='function') patchStudyOptions(); if(typeof installHomeActions==='function') installHomeActions(); ensureHomeImport(); if(typeof updateKpis==='function') updateKpis(); }catch(e){}
@@ -8744,7 +8805,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     reader.onload=()=>{
       try{
         const text=String(reader.result||'');
-        const obj=/\.csv$/i.test(file.name)?parseCsv(text):JSON.parse(text);
+	        const obj=/\.csv$/i.test(file.name)?parseCsv(text):parseJsonText(text);
         importObject(obj,file.name);
       }catch(err){ try{toast('LIMITLESS import failed: '+(err&&err.message?err.message:'check file'));}catch(e){} }
     };
@@ -8834,10 +8895,29 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   const AI_SHORT='Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade card schema.';
   const AI_LONG='Convert the uploaded deck into Cozy Arcade Board Prep Medicine JSON using the current DB mapping: old presentation maps to current prompt / presentation_CLEAN; educational_objective maps to current answer / reveal; diagnosis remains the answer choice/Reveal title; board_trigger; tags/system map to current tags and sys. Preserve one_thing, level_1_presentation, level_2_three_second_exposure, quick_recall, treatment, next_step, and explanation when present. Return valid JSON with { metadata, cards } only. Do not rewrite medical content.';
   const clean=v=>String(v==null?'':v).replace(/NOT SPECIFIED IN SOURCE/g,'').replace(/\s+/g,' ').trim();
-  const first=(...xs)=>xs.find(x=>clean(x))||'';
-  const esc=s=>String(s==null?'':s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
-  const normKey=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'');
-  function appData(){try{return DATA;}catch(e){return window.DATA||null;}}
+	  const first=(...xs)=>xs.find(x=>clean(x))||'';
+	  const esc=s=>String(s==null?'':s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+	  const normKey=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'');
+	  function parseJsonText351(text){
+	    try{return JSON.parse(text);}
+	    catch(err){
+	      const cleaned=String(text||'').replace(/:\s*NaN(\s*[,}])/g,': null$1').replace(/:\s*Infinity(\s*[,}])/g,': null$1').replace(/:\s*-Infinity(\s*[,}])/g,': null$1');
+	      return JSON.parse(cleaned);
+	    }
+	  }
+	  function progressState351(){try{return JSON.parse(JSON.stringify(state||{}));}catch(e){return {};}}
+	  function mergeProgressState351(obj){
+	    const incoming=(obj&&obj.state)||(obj&&obj.progress)||{};
+	    if(!incoming||typeof incoming!=='object') return 0;
+	    let merged=0;
+	    try{
+	      Object.keys(incoming).forEach(k=>{if(!k) return; state[k]=Object.assign({},state[k]||{},incoming[k]||{}); merged+=1;});
+	      saveState();
+	      if(typeof updateKpis==='function') updateKpis();
+	    }catch(e){}
+	    return merged;
+	  }
+	  function appData(){try{return DATA;}catch(e){return window.DATA||null;}}
   function appCards(){try{return Array.isArray(cards)?cards:[];}catch(e){return Array.isArray(window.cards)?window.cards:[];}}
   function setCards(next){try{cards=next;}catch(e){window.cards=next;} try{window.cards=next;}catch(e){} const d=appData(); if(d){try{d.cards=next; window.DATA=d;}catch(e){}}}
   function formattedId(raw,i){let v=clean(raw); if(!v) v=String((Number(i)||0)+1); if(/^\d+$/.test(v)) v='card-'+v.padStart(4,'0'); return v;}
@@ -8997,21 +9077,22 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   function importObject(obj,label){
     const raw=Array.isArray(obj)?obj:(obj&&Array.isArray(obj.cards)?obj.cards:(obj&&Array.isArray(obj.data)?obj.data:[]));
     if(!raw.length) throw new Error('No cards found');
-    const meta=Object.assign({},(obj&&(obj.metadata||obj.meta))||{},{deck_label:label||APP_LABEL,imported_at:new Date().toISOString(),cards_embedded:raw.length});
-    setDeck(raw,meta);
-    try{toast('Deck imported: '+raw.length+' cards');}catch(e){}
+	    const meta=Object.assign({},(obj&&(obj.metadata||obj.meta))||{},{deck_label:label||APP_LABEL,imported_at:new Date().toISOString(),cards_embedded:raw.length});
+	    setDeck(raw,meta);
+	    mergeProgressState351(obj);
+	    try{toast('Deck imported: '+raw.length+' cards');}catch(e){}
     return raw.length;
   }
   function importFile(file){
     if(!file) return;
     const reader=new FileReader();
-    reader.onload=()=>{try{const text=String(reader.result||''); const obj=/\.csv$/i.test(file.name)?{cards:parseCsv(text)}:JSON.parse(text); importObject(obj,file.name);}catch(err){try{toast('Import failed: '+(err&&err.message?err.message:'check file'));}catch(e){}}};
+	    reader.onload=()=>{try{const text=String(reader.result||''); const obj=/\.csv$/i.test(file.name)?{cards:parseCsv(text)}:parseJsonText351(text); importObject(obj,file.name);}catch(err){try{toast('Import failed: '+(err&&err.message?err.message:'check file'));}catch(e){}}};
     reader.readAsText(file);
   }
   function downloadJson(){
     const active=appCards();
     if(!active.length){ downloadExampleDeck(); return; }
-    const payload={metadata:Object.assign({},(appData()&&appData().metadata)||{},{exported_at:new Date().toISOString(),cards_embedded:active.length}),cards:active};
+	    const payload={metadata:Object.assign({},(appData()&&appData().metadata)||{},{exported_at:new Date().toISOString(),cards_embedded:active.length,type:'deck_with_progress'}),cards:active,state:progressState351()};
     const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=active.length?'cozy_arcade_deck_export.json':'example_deck_template.json'; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
   }
@@ -9161,11 +9242,33 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     return [];
   }
 
-  function currentCard351(){
-    try{ if(typeof current !== 'undefined' && current) return current; }catch(_){}
-    try{ if(window.getCurrent) return window.getCurrent(); }catch(_){}
-    return appCards351()[0] || null;
-  }
+	  function currentCard351(){
+	    try{ if(typeof current !== 'undefined' && current) return current; }catch(_){}
+	    try{ if(window.getCurrent) return window.getCurrent(); }catch(_){}
+	    return appCards351()[0] || null;
+	  }
+	  function parseJsonLoosePublic351(text){
+	    try{return JSON.parse(text);}
+	    catch(err){
+	      const cleaned=String(text||'').replace(/:\s*NaN(\s*[,}])/g,': null$1').replace(/:\s*Infinity(\s*[,}])/g,': null$1').replace(/:\s*-Infinity(\s*[,}])/g,': null$1');
+	      return JSON.parse(cleaned);
+	    }
+	  }
+	  function mergeProgressPublic351(obj){
+	    const incoming = obj && (obj.state || obj.progress);
+	    if(!incoming || typeof incoming !== 'object') return 0;
+	    let merged = 0;
+	    try{
+	      Object.keys(incoming).forEach(key => {
+	        if(!key) return;
+	        state[key] = Object.assign({}, state[key] || {}, incoming[key] || {});
+	        merged += 1;
+	      });
+	      saveState();
+	      if(typeof updateKpis === 'function') updateKpis();
+	    }catch(_){}
+	    return merged;
+	  }
 
   function setCards351(nextCards, meta){
     const normalized = (nextCards || []).map(window.normalizeLimitlessCard);
@@ -9217,9 +9320,10 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 
   function importDeckObject351(obj, label){
     const raw = Array.isArray(obj) ? obj : (Array.isArray(obj?.cards) ? obj.cards : (Array.isArray(obj?.data) ? obj.data : []));
-    if(!raw.length) throw new Error('No cards found');
-    const count = setCards351(raw, Object.assign({}, obj?.metadata || obj?.meta || {}, { deck_label: label || 'Uploaded public deck', imported_at: new Date().toISOString() }));
-    try{ if(window.importLimitlessDeck && window.importLimitlessDeck !== importDeckObject351) window.importLimitlessDeck(obj, label); }catch(_){}
+	    if(!raw.length) throw new Error('No cards found');
+	    const count = setCards351(raw, Object.assign({}, obj?.metadata || obj?.meta || {}, { deck_label: label || 'Uploaded public deck', imported_at: new Date().toISOString() }));
+	    mergeProgressPublic351(obj);
+	    try{ if(window.importLimitlessDeck && window.importLimitlessDeck !== importDeckObject351) window.importLimitlessDeck(obj, label); }catch(_){}
     try{ if(typeof toast === 'function') toast('Deck imported: ' + count + ' cards'); }catch(_){}
     return count;
   }
@@ -9230,7 +9334,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     reader.onload = () => {
       try{
         const text = String(reader.result || '');
-        const parsed = /\.csv$/i.test(file.name) && typeof parseCsv === 'function' ? { cards: parseCsv(text) } : JSON.parse(text);
+	        const parsed = /\.csv$/i.test(file.name) && typeof parseCsv === 'function' ? { cards: parseCsv(text) } : parseJsonLoosePublic351(text);
         importDeckObject351(parsed, file.name);
       }catch(err){
         try{ if(window.importLimitlessFile && window.importLimitlessFile !== importFile351) return window.importLimitlessFile(file); }catch(_){}
@@ -9264,7 +9368,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     const active = appCards351();
     if(!active.length) return downloadExample351();
     const data = (window.DATA || (typeof DATA !== 'undefined' ? DATA : {}));
-    const payload = { metadata: Object.assign({}, data.metadata || {}, { exported_at: new Date().toISOString(), cards_embedded: active.length }), cards: active };
+	    const payload = { metadata: Object.assign({}, data.metadata || {}, { exported_at: new Date().toISOString(), cards_embedded: active.length, type:'deck_with_progress' }), cards: active, state: JSON.parse(JSON.stringify(state || {})) };
     downloadBlob351(new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' }), 'cozy_arcade_deck_export.json');
   }
 
