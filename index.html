@@ -10601,4 +10601,776 @@ function fixStableOneThingDropdown351() {
   setTimeout(fixStableOneThingDropdown351, 1000);
 })();
 </script>
+<script id="cozy-phase3-state-model-js">
+(() => {
+  const STATE_KEY = 'cozy_arcade_state_v3';
+  const LEGACY_STATE_KEYS = ['soloStudyingState_v1757'];
+  const q = id => document.getElementById(id);
+  const clean = value => String(value == null ? '' : value).replace(/\s+/g, ' ').trim();
+  const nowIso = () => new Date().toISOString();
+  const addMinutes = (date, minutes) => new Date(date.getTime() + minutes * 60000);
+  const addDays = (date, days) => new Date(date.getTime() + days * 86400000);
+  const isPlainNumeric = value => /^\d+$/.test(String(value || '').trim());
+
+  function hashStr(value) {
+    let h = 2166136261;
+    const text = String(value || '');
+    for (let i = 0; i < text.length; i++) {
+      h ^= text.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return 'h_' + (h >>> 0).toString(36);
+  }
+
+  function canonicalCardId(card) {
+    return clean(card?.qid_unique)
+      || clean(card?.card_id)
+      || clean(card?.json_id)
+      || clean(card?.original_qid)
+      || clean(card?.qid)
+      || clean(card?.id)
+      || clean(card?.legacy_id)
+      || hashStr(`${card?.presentation || card?.prompt || ''}::${card?.diagnosis || card?.answer || ''}`);
+  }
+
+  function defaultProgress(cardId) {
+    const now = nowIso();
+    return {
+      card_id: cardId,
+      seen_count: 0,
+      correct_count: 0,
+      wrong_count: 0,
+      reviewed_count: 0,
+      pinned: false,
+      buried: false,
+      suspended: false,
+      repair_point: false,
+      stage: 'new',
+      last_rating: null,
+      last_seen_at: null,
+      next_due_at: null,
+      interval_days: 0,
+      ease_factor: 2.5,
+      lapses: 0,
+      created_at: now,
+      updated_at: now
+    };
+  }
+
+  function appCards() {
+    try { if (Array.isArray(cards)) return cards; } catch (_) {}
+    try { if (Array.isArray(window.cards)) return window.cards; } catch (_) {}
+    try { if (window.DATA && Array.isArray(window.DATA.cards)) return window.DATA.cards; } catch (_) {}
+    return [];
+  }
+
+  function setAppCards(nextCards) {
+    try { cards = nextCards; } catch (_) { window.cards = nextCards; }
+    window.cards = nextCards;
+    try { if (window.DATA) window.DATA.cards = nextCards; } catch (_) {}
+    try { if (typeof DATA !== 'undefined') DATA.cards = nextCards; } catch (_) {}
+  }
+
+  function normalizeCardIdentity(card) {
+    if (!card || typeof card !== 'object') return card;
+    const id = canonicalCardId(card);
+    card.card_id = id;
+    if (!clean(card.qid_unique) && clean(card.qid)) card.qid_unique = clean(card.qid);
+    return card;
+  }
+
+  function normalizeDeckIdentities() {
+    const normalized = appCards().map(normalizeCardIdentity);
+    setAppCards(normalized);
+    return normalized;
+  }
+
+  function deckFingerprint(cardsList = appCards()) {
+    const ids = cardsList.map(c => canonicalCardId(c)).join('|');
+    return 'deck_' + hashStr(ids + '::' + cardsList.length);
+  }
+
+  function emptyState(cardsList = appCards()) {
+    let deckLabel = 'Cozy Arcade Board Prep Medicine';
+    try { deckLabel = window.DATA?.metadata?.deck_label || window.DATA?.meta?.deck_label || deckLabel; } catch (_) {}
+    return {
+      schema_version: '3.0',
+      deck_fingerprint: deckFingerprint(cardsList),
+      deck_label: deckLabel,
+      imported_at: nowIso(),
+      settings: {
+        solo_order: 'random_new',
+        expansion_order: 'new_first',
+        timer_seconds: 5,
+        bionic: false,
+        auto_select: true
+      },
+      progress: {}
+    };
+  }
+
+  function legacyToProgress(cardId, legacy) {
+    const base = defaultProgress(cardId);
+    const reviewed = Number(legacy?.reviewed || legacy?.reviewed_count || 0) || 0;
+    const correct = Number(legacy?.correct || legacy?.correct_count || 0) || 0;
+    const wrong = Number(legacy?.wrong_count || legacy?.wrong || legacy?.incorrect || 0) || 0;
+    const rating = clean(legacy?.last_rating || legacy?.rating) || null;
+    const seenCount = Math.max(Number(legacy?.seen_count || 0) || 0, legacy?.seen ? 1 : 0, reviewed ? 1 : 0);
+    const lastSeen = legacy?.last_seen_at || legacy?.last || legacy?.last_rating_at || null;
+    const repair = !!(legacy?.repair_point || legacy?.wrong || legacy?.missed || rating === 'again' || rating === 'hard');
+    return Object.assign(base, {
+      seen_count: seenCount,
+      correct_count: correct,
+      wrong_count: wrong + (rating === 'again' ? 1 : 0),
+      reviewed_count: reviewed || seenCount,
+      pinned: !!legacy?.pinned,
+      buried: !!legacy?.buried,
+      suspended: !!(legacy?.suspended || legacy?.apkg_status === 'suspended'),
+      repair_point: repair,
+      stage: legacy?.stage || (seenCount ? 'review' : 'new'),
+      last_rating: rating,
+      last_seen_at: lastSeen,
+      next_due_at: legacy?.next_due_at || (repair ? nowIso() : null),
+      interval_days: Number(legacy?.interval_days || 0) || 0,
+      ease_factor: Number(legacy?.ease_factor || 2.5) || 2.5,
+      lapses: Number(legacy?.lapses || 0) || 0,
+      created_at: legacy?.created_at || lastSeen || base.created_at,
+      updated_at: legacy?.updated_at || lastSeen || base.updated_at
+    });
+  }
+
+  function buildIdentityLookup(cardsList) {
+    const lookup = new Map();
+    cardsList.forEach((card, idx) => {
+      const canonical = canonicalCardId(card);
+      [card?.qid_unique, card?.card_id, card?.json_id, card?.original_qid, card?.qid, card?.id, card?.legacy_id]
+        .map(clean)
+        .filter(Boolean)
+        .forEach(key => lookup.set(key, canonical));
+      lookup.set(String(idx + 1), canonical);
+    });
+    return lookup;
+  }
+
+  function migrateLegacyProgress(oldState, cardsList = appCards()) {
+    const progress = {};
+    const raw = oldState?.progress || oldState?.state || oldState || {};
+    const lookup = buildIdentityLookup(cardsList);
+    Object.keys(raw || {}).forEach(oldKey => {
+      const legacy = raw[oldKey] || {};
+      const direct = lookup.get(clean(oldKey));
+      const positional = isPlainNumeric(oldKey) ? lookup.get(String(Number(oldKey))) : '';
+      const cardId = direct || positional || (!isPlainNumeric(oldKey) ? clean(oldKey) : '');
+      if (!cardId) return;
+      progress[cardId] = Object.assign(progress[cardId] || defaultProgress(cardId), legacyToProgress(cardId, legacy));
+    });
+    return progress;
+  }
+
+  function coerceState(obj, cardsList = appCards()) {
+    const base = emptyState(cardsList);
+    const incoming = obj && typeof obj === 'object' ? obj : {};
+    const settings = Object.assign({}, base.settings, incoming.settings || {});
+    const progress = migrateLegacyProgress(incoming.progress ? { progress: incoming.progress } : incoming, cardsList);
+    return Object.assign(base, {
+      schema_version: '3.0',
+      deck_fingerprint: incoming.deck_fingerprint || base.deck_fingerprint,
+      deck_label: incoming.deck_label || incoming.metadata?.deck_label || incoming.meta?.deck_label || base.deck_label,
+      imported_at: incoming.imported_at || base.imported_at,
+      settings,
+      progress
+    });
+  }
+
+  function loadPhase3State(cardsList = appCards()) {
+    try {
+      const saved = JSON.parse(localStorage.getItem(STATE_KEY) || 'null');
+      if (saved && typeof saved === 'object') return coerceState(saved, cardsList);
+    } catch (_) {}
+    for (const key of LEGACY_STATE_KEYS) {
+      try {
+        const legacy = JSON.parse(localStorage.getItem(key) || 'null');
+        if (legacy && typeof legacy === 'object') return coerceState({ state: legacy }, cardsList);
+      } catch (_) {}
+    }
+    try {
+      if (state && typeof state === 'object' && !state.schema_version) return coerceState({ state }, cardsList);
+    } catch (_) {}
+    return emptyState(cardsList);
+  }
+
+  let phase3State = loadPhase3State(normalizeDeckIdentities());
+  const session = {
+    buriedToday: new Set(),
+    seenThisSession: new Set(),
+    poolKey: '',
+    pool: []
+  };
+
+  function exportProgressMap() {
+    const out = {};
+    Object.keys(phase3State.progress || {}).forEach(cardId => {
+      const p = Object.assign(defaultProgress(cardId), phase3State.progress[cardId] || {}, { card_id: cardId });
+      out[cardId] = {
+        card_id: p.card_id,
+        seen_count: Number(p.seen_count || 0),
+        correct_count: Number(p.correct_count || 0),
+        wrong_count: Number(p.wrong_count || 0),
+        reviewed_count: Number(p.reviewed_count || 0),
+        pinned: !!p.pinned,
+        buried: !!p.buried,
+        suspended: !!p.suspended,
+        repair_point: !!p.repair_point,
+        stage: p.stage || 'new',
+        last_rating: p.last_rating || null,
+        last_seen_at: p.last_seen_at || null,
+        next_due_at: p.next_due_at || null,
+        interval_days: Number(p.interval_days || 0),
+        ease_factor: Number(p.ease_factor || 2.5),
+        lapses: Number(p.lapses || 0),
+        created_at: p.created_at || nowIso(),
+        updated_at: p.updated_at || nowIso()
+      };
+    });
+    return out;
+  }
+
+  function savePhase3State() {
+    phase3State.progress = phase3State.progress || {};
+    phase3State.deck_fingerprint = deckFingerprint();
+    try { localStorage.setItem(STATE_KEY, JSON.stringify(Object.assign({}, phase3State, { progress: exportProgressMap() }))); } catch (_) {}
+    try { state = phase3State.progress; } catch (_) {}
+    window.cozyPhase3State = phase3State;
+    window.cozyPhase3Session = session;
+  }
+
+  function getProgress(cardId) {
+    phase3State.progress = phase3State.progress || {};
+    return phase3State.progress[cardId] || defaultProgress(cardId);
+  }
+
+  function setProgress(cardId, patch) {
+    phase3State.progress = phase3State.progress || {};
+    const next = Object.assign({}, getProgress(cardId), patch || {}, { card_id: cardId, updated_at: nowIso() });
+    phase3State.progress[cardId] = next;
+    savePhase3State();
+    return next;
+  }
+
+  function progressForCard(card) {
+    return getProgress(canonicalCardId(card));
+  }
+
+  function isDue(progress) {
+    if (!progress) return false;
+    if (progress.repair_point || progress.stage === 'relearning') return true;
+    if (!progress.next_due_at) return false;
+    return Date.parse(progress.next_due_at) <= Date.now();
+  }
+
+  function rateCard(cardId, rating) {
+    const p = getProgress(cardId);
+    if (rating === 'pin') {
+      setProgress(cardId, { pinned: !p.pinned });
+      return;
+    }
+    if (rating === 'bury') {
+      setProgress(cardId, { buried: !p.buried, suspended: !p.buried });
+      return;
+    }
+
+    const now = new Date();
+    let ease = Number(p.ease_factor || 2.5);
+    let interval = Number(p.interval_days || 0);
+    let stage = p.stage || 'new';
+    let lapses = Number(p.lapses || 0);
+    let repair = false;
+    let buried = false;
+    let nextDue = now;
+
+    if (rating === 'again') {
+      stage = 'relearning';
+      interval = 0;
+      ease = Math.max(1.3, ease - 0.2);
+      lapses += p.stage === 'review' ? 1 : 0;
+      repair = true;
+      buried = false;
+      nextDue = addMinutes(now, 10);
+    } else if (rating === 'hard') {
+      stage = stage === 'new' ? 'learning' : 'review';
+      interval = Math.max(1, Math.round(interval * 1.2) || 1);
+      ease = Math.max(1.3, ease - 0.15);
+      repair = true;
+      buried = true;
+      nextDue = addDays(now, interval);
+    } else if (rating === 'good') {
+      stage = 'review';
+      interval = interval <= 0 ? 1 : Math.max(1, Math.round(interval * ease));
+      repair = false;
+      buried = true;
+      nextDue = addDays(now, interval);
+    } else if (rating === 'easy') {
+      stage = 'review';
+      ease += 0.15;
+      interval = interval <= 0 ? 4 : Math.max(4, Math.round(interval * ease * 1.3));
+      repair = false;
+      buried = true;
+      nextDue = addDays(now, interval);
+    } else {
+      return;
+    }
+
+    session.seenThisSession.add(cardId);
+    if (buried) session.buriedToday.add(cardId);
+    setProgress(cardId, {
+      seen_count: Number(p.seen_count || 0) + 1,
+      reviewed_count: Number(p.reviewed_count || 0) + 1,
+      correct_count: Number(p.correct_count || 0) + (rating === 'good' || rating === 'easy' ? 1 : 0),
+      wrong_count: Number(p.wrong_count || 0) + (rating === 'again' || rating === 'hard' ? 1 : 0),
+      stage,
+      last_rating: rating,
+      last_seen_at: now.toISOString(),
+      next_due_at: nextDue.toISOString(),
+      interval_days: interval,
+      ease_factor: ease,
+      lapses,
+      repair_point: repair,
+      buried,
+      updated_at: now.toISOString()
+    });
+  }
+
+  function shuffleCards(arr) {
+    const out = [...arr];
+    const rand = () => {
+      try { const data = new Uint32Array(1); crypto.getRandomValues(data); return data[0] / 4294967296; }
+      catch (_) { return Math.random(); }
+    };
+    for (let i = out.length - 1; i > 0; i--) {
+      const j = Math.floor(rand() * (i + 1));
+      [out[i], out[j]] = [out[j], out[i]];
+    }
+    if (out.length > 1 && canonicalCardId(out[0]) === canonicalCardId(arr[0])) out.push(...out.splice(0, 1));
+    return out;
+  }
+
+  function splitBuriedToBack(arr) {
+    const active = [], buried = [];
+    arr.forEach(card => {
+      const id = canonicalCardId(card);
+      const p = getProgress(id);
+      (session.buriedToday.has(id) || p.buried ? buried : active).push(card);
+    });
+    return active.concat(buried);
+  }
+
+  function clearSessionBuried() {
+    session.buriedToday.clear();
+    session.seenThisSession.clear();
+    session.poolKey = '';
+    session.pool = [];
+    Object.keys(phase3State.progress || {}).forEach(cardId => {
+      if (phase3State.progress[cardId]?.buried) phase3State.progress[cardId].buried = false;
+    });
+    savePhase3State();
+  }
+
+  function normalizeMode(mode) {
+    const map = {
+      new: 'new_first',
+      all: 'new_first',
+      sequential: 'new_first',
+      random: 'random_all',
+      'random-new': 'random_new',
+      review: 'review_deck',
+      wrong: 'review_deck',
+      hard: 'hard',
+      pinned: 'pinned',
+      due: 'due',
+      reviewed: 'reviewed_first',
+      reviewed_first: 'reviewed_first',
+      new_first: 'new_first',
+      random_all: 'random_all',
+      random_new: 'random_new',
+      review_deck: 'review_deck',
+      suspended: 'suspended'
+    };
+    return map[mode] || 'new_first';
+  }
+
+  function selectedOrder(gameType) {
+    const explicit = document.documentElement.dataset.cozyLaunchScope || '';
+    const general = q('browseScope351')?.value || q('generalStudyMode351')?.value || '';
+    const expansion = q('expansionOrderPhase3')?.value || '';
+    if (gameType === 'expansion') return normalizeMode(expansion || phase3State.settings.expansion_order || general || explicit || 'new_first');
+    return normalizeMode(general || explicit || phase3State.settings.solo_order || 'random_new');
+  }
+
+  function basePlayableCards() {
+    return normalizeDeckIdentities().filter(card => {
+      const p = progressForCard(card);
+      const diagnosis = clean(card.diagnosis || card.answer);
+      const prompt = clean(card.presentation || card.prompt || card.quick_recall || card.educational_objective);
+      return diagnosis && prompt && !p.suspended;
+    });
+  }
+
+  function getStudyPool(mode, gameType) {
+    const selected = normalizeMode(mode || selectedOrder(gameType));
+    let arr = basePlayableCards();
+    const progress = card => progressForCard(card);
+    const dueSort = (a, b) => {
+      const pa = progress(a), pb = progress(b);
+      const ad = isDue(pa) ? 0 : 1;
+      const bd = isDue(pb) ? 0 : 1;
+      if (ad !== bd) return ad - bd;
+      return String(pa.last_seen_at || '').localeCompare(String(pb.last_seen_at || ''));
+    };
+
+    if (selected === 'new_first') {
+      arr = [
+        ...arr.filter(c => progress(c).stage === 'new' || !progress(c).seen_count),
+        ...arr.filter(c => isDue(progress(c)) && progress(c).seen_count),
+        ...arr.filter(c => progress(c).seen_count && !isDue(progress(c)))
+      ];
+    } else if (selected === 'random_all') {
+      arr = shuffleCards(arr);
+    } else if (selected === 'random_new') {
+      const fresh = arr.filter(c => progress(c).stage === 'new' || !progress(c).seen_count);
+      arr = shuffleCards(fresh.length ? fresh : arr);
+    } else if (selected === 'reviewed_first') {
+      arr = [
+        ...arr.filter(c => progress(c).seen_count).sort(dueSort),
+        ...arr.filter(c => !progress(c).seen_count)
+      ];
+    } else if (selected === 'due') {
+      arr = arr.filter(c => isDue(progress(c)) || progress(c).stage === 'relearning');
+    } else if (selected === 'review_deck') {
+      arr = arr.filter(c => {
+        const p = progress(c);
+        return p.pinned || p.repair_point || p.last_rating === 'again' || p.last_rating === 'hard';
+      }).sort((a, b) => {
+        const pa = progress(a), pb = progress(b);
+        const score = p => (p.pinned ? 0 : p.repair_point ? 1 : 2);
+        if (score(pa) !== score(pb)) return score(pa) - score(pb);
+        return String(pa.last_seen_at || '').localeCompare(String(pb.last_seen_at || ''));
+      });
+    } else if (selected === 'pinned') {
+      arr = arr.filter(c => progress(c).pinned);
+    } else if (selected === 'hard') {
+      arr = arr.filter(c => progress(c).repair_point || progress(c).last_rating === 'hard' || progress(c).last_rating === 'again');
+    } else if (selected === 'suspended') {
+      arr = normalizeDeckIdentities().filter(c => progressForCard(c).suspended);
+    }
+
+    if (selected === 'random_new') {
+      const active = arr.filter(c => !session.buriedToday.has(canonicalCardId(c)));
+      return active.length ? active : arr;
+    }
+    return splitBuriedToBack(arr.length ? arr : basePlayableCards());
+  }
+
+  function poolKey(gameType) {
+    return [gameType, selectedOrder(gameType), deckFingerprint(), session.buriedToday.size, session.seenThisSession.size].join('|');
+  }
+
+  function sessionPool(gameType) {
+    const key = poolKey(gameType);
+    if (session.poolKey !== key || !session.pool.length) {
+      session.pool = getStudyPool(selectedOrder(gameType), gameType);
+      session.poolKey = key;
+      try { index = 0; } catch (_) {}
+    }
+    return session.pool;
+  }
+
+  function updateKpisPhase3() {
+    const all = normalizeDeckIdentities();
+    const progress = phase3State.progress || {};
+    const vals = Object.values(progress);
+    if (q('cardCount')) q('cardCount').textContent = all.length;
+    if (q('reviewedCount')) q('reviewedCount').textContent = vals.filter(p => Number(p.seen_count || 0) > 0).length;
+    if (q('dueCount')) q('dueCount').textContent = all.filter(card => isDue(getProgress(canonicalCardId(card)))).length;
+    if (q('pinCount')) q('pinCount').textContent = vals.filter(p => p.pinned).length;
+  }
+
+  function answerFor(card) { return clean(card?.diagnosis || card?.answer || card?.title || card?.topic); }
+  function promptFor(card) { return clean(card?.presentation || card?.prompt || card?.quick_recall || card?.educational_objective || card?.clinical_vignette); }
+
+  function renderReviewList(mode = normalizeMode(q('browseScope351')?.value || 'review_deck')) {
+    const list = q('reviewList');
+    if (!list) return;
+    const pool = getStudyPool(mode === 'new_first' ? 'due' : mode, 'solo');
+    list.innerHTML = '';
+    if (!pool.length) {
+      list.innerHTML = '<div class="empty">No due, pinned, missed, or hard cards for this view yet.</div>';
+      return;
+    }
+    pool.slice(0, 250).forEach(card => {
+      const p = progressForCard(card);
+      const div = document.createElement('div');
+      div.className = 'reviewItem352';
+      div.innerHTML = '<h3>' + escHTML(answerFor(card)) + '</h3><div class="reviewMeta352"><span class="chip352">' + escHTML(card.system || card.sys || '') + '</span>' + (p.pinned ? '<span class="chip352 pinned">Pinned</span>' : '') + (p.repair_point ? '<span class="chip352">Repair</span>' : '') + (p.last_rating ? '<span class="chip352">Rating: ' + escHTML(p.last_rating) + '</span>' : '') + '</div><div class="reviewText352">' + escHTML(promptFor(card).slice(0, 220)) + '</div>';
+      list.appendChild(div);
+    });
+  }
+
+  function progressPayload() {
+    return {
+      metadata: { type: 'progress', deck_fingerprint: deckFingerprint(), exported_at: nowIso(), schema_version: '3.0' },
+      progress: exportProgressMap()
+    };
+  }
+
+  function cleanDeckCard(card) {
+    const out = Object.assign({}, card, { card_id: canonicalCardId(card) });
+    ['seen_count','correct_count','wrong_count','reviewed_count','pinned','buried','suspended','repair_point','stage','last_rating','last_seen_at','next_due_at','interval_days','ease_factor','lapses','created_at','updated_at'].forEach(key => { delete out[key]; });
+    return out;
+  }
+
+  function cleanDeckPayload() {
+    return {
+      meta: { type: 'deck', total_cards: appCards().length, exported_at: nowIso(), schema_version: '3.0' },
+      cards: appCards().map(cleanDeckCard)
+    };
+  }
+
+  function backupPayload() {
+    return {
+      metadata: { type: 'deck_with_progress', deck_fingerprint: deckFingerprint(), exported_at: nowIso(), schema_version: '3.0' },
+      cards: cleanDeckPayload().cards,
+      progress: exportProgressMap()
+    };
+  }
+
+  function downloadJson(name, payload) {
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 500);
+  }
+
+  function exportCleanDeck() { downloadJson('cozy_arcade_clean_deck.json', cleanDeckPayload()); }
+  function exportProgressOnly() { downloadJson('cozy_arcade_progress_only.json', progressPayload()); }
+  function exportDeckWithProgress() { downloadJson('cozy_arcade_deck_with_progress_backup.json', backupPayload()); }
+  function exportSessionSummary() {
+    const vals = Object.values(phase3State.progress || {});
+    downloadJson('cozy_arcade_session_summary.json', {
+      metadata: { type: 'session_summary', exported_at: nowIso() },
+      session: {
+        score: typeof score !== 'undefined' ? score : 0,
+        streak: typeof streak !== 'undefined' ? streak : 0,
+        correct: vals.reduce((n, p) => n + Number(p.correct_count || 0), 0),
+        incorrect: vals.reduce((n, p) => n + Number(p.wrong_count || 0), 0),
+        cards_seen: session.seenThisSession.size,
+        one_thing_last: document.querySelector('.oneThingText351')?.textContent || '',
+        weakest_system: ''
+      }
+    });
+  }
+
+  function parseJsonLoose(text) {
+    try { return JSON.parse(text); }
+    catch (_) {
+      const cleaned = String(text || '').replace(/:\s*NaN(\s*[,}])/g, ': null$1').replace(/:\s*Infinity(\s*[,}])/g, ': null$1').replace(/:\s*-Infinity(\s*[,}])/g, ': null$1');
+      return JSON.parse(cleaned);
+    }
+  }
+
+  function importObjectPhase3(obj, label) {
+    const type = clean(obj?.metadata?.type || obj?.meta?.type || obj?.type);
+    if (type === 'session_summary') {
+      try { toast('This is a session summary, not a deck/progress backup.'); } catch (_) {}
+      return { cards: 0, progress: 0, skipped: 'session_summary' };
+    }
+    const rawCards = Array.isArray(obj) ? obj : (Array.isArray(obj?.cards) ? obj.cards : (Array.isArray(obj?.data) ? obj.data : []));
+    let importedCards = 0;
+    if (rawCards.length) {
+      const normalized = rawCards.map(card => normalizeCardIdentity(Object.assign({}, card)));
+      setAppCards(normalized);
+      importedCards = normalized.length;
+      phase3State.deck_label = label || obj?.metadata?.deck_label || obj?.meta?.deck_label || phase3State.deck_label;
+      phase3State.deck_fingerprint = deckFingerprint(normalized);
+    }
+    const progressSource = obj?.progress ? { progress: obj.progress } : (obj?.state ? { state: obj.state } : null);
+    const migrated = progressSource ? migrateLegacyProgress(progressSource, appCards()) : {};
+    Object.keys(migrated).forEach(cardId => {
+      phase3State.progress[cardId] = Object.assign(defaultProgress(cardId), phase3State.progress[cardId] || {}, migrated[cardId], { card_id: cardId });
+    });
+    savePhase3State();
+    updateKpisPhase3();
+    try { toast(importedCards ? 'Imported ' + importedCards + ' cards' : 'Progress merged'); } catch (_) {}
+    return { cards: importedCards, progress: Object.keys(migrated).length };
+  }
+
+  function importFilePhase3(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try { importObjectPhase3(parseJsonLoose(reader.result || '{}'), file.name); }
+      catch (err) { try { toast('Import failed: ' + (err?.message || 'check file')); } catch (_) {} }
+    };
+    reader.readAsText(file);
+  }
+
+  function wireFileInputs() {
+    ['limitlessHomeDeckFile', 'deckFile', 'deckFile2', 'deckUpload351', 'mergeFile2', 'progressFile2'].forEach(id => {
+      const el = q(id);
+      if (!el || el.dataset.phase3Input === '1') return;
+      const clone = el.cloneNode(true);
+      clone.dataset.phase3Input = '1';
+      clone.setAttribute('accept', '.json,application/json');
+      clone.addEventListener('change', event => {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation?.();
+        importFilePhase3(file);
+        try { event.target.value = ''; } catch (_) {}
+      }, true);
+      el.replaceWith(clone);
+    });
+  }
+
+  function optionHtml(selected) {
+    const opts = [
+      ['new_first', 'New cards first'],
+      ['random_all', 'Random - all cards'],
+      ['random_new', 'Random - new cards'],
+      ['reviewed_first', 'Reviewed cards first'],
+      ['due', 'Due cards only'],
+      ['review_deck', 'Review deck: pinned / missed / hard']
+    ];
+    return opts.map(([value, label]) => '<option value="' + value + '"' + (value === selected ? ' selected' : '') + '>' + label + '</option>').join('');
+  }
+
+  function wireUi() {
+    const browse = q('browseScope351');
+    if (browse) {
+      const selected = normalizeMode(browse.value || phase3State.settings.solo_order);
+      browse.dataset.phase3Options = '1';
+      if (browse.innerHTML !== optionHtml(selected)) browse.innerHTML = optionHtml(selected);
+      const label = browse.closest('div')?.querySelector('label');
+      if (label) label.textContent = 'General Study Mode';
+      browse.onchange = () => {
+        phase3State.settings.solo_order = normalizeMode(browse.value);
+        phase3State.settings.expansion_order = normalizeMode(browse.value);
+        savePhase3State();
+        session.poolKey = '';
+        updateKpisPhase3();
+      };
+    }
+    const anchor = q('browseReview351')?.closest('.reviewBrowse351') || q('homeActions351');
+    if (anchor && !q('expansionOrderPhase3')) {
+      const wrap = document.createElement('div');
+      wrap.innerHTML = '<label>Knowledge Expansion Order</label><select id="expansionOrderPhase3">' + optionHtml(phase3State.settings.expansion_order) + '</select>';
+      anchor.insertBefore(wrap, q('browseReview351'));
+      q('expansionOrderPhase3').onchange = event => {
+        phase3State.settings.expansion_order = normalizeMode(event.target.value);
+        savePhase3State();
+        session.poolKey = '';
+      };
+    }
+    if (q('limitlessExampleDeck')) q('limitlessExampleDeck').textContent = 'Download Clean Deck JSON';
+    if (q('exportBtn')) { q('exportBtn').textContent = 'Export Progress'; q('exportBtn').onclick = exportProgressOnly; }
+    if (q('pauseExport')) { q('pauseExport').textContent = 'Export Progress'; q('pauseExport').onclick = exportProgressOnly; }
+    if (q('drawerExport351')) { q('drawerExport351').textContent = 'Download Clean Deck JSON'; q('drawerExport351').onclick = exportCleanDeck; }
+    if (q('exportJson351')) { q('exportJson351').textContent = 'Download Clean Deck JSON'; q('exportJson351').onclick = exportCleanDeck; }
+    if (q('limitlessExampleDeck')) q('limitlessExampleDeck').onclick = exportCleanDeck;
+    if (q('settingsExportProgress351')) q('settingsExportProgress351').onclick = exportProgressOnly;
+    if (q('exportCardsOnly2')) { q('exportCardsOnly2').textContent = 'Download Clean Deck JSON'; q('exportCardsOnly2').onclick = exportCleanDeck; }
+    if (q('exportProgress2')) { q('exportProgress2').textContent = 'Export Progress Only'; q('exportProgress2').onclick = exportProgressOnly; }
+    if (q('exportEntire2')) { q('exportEntire2').textContent = 'Export Deck + Progress Backup'; q('exportEntire2').onclick = exportDeckWithProgress; }
+    if (q('exportMergeInfo2')) { q('exportMergeInfo2').textContent = 'Export Session Summary'; q('exportMergeInfo2').onclick = exportSessionSummary; }
+    if (q('exportProgress351Btn')) q('exportProgress351Btn').onclick = () => { exportProgressOnly(); q('saveProgress351')?.classList.add('hidden'); try { home(true); } catch (_) {} };
+    if (q('browseReview351')) q('browseReview351').onclick = () => { showReviewPhase3(); };
+    if (q('spacedBtn')) q('spacedBtn').onclick = () => showReviewPhase3('due');
+  }
+
+  function showReviewPhase3(mode) {
+    try { show('review'); } catch (_) {}
+    renderReviewList(normalizeMode(mode || q('browseScope351')?.value || 'review_deck'));
+  }
+
+  function patchFunctions() {
+    window.canonicalCardId = canonicalCardId;
+    window.defaultProgress = defaultProgress;
+    window.getProgress = getProgress;
+    window.setProgress = setProgress;
+    window.rateCard = rateCard;
+    window.getStudyPool = getStudyPool;
+    window.migrateLegacyProgress = migrateLegacyProgress;
+    window.cozyPhase3 = { exportCleanDeck, exportProgressOnly, exportDeckWithProgress, exportSessionSummary, importObjectPhase3, cleanDeckPayload, progressPayload, backupPayload, getStudyPool, clearSessionBuried, wireUi };
+    window.cozyProgressPayload351 = progressPayload;
+    window.mergeProgressObject351 = obj => {
+      const migrated = migrateLegacyProgress(obj?.progress ? { progress: obj.progress } : obj, appCards());
+      Object.keys(migrated).forEach(cardId => { phase3State.progress[cardId] = Object.assign(defaultProgress(cardId), phase3State.progress[cardId] || {}, migrated[cardId]); });
+      savePhase3State();
+      updateKpisPhase3();
+      return Object.keys(migrated).length;
+    };
+    window.cozyParseJson351 = parseJsonLoose;
+    window.importLimitlessDeck = importObjectPhase3;
+    window.importLimitlessFile = importFilePhase3;
+    window.exportSession = exportProgressOnly;
+    window.exportDeckJson351 = exportCleanDeck;
+    window.exportProgress351 = exportProgressOnly;
+    window.showReview = showReview = showReviewPhase3;
+    window.updateKpis = updateKpis = updateKpisPhase3;
+    window.saveState = saveState = savePhase3State;
+    window.cardState = cardState = card => progressForCard(card);
+    window.record = record = (card, ok) => {
+      const id = canonicalCardId(card);
+      session.seenThisSession.add(id);
+      setProgress(id, { last_seen_at: nowIso(), repair_point: ok === false ? true : getProgress(id).repair_point });
+    };
+    window.rate = rate = (card, rating) => {
+      rateCard(canonicalCardId(card), rating);
+      updateKpisPhase3();
+    };
+    window.cardPool = cardPool = () => sessionPool(mode === 'domain' ? 'expansion' : 'solo');
+    window.nextCard = nextCard = () => {
+      const gameType = mode === 'domain' ? 'expansion' : 'solo';
+      const pool = sessionPool(gameType);
+      if (!pool.length) { try { toast('No cards available for this study mode'); } catch (_) {} return; }
+      current = pool[index % pool.length];
+      index += 1;
+      if (typeof makeChoices === 'function') makeChoices();
+    };
+    window.resetRun = resetRun = () => {
+      score = 0; streak = 0; hp = 100; gate = 1; domainRound = 1; paused = false; index = 0;
+      clearSessionBuried();
+      nextCard();
+    };
+    const priorStartSolo = window.startSolo || startSolo;
+    window.startSolo = startSolo = function() { phase3State.settings.solo_order = normalizeMode(q('browseScope351')?.value || phase3State.settings.solo_order); savePhase3State(); return priorStartSolo.apply(this, arguments); };
+    const priorStartDomain = window.startDomain || startDomain;
+    window.startDomain = startDomain = function() { phase3State.settings.expansion_order = normalizeMode(q('expansionOrderPhase3')?.value || phase3State.settings.expansion_order); savePhase3State(); return priorStartDomain.apply(this, arguments); };
+    if (q('startSolo')) q('startSolo').onclick = startSolo;
+    if (q('startDomain')) q('startDomain').onclick = startDomain;
+  }
+
+  function install() {
+    normalizeDeckIdentities();
+    phase3State = coerceState(phase3State, appCards());
+    try { state = phase3State.progress; } catch (_) {}
+    savePhase3State();
+    patchFunctions();
+    wireFileInputs();
+    wireUi();
+    updateKpisPhase3();
+  }
+
+  install();
+  document.addEventListener('DOMContentLoaded', install);
+  setTimeout(install, 100);
+  setTimeout(install, 600);
+  setInterval(() => { wireFileInputs(); wireUi(); updateKpisPhase3(); }, 1000);
+})();
+</script>
 </body></html>
