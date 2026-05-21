@@ -8905,6 +8905,56 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       ['TAGS',c.tags]
     ].filter(x=>clean(x[1])).map(x=>x[0]+':\n'+x[1]).join('\n\n');
   }
+  function oneThingStableKey351(card, fallback){
+    const key=clean(card&&(card.qid_unique||card.card_id||card.id||card.json_id||card.qid||card.diagnosis||card.answer));
+    return key||clean(fallback).slice(0,120);
+  }
+  function oneThingStoredValue351(card){
+    const keys=[card&&card.qid_unique,card&&card.card_id,card&&card.id,card&&card.json_id,card&&card.qid,card&&card.diagnosis,card&&card.answer].map(clean).filter(Boolean);
+    const maps=[];
+    try{maps.push(JSON.parse(localStorage.getItem('cozyUserOneThingMap351')||'{}')||{});}catch(e){}
+    try{maps.push(JSON.parse(localStorage.getItem(USER_ONE_THING_KEY)||'{}')||{});}catch(e){}
+    for(const map of maps){for(const key of keys){if(clean(map&&map[key])) return map[key];}}
+    return first(card&&card.user_one_thing,card&&card.userOneThing,card&&card.one_thing,card&&card.oneThing,card&&card.takeaway,card&&card.personal_takeaway);
+  }
+  function oneThingHtml351(value){
+    try{if(typeof safeBionic==='function') return safeBionic(value);}catch(e){}
+    return esc(value);
+  }
+  function renderOneThingStable351(el, card, editing){
+    if(!el||!card) return;
+    const value=oneThingStoredValue351(card);
+    const raw=clean(value);
+    const key=oneThingStableKey351(card,raw);
+    const store=window.__cozyOneThingExpandedState351||(window.__cozyOneThingExpandedState351={});
+    const longEnough=raw.length>160||el.dataset.oneThingMeasuredLong351==='1';
+    const expanded=longEnough?store[key]==='1':true;
+    el.dataset.oneThingStableKey=key;
+    el.dataset.oneThingOverflowSignature=raw;
+    el.classList.add('oneThingUx351','oneThingDropdown351');
+    el.classList.toggle('oneThingEditing351',!!editing);
+    el.classList.toggle('oneThingEmpty351',!raw&&!editing);
+    el.classList.toggle('oneThingLong351',longEnough);
+    el.classList.toggle('expanded',expanded);
+    el.style.display=(raw||editing)?'block':'none';
+    if(editing){
+      el.innerHTML='<div class="oneThingEdit351"><textarea>'+esc(value)+'</textarea><div class="oneThingEditBtns351"><button data-one-thing-action="cancel" type="button">Cancel</button><button data-one-thing-action="save" type="button">Save</button></div></div>';
+      return;
+    }
+    if(!raw){
+      delete el.dataset.oneThingMeasuredLong351;
+      el.innerHTML='<button class="oneThingAdd351" data-one-thing-action="edit" type="button">ADD YOUR ONE THING +</button>';
+      return;
+    }
+    const toggle=longEnough?'<button type="button" class="oneThingToggle351" aria-expanded="'+(expanded?'true':'false')+'">'+(expanded?'Show less ▲':'Show more ▼')+'</button>':'';
+    const html='<div class="oneThingText351">'+oneThingHtml351(value)+'</div><button class="oneThingUpdate351" data-one-thing-action="edit" type="button">UPDATE</button>'+toggle;
+    const sig=key+'|'+raw+'|'+(longEnough?'1':'0')+'|'+(expanded?'1':'0');
+    if(el.dataset.oneThingStableRenderSig!==sig||el.innerHTML!==html){
+      el.innerHTML=html;
+      el.dataset.oneThingStableRenderSig=sig;
+    }
+  }
+  try{window.renderOneThingStable351=renderOneThingStable351;}catch(e){}
   function setDeck(next,metadata){
     const normalized=(next||[]).map(normalizeSourceCard);
     setCards(normalized);
@@ -9015,7 +9065,8 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     let board=root.querySelector('.boardTrigger350'); if(!board){board=document.createElement('div'); board.className='boardTrigger350'; trigger.insertAdjacentElement('afterend',board);}
     board.innerHTML=(typeof safeBionic==='function'?safeBionic(card.board_trigger):esc(card.board_trigger)); board.style.display=clean(card.board_trigger)?'block':'none';
     let one=root.querySelector('.oneThing350'); if(!one){one=document.createElement('div'); one.className='oneThing350'; board.insertAdjacentElement('afterend',one);}
-    const oneText=first(userOneThing(card),card.one_thing); one.innerHTML=(typeof safeBionic==='function'?safeBionic(oneText):esc(oneText)); one.style.display=clean(oneText)?'block':'none';
+    if(one.querySelector('textarea,.oneThingEdit351')) one.style.display='block';
+    else renderOneThingStable351(one,card,false);
     const fullBox=root.querySelector('.fullDropdown350');
     if(fullBox&&!fullBox.classList.contains('hidden')) fullBox.innerHTML='<button type="button" class="fullClose351">UP TO CLOSE</button><pre style="white-space:pre-wrap;margin:0">'+esc(sourceFull(card))+'</pre>';
   }
@@ -9226,6 +9277,10 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   function renderOneThing351(el, card, editing = false){
     if(!el || !card) return;
     const value = oneThingValue351(card);
+    if(!editing && typeof window.renderOneThingStable351 === 'function'){
+      window.renderOneThingStable351(el, card, false);
+      return;
+    }
     el.style.display = 'block';
     el.classList.add('oneThingUx351');
     el.classList.toggle('oneThingEmpty351', !value && !editing);
@@ -9716,11 +9771,10 @@ Do not rewrite medical content. Map sys/system fields to card.sys.`;
     document.querySelectorAll('.oneThing350').forEach(one => {
       if (one.querySelector('textarea')) return;
       if (!one.querySelector('[data-one-thing-action]')) {
-        const value = one.textContent.trim();
-        one.classList.add('oneThingUx351');
-        one.innerHTML = value
-          ? `<div class="oneThingText351">${value}</div><button class="oneThingUpdate351" data-one-thing-action="edit" type="button">UPDATE</button>`
-          : '<button class="oneThingAdd351" data-one-thing-action="edit" type="button">ADD YOUR ONE THING +</button>';
+        try {
+          const card = typeof current !== 'undefined' ? current : null;
+          if (card && typeof window.renderOneThingStable351 === 'function') window.renderOneThingStable351(one, card, false);
+        } catch (_) {}
       }
     });
   }
@@ -9904,7 +9958,7 @@ Do not rewrite medical content. Map sys/system fields to card.sys.`;
   object-fit: contain !important;
   content: url('./MODE%20PURPLE%20SIGIL.png') !important;
 }
-.oneThing350.oneThingUx351.oneThingLong351 {
+.oneThing350.oneThingUx351.oneThingLong351:not(.oneThingDropdown351) {
   max-height: 5.6em !important;
   overflow: hidden !important;
   position: relative !important;
@@ -9952,12 +10006,16 @@ function fixCozyV24SigilsAndOneThingOverflow() {
 
   document.querySelectorAll('.oneThing350').forEach(el => {
     if (el.querySelector('textarea')) return;
-    const signature = el.textContent.trim();
+    const text = el.querySelector('.oneThingText351');
+    const signature = (text || el).textContent.trim();
     const isLong = el.scrollHeight > 90 || signature.length > 180;
-    const changed = el.dataset.oneThingOverflowSignature !== signature;
     el.dataset.oneThingOverflowSignature = signature;
+    el.dataset.oneThingMeasuredLong351 = isLong ? '1' : '0';
     el.classList.toggle('oneThingLong351', isLong);
-    if (changed) el.classList.toggle('expanded', !isLong);
+    if (el.classList.contains('oneThingDropdown351')) {
+      el.querySelector('.oneThingFade351')?.remove();
+      return;
+    }
     if (isLong && !el.querySelector('.oneThingFade351')) {
       const fade = document.createElement('div');
       fade.className = 'oneThingFade351';
@@ -9981,14 +10039,6 @@ function fixCozyV24SigilsAndOneThingOverflow() {
   else run();
   setTimeout(run, 250);
   setTimeout(run, 900);
-
-  document.addEventListener('click', ev => {
-    const one = ev.target?.closest?.('.oneThing350');
-    if (!one) return;
-    if (ev.target.closest('[data-one-thing-action],button,textarea,input,a')) return;
-    if (one.classList.contains('oneThingLong351')) one.classList.toggle('expanded');
-  });
-
   new MutationObserver(run).observe(document.body, { childList: true, subtree: true });
 })();
 </script>
@@ -10309,7 +10359,7 @@ function fixCanonicalDisplayTitle351() {
   transition: max-height .22s ease !important;
 }
 .oneThing350.oneThingDropdown351.oneThingLong351:not(.expanded) .oneThingText351 {
-  max-height: 4.65em !important;
+  max-height: 4.8em !important;
   overflow: hidden !important;
 }
 .oneThing350.oneThingDropdown351.oneThingLong351.expanded .oneThingText351 {
@@ -10370,10 +10420,8 @@ function fixStableOneThingDropdown351() {
     window.__cozyOneThingDropdownHook351 = true;
     document.addEventListener('click', ev => {
       const toggle = ev.target?.closest?.('.oneThingToggle351');
-      const body = ev.target?.closest?.('.oneThing350.oneThingLong351.oneThingDropdown351');
-      const blocked = ev.target?.closest?.('[data-one-thing-action],button,textarea,input,a');
-      if (!toggle && (!body || blocked)) return;
-      const el = toggle ? toggle.closest('.oneThing350') : body;
+      if (!toggle) return;
+      const el = toggle.closest('.oneThing350');
       if (!el) return;
       ev.preventDefault();
       ev.stopPropagation();
@@ -10402,6 +10450,7 @@ function fixStableOneThingDropdown351() {
     el.dataset.oneThingStableKey = key;
     const lineHeight = parseFloat(getComputedStyle(text).lineHeight) || 24;
     const longEnough = raw.length > 160 || text.scrollHeight > (lineHeight * 3.35);
+    el.dataset.oneThingMeasuredLong351 = longEnough ? '1' : '0';
     el.classList.toggle('oneThingLong351', longEnough);
 
     let toggle = el.querySelector('.oneThingToggle351');
@@ -10421,7 +10470,7 @@ function fixStableOneThingDropdown351() {
       if (toggle) toggle.remove();
       delete store[key];
     }
-    el.dataset.oneThingOverflowSignature = el.textContent.trim();
+    el.dataset.oneThingOverflowSignature = raw;
   });
 }
 
@@ -10436,7 +10485,7 @@ function fixStableOneThingDropdown351() {
         const key = el.dataset.oneThingStableKey || '';
         const saved = key && window.__cozyOneThingExpandedState351 && window.__cozyOneThingExpandedState351[key] === '1';
         if (saved) el.classList.add('expanded');
-        el.dataset.oneThingOverflowSignature = el.textContent.trim();
+        el.dataset.oneThingOverflowSignature = (el.querySelector('.oneThingText351')?.textContent || '').trim();
       });
       return out;
     };
