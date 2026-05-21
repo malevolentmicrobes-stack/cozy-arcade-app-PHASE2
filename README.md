@@ -1,67 +1,127 @@
-# Cozy Arcade App
+# Cozy Arcade Board Prep — Medicine
 
-Cozy Arcade Board Prep Medicine is a single-file offline study app. This public version ships as a blank app: no private ABIM deck, no MGH deck, and no connected database.
-
-## Branch Model
+A single-file offline flashcard game for medical board prep. No server. No account. Open `index.html`, drag in a JSON deck, and study.
 
 ```text
 malevolentmicrobes-stack/cozy-arcade-app
-├── main    private ABIM version
-├── public  sanitized GitHub Pages version
-└── dev     working branch before PRs
+├── main    current publication branch
+├── public  optional GitHub Pages branch
+└── dev     working branch
 ```
-
-This branch is prepared for the sanitized/public flow: open `index.html`, upload your own JSON deck, study offline, then export progress or deck JSON from the app.
-
-## Public Files
-
-```text
-index.html
-example_deck_template.json
-README.md
-.gitignore
-HOW_TO_CREATE_YOUR_OWN_CARDS(1).md
-```
-
-`mgh_whitebook_cards_v17_index.json`, ABIM exports, and other source decks are intentionally ignored and should not be pushed to the public branch.
 
 ## Quick Start
 
-Open `index.html` directly in a browser, or publish the branch with GitHub Pages.
+1. Open `index.html` in any browser.
+2. Drag `example_deck_template.json` onto the app to test the flow.
+3. Replace the example cards with your own JSON deck.
+4. Use **Export Progress** after studying if you want a portable backup.
 
-For GitHub Pages:
+GitHub Pages URL:
+`https://malevolentmicrobes-stack.github.io/cozy-arcade-app/`
 
-1. Push the sanitized branch to GitHub.
-2. In the repository settings, enable Pages from the branch root.
-3. Open the Pages URL.
-4. Use `Upload JSON Deck` in the app.
-5. Use `Download Example JSON` or `example_deck_template.json` as the template for your own cards.
+## Study Flow
 
-## JSON Import
+```text
+Upload JSON deck -> Study New Cards -> answer -> reveal one_thing
+                                      -> Show Full Card for objective/explanation
+```
 
-The app accepts a JSON object with a `cards` array. Minimal card shape:
+The app supports:
+
+- System filter: `sys`
+- Test/deck filter: `test`
+- Status filter: `new`, `reviewed`, `pinned`, `missed`
+- Search across diagnosis, qid, system, test, tags, and presentation
+- Progress export/import by `qid`
+- AI card prompt panel for converting notes into JSON
+
+Keyboard controls:
+`←` / `→` move, `1`-`4` select, `Space` or `Enter` confirm, `F` full card, `Enter` next.
+
+## Card Schema
+
+Minimum working card:
 
 ```json
 {
-  "meta": {
-    "schema": "cozy-arcade-v1",
-    "total": 1
-  },
   "cards": [
     {
-      "id": "demo-001",
+      "qid": "MY-001",
       "sys": "CV",
-      "diagnosis": "Myocardial infarction",
-      "prompt": "Patient with chest pain, diaphoresis, and ST elevation.",
-      "one_thing": "STEMI needs emergent PCI.",
-      "board_trigger": "IF ST elevation with ischemic symptoms -> activate cath lab"
+      "diagnosis": "STEMI",
+      "presentation": "Crushing chest pain, diaphoresis, ST elevation in II/III/aVF.",
+      "one_thing": "Inferior STEMI -> right coronary artery -> PCI within 90 minutes."
     }
   ]
 }
 ```
 
-The importer also normalizes nearby field names such as `front`, `question`, `back`, `answer`, `topic`, `system`, `tags`, `level_1`, `level_2`, `level_3_recall`, `level_3_treatment`, and `level_3_next_step`.
+Full card fields:
 
-## Offline Use
+| Field | Required | Purpose |
+| --- | --- | --- |
+| `qid` | yes | Unique ID used for progress tracking |
+| `sys` | yes | Organ system, normalized on import |
+| `diagnosis` | yes | Correct answer choice |
+| `presentation` | yes | Question or clinical stem shown first |
+| `one_thing` | yes | Main reveal after answering |
+| `test` | recommended | Deck/test group for filtering |
+| `educational_objective` | recommended | Full teaching point in expanded card |
+| `board_trigger` | recommended | IF finding -> diagnosis -> action |
+| `why_not_others` | optional | Distractor explanations |
+| `explanation` | optional | Longer full explanation |
+| `quick_recall` | optional | One-sentence recall fallback |
+| `tags` | optional | Comma-separated keywords |
 
-Uploaded cards are stored in browser localStorage for this temporary database-free beta. Export your deck or progress JSON from the app if you want a portable backup.
+Accepted aliases:
+
+- `prompt`, `front`, `question`, `clinical_vignette_summary` -> `presentation`
+- `answer`, `back` -> `diagnosis`
+- `takeaway`, `quick_recall`, `level_2_three_second` -> `one_thing`
+- `system`, `subject` -> `sys`
+
+## Create Cards From Notes
+
+Open the app and click **AI Cards**. Copy the prompt, paste it into Claude or ChatGPT with your notes, then drag the returned JSON into the app.
+
+The prompt enforces:
+
+- `presentation` is the testing prompt
+- `diagnosis` is the correct answer
+- `one_thing` is the key takeaway in your own words
+- `educational_objective` and `explanation` stay behind the full-card expansion
+
+Manual instructions are in `HOW_TO_CREATE_YOUR_OWN_CARDS(1).md`.
+
+## Progress
+
+Progress is saved automatically in browser `localStorage` under `cazy_v3`.
+
+Export:
+`cozy_progress_YYYY-MM-DD.json`
+
+Import:
+Use **Import Progress** and select a prior progress JSON. The app merges by `qid`, keeping the newer record when timestamps conflict.
+
+When a deck loads, the app counts never-seen cards and defaults to the New-card study path.
+
+## Public Files
+
+```text
+index.html                       app shell, no private cards embedded
+example_deck_template.json       public demo deck
+README.md                        this file
+HOW_TO_CREATE_YOUR_OWN_CARDS(1).md
+ABIM_JSON_SCHEMA_REFERENCE.txt   schema reference, ignored from public commits when private
+MODE PURPLE SIGIL.png            mode sigil asset
+EXPANSION SIGAL.png              expansion sigil asset
+DNAHELIX_ORB_SIGAL.png           DNA orb asset
+4_POINT_RUNNER_SPRITE.png        runner sprite asset
+.gitignore                       blocks private decks and exports
+```
+
+Private decks matching `*ABIM*`, `*MGH*`, and `*SOURCE*` are ignored and should not be committed to public releases.
+
+## Developer Notes
+
+`index.html` is intentionally standalone. No build step. No package install. The current publication shell keeps the prior complex prototype in `index_PRIOR.html` only as an archive/validation reference.
