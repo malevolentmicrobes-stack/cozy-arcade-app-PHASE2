@@ -22,21 +22,23 @@ GitHub Pages URL:
 ## Study Flow
 
 ```text
-Upload JSON deck -> Study New Cards -> answer -> reveal one_thing
-                                      -> Show Full Card for objective/explanation
+Upload JSON deck -> Solo Studying / Knowledge Expansion -> answer -> reveal
+                                                      -> Full Card for objective/explanation
 ```
 
 The app supports:
 
+- Solo Studying runner-lane game
+- Knowledge Expansion orb game
+- Shadow Dungeon review mode
 - System filter: `sys`
-- Test/deck filter: `test`
-- Status filter: `new`, `reviewed`, `pinned`, `missed`
-- Search across diagnosis, qid, system, test, tags, and presentation
-- Progress export/import by `qid`
-- AI card prompt panel for converting notes into JSON
+- Study scope filter: new, random, review, hard, pinned, tagged, due-weighted
+- Local JSON/CSV upload with browser-only storage
+- Export deck/progress JSON
+- Settings and Game Play panel with AI prompt guidance
 
 Keyboard controls:
-`←` / `→` move, `1`-`4` select, `Space` or `Enter` confirm, `F` full card, `Enter` next.
+`←` / `→` move, `1`-`4` select/rate, `Enter` continue, `Down` full card, `Up` close full card.
 
 ## Card Schema
 
@@ -82,7 +84,7 @@ Accepted aliases:
 
 ## Create Cards From Notes
 
-Open the app and click **AI Cards**. Copy the prompt, paste it into Claude or ChatGPT with your notes, then drag the returned JSON into the app.
+Open **Settings and Game Play**. Copy the AI prompt, paste it into Claude or ChatGPT with your notes, then drag the returned JSON into the app.
 
 The prompt enforces:
 
@@ -95,15 +97,15 @@ Manual instructions are in `HOW_TO_CREATE_YOUR_OWN_CARDS(1).md`.
 
 ## Progress
 
-Progress is saved automatically in browser `localStorage` under `cazy_v3`.
+Progress and uploaded decks are saved locally in the browser. Use export as your portable backup.
 
 Export:
-`cozy_progress_YYYY-MM-DD.json`
+`cozy_arcade_deck_export.json` or the app's progress export file
 
 Import:
-Use **Import Progress** and select a prior progress JSON. The app merges by `qid`, keeping the newer record when timestamps conflict.
+Use the settings/import controls to upload deck JSON/CSV or merge progress JSON.
 
-When a deck loads, the app counts never-seen cards and defaults to the New-card study path.
+No private cards are embedded in `index.html`; users upload their own deck locally.
 
 ## Public Files
 
@@ -124,4 +126,4 @@ Private decks matching `*ABIM*`, `*MGH*`, and `*SOURCE*` are ignored and should 
 
 ## Developer Notes
 
-`index.html` is intentionally standalone. No build step. No package install. The current publication shell keeps the prior complex prototype in `index_PRIOR.html` only as an archive/validation reference.
+`index.html` is intentionally standalone. No build step. No package install. The restored publication shell uses the richer prior gameplay engine with a blank public deck (`cards_embedded: 0`).

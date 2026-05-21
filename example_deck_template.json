@@ -2,24 +2,10 @@
   "meta": {
     "schema": "cozy-arcade-v3",
     "version": "public-example-v3",
-    "description": "Public example deck. Drag this into the app to test the flow, then replace with your own cards.",
+    "description": "Public example deck — 3 demo cards. Drag this into the app to see how it works, then replace with your own cards.",
     "total": 3,
-    "required_fields": [
-      "qid",
-      "sys",
-      "diagnosis",
-      "presentation",
-      "one_thing"
-    ],
-    "optional_fields": [
-      "test",
-      "educational_objective",
-      "board_trigger",
-      "why_not_others",
-      "explanation",
-      "quick_recall",
-      "tags"
-    ]
+    "required_fields": ["qid", "sys", "diagnosis", "presentation", "one_thing"],
+    "optional_fields": ["board_trigger", "educational_objective", "why_not_others", "explanation", "test", "quick_recall", "tags"]
   },
   "cards": [
     {
@@ -28,12 +14,12 @@
       "test": "DEMO DECK",
       "diagnosis": "STEMI",
       "presentation": "62-year-old man with 45 minutes of crushing substernal chest pain, diaphoresis, and ST elevation in leads II, III, aVF.",
-      "one_thing": "ST elevation in inferior leads (II, III, aVF) = inferior STEMI from RCA -> emergent PCI within 90 minutes.",
-      "educational_objective": "Inferior STEMI is commonly caused by right coronary artery occlusion. Emergent PCI is preferred when available within 90 minutes of first medical contact.",
-      "board_trigger": "IF ST elevation in II, III, aVF -> inferior STEMI -> activate cath lab -> PCI within 90 minutes",
-      "why_not_others": "Unstable angina has no ST elevation and no biomarker rise. Pericarditis usually causes diffuse ST elevation rather than a contiguous coronary territory.",
-      "explanation": "The RCA supplies the inferior wall in most patients. Inferior STEMI should prompt emergent reperfusion and consideration of right-sided ECG leads because RV infarct can change nitrate management.",
-      "quick_recall": "Inferior STEMI: ST elevation II/III/aVF -> RCA -> PCI within 90 minutes.",
+      "one_thing": "ST elevation in inferior leads (II, III, aVF) = inferior STEMI from RCA → emergent PCI within 90 min.",
+      "educational_objective": "Inferior STEMI is caused by occlusion of the right coronary artery. Emergent PCI is the treatment of choice when available within 90 minutes of first medical contact.",
+      "board_trigger": "IF ST elevation in II + III + aVF → inferior STEMI → activate cath lab → PCI <90 min",
+      "why_not_others": "Unstable angina has no ST elevation and no biomarker rise. Pericarditis causes diffuse ST elevation (saddle-shaped) across multiple leads, not contiguous territory.",
+      "explanation": "The right coronary artery (RCA) supplies the inferior wall. Occlusion causes ST elevation in the inferior leads. Right heart involvement should be screened with right-sided leads (RV infarct changes management — avoid nitrates).",
+      "quick_recall": "Inferior STEMI: ST elevation II/III/aVF → RCA → PCI <90 min",
       "tags": "CV, STEMI, ACS, must-know"
     },
     {
@@ -41,27 +27,27 @@
       "sys": "PULM",
       "test": "DEMO DECK",
       "diagnosis": "Tension pneumothorax",
-      "presentation": "Trauma patient on mechanical ventilation develops sudden hypotension, absent left breath sounds, tracheal deviation to the right, and rising peak airway pressures.",
-      "one_thing": "Tension pneumothorax is a clinical diagnosis. Decompress immediately; do not wait for chest x-ray.",
-      "educational_objective": "Tension pneumothorax causes obstructive shock from air under pressure compressing the lung and mediastinum. Immediate needle decompression is life-saving and should be followed by chest tube placement.",
-      "board_trigger": "IF hypotension + unilateral absent breath sounds + tracheal deviation -> tension pneumothorax -> needle decompression now",
-      "why_not_others": "Hemothorax can cause absent breath sounds but classically has dullness to percussion and blood loss. Mainstem intubation causes unilateral breath sounds but does not usually cause obstructive shock with tracheal deviation.",
-      "explanation": "Air enters the pleural space under pressure, collapses the ipsilateral lung, shifts the mediastinum, and impairs venous return. Treat before imaging when unstable.",
-      "quick_recall": "Tension pneumothorax: hypotension + absent breath sounds + tracheal shift -> immediate decompression.",
+      "presentation": "Trauma patient, mechanically ventilated, sudden hypotension, absent left breath sounds, tracheal deviation to the right, rising peak airway pressures.",
+      "one_thing": "Tension pneumothorax = clinical diagnosis + immediate needle decompression. Do NOT wait for CXR.",
+      "educational_objective": "Tension pneumothorax causes obstructive shock by compressing the mediastinum. Immediate needle decompression (2nd ICS, midclavicular line) is life-saving and should not be delayed for imaging.",
+      "board_trigger": "IF hypotension + absent unilateral breath sounds + tracheal deviation → tension pneumothorax → needle decompression NOW",
+      "why_not_others": "Hemothorax causes absent breath sounds but without tracheal deviation and without elevated airway pressures. Mainstem intubation causes unilateral absent sounds but no hypotension from obstructive shock.",
+      "explanation": "Air accumulates under pressure, collapsing the ipsilateral lung and shifting mediastinum contralaterally. JVD from impaired venous return, tracheal deviation away from affected side. Needle at 2nd ICS MCL converts to simple pneumothorax, then chest tube.",
+      "quick_recall": "Tension PTX: hypotension + absent sounds + trachea deviation → needle decompression 2nd ICS MCL",
       "tags": "PULM, emergency, pneumothorax, must-know"
     },
     {
       "qid": "demo-003",
       "sys": "RENAL",
       "test": "DEMO DECK",
-      "diagnosis": "SIADH",
-      "presentation": "65-year-old with small cell lung cancer has sodium 122, low serum osmolality, euvolemic exam, urine sodium greater than 40, and urine osmolality greater than 100.",
-      "one_thing": "SIADH = euvolemic hypotonic hyponatremia with inappropriately concentrated urine. Start with fluid restriction.",
-      "educational_objective": "SIADH presents with hypotonic hyponatremia, euvolemia, urine sodium greater than 40 mEq/L, urine osmolality greater than 100 mOsm/kg, and normal thyroid/adrenal function.",
-      "board_trigger": "IF euvolemic hyponatremia + urine Na >40 + urine Osm >100 + malignancy -> SIADH -> fluid restriction",
-      "why_not_others": "Hypovolemic hyponatremia has volume depletion signs. Hypervolemic hyponatremia has edema or ascites. Hypothyroidism and adrenal insufficiency must be excluded.",
-      "explanation": "Excess ADH retains free water and dilutes serum sodium. Urine remains concentrated despite low serum osmolality. Correct sodium slowly to avoid osmotic demyelination.",
-      "quick_recall": "SIADH: euvolemic hypo-Na + urine Na >40 + urine Osm >100 -> fluid restrict.",
+      "diagnosis": "Hyponatremia — SIADH",
+      "presentation": "65-year-old with small cell lung cancer, Na 122, euvolemic on exam, urine Na >40, urine Osm >100, serum Osm low.",
+      "one_thing": "SIADH: euvolemic hyponatremia + urine Na >40 + urine Osm inappropriately concentrated → fluid restrict first.",
+      "educational_objective": "SIADH is diagnosed by: euvolemia + low serum Osm + urine Na >40 mEq/L + urine Osm >100 mOsm/kg + normal thyroid/adrenal function. Small cell lung cancer is the classic paraneoplastic cause.",
+      "board_trigger": "IF euvolemic hyponatremia + urine Na >40 + urine Osm >serum Osm + malignancy → SIADH → fluid restriction ± tolvaptan",
+      "why_not_others": "Hypervolemic hyponatremia (CHF, cirrhosis) shows elevated urine Na <20 with signs of volume overload. Hypovolemic hyponatremia shows urine Na <20 with volume depletion signs. Hypothyroidism and adrenal insufficiency must be excluded.",
+      "explanation": "ADH is secreted inappropriately (ectopic from small cell carcinoma, CNS, pulmonary causes). Water is retained diluting serum Na. Urine remains concentrated despite low serum Osm — the key diagnostic clue. Correct Na slowly (<8 mEq/L/24h) to prevent osmotic demyelination.",
+      "quick_recall": "SIADH: euvolemic hypo-Na + urine Na >40 + urine Osm > serum Osm → fluid restrict",
       "tags": "RENAL, hyponatremia, SIADH, electrolytes"
     }
   ]
