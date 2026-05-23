@@ -10868,6 +10868,25 @@ function fixStableOneThingDropdown351() {
     return Date.parse(progress.next_due_at) <= Date.now();
   }
 
+  function intervalLabel(days, minutes) {
+    if (minutes) return minutes + 'm';
+    if (days < 1) return '10m';
+    if (days < 30) return days + 'd';
+    return Math.round(days / 30) + 'mo';
+  }
+
+  function previewInterval(cardOrId, rating) {
+    const cardId = typeof cardOrId === 'string' ? cardOrId : canonicalCardId(cardOrId || current || {});
+    const p = getProgress(cardId);
+    const interval = Number(p.interval_days || 0);
+    const ease = Number(p.ease_factor || 2.5);
+    if (rating === 'again') return intervalLabel(0, 10);
+    if (rating === 'hard') return intervalLabel(Math.max(1, Math.round(interval * 1.2) || 1));
+    if (rating === 'good') return intervalLabel(interval <= 0 ? 1 : Math.max(1, Math.round(interval * ease)));
+    if (rating === 'easy') return intervalLabel(interval <= 0 ? 4 : Math.max(4, Math.round(interval * (ease + 0.15) * 1.3)));
+    return '';
+  }
+
   function rateCard(cardId, rating) {
     const p = getProgress(cardId);
     if (rating === 'pin') {
@@ -11297,11 +11316,30 @@ function fixStableOneThingDropdown351() {
     renderReviewList(normalizeMode(mode || q('browseScope351')?.value || 'review_deck'));
   }
 
+  function runCozySmokeTestsPhase3() {
+    const results = [];
+    const pass = name => results.push({ name, pass: true });
+    const fail = (name, err) => results.push({ name, pass: false, err: String(err || '') });
+    try { const p = defaultProgress('__smoke'); (p.stage === 'new' && p.interval_days === 0 && p.ease_factor === 2.5) ? pass('default progress') : fail('default progress', JSON.stringify(p)); } catch (err) { fail('default progress', err); }
+    try { isDue(Object.assign(defaultProgress('__due'), { repair_point: true, next_due_at: addDays(new Date(), 1).toISOString() })) ? pass('repair points are due') : fail('repair points are due'); } catch (err) { fail('repair points are due', err); }
+    try { previewInterval('__preview', 'good') === '1d' && previewInterval('__preview', 'again') === '10m' ? pass('interval previews') : fail('interval previews'); } catch (err) { fail('interval previews', err); }
+    try { const id = '__rate_smoke'; setProgress(id, Object.assign(defaultProgress(id), { stage: 'review', interval_days: 10, ease_factor: 2.5 })); rateCard(id, 'hard'); const p = getProgress(id); (p.interval_days === 12 && Math.abs(p.ease_factor - 2.35) < 0.001 && p.repair_point) ? pass('rateCard hard') : fail('rateCard hard', JSON.stringify(p)); delete phase3State.progress[id]; savePhase3State(); } catch (err) { fail('rateCard hard', err); }
+    try { Array.isArray(appCards()) ? pass('deck access') : fail('deck access'); } catch (err) { fail('deck access', err); }
+    try { (typeof importObjectPhase3 === 'function' && typeof exportProgressOnly === 'function' && typeof exportDeckWithProgress === 'function') ? pass('import/export functions') : fail('import/export functions'); } catch (err) { fail('import/export functions', err); }
+    const passed = results.filter(r => r.pass).length;
+    console.log('Cozy Phase 3 Smoke Tests: ' + passed + '/' + results.length + ' passed');
+    return { passed, total: results.length, results };
+  }
+
   function patchFunctions() {
     window.canonicalCardId = canonicalCardId;
     window.defaultProgress = defaultProgress;
     window.getProgress = getProgress;
+    window.getCardProgress = getProgress;
     window.setProgress = setProgress;
+    window.updateCardProgress = setProgress;
+    window.isDue = isDue;
+    window.previewInterval = previewInterval;
     window.rateCard = rateCard;
     window.getStudyPool = getStudyPool;
     window.migrateLegacyProgress = migrateLegacyProgress;
@@ -11315,6 +11353,7 @@ function fixStableOneThingDropdown351() {
       return Object.keys(migrated).length;
     };
     window.cozyParseJson351 = parseJsonLoose;
+    window.runCozySmokeTests = runCozySmokeTestsPhase3;
     window.importLimitlessDeck = importObjectPhase3;
     window.importLimitlessFile = importFilePhase3;
     window.exportSession = exportProgressOnly;
@@ -11332,6 +11371,11 @@ function fixStableOneThingDropdown351() {
     window.rate = rate = (card, rating) => {
       rateCard(canonicalCardId(card), rating);
       updateKpisPhase3();
+    };
+    window.ratingsHTML = ratingsHTML = () => {
+      let pinned = false, buried = false;
+      try { const st = getProgress(canonicalCardId(current || {})); pinned = !!st.pinned; buried = !!st.buried; } catch (_) {}
+      return '<div class="ratingBar"><button class="btn ' + (pinned ? 'pinActive350' : '') + '" data-rate="pin">' + (pinned ? 'Unpin' : 'Pin') + '</button><button class="btn buryBtn352 ' + (buried ? 'buryActive352' : '') + '" data-rate="bury">' + (buried ? 'Suspended' : 'Bury') + '</button><button class="btn red" data-rate="again">Again · ' + previewInterval(current, 'again') + '</button><button class="btn" data-rate="hard">Hard · ' + previewInterval(current, 'hard') + '</button><button class="btn" data-rate="good">Good · ' + previewInterval(current, 'good') + '</button><button class="btn primary" data-rate="easy">Easy · ' + previewInterval(current, 'easy') + '</button><button class="btn primary" data-rate="continue">Continue</button></div>';
     };
     window.cardPool = cardPool = () => sessionPool(mode === 'domain' ? 'expansion' : 'solo');
     window.nextCard = nextCard = () => {
