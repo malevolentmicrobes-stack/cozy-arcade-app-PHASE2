@@ -417,7 +417,7 @@ function positionOrbs(p){let cx=innerWidth/2, cy=innerHeight*.65; let maxR=Math.
 function loopDomain(){clearInterval(ticker);ticker=setInterval(()=>{if(mode!=='domain'||paused)return;timer-=.08;let p=1-Math.max(0,timer/timerMax);positionOrbs(p); if(timer<=0&&autoSelect){let nearest=0,best=1e9;orbData.forEach((o,i)=>{let d=(o.x-cursor.x)**2+(o.y-cursor.y)**2;if(d<best){best=d;nearest=i}});selectDomain(nearest)}},80)}
 function selectDomain(i){if($('domainReveal').classList.contains('hidden')===false)return;clearInterval(ticker);let ok=choices[i]===clean(current.diagnosis);orbData.forEach((o,j)=>{if(choices[j]===clean(current.diagnosis))o.el.classList.add('correct');else if(j===i)o.el.classList.add('wrong')});if(ok){score+=900+streak*175;streak++;fireworks(cursor.x,cursor.y,'cyan')}else{streak=0;fireworks(cursor.x,cursor.y,'red')}record(current,ok);setTimeout(()=>reveal('domain',ok),650)}
 function reveal(which,ok){let dx=clean(current.diagnosis), obj=clean(current.educational_objective||current.board_trigger||current.quick_recall); if(which==='solo'){$('soloRevealTitle').textContent=ok?'Gate Completed':'Learning Moment';$('soloRevealDx').textContent=dx;$('soloTrigger').textContent=obj;$('soloRevealRatings').innerHTML=ratingsHTML();$('soloReveal').classList.remove('hidden');$('soloScore').textContent=score;$('soloStreak').textContent=streak;$('hpFill').style.width=hp+'%'}else{$('domainRevealTitle').textContent=ok?'Correct':'Learning Moment';$('domainDx').textContent=dx;$('domainObj').textContent=obj;$('domainRevealRatings').innerHTML=ratingsHTML();$('domainReveal').classList.remove('hidden');$('domainScore').textContent=score;$('domainStreak').textContent=streak} bindRatings(which);}
-function ratingsHTML(){return `<div class="ratingBar"><button class="btn" data-rate="pin">Pin</button><button class="btn red" data-rate="again">No Idea</button><button class="btn" data-rate="hard">Hard</button><button class="btn" data-rate="good">Good</button><button class="btn primary" data-rate="easy">EASY</button><button class="btn primary" data-rate="continue">Continue</button></div>`}
+function ratingsHTML(){return `<div class="ratingBar"><button class="btn" data-rate="pin">Pin</button><button class="btn buryBtn352" data-rate="bury">Bury</button><button class="btn againBtn352" data-rate="again">Again</button><button class="btn" data-rate="hard">Hard</button><button class="btn" data-rate="good">Good</button><button class="btn primary" data-rate="easy">EASY</button><button class="btn primary" data-rate="continue">Continue</button></div>`}
 function bindRatings(which){document.querySelectorAll('[data-rate]').forEach(b=>b.onclick=()=>{let r=b.dataset.rate;if(r==='continue'){advance(which);return}rate(current,r); if(r==='pin')toast('Pinned'); else advance(which)})}
 function advance(which){if(hp<=0&&which==='solo')return endRun('Game Completed');nextCard(); if(which==='solo'){gate++;renderSolo();loopSolo()}else{domainRound++;renderDomain();loopDomain()}}
 function record(c,ok){let k=c.id||c.qid;state[k]=state[k]||{};state[k].seen=true;state[k].reviewed=(state[k].reviewed||0)+1;state[k].correct=(state[k].correct||0)+(ok?1:0);state[k].last=new Date().toISOString();if(!ok)state[k].rating='again';saveState();updateKpis()}
@@ -2189,7 +2189,7 @@ body:not(.hideContinueHint175158) .continueHint175158{display:block!important;ma
   }
   function ratingsHTML175158(){
     return ratingsOn()
-      ? '<div class="ratingBar"><button class="btn" data-rate="pin">Pin</button><button class="btn red" data-rate="again">No Idea</button><button class="btn" data-rate="hard">Hard</button><button class="btn" data-rate="good">Good</button><button class="btn primary" data-rate="easy">EASY</button><button class="btn primary" data-rate="continue">Continue</button></div>'
+      ? '<div class="ratingBar"><button class="btn" data-rate="pin">Pin</button><button class="btn buryBtn352" data-rate="bury">Bury</button><button class="btn againBtn352" data-rate="again">Again</button><button class="btn" data-rate="hard">Hard</button><button class="btn" data-rate="good">Good</button><button class="btn primary" data-rate="easy">EASY</button><button class="btn primary" data-rate="continue">Continue</button></div>'
       : '<div class="ratingBar"><button class="btn primary" data-rate="continue">Continue</button><span class="btn">Next card in 7s</span></div>';
   }
   const priorBind=window.bindRatings||bindRatings;
@@ -5895,11 +5895,11 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 .heroTitle{letter-spacing:.08em!important;font-size:clamp(42px,6vw,78px)!important;line-height:1.02!important;max-width:1100px}.heroSub{font-family:Orbitron,monospace;text-transform:uppercase;letter-spacing:.18em;color:#9feaff;font-weight:900;margin-top:14px}.modeCaption{margin:14px 0 0;color:#aeb8cf;font-weight:900;letter-spacing:.04em;line-height:1.35}.modeCard:nth-child(1){border-color:rgba(103,232,249,.20)}.modeCard:nth-child(2){border-color:rgba(167,139,250,.24)}
 .pauseBox{width:min(860px,92vw)!important;min-height:320px!important;background:linear-gradient(180deg,rgba(3,10,24,.90),rgba(4,8,20,.82))!important}.pauseBox .notifyLabel{font-size:clamp(28px,4vw,48px)!important;color:#bffbff!important}.pauseBox .controls .btn{min-width:160px}.settingsGear,.homeTopBtn{box-shadow:0 0 24px rgba(103,232,249,.10)!important}.hudPill{backdrop-filter:blur(14px)}
 /* PUBLIC Expansion-style reveal card: compact top diagnosis + full educational objective area */
-.reveal{width:min(1040px,92vw)!important;text-align:left!important;border-radius:26px!important;background:linear-gradient(180deg,rgba(7,9,25,.96),rgba(8,12,32,.94))!important;border:1px solid rgba(103,232,249,.26)!important;box-shadow:0 28px 96px rgba(0,0,0,.58), inset 0 0 44px rgba(103,232,249,.04)!important}.reveal h2{font-family:Orbitron,monospace;text-transform:uppercase;letter-spacing:.16em;color:#9feaff;font-size:18px!important;margin-bottom:8px!important}.dx{font-size:clamp(32px,4vw,54px)!important;color:#f5f7ff!important;letter-spacing:-.03em}.trigger{border-left:4px solid #67e8f9!important;background:rgba(103,232,249,.06)!important;color:#eef7ff!important;font-size:18px}.trigger:before{content:'EDUCATIONAL OBJECTIVE';display:block;font-family:Orbitron,monospace;font-size:11px;letter-spacing:.20em;color:#67e8f9;margin-bottom:8px}.ratingBar{justify-content:flex-start!important}.ratingBar .btn[data-rate="pin"]{border-color:#facc15;color:#fff5cc}.ratingBar .btn[data-rate="again"]{border-color:#fb5876}.ratingBar .btn[data-rate="continue"]{margin-left:auto}
+.reveal{width:min(1040px,92vw)!important;text-align:left!important;border-radius:26px!important;background:linear-gradient(180deg,rgba(7,9,25,.96),rgba(8,12,32,.94))!important;border:1px solid rgba(103,232,249,.26)!important;box-shadow:0 28px 96px rgba(0,0,0,.58), inset 0 0 44px rgba(103,232,249,.04)!important}.reveal h2{font-family:Orbitron,monospace;text-transform:uppercase;letter-spacing:.16em;color:#9feaff;font-size:18px!important;margin-bottom:8px!important}.dx{font-size:clamp(32px,4vw,54px)!important;color:#f5f7ff!important;letter-spacing:-.03em}.trigger{border-left:4px solid #67e8f9!important;background:rgba(103,232,249,.06)!important;color:#eef7ff!important;font-size:18px}.trigger:before{content:'EDUCATIONAL OBJECTIVE';display:block;font-family:Orbitron,monospace;font-size:11px;letter-spacing:.20em;color:#67e8f9;margin-bottom:8px}.ratingBar{justify-content:flex-start!important}.ratingBar .btn[data-rate="pin"]{border-color:#facc15;color:#fff5cc}.ratingBar .btn[data-rate="again"]{border-color:#fb5876}.ratingBar .btn[data-rate="continue"]{display:none!important;margin:0}
 /* Pretty blue swipe / selection feedback */
 .orb.selected,.choice.selected{outline:2px solid rgba(103,232,249,.85)!important;box-shadow:0 0 0 4px rgba(103,232,249,.12),0 0 42px rgba(103,232,249,.28)!important}.swipeFlash{position:fixed;z-index:180;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none;font-family:Orbitron,monospace;font-weight:950;letter-spacing:.22em;color:#dffbff;text-shadow:0 0 22px #67e8f9;border:1px solid rgba(103,232,249,.35);border-radius:999px;padding:12px 22px;background:rgba(4,12,28,.72);animation:swipeFlash .52s ease-out forwards}@keyframes swipeFlash{to{opacity:0;transform:translate(-50%,-60%) scale(1.08)}}
 .mobileControls{display:flex!important}.mobileControls .btn{min-width:56px}.domain .mobileControls{display:flex!important}.domainTouchPad{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:62;display:flex;gap:8px;align-items:center;justify-content:center}.domainTouchPad .btn{min-width:54px}.domain .orb{transition:left .08s linear,top .08s linear,outline .12s,box-shadow .12s,transform .12s}.domain .orb.selected{transform:scale(1.04)}
-@media(max-width:820px){.heroTitle{font-size:34px!important;letter-spacing:.05em!important}.heroSub{font-size:12px}.ratingBar .btn[data-rate="continue"]{margin-left:0}.reveal{max-height:78vh!important}.trigger{font-size:15px}.domainTouchPad{bottom:8px}.domainTouchPad .btn{padding:9px 10px}}
+@media(max-width:820px){.heroTitle{font-size:34px!important;letter-spacing:.05em!important}.heroSub{font-size:12px}.ratingBar .btn[data-rate="continue"]{display:none!important}.reveal{max-height:78vh!important}.trigger{font-size:15px}.domainTouchPad{bottom:8px}.domainTouchPad .btn{padding:9px 10px}}
 </style>
 <script id="cozyArcadeBehaviorPatch">
 (function(){
@@ -7380,7 +7380,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 
   window.ratingsHTML=function(){
     const pinned=!!((state||{})[cardKey(current)]&&(state||{})[cardKey(current)].pinned);
-    return '<div class="ratingBar" title="?"><button class="btn '+(pinned?'pinActive350':'')+'" data-rate="pin">'+(pinned?'Unpin':'Pin')+'</button><button class="btn red" data-rate="again">Weak Signal</button><button class="btn" data-rate="hard">Moderate</button><button class="btn" data-rate="good">Strong</button><button class="btn primary" data-rate="easy">Anchored</button><button class="btn primary" data-rate="continue">Continue</button><span class="signalTip351">?</span></div>';
+    return '<div class="ratingBar" title="?"><button class="btn '+(pinned?'pinActive350':'')+'" data-rate="pin">'+(pinned?'Unpin':'Pin')+'</button><button class="btn buryBtn352" data-rate="bury">Bury</button><button class="btn againBtn352" data-rate="again">Again</button><button class="btn" data-rate="hard">Hard</button><button class="btn" data-rate="good">Good</button><button class="btn primary" data-rate="easy">EASY</button><button class="btn primary" data-rate="continue">Continue</button></div>';
   };
 
   window.bindRatings=function(which){
@@ -7875,7 +7875,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       [/signals anchored today/gi, 'energy earned today'],
       [/Signal strength = how stable is this recall\?/g, ''],
       [/This is a resonance style, not a diagnosis\.\s*/g, ''],
-      [/Weak Signal/g, 'Hard'],
+      [/Weak Signal/g, 'Again'],
       [/Moderate/g, 'Hard'],
       [/Strong/g, 'Good'],
       [/Anchored/g, 'EASY']
@@ -8115,7 +8115,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       pinned = !!st.pinned;
       buried = !!st.buried;
     }catch(_){}
-    return '<div class="ratingBar"><button class="btn '+(pinned?'pinActive350':'')+'" data-rate="pin">'+(pinned?'Unpin':'Pin')+'</button><button class="btn buryBtn352 '+(buried?'buryActive352':'')+'" data-rate="bury">'+(buried?'Suspended':'Bury')+'</button><button class="btn" data-rate="hard">Hard</button><button class="btn" data-rate="good">Good</button><button class="btn primary" data-rate="easy">EASY</button><button class="btn primary" data-rate="continue">Continue</button></div>';
+    return '<div class="ratingBar"><button class="btn '+(pinned?'pinActive350':'')+'" data-rate="pin">'+(pinned?'Unpin':'Pin')+'</button><button class="btn buryBtn352 '+(buried?'buryActive352':'')+'" data-rate="bury">'+(buried?'Suspended':'Bury')+'</button><button class="btn againBtn352" data-rate="again">Again</button><button class="btn" data-rate="hard">Hard</button><button class="btn" data-rate="good">Good</button><button class="btn primary" data-rate="easy">EASY</button><button class="btn primary" data-rate="continue">Continue</button></div>';
   }
   function installRatings(){
     try{
@@ -8858,7 +8858,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     if(anchor) home.insertBefore(panel,anchor);
     else home.appendChild(panel);
     const example=document.getElementById("limitlessExampleDeck");
-    if(example) example.onclick=downloadExampleDeck;
+    if(example) example.onclick=()=>{ if(typeof window.exportProgress351==='function') window.exportProgress351(); else downloadExampleDeck(); };
   }
   function wire(){
     normalizeDeck();
@@ -9130,7 +9130,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     let panel=document.getElementById('limitlessHomeImport');
     if(!panel){panel=document.createElement('div'); panel.id='limitlessHomeImport'; panel.className='limitlessHomeControls'; home.insertBefore(panel,home.querySelector('.modeGrid')||home.firstChild);}
     panel.innerHTML='<label class="btn primary" for="limitlessHomeDeckFile">Upload JSON Deck</label><input id="limitlessHomeDeckFile" type="file" accept=".json,.csv,application/json,text/csv"><button id="limitlessExampleDeck" class="btn" type="button">Download JSON</button><span id="limitlessLocalDeckStorage" class="btn" aria-disabled="true"></span>';
-    const ex=document.getElementById('limitlessExampleDeck'); if(ex) ex.onclick=downloadJson;
+    const ex=document.getElementById('limitlessExampleDeck'); if(ex) ex.onclick=()=>{ if(typeof window.exportProgress351==='function') window.exportProgress351(); else downloadJson(); };
     updateImportButtons();
   }
   function renderReviewDeck(){
@@ -9576,7 +9576,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       el.onclick = openDrawer351;
     });
     const homeExample = q('limitlessExampleDeck');
-    if(homeExample) homeExample.onclick = downloadExample351;
+    if(homeExample) homeExample.onclick = () => { if(typeof window.exportProgress351 === 'function') window.exportProgress351(); else downloadExample351(); };
   }
 
   document.addEventListener('click', ev => {
@@ -10513,6 +10513,62 @@ function fixCanonicalDisplayTitle351() {
 .oneThing350.oneThingEditing351 .oneThingToggle351 {
   display: none !important;
 }
+#limitlessImportStatus,
+#limitlessLocalDeckStorage{
+  background:rgba(103,232,249,.07)!important;
+  border:1px solid rgba(103,232,249,.32)!important;
+  color:#9fe8ff!important;
+  letter-spacing:.12em!important;
+  font-size:12px!important;
+  font-weight:900!important;
+  pointer-events:none!important;
+  cursor:default!important;
+  min-width:100px!important;
+  text-align:center!important;
+  border-radius:999px!important;
+}
+#limitlessImportStatus:empty::before,
+#limitlessLocalDeckStorage:empty::before{
+  content:'Progress \2197';
+  opacity:.55;
+  font-size:11px;
+  letter-spacing:.14em;
+}
+.ratingBar{
+  display:flex!important;
+  align-items:center!important;
+  gap:8px!important;
+  flex-wrap:nowrap!important;
+  justify-content:flex-start!important;
+}
+.ratingBar .btn[data-rate="continue"]{
+  display:none!important;
+  margin:0!important;
+}
+.ratingBar .againBtn352,
+.ratingBar .btn[data-rate="again"]{
+  background:rgba(251,88,118,.14)!important;
+  border-color:rgba(251,88,118,.65)!important;
+  color:#ffc0c8!important;
+}
+.ratingBar .btn[data-rate="bury"]{
+  font-size:11px!important;
+  padding:5px 9px!important;
+  border-color:rgba(160,160,210,.30)!important;
+  color:#a8b2cc!important;
+}
+.signalTip351{
+  display:none!important;
+  width:0!important;
+  overflow:hidden!important;
+}
+.ratingBar .fullInlineBtn{
+  margin-left:auto!important;
+  flex-shrink:0!important;
+  background:rgba(103,232,249,.12)!important;
+  border-color:rgba(103,232,249,.55)!important;
+  color:#9fe8ff!important;
+}
 </style>
 <script id="cozy-one-thing-stable-dropdown-js">
 function fixStableOneThingDropdown351() {
@@ -11291,7 +11347,11 @@ function fixStableOneThingDropdown351() {
   }
 
   function exportCleanDeck() { downloadJson('cozy_arcade_clean_deck.json', cleanDeckPayload()); }
-  function exportProgressOnly() { downloadJson('cozy_arcade_progress_' + new Date().toISOString().slice(0, 10) + '.json', progressPayload()); }
+  function exportProgressOnly() {
+    savePhase3State();
+    updateKpisPhase3();
+    downloadJson('cozy_arcade_progress_' + new Date().toISOString().slice(0, 10) + '.json', progressPayload());
+  }
   function exportDeckWithProgress() { downloadJson('cozy_arcade_deck_with_progress_backup.json', backupPayload()); }
   function exportSessionSummary() {
     const vals = Object.values(phase3State.progress || {});
@@ -11424,7 +11484,7 @@ function fixStableOneThingDropdown351() {
     if (q('pauseExport')) { q('pauseExport').textContent = 'Export Progress'; q('pauseExport').onclick = exportProgressOnly; }
     if (q('drawerExport351')) q('drawerExport351').remove();
     if (q('exportJson351')) { q('exportJson351').textContent = 'Download JSON'; q('exportJson351').onclick = exportCleanDeck; }
-    if (q('limitlessExampleDeck')) q('limitlessExampleDeck').onclick = exportCleanDeck;
+    if (q('limitlessExampleDeck')) q('limitlessExampleDeck').onclick = exportProgressOnly;
     if (q('settingsExportProgress351')) q('settingsExportProgress351').onclick = exportProgressOnly;
     if (q('exportProgress2')) { q('exportProgress2').textContent = 'Export Progress Only'; q('exportProgress2').onclick = exportProgressOnly; }
     if (q('exportMergeInfo2')) { q('exportMergeInfo2').textContent = 'Export Progress Summary'; q('exportMergeInfo2').onclick = exportSessionSummary; }
@@ -11509,7 +11569,7 @@ function fixStableOneThingDropdown351() {
     window.ratingsHTML = ratingsHTML = () => {
       let pinned = false, buried = false;
       try { const st = getProgress(canonicalCardId(current || {})); pinned = !!st.pinned; buried = !!st.buried; } catch (_) {}
-      return '<div class="ratingBar"><button class="btn ' + (pinned ? 'pinActive350' : '') + '" data-rate="pin">' + (pinned ? 'Unpin' : 'Pin') + '</button><button class="btn buryBtn352 ' + (buried ? 'buryActive352' : '') + '" data-rate="bury">' + (buried ? 'Suspended' : 'Bury') + '</button><button class="btn red ratingBtn again" data-rate="again" data-rating="again">Again · ' + previewInterval(current, 'again') + '</button><button class="btn ratingBtn hard" data-rate="hard" data-rating="hard">Hard · ' + previewInterval(current, 'hard') + '</button><button class="btn ratingBtn good" data-rate="good" data-rating="good">Good · ' + previewInterval(current, 'good') + '</button><button class="btn primary ratingBtn easy" data-rate="easy" data-rating="easy">Easy · ' + previewInterval(current, 'easy') + '</button><button class="btn primary" data-rate="continue">Continue</button></div>';
+      return '<div class="ratingBar"><button class="btn ' + (pinned ? 'pinActive350' : '') + '" data-rate="pin">' + (pinned ? 'Unpin' : 'Pin') + '</button><button class="btn buryBtn352 ' + (buried ? 'buryActive352' : '') + '" data-rate="bury">' + (buried ? 'Suspended' : 'Bury') + '</button><button class="btn againBtn352 ratingBtn again" data-rate="again" data-rating="again">Again</button><button class="btn ratingBtn hard" data-rate="hard" data-rating="hard">Hard</button><button class="btn ratingBtn good" data-rate="good" data-rating="good">Good</button><button class="btn primary ratingBtn easy" data-rate="easy" data-rating="easy">EASY</button><button class="btn primary" data-rate="continue">Continue</button></div>';
     };
     window.cardPool = cardPool = () => sessionPool(mode === 'domain' ? 'expansion' : 'solo');
     window.nextCard = nextCard = () => {
