@@ -6541,7 +6541,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     hub=document.createElement('div');
     hub.id='gameplayHub351';
     hub.className='screen settings hidden';
-    hub.innerHTML='<div class="box gameplayPanel351"><div class="controls"><button class="btn" id="gameplayHome351">Home</button><button class="btn primary" id="openImport351">Advanced: Merge / Progress Import</button><button class="btn primary" id="applyGameplay351">Apply</button><button class="btn" id="closeGameplay351">Close Settings</button></div><div class="gameplayCard351"><h2>Settings</h2><label>Gameplay</label><select id="gameplayMode351"><option>Solo Studying controls</option><option>Knowledge Expansion controls</option><option>Shadow Dungeon</option><option>Answer card controls</option><option>Import / export workflow</option></select><div class="inlineSettings351"><label class="toggleLine351"><input id="gameplayBionic351" type="checkbox"> Toggle Bionic Reading</label><div><label>Game timing</label><select id="questionTime351"><option value="3">3 seconds</option><option value="4">4 seconds</option><option value="5">5 seconds</option><option value="6">6 seconds</option><option value="7">7 seconds</option><option value="8">8 seconds</option><option value="9">9 seconds</option><option value="10">10 seconds</option></select></div></div><p><span class="kbd351">Enter</span><span class="kbd351">Right</span> choose Good and continue. <span class="kbd351">1</span> Again, <span class="kbd351">2</span> Hard, <span class="kbd351">3</span> Good, <span class="kbd351">4</span> Easy. <span class="kbd351">Down</span> opens Full Card. <span class="kbd351">Up</span> closes Full Card.</p><p>Timing controls the review pace across games. Knowledge Expansion arrows map to top, right, bottom, left; Enter, slash, or click selects after the brief prompt lock.</p></div><div class="gameplayGrid351"><div class="gameplayCard351"><h3>Prompt AI</h3><p>Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade card schema, then upload locally or export for GitHub.</p><textarea class="promptBox351" readonly>Convert the uploaded deck into Cozy Arcade Board Prep Medicine JSON using the current DB mapping: old presentation maps to current prompt / presentation_CLEAN; old educational_objective maps to current answer / reveal; diagnosis remains the answer choice; board_trigger remains board_trigger; tags/system map to current tags and sys. Preserve one_thing, level_1_presentation, level_2_three_second_exposure, quick_recall, treatment, next_step, and explanation when present. Return valid JSON with { metadata, cards } only. Do not rewrite medical content.</textarea></div></div></div>';
+    hub.innerHTML='<div class="box gameplayPanel351"><div class="controls"><button class="btn" id="gameplayHome351">Home</button><button class="btn primary" id="openImport351">Advanced: Merge / Progress Import</button><button class="btn primary" id="applyGameplay351">Apply</button><button class="btn" id="closeGameplay351">Close Settings</button></div><div class="gameplayCard351"><h2>Settings</h2><label>Gameplay</label><select id="gameplayMode351"><option>Solo Studying controls</option><option>Knowledge Expansion controls</option><option>Shadow Dungeon</option><option>Answer card controls</option><option>Import / export workflow</option></select><div class="inlineSettings351"><label class="toggleLine351"><input id="gameplayBionic351" type="checkbox"> Toggle Bionic Reading</label><div><label>Game timing</label><select id="questionTime351"><option value="3">3 seconds</option><option value="4">4 seconds</option><option value="5">5 seconds</option><option value="6">6 seconds</option><option value="7">7 seconds</option><option value="8">8 seconds</option><option value="9">9 seconds</option><option value="10">10 seconds</option></select></div></div><p><span class="kbd351">Enter</span><span class="kbd351">Right</span> choose Good and continue. <span class="kbd351">1</span> Again, <span class="kbd351">2</span> Hard, <span class="kbd351">3</span> Good, <span class="kbd351">4</span> Easy. <span class="kbd351">Down</span> opens Full Card. <span class="kbd351">Up</span> closes Full Card.</p><p>Timing controls the review pace across games. Knowledge Expansion arrows map to top, right, bottom, left; Enter, slash, or click selects after the brief prompt lock.</p></div><div class="gameplayGrid351"><div class="gameplayCard351"><h3>Prompt AI</h3><p>Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade card schema.</p><textarea class="promptBox351" readonly>Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade\ncard schema. \nReturn valid JSON only:\n{\n  "meta": { "schema": "cozy-arcade-v3" },\n  "cards": [\n    {\n      "qid": "unique-id",\n      "sys": "CV",\n      "diagnosis": "correct answer/topic",\n      "presentation": "question, prompt, or vignette",\n      "one_thing": "single highest-yield takeaway",\n      "educational_objective": "full teaching point if available",\n      "board_trigger": "IF finding → THINK diagnosis → ACTION",\n      "explanation": "long explanation if available",\n      "tags": []\n    }\n  ]\n}\nDo not rewrite medical content. Map sys/system fields to card.sys.</textarea></div></div></div>';
     document.body.appendChild(hub);
     $('gameplayHome351').onclick=()=>{hub.classList.add('hidden'); try{show('home');}catch(e){} try{paused=false;}catch(e){}};
     $('closeGameplay351').onclick=()=>closeGameplayHub351();
@@ -8911,7 +8911,26 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   const META_KEY='cozy_arcade_limitless_meta_v1';
   const USER_ONE_THING_KEY='cozy_user_one_thing_v1';
   const AI_SHORT='Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade card schema.';
-  const AI_LONG='Convert the uploaded deck into Cozy Arcade Board Prep Medicine JSON using the current DB mapping: old presentation maps to current prompt / presentation_CLEAN; educational_objective maps to current answer / reveal; diagnosis remains the answer choice/Reveal title; board_trigger; tags/system map to current tags and sys. Preserve one_thing, level_1_presentation, level_2_three_second_exposure, quick_recall, treatment, next_step, and explanation when present. Return valid JSON with { metadata, cards } only. Do not rewrite medical content.';
+  const AI_LONG=`Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade
+card schema. 
+Return valid JSON only:
+{
+  "meta": { "schema": "cozy-arcade-v3" },
+  "cards": [
+    {
+      "qid": "unique-id",
+      "sys": "CV",
+      "diagnosis": "correct answer/topic",
+      "presentation": "question, prompt, or vignette",
+      "one_thing": "single highest-yield takeaway",
+      "educational_objective": "full teaching point if available",
+      "board_trigger": "IF finding → THINK diagnosis → ACTION",
+      "explanation": "long explanation if available",
+      "tags": []
+    }
+  ]
+}
+Do not rewrite medical content. Map sys/system fields to card.sys.`;
   const clean=v=>String(v==null?'':v).replace(/NOT SPECIFIED IN SOURCE/g,'').replace(/\s+/g,' ').trim();
 	  const first=(...xs)=>xs.find(x=>clean(x))||'';
 	  const esc=s=>String(s==null?'':s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
@@ -9753,9 +9772,24 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   const XP_KEY = 'cozyCorrect351';
   const RANKS = ['rank-e','rank-d','rank-b','rank-a','rank-s','rank-apex','rank-monarch'];
   const PROMPT_TEXT = `Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade
-card schema. Preserve one_thing, level_1_presentation,
-level_2_three_second_exposure, quick_recall, treatment, next_step, and
-explanation when present. Return valid JSON with { metadata, cards } only.
+card schema. 
+Return valid JSON only:
+{
+  "meta": { "schema": "cozy-arcade-v3" },
+  "cards": [
+    {
+      "qid": "unique-id",
+      "sys": "CV",
+      "diagnosis": "correct answer/topic",
+      "presentation": "question, prompt, or vignette",
+      "one_thing": "single highest-yield takeaway",
+      "educational_objective": "full teaching point if available",
+      "board_trigger": "IF finding → THINK diagnosis → ACTION",
+      "explanation": "long explanation if available",
+      "tags": []
+    }
+  ]
+}
 Do not rewrite medical content. Map sys/system fields to card.sys.`;
   const RUNNER_ANIMATION = 'runnerSprint 420ms steps(4) infinite, narutoSpriteBob .34s ease-in-out infinite alternate';
 
