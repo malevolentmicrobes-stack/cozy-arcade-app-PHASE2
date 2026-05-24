@@ -11168,6 +11168,7 @@ function fixStableOneThingDropdown351() {
     try { localStorage.setItem(STATE_KEY, JSON.stringify(Object.assign({}, phase3State, { progress: exportProgressMap() }))); } catch (_) {}
     try { state = phase3State.progress; } catch (_) {}
     window.cozyPhase3State = phase3State;
+    try { Object.defineProperty(phase3State, 'session', { value: session, configurable: true, enumerable: false }); } catch (_) { phase3State.session = session; }
     window.phase3State = phase3State;
     window.cozyPhase3Session = session;
   }
@@ -11469,11 +11470,18 @@ function fixStableOneThingDropdown351() {
       arr = normalizeDeckIdentities().filter(c => progressForCard(c).suspended);
     }
 
+    if (!arr.length && ['due', 'review_deck', 'pinned', 'hard', 'suspended'].includes(selected)) return [];
+
     if (selected === 'random_new') {
       const active = arr.filter(c => !session.buriedToday.has(canonicalCardId(c)));
       return active.length ? active : arr;
     }
-    return splitBuriedToBack(arr.length ? arr : basePlayableCards());
+    const ordered = splitBuriedToBack(arr.length ? arr : basePlayableCards());
+    const active = ordered.filter(c => {
+      const id = canonicalCardId(c);
+      return !session.buriedToday.has(id) && !getProgress(id).buried;
+    });
+    return active.length ? active : ordered;
   }
 
   function poolKey(gameType) {
@@ -11771,7 +11779,7 @@ function fixStableOneThingDropdown351() {
     window.rateCard = rateCard;
     window.getStudyPool = getStudyPool;
     window.migrateLegacyProgress = migrateLegacyProgress;
-    window.cozyPhase3 = { exportCleanDeck, exportProgressOnly, exportDeckWithProgress, exportSessionSummary, importObjectPhase3, cleanDeckPayload, progressPayload, backupPayload, getStudyPool, clearSessionBuried, wireUi };
+    window.cozyPhase3 = { exportCleanDeck, exportProgressOnly, exportDeckWithProgress, importObjectPhase3, cleanDeckPayload, progressPayload, backupPayload, getStudyPool, clearSessionBuried, wireUi };
     window.cozyProgressPayload351 = progressPayload;
     window.mergeProgressObject351 = obj => {
       const migrated = migrateLegacyProgress(obj?.progress ? { progress: obj.progress } : obj, appCards());
@@ -11782,6 +11790,7 @@ function fixStableOneThingDropdown351() {
     };
     window.cozyParseJson351 = parseJsonLoose;
     window.runCozySmokeTests = runCozySmokeTestsPhase3;
+    window.appCards = appCards;
     window.importLimitlessDeck = importObjectPhase3;
     window.importLimitlessFile = importFilePhase3;
     window.exportSession = exportProgressOnly;
