@@ -9136,7 +9136,8 @@ Do not rewrite medical content. Map sys/system fields to card.sys.`;
     const n=appCards().length;
     document.querySelectorAll('#limitlessExampleDeck,#exportJson351').forEach(btn=>{if(btn&&btn.id==='limitlessExampleDeck') btn.textContent='Download Deck';});
     const local=document.getElementById('limitlessLocalDeckStorage');
-    if(local){
+    const progress=document.getElementById('limitlessImportStatus');
+    if(local && local!==progress){
       local.textContent=n?(n+' cards'):'';
       local.onclick=null;
       local.style.pointerEvents='none';
@@ -9148,7 +9149,12 @@ Do not rewrite medical content. Map sys/system fields to card.sys.`;
     if(!home) return;
     let panel=document.getElementById('limitlessHomeImport');
     if(!panel){panel=document.createElement('div'); panel.id='limitlessHomeImport'; panel.className='limitlessHomeControls'; home.insertBefore(panel,home.querySelector('.modeGrid')||home.firstChild);}
-    panel.innerHTML='<label class="btn primary" for="limitlessHomeDeckFile">Upload Deck</label><input id="limitlessHomeDeckFile" type="file" accept=".json,.csv,application/json,text/csv"><button id="limitlessExampleDeck" class="btn" type="button">Download Deck</button><span id="limitlessImportStatus" class="btn"></span>';
+    if(!panel.querySelector('label[for="limitlessHomeDeckFile"]')) panel.insertAdjacentHTML('beforeend','<label class="btn primary" for="limitlessHomeDeckFile">Upload Deck</label>');
+    if(!document.getElementById('limitlessHomeDeckFile')) panel.insertAdjacentHTML('beforeend','<input id="limitlessHomeDeckFile" type="file" accept=".json,.csv,application/json,text/csv" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">');
+    if(!document.getElementById('limitlessExampleDeck')) panel.insertAdjacentHTML('beforeend','<button id="limitlessExampleDeck" class="btn" type="button">Download Deck</button>');
+    let progress=document.getElementById('limitlessImportStatus');
+    if(!progress){ progress=document.createElement('span'); progress.id='limitlessImportStatus'; progress.className='btn'; }
+    if(progress.parentElement!==panel) panel.appendChild(progress);
     const ex=document.getElementById('limitlessExampleDeck'); if(ex) ex.onclick=()=>{ if(window.cozyPhase3&&typeof window.cozyPhase3.exportDeckWithProgress==='function') window.cozyPhase3.exportDeckWithProgress(); else if(typeof window.exportProgress351==='function') window.exportProgress351(); else downloadJson(); };
     updateImportButtons();
   }
@@ -11620,10 +11626,11 @@ function fixStableOneThingDropdown351() {
   }
 
   function backupPayload() {
+    const progress = deduplicateProgress(exportProgressMap(), appCards());
     return {
       metadata: { type: 'deck_with_progress', deck_fingerprint: deckFingerprint(), exported_at: nowIso(), schema_version: '3.0' },
       cards: cleanDeckPayload().cards,
-      progress: phase3State.progress || {}
+      progress
     };
   }
 
@@ -11644,7 +11651,7 @@ function fixStableOneThingDropdown351() {
     updateKpisPhase3();
     downloadJson('cozy_arcade_progress_' + new Date().toISOString().slice(0, 10) + '.json', progressPayload());
   }
-  function exportDeckWithProgress() { downloadJson('cozy_arcade_deck_with_progress_backup.json', backupPayload()); }
+  function exportDeckWithProgress() { savePhase3State(); updateKpisPhase3(); downloadJson('cozy_arcade_deck_with_progress_backup.json', backupPayload()); }
   function fullGameStatePayload() {
     const settings = {};
     try { settings.questionSeconds = localStorage.getItem('cozyQuestionSeconds351') || '7'; } catch(_) {}
@@ -11828,13 +11835,9 @@ function fixStableOneThingDropdown351() {
     if (q('exportMergeInfo2')) { q('exportMergeInfo2').textContent = 'Export Progress Summary'; q('exportMergeInfo2').onclick = exportSessionSummary; }
     if (q('browseReview351')) q('browseReview351').onclick = () => { showReviewPhase3(); };
     if (q('settingsBtn')) q('settingsBtn').textContent = 'Settings';
-    let progressBtn = document.getElementById('limitlessImportStatus');
+    const progressBtn = document.getElementById('limitlessImportStatus');
     const localDeckStorage = document.getElementById('limitlessLocalDeckStorage');
-    if (!progressBtn && localDeckStorage) {
-      localDeckStorage.id = 'limitlessImportStatus';
-      progressBtn = localDeckStorage;
-    }
-    if (localDeckStorage) {
+    if (localDeckStorage && localDeckStorage !== progressBtn) {
       const n = appCards().length;
       localDeckStorage.textContent = n ? (n + ' cards') : '';
       localDeckStorage.onclick = null;
@@ -11842,8 +11845,7 @@ function fixStableOneThingDropdown351() {
       localDeckStorage.setAttribute('aria-disabled','true');
     }
     if (progressBtn) {
-      const n = appCards().length;
-      progressBtn.textContent = n ? `Progress (${n} cards)` : 'Progress';
+      progressBtn.textContent = 'Progress';
       progressBtn.removeAttribute('aria-disabled');
       progressBtn.style.pointerEvents = 'auto';
       progressBtn.style.cursor = 'pointer';
