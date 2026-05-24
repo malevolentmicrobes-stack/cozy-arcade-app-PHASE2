@@ -313,6 +313,12 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,sans
       <div class="s-head" style="margin-top:16px">
         Card Browser
         <span id="browser-count" style="color:var(--text2);font-size:9px;font-weight:400;letter-spacing:.06em;text-transform:none;"></span>
+        <div id="deck-hint-msg" style="display:none;font-size:10px;color:var(--text2);
+          margin:6px 0 10px;padding:7px 10px;
+          border:1px solid rgba(160,160,210,.12);border-radius:6px;line-height:1.5">
+          ⚠ No deck loaded — open main app, upload deck, then click ↻ Sync
+          for diagnosis text, system colors, and full card details.
+        </div>
       </div>
       <div class="search-row">
         <input class="search-input" id="search-input"
@@ -427,6 +433,24 @@ function readProgress() {
   }
   return {};
 }
+
+const atlasLoadDeck = function loadDeckFromLocalStorage() {
+  try {
+    const raw = localStorage.getItem('cozy_arcade_limitless_cards_v1');
+    if (!raw) { deckMap = {}; return 0; }
+    const payload = JSON.parse(raw);
+    const cards = Array.isArray(payload) ? payload : (Array.isArray(payload?.['cards']) ? payload['cards'] : []);
+    deckMap = {};
+    cards.forEach(c => {
+      const id = c?.qid_unique || c?.qid || c?.card_id || c?.id;
+      if (id) deckMap[id] = c;
+    });
+    return Object.keys(deckMap).length;
+  } catch(_) {
+    deckMap = {};
+    return 0;
+  }
+};
 
 // ── File upload handler (progress JSON or deck JSON) ─────────
 function handleFileUpload(e) {
@@ -1202,10 +1226,13 @@ function renderTable() {
   });
 
   set('browser-count',rows.length+' signals');
+  const _hint = document.getElementById('deck-hint-msg');
+  if (_hint) _hint.style.display = Object.keys(deckMap).length === 0 ? 'block' : 'none';
 
   const MAX=250, body=document.getElementById('table-body');
   if (!body) return;
   body.innerHTML=rows.slice(0,MAX).map(({id,p})=>{
+    const card=deckMap[id]||{};
     const due=p.next_due_at?new Date(p.next_due_at):null;
     let ds='—', dc='';
     if (due) {
@@ -1217,10 +1244,11 @@ function renderTable() {
     const st=p.stage||'new';
     const stPill=`p-${st.slice(0,3)}`;
     const flags=[p.pinned?'📌':'',p.repair_point?'⚠':'',isLeech(p)?'💀':'',p.suspended||p.buried?'🚫':''].filter(Boolean).join('');
-    const sid=id.length>22?id.slice(0,22)+'…':id;
+    const label=card.diagnosis||id;
+    const sid=label.length>42?label.slice(0,42)+'…':label;
     const sys=p.sys||'—';
-    return `<tr onclick="openCardDetail('${esc(id)}')" title="Click for full card · ${esc(id)}">
-      <td style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(sid)}</td>
+    return `<tr onclick="openCardDetail('${esc(id)}')" title="Click for full card · ${esc(id)}${card.diagnosis?' · '+esc(card.diagnosis):''}">
+      <td style="max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(sid)}</td>
       <td style="font-size:9px;color:${sysColor(sys)};font-weight:900;white-space:nowrap">${esc(sys)}</td>
       <td><span class="pill ${stPill}">${st.slice(0,3)}</span></td>
       <td class="${dc}" style="font-size:10px;font-weight:900">${ds}</td>
@@ -1352,7 +1380,9 @@ function fullRefreshDisplay() {
 }
 
 function fullRefresh() {
+  atlasLoadDeck();
   progress=readProgress();
+  mergeSysFromDeck();
   fullRefreshDisplay();
   showToast('Atlas refreshed ↻');
 }
@@ -1371,6 +1401,7 @@ function init() {
   resize();
   window.addEventListener('resize',resize);
 
+  atlasLoadDeck();
   progress=readProgress();
   mergeSysFromDeck();
   sysMap=buildSysMap(progress);
