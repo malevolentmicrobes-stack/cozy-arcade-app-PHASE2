@@ -6747,6 +6747,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     const label=$('shadowDropLabel351'); if(label) label.textContent=n+' seconds';
     ov.classList.remove('hidden');
   }
+  window.openShadowSetup351=openShadowSetup351;
 
   function isGameActive351(){
     try{return mode==='solo'||mode==='domain';}catch(e){return false;}
@@ -11903,8 +11904,8 @@ function fixStableOneThingDropdown351() {
       else if (typeof showPersonaSelector351 === 'function') showPersonaSelector351();
     };
     if (q('cozySDSection370')) q('cozySDSection370').onclick = () => {
-      if (q('shadow351')) q('shadow351').click();
-      else if (typeof openShadowSetup351 === 'function') openShadowSetup351();
+      if (typeof openShadowSetup351 === 'function') openShadowSetup351();
+      else if (q('shadow351')) q('shadow351').click();
     };
   }
 
@@ -11913,6 +11914,608 @@ function fixStableOneThingDropdown351() {
   setTimeout(cozyHomeLayout370, 100);
   setTimeout(cozyHomeLayout370, 700);
   setInterval(cozyHomeLayout370, 1200);
+})();
+</script>
+<style id="cozy-mobile-shell-371-css">
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --hud-h: 112px;
+  --bottom-h: 104px;
+  --game-gap: 12px;
+}
+
+@media (max-width: 900px), (orientation: landscape) and (max-height: 560px) {
+  #solo.game-shell,
+  #domain.game-shell {
+    min-height: 100dvh !important;
+    padding-top: var(--safe-top) !important;
+    padding-bottom: var(--safe-bottom) !important;
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) auto !important;
+    overflow: hidden !important;
+  }
+
+  #solo.game-shell.hidden,
+  #domain.game-shell.hidden {
+    display: none !important;
+  }
+
+  .gameHud {
+    position: sticky !important;
+    top: 0 !important;
+    left: auto !important;
+    right: auto !important;
+    z-index: 120 !important;
+    min-height: var(--hud-h) !important;
+    display: grid !important;
+    grid-template-rows: auto auto !important;
+    align-content: center !important;
+    justify-items: center !important;
+    gap: 7px !important;
+    padding: 8px 10px !important;
+    background: linear-gradient(180deg, rgba(2,6,17,.95), rgba(2,6,17,.76) 78%, rgba(2,6,17,0)) !important;
+    pointer-events: auto !important;
+  }
+
+  .hudStats371,
+  .hudActions371 {
+    width: min(100%, 720px) !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 7px !important;
+    min-width: 0 !important;
+  }
+
+  .gameHud .hudGroup:empty {
+    display: none !important;
+  }
+
+  .gameHud .hudPill,
+  .gameHud .energyHud352 {
+    max-width: 100% !important;
+    min-height: 34px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    padding: 7px 10px !important;
+    font-size: 12px !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    backdrop-filter: blur(14px) !important;
+  }
+
+  .gameHud .hpWrap {
+    width: 46px !important;
+    height: 7px !important;
+    margin-left: 0 !important;
+    flex: 0 0 46px !important;
+  }
+
+  .hudIconButton371 {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    font-size: 0 !important;
+    flex: 0 0 auto !important;
+  }
+
+  .hudIconButton371::before {
+    content: attr(data-hud-icon);
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  .game-main,
+  .gameMain371 {
+    position: relative !important;
+    z-index: 20 !important;
+    min-height: 0 !important;
+    overflow: auto !important;
+    overscroll-behavior: contain !important;
+    padding: var(--game-gap) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: var(--game-gap) !important;
+  }
+
+  .gameMain371 > .promptBox {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    transform: none !important;
+    width: min(100%, 760px) !important;
+    min-height: 124px !important;
+    max-height: 32dvh !important;
+    flex: 0 0 auto !important;
+    margin: 0 auto !important;
+    overflow: auto !important;
+    padding: 16px 18px 17px !important;
+    border-radius: 18px !important;
+  }
+
+  .gameMain371 .promptText {
+    font-size: clamp(14px, 4.2vw, 22px) !important;
+    line-height: 1.22 !important;
+    letter-spacing: 0 !important;
+    margin-top: 24px !important;
+  }
+
+  .gameMain371 .systemBadge {
+    position: absolute !important;
+    left: 14px !important;
+    top: 12px !important;
+    max-width: calc(100% - 28px) !important;
+    font-size: 10px !important;
+    padding: 4px 9px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .gameMain371 > .domainTitle {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    transform: none !important;
+    max-width: min(100%, 720px) !important;
+    margin: 0 auto !important;
+    font-size: clamp(17px, 4.6vw, 26px) !important;
+    letter-spacing: .08em !important;
+    z-index: 22 !important;
+  }
+
+  .gameMain371 > .soloTrack,
+  .gameMain371 > .orbArena {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    flex: 1 1 auto !important;
+    min-height: 285px !important;
+    overflow: hidden !important;
+    z-index: 20 !important;
+  }
+
+  .gameMain371 > .orbArena {
+    min-height: 330px !important;
+    max-width: 760px !important;
+    margin: 0 auto !important;
+  }
+
+  .gameMain371 > .reveal {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+    width: min(100%, 720px) !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    flex: 1 1 auto !important;
+    margin: 0 auto !important;
+    overflow: auto !important;
+    padding: 18px !important;
+    border-radius: 18px !important;
+  }
+
+  .gameMain371 > .reveal.hidden {
+    display: none !important;
+  }
+
+  .gameMain371:has(.reveal:not(.hidden)) > .promptBox,
+  .gameMain371:has(.reveal:not(.hidden)) > .soloTrack,
+  .gameMain371:has(.reveal:not(.hidden)) > .orbArena,
+  .gameMain371:has(.reveal:not(.hidden)) > .domainTitle {
+    display: none !important;
+  }
+
+  .gameMain371 .trigger {
+    max-height: none !important;
+    overflow: visible !important;
+    font-size: clamp(14px, 3.7vw, 17px) !important;
+    line-height: 1.38 !important;
+  }
+
+  .gameMain371 .ratingBar {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 7px !important;
+  }
+
+  .gameMain371 .ratingBar .fullInlineBtn {
+    margin-left: 0 !important;
+  }
+
+  .game-bottom-controls {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    z-index: 110 !important;
+    display: flex !important;
+    justify-content: center !important;
+    padding: 8px 10px calc(8px + var(--safe-bottom)) !important;
+    min-height: var(--bottom-h) !important;
+    background: linear-gradient(0deg, rgba(2,6,17,.92), rgba(2,6,17,0)) !important;
+  }
+
+  .game-bottom-controls .btn {
+    min-width: 64px !important;
+    min-height: 44px !important;
+  }
+
+  .domainTouchPad {
+    bottom: calc(8px + var(--safe-bottom)) !important;
+    max-width: calc(100vw - 16px) !important;
+    flex-wrap: wrap !important;
+  }
+
+  .gateBanner {
+    top: 48% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --hud-h: 96px;
+    --bottom-h: 88px;
+    --game-gap: 10px;
+  }
+
+  .gameHud {
+    padding: 7px 8px !important;
+    gap: 6px !important;
+  }
+
+  .gameHud .hudPill,
+  .gameHud .energyHud352 {
+    font-size: 11px !important;
+    padding: 6px 8px !important;
+  }
+
+  .hudIconButton371 {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+  }
+
+  .gameMain371 > .promptBox {
+    max-height: 31dvh !important;
+    padding: 15px 14px 16px !important;
+  }
+
+  #choiceRow.v17515-css-drop,
+  #choiceRow.v17514-live-drop,
+  #choiceRow {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 9px !important;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 560px) {
+  :root {
+    --hud-h: 64px;
+    --bottom-h: 64px;
+    --game-gap: 8px;
+  }
+
+  #solo.game-shell,
+  #domain.game-shell {
+    grid-template-rows: auto minmax(0, 1fr) auto !important;
+  }
+
+  .gameHud {
+    min-height: var(--hud-h) !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    grid-template-rows: auto !important;
+    padding: 4px 8px !important;
+  }
+
+  .hudStats371,
+  .hudActions371 {
+    width: auto !important;
+  }
+
+  .gameMain371 {
+    max-width: 980px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+  }
+
+  .gameMain371 > .promptBox {
+    max-height: 30dvh !important;
+    min-height: 96px !important;
+  }
+
+  .gameMain371 > .soloTrack,
+  .gameMain371 > .orbArena {
+    min-height: 190px !important;
+  }
+
+  .gameMain371 > .reveal {
+    max-width: 760px !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .shadowSetup351,
+  .saveProgress351 {
+    align-items: flex-start !important;
+    overflow: auto !important;
+    padding: calc(12px + var(--safe-top)) 12px calc(12px + var(--safe-bottom)) !important;
+  }
+
+  .shadowBox351,
+  .saveBox351 {
+    width: min(560px, 100%) !important;
+    max-height: none !important;
+    padding: 20px !important;
+    border-radius: 20px !important;
+  }
+
+  .shadowGrid351,
+  .shadowFilters,
+  .reviewFilters,
+  .inlineSettings351 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .shadowGrid351 select,
+  .shadowFilters select,
+  .shadowFilters input,
+  .reviewFilters select,
+  .reviewFilters input,
+  .inlineSettings351 select {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 44px !important;
+  }
+
+  .shadowStart,
+  .shadowBox351 .controls {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .shadowStart .btn,
+  .shadowBox351 .btn {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+}
+</style>
+<script id="cozy-mobile-shell-371-js">
+(function(){
+  if (window.__cozyMobileShell371) return;
+  window.__cozyMobileShell371 = true;
+
+  const q = id => document.getElementById(id);
+  const mobileQuery = () => matchMedia('(max-width: 900px), (orientation: landscape) and (max-height: 560px)').matches;
+
+  function cleanText(value) {
+    return String(value == null ? '' : value).replace(/\s+/g, ' ').trim();
+  }
+
+  function pillFor(id) {
+    const el = q(id);
+    return el && el.closest('.hudPill,.energyHud352,button');
+  }
+
+  function appendIf(parent, child) {
+    if (parent && child && child.parentElement !== parent) parent.appendChild(child);
+  }
+
+  function iconize(button, label, icon) {
+    if (!button) return;
+    button.classList.add('hudIconButton371', 'hud-icon');
+    button.dataset.hudIcon = icon;
+    button.setAttribute('aria-label', label);
+    button.setAttribute('title', label);
+  }
+
+  function ensureSettingsButton(hud) {
+    let button = hud.querySelector('[data-mobile-settings371]');
+    if (!button) {
+      button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'hudPill';
+      button.dataset.mobileSettings371 = '1';
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        const gear = q('gearBtn') || q('settingsBtn');
+        if (gear) gear.click();
+        else {
+          try { if (typeof show === 'function') show('settings'); } catch (_) {}
+        }
+      });
+      hud.appendChild(button);
+    }
+    iconize(button, 'Settings', '⚙');
+    return button;
+  }
+
+  function ensureEnergyPill(hud) {
+    let pill = hud.querySelector('.energyHud352');
+    if (!pill) {
+      pill = document.createElement('div');
+      pill.className = 'hudPill energyHud352';
+      pill.textContent = 'Energy Lv 1 · +0 CE';
+      hud.insertBefore(pill, hud.firstElementChild || null);
+    }
+    return pill;
+  }
+
+  function normalizeHud(gameId) {
+    const game = q(gameId);
+    const hud = game && game.querySelector(':scope > .hud, :scope > .gameHud');
+    if (!game || !hud) return;
+
+    game.classList.add('game-shell');
+    hud.classList.add('gameHud', 'mobileHud');
+
+    let stats = hud.querySelector(':scope > .hudStats371');
+    let actions = hud.querySelector(':scope > .hudActions371');
+    if (!stats) {
+      stats = document.createElement('div');
+      stats.className = 'hudGroup hudStats371';
+      hud.insertBefore(stats, hud.firstElementChild || null);
+    }
+    if (!actions) {
+      actions = document.createElement('div');
+      actions.className = 'hudGroup hudActions371';
+      hud.appendChild(actions);
+    }
+
+    const energyClones = [...hud.querySelectorAll('.energyHud352')];
+    const score = pillFor(gameId === 'solo' ? 'soloScore' : 'domainScore');
+    const streak = pillFor(gameId === 'solo' ? 'soloStreak' : 'domainStreak');
+    const phase = pillFor(gameId === 'solo' ? 'soloGate' : 'domainRound');
+    const pause = q(gameId === 'solo' ? 'soloPause' : 'domainPause');
+    const exit = hud.querySelector('button[data-home]');
+    const settings = ensureSettingsButton(hud);
+
+    let energy = gameId === 'solo' ? pillFor('hpFill') : (energyClones[0] || ensureEnergyPill(hud));
+    if (gameId === 'solo') {
+      energyClones.forEach(el => el.remove());
+      if (energy) {
+        energy.childNodes.forEach(node => {
+          if (node.nodeType === Node.TEXT_NODE && /\bHP\b/.test(node.textContent || '')) {
+            node.textContent = node.textContent.replace(/\bHP\b/, 'Energy Level');
+          }
+        });
+      }
+    } else {
+      energyClones.slice(1).forEach(el => el.remove());
+    }
+
+    appendIf(stats, energy);
+    appendIf(stats, score);
+    appendIf(stats, streak);
+    appendIf(actions, phase);
+    appendIf(actions, pause);
+    appendIf(actions, exit);
+    appendIf(actions, settings);
+
+    iconize(pause, 'Pause', '⏸');
+    iconize(exit, 'Close', '×');
+
+    [...hud.children].forEach(child => {
+      if (child.classList && child.classList.contains('hudGroup') && child !== stats && child !== actions && !child.children.length) child.remove();
+    });
+  }
+
+  function wrapGameMain(gameId) {
+    const game = q(gameId);
+    const hud = game && game.querySelector(':scope > .gameHud, :scope > .hud');
+    if (!game || !hud) return;
+    let main = game.querySelector(':scope > .gameMain371');
+    if (!main) {
+      main = document.createElement('div');
+      main.className = 'game-main gameMain371';
+      hud.insertAdjacentElement('afterend', main);
+    }
+    const ids = gameId === 'solo'
+      ? ['.promptBox', '.soloTrack', '#soloReveal']
+      : ['.domainTitle', '.promptBox', '#orbArena', '#domainReveal'];
+    ids.forEach(selector => {
+      const el = game.querySelector(selector);
+      if (el && el.parentElement !== main) main.appendChild(el);
+    });
+    const bottom = game.querySelector(':scope > .mobileControls, :scope > .game-bottom-controls');
+    if (bottom) bottom.classList.add('game-bottom-controls');
+  }
+
+  function patchDomainGeometry() {
+    if (typeof window.positionOrbs !== 'function' || window.positionOrbs.__mobileShell371) return;
+    const priorPosition = window.positionOrbs;
+    window.positionOrbs = positionOrbs = function(p) {
+      const arena = q('orbArena');
+      if (!mobileQuery() || !arena || !arena.closest('.gameMain371')) return priorPosition.apply(this, arguments);
+      const rect = arena.getBoundingClientRect();
+      const cx = rect.width / 2;
+      const cy = rect.height * .46;
+      const maxR = Math.min(rect.width, rect.height) * .34;
+      try {
+        orbData.forEach((o, i) => {
+          const r = 58 + p * maxR;
+          const wob = Math.sin(Date.now() / 650 + i) * 7;
+          o.x = cx + (r + wob) * Math.cos(o.ang);
+          o.y = cy + (r + wob) * Math.sin(o.ang);
+          o.el.style.left = o.x + 'px';
+          o.el.style.top = o.y + 'px';
+          o.el.style.transform = 'translate(-50%,-50%) scale(' + (1 + p * .05) + ')';
+        });
+      } catch (_) {
+        return priorPosition.apply(this, arguments);
+      }
+    };
+    window.positionOrbs.__mobileShell371 = true;
+  }
+
+  function openShadowSetupFallback371() {
+    let ov = q('shadowSetup351');
+    if (!ov) {
+      ov = document.createElement('div');
+      ov.id = 'shadowSetup351';
+      ov.className = 'shadowSetup351 hidden';
+      ov.innerHTML = '<div class="shadowBox351"><h2>Shadow Dungeon</h2><p>Review pinned, missed, hard, or scheduled cards with the same timing as Solo Studying.</p><div class="shadowGrid351"><div><label>Option review</label><select id="shadowScope351"><option value="review">Review pinned and missed cards</option><option value="pinned">Pinned only</option><option value="due">Review scheduled - beta spaced repetition</option><option value="random-new">Random new cards</option></select></div><div><label>Type</label><select id="shadowType351"><option value="solo">Solo Studying: Runner</option><option value="domain">Knowledge Expansion: orb select</option></select></div><div><label>Game timing</label><select id="shadowDropSeconds351"><option value="3">3 seconds</option><option value="4">4 seconds</option><option value="5">5 seconds</option><option value="6">6 seconds</option><option value="7">7 seconds</option><option value="8">8 seconds</option><option value="9">9 seconds</option><option value="10">10 seconds</option></select></div><div><label>Review scheduled</label><select id="shadowSchedule351"><option value="due">Beta spaced repetition</option><option value="review">Pinned / missed / hard</option></select></div></div><div class="controls"><button id="shadowStart351" class="btn primary">Start Shadow Dungeon</button><button id="shadowCancel351" class="btn red">Cancel</button></div></div>';
+      document.body.appendChild(ov);
+    }
+    const cancel = q('shadowCancel351');
+    if (cancel && !cancel.dataset.mobileShell371) {
+      cancel.dataset.mobileShell371 = '1';
+      cancel.addEventListener('click', () => ov.classList.add('hidden'));
+    }
+    const start = q('shadowStart351');
+    if (start && !start.dataset.mobileShell371) {
+      start.dataset.mobileShell371 = '1';
+      start.addEventListener('click', () => {
+        const scope = q('shadowScope351')?.value || 'review';
+        const browse = q('browseScope351');
+        if (browse) {
+          browse.value = scope;
+          browse.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        ov.classList.add('hidden');
+        const type = q('shadowType351')?.value || 'solo';
+        q(type === 'domain' ? 'startDomain' : 'startSolo')?.click();
+      });
+    }
+    ov.classList.remove('hidden');
+  }
+
+  function run() {
+    try { if (typeof updateEnergyHud === 'function') updateEnergyHud(); } catch (_) {}
+    normalizeHud('solo');
+    normalizeHud('domain');
+    wrapGameMain('solo');
+    wrapGameMain('domain');
+    patchDomainGeometry();
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+  else run();
+  document.addEventListener('click', event => {
+    const trigger = event.target && event.target.closest && event.target.closest('#cozySDSection370,#shadow351,#shadowBtn');
+    if (!trigger) return;
+    event.preventDefault();
+    event.stopPropagation();
+    if (typeof window.openShadowSetup351 === 'function') window.openShadowSetup351();
+    else openShadowSetupFallback371();
+  }, true);
+  setTimeout(run, 100);
+  setTimeout(run, 700);
+  setInterval(run, 900);
+  new MutationObserver(run).observe(document.body, { childList: true, subtree: true });
 })();
 </script>
 </body></html>
