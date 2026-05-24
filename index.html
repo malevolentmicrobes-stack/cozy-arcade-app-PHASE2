@@ -383,7 +383,7 @@
 }
 </style>
 
-</head><body><button id="homeTopBtn" class="homeTopBtn" title="Home">⌂</button><button id="gearBtn" class="settingsGear" title="Settings">⚙</button><div id="home" class="screen"><div class="homeWrap"><section class="hero"><div class="heroIcon">⚔️</div><div class="heroTitle">COZY ARCADE BOARD PREP-MEDICINE</div><div class="heroSub">BOARD PREP-MEDICINE</div></section><section class="modeGrid"><button id="startSolo" class="modeCard"><span class="modeIcon">⚔️</span><h2 class="modeTitle">Solo Studying</h2><p class="modeCaption">Game 1 · runner lanes</p></button><button id="startDomain" class="modeCard"><span class="modeIcon">🌀</span><h2 class="modeTitle">Knowledge Expansion</h2><p class="modeCaption">Game 2 · swipe/orb select</p></button></section><div class="controls"><button id="spacedBtn" class="btn">Spaced Repetition</button><button id="settingsBtn" class="btn">Import / Settings</button><button id="exportBtn" class="btn">Export Session</button></div><div id="limitlessHomeImport" class="limitlessHomeControls" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;align-items:center"><label class="btn primary" for="limitlessHomeDeckFile">Upload JSON Deck</label><input id="limitlessHomeDeckFile" type="file" accept=".json,.csv,application/json,text/csv" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0"><button id="limitlessExampleDeck" class="btn" type="button">Download Example JSON</button><span class="btn" id="limitlessImportStatus">Local deck storage</span></div><div class="kpis"><div class="kpi"><b id="cardCount">0</b><span>Cards</span></div><div class="kpi"><b id="reviewedCount">0</b><span>Reviewed</span></div><div class="kpi"><b id="dueCount">0</b><span>Due</span></div><div class="kpi"><b id="pinCount">0</b><span>Pinned</span></div></div></div></div><div id="solo" class="game solo hidden"><div class="hud"><div class="hudGroup"><div class="hudPill">HP <div class="hpWrap"><div id="hpFill" class="hpFill"></div></div></div><div class="hudPill">Score <span id="soloScore">0</span></div><div class="hudPill">Streak <span id="soloStreak">0</span></div><div class="hudPill">Gate <span id="soloGate">1</span></div></div><div class="hudGroup"><button id="soloPause" class="hudPill">Pause</button><button class="hudPill" data-home>Exit</button></div></div><div class="promptBox"><span id="soloSystem" class="systemBadge"></span><div id="soloQuestion" class="promptText"></div><div class="timer"><div id="soloTimerFill" class="timerFill"></div></div></div><div class="soloTrack"><div id="choiceRow" class="choiceRow"></div><div id="runner" class="hunter lane0"><i class="hair"></i><i class="head"></i><i class="coat"></i><i class="arm l"></i><i class="arm r"></i><i class="leg l"></i><i class="leg r"></i><i class="blade"></i></div><div id="groundGlow"></div><div id="gateComplete" class="gateBanner hidden">GATE COMPLETED</div><div class="soloHint">← / → move • 1–4 select • timer auto-locks selected answer</div></div><div id="soloReveal" class="reveal hidden"><h2 id="soloRevealTitle"></h2><div id="soloRevealDx" class="dx"></div><div id="soloTrigger" class="trigger"></div><div id="soloRevealRatings"></div><div class="controls" style="justify-content:center"><button id="soloFull" class="btn primary">Full Card</button></div></div><div class="mobileControls"><button id="leftBtn" class="btn">←</button><button id="selectBtn" class="btn primary">Select</button><button id="rightBtn" class="btn">→</button></div></div><div id="domain" class="game domain hidden"><div id="cursorGlow" class="cursorGlow"></div><div class="domainTitle">Knowledge Expansion</div><div class="hud"><div class="hudGroup"><div class="hudPill">Round <span id="domainRound">1</span></div><div class="hudPill">Score <span id="domainScore">0</span></div><div class="hudPill">Streak <span id="domainStreak">0</span></div></div><div class="hudGroup"><button id="domainPause" class="hudPill">Pause</button><button class="hudPill" data-home>Exit</button></div></div><div class="promptBox"><span id="domainSystem" class="systemBadge"></span><div id="domainQuestion" class="promptText"></div><div class="timer"><div class="timerFill" id="domainTimerFill"></div></div></div><div id="orbArena" class="orbArena"></div><div id="domainReveal" class="reveal hidden"><h2 id="domainRevealTitle"></h2><div id="domainDx" class="dx"></div><div id="domainObj" class="trigger"></div><div id="domainRevealRatings"></div><div class="controls" style="justify-content:center"><button id="domainFull" class="btn primary">Full Card</button></div></div></div><div id="review" class="screen settings hidden"><div class="box"><h1>Spaced Repetition</h1><div class="controls"><button class="btn" data-home>Home</button><button id="clearBtn" class="btn red">Clear Local State</button></div><div id="reviewList"></div></div></div><div id="settings" class="screen settings hidden"><div class="box"><h1>Import / Settings</h1><div class="grid2"><div class="field"><label>Deck mode</label><select id="deckMode"><option value="sequential">Sequential</option><option value="random">Random</option><option value="due">Due + pinned first</option><option value="pinned">Pinned only</option></select></div><div class="field"><label>Prompt field</label><select id="promptField"><option value="quick">Quick recall</option><option value="presentation" selected>Presentation</option><option value="objective">Educational objective</option></select></div><div class="field"><label>Solo timer seconds</label><input id="soloTimerInput" type="number" min="4" max="40" value="7"></div><div class="field"><label>Import JSON deck</label><input id="deckFile" type="file" accept=".json,application/json"></div><div class="field"><label><input id="autoSelect" type="checkbox" checked> Timer auto-selects</label></div><div class="field"><label><input id="bionicToggle" type="checkbox"> Bionic emphasis</label></div><div class="field"><label><input id="spacedToggle" type="checkbox"> Spaced Repetition after answers</label></div></div><div class="controls"><button id="applyBtn" class="btn primary">Apply</button><button class="btn" data-home>Home</button></div></div></div><div id="notify" class="notification hidden"><div class="notifyBox"><div class="notifyLabel">NOTIFICATION</div><div id="notifyBody" class="notifyBody"></div><div class="controls" style="justify-content:center"><button id="notifyContinue" class="btn primary">Continue</button><span id="notifyTimer" class="btn">5s</span></div></div></div><div id="pause" class="pause hidden"><div class="pauseBox"><div class="notifyLabel">PAUSED</div><div id="pauseBody" class="notifyBody"></div><div class="controls" style="justify-content:center"><button id="pauseResume" class="btn primary">Resume</button><button id="pauseExport" class="btn">Export Session</button><button id="pauseHome" class="btn">Exit to Home</button></div></div></div><div id="end" class="end hidden"><div class="endBox"><h1 id="endTitle"></h1><p id="endBody"></p><div class="controls" style="justify-content:center"><button id="endRestart" class="btn primary">Restart</button><button id="endHome" class="btn">Home</button></div></div></div><div id="modal" class="modal hidden"><div class="modalBox"><h2 id="modalTitle"></h2><pre id="modalText"></pre><button id="modalClose" class="btn primary">Close</button></div></div><div id="fx" class="fx"></div><div id="toast" class="toast hidden"></div><script>
+</head><body><button id="homeTopBtn" class="homeTopBtn" title="Home">⌂</button><button id="gearBtn" class="settingsGear" title="Settings">⚙</button><div id="home" class="screen"><div class="homeWrap"><section class="hero"><div class="heroIcon">⚔️</div><div class="heroTitle">COZY ARCADE BOARD PREP-MEDICINE</div><div class="heroSub">BOARD PREP-MEDICINE</div></section><section class="modeGrid"><button id="startSolo" class="modeCard"><span class="modeIcon">⚔️</span><h2 class="modeTitle">Solo Studying</h2><p class="modeCaption">Game 1 · runner lanes</p></button><button id="startDomain" class="modeCard"><span class="modeIcon">🌀</span><h2 class="modeTitle">Knowledge Expansion</h2><p class="modeCaption">Game 2 · swipe/orb select</p></button></section><div class="controls"><button id="settingsBtn" class="btn">Settings</button></div><div id="limitlessHomeImport" class="limitlessHomeControls" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;align-items:center"><label class="btn primary" for="limitlessHomeDeckFile">Upload JSON Deck</label><input id="limitlessHomeDeckFile" type="file" accept=".json,.csv,application/json,text/csv" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0"><button id="limitlessExampleDeck" class="btn" type="button">Download JSON</button><span class="btn" id="limitlessImportStatus"></span></div><div class="kpis"><div class="kpi"><b id="cardCount">0</b><span>Cards</span></div><div class="kpi"><b id="reviewedCount">0</b><span>Reviewed</span></div><div class="kpi"><b id="dueCount">0</b><span>Due</span></div><div class="kpi"><b id="pinCount">0</b><span>Pinned</span></div></div></div></div><div id="solo" class="game solo hidden"><div class="hud"><div class="hudGroup"><div class="hudPill">HP <div class="hpWrap"><div id="hpFill" class="hpFill"></div></div></div><div class="hudPill">Score <span id="soloScore">0</span></div><div class="hudPill">Streak <span id="soloStreak">0</span></div><div class="hudPill">Gate <span id="soloGate">1</span></div></div><div class="hudGroup"><button id="soloPause" class="hudPill">Pause</button><button class="hudPill" data-home>Exit</button></div></div><div class="promptBox"><span id="soloSystem" class="systemBadge"></span><div id="soloQuestion" class="promptText"></div><div class="timer"><div id="soloTimerFill" class="timerFill"></div></div></div><div class="soloTrack"><div id="choiceRow" class="choiceRow"></div><div id="runner" class="hunter lane0"><i class="hair"></i><i class="head"></i><i class="coat"></i><i class="arm l"></i><i class="arm r"></i><i class="leg l"></i><i class="leg r"></i><i class="blade"></i></div><div id="groundGlow"></div><div id="gateComplete" class="gateBanner hidden">GATE COMPLETED</div><div class="soloHint">← / → move • 1–4 select • timer auto-locks selected answer</div></div><div id="soloReveal" class="reveal hidden"><h2 id="soloRevealTitle"></h2><div id="soloRevealDx" class="dx"></div><div id="soloTrigger" class="trigger"></div><div id="soloRevealRatings"></div><div class="controls" style="justify-content:center"><button id="soloFull" class="btn primary">Full Card</button></div></div><div class="mobileControls"><button id="leftBtn" class="btn">←</button><button id="selectBtn" class="btn primary">Select</button><button id="rightBtn" class="btn">→</button></div></div><div id="domain" class="game domain hidden"><div id="cursorGlow" class="cursorGlow"></div><div class="domainTitle">Knowledge Expansion</div><div class="hud"><div class="hudGroup"><div class="hudPill">Round <span id="domainRound">1</span></div><div class="hudPill">Score <span id="domainScore">0</span></div><div class="hudPill">Streak <span id="domainStreak">0</span></div></div><div class="hudGroup"><button id="domainPause" class="hudPill">Pause</button><button class="hudPill" data-home>Exit</button></div></div><div class="promptBox"><span id="domainSystem" class="systemBadge"></span><div id="domainQuestion" class="promptText"></div><div class="timer"><div class="timerFill" id="domainTimerFill"></div></div></div><div id="orbArena" class="orbArena"></div><div id="domainReveal" class="reveal hidden"><h2 id="domainRevealTitle"></h2><div id="domainDx" class="dx"></div><div id="domainObj" class="trigger"></div><div id="domainRevealRatings"></div><div class="controls" style="justify-content:center"><button id="domainFull" class="btn primary">Full Card</button></div></div></div><div id="review" class="screen settings hidden"><div class="box"><h1>Spaced Repetition</h1><div class="controls"><button class="btn" data-home>Home</button><button id="clearBtn" class="btn red">Clear Local State</button></div><div id="reviewList"></div></div></div><div id="settings" class="screen settings hidden"><div class="box"><h1>Settings</h1><div class="grid2"><div class="field"><label>Deck mode</label><select id="deckMode"><option value="sequential">Sequential</option><option value="random">Random</option><option value="due">Due + pinned first</option><option value="pinned">Pinned only</option></select></div><div class="field"><label>Prompt field</label><select id="promptField"><option value="quick">Quick recall</option><option value="presentation" selected>Presentation</option><option value="objective">Educational objective</option></select></div><div class="field"><label>Solo timer seconds</label><input id="soloTimerInput" type="number" min="4" max="40" value="7"></div><div class="field"><label>Import JSON deck</label><input id="deckFile" type="file" accept=".json,application/json"></div><div class="field"><label><input id="autoSelect" type="checkbox" checked> Timer auto-selects</label></div><div class="field"><label><input id="bionicToggle" type="checkbox"> Bionic emphasis</label></div><div class="field"><label><input id="spacedToggle" type="checkbox"> Spaced Repetition after answers</label></div></div><div class="controls"><button id="applyBtn" class="btn primary">Apply</button><button class="btn" data-home>Home</button></div></div></div><div id="notify" class="notification hidden"><div class="notifyBox"><div class="notifyLabel">NOTIFICATION</div><div id="notifyBody" class="notifyBody"></div><div class="controls" style="justify-content:center"><button id="notifyContinue" class="btn primary">Continue</button><span id="notifyTimer" class="btn">5s</span></div></div></div><div id="pause" class="pause hidden"><div class="pauseBox"><div class="notifyLabel">PAUSED</div><div id="pauseBody" class="notifyBody"></div><div class="controls" style="justify-content:center"><button id="pauseResume" class="btn primary">Resume</button><button id="pauseExport" class="btn">Export Progress</button><button id="pauseHome" class="btn">Exit to Home</button></div></div></div><div id="end" class="end hidden"><div class="endBox"><h1 id="endTitle"></h1><p id="endBody"></p><div class="controls" style="justify-content:center"><button id="endRestart" class="btn primary">Restart</button><button id="endHome" class="btn">Home</button></div></div></div><div id="modal" class="modal hidden"><div class="modalBox"><h2 id="modalTitle"></h2><pre id="modalText"></pre><button id="modalClose" class="btn primary">Close</button></div></div><div id="fx" class="fx"></div><div id="toast" class="toast hidden"></div><script>
 const DATA={"metadata":{"app":"Cozy Arcade Board Prep Medicine","title":"COZY ARCADE BOARD PREP-MEDICINE LIMITLESS","version":"v3.5.3 LIMITLESS card-id-repaired","rescue_base":"v3.5.3 public import shell","deck_label":"BLANK HTML LIMITLESS","limitless_text":"BLANK HTML LIMITLESS","created_at":"2026-05-17T00:36:59.356Z","mapping":"LIMITLESS: Card ID*, Card ID, card_id, cardId, json_id, id, qid_unique, qid, original_qid, legacy_id preserved; card_type/source/input/output retained.","cards_embedded":0,"import_ready":true},"cards":[]};
 let cards=(DATA.cards||[]), state=loadState(), deckMode='sequential', promptField='quick', autoSelect=true, bionicOn=true;
 let mode=null, current=null, choices=[], selected=0, timer=0, timerMax=9, ticker=null, index=0, score=0, streak=0, hp=100, gate=1, paused=false, domainRound=1, orbData=[], cursor={x:innerWidth/2,y:innerHeight/2};
@@ -417,7 +417,7 @@ function positionOrbs(p){let cx=innerWidth/2, cy=innerHeight*.65; let maxR=Math.
 function loopDomain(){clearInterval(ticker);ticker=setInterval(()=>{if(mode!=='domain'||paused)return;timer-=.08;let p=1-Math.max(0,timer/timerMax);positionOrbs(p); if(timer<=0&&autoSelect){let nearest=0,best=1e9;orbData.forEach((o,i)=>{let d=(o.x-cursor.x)**2+(o.y-cursor.y)**2;if(d<best){best=d;nearest=i}});selectDomain(nearest)}},80)}
 function selectDomain(i){if($('domainReveal').classList.contains('hidden')===false)return;clearInterval(ticker);let ok=choices[i]===clean(current.diagnosis);orbData.forEach((o,j)=>{if(choices[j]===clean(current.diagnosis))o.el.classList.add('correct');else if(j===i)o.el.classList.add('wrong')});if(ok){score+=900+streak*175;streak++;fireworks(cursor.x,cursor.y,'cyan')}else{streak=0;fireworks(cursor.x,cursor.y,'red')}record(current,ok);setTimeout(()=>reveal('domain',ok),650)}
 function reveal(which,ok){let dx=clean(current.diagnosis), obj=clean(current.educational_objective||current.board_trigger||current.quick_recall); if(which==='solo'){$('soloRevealTitle').textContent=ok?'Gate Completed':'Learning Moment';$('soloRevealDx').textContent=dx;$('soloTrigger').textContent=obj;$('soloRevealRatings').innerHTML=ratingsHTML();$('soloReveal').classList.remove('hidden');$('soloScore').textContent=score;$('soloStreak').textContent=streak;$('hpFill').style.width=hp+'%'}else{$('domainRevealTitle').textContent=ok?'Correct':'Learning Moment';$('domainDx').textContent=dx;$('domainObj').textContent=obj;$('domainRevealRatings').innerHTML=ratingsHTML();$('domainReveal').classList.remove('hidden');$('domainScore').textContent=score;$('domainStreak').textContent=streak} bindRatings(which);}
-function ratingsHTML(){return `<div class="ratingBar"><button class="btn" data-rate="pin">Pin</button><button class="btn red" data-rate="again">No Idea</button><button class="btn" data-rate="hard">Hard</button><button class="btn" data-rate="good">Good</button><button class="btn primary" data-rate="easy">EASY</button><button class="btn primary" data-rate="continue">Continue</button></div>`}
+function ratingsHTML(){return `<div class="ratingBar"><button class="btn" data-rate="pin">Pin</button><button class="btn buryBtn352" data-rate="bury">Bury</button><button class="btn againBtn352" data-rate="again">Again</button><button class="btn" data-rate="hard">Hard</button><button class="btn" data-rate="good">Good</button><button class="btn primary" data-rate="easy">EASY</button><button class="btn primary" data-rate="continue">Continue</button></div>`}
 function bindRatings(which){document.querySelectorAll('[data-rate]').forEach(b=>b.onclick=()=>{let r=b.dataset.rate;if(r==='continue'){advance(which);return}rate(current,r); if(r==='pin')toast('Pinned'); else advance(which)})}
 function advance(which){if(hp<=0&&which==='solo')return endRun('Game Completed');nextCard(); if(which==='solo'){gate++;renderSolo();loopSolo()}else{domainRound++;renderDomain();loopDomain()}}
 function record(c,ok){let k=c.id||c.qid;state[k]=state[k]||{};state[k].seen=true;state[k].reviewed=(state[k].reviewed||0)+1;state[k].correct=(state[k].correct||0)+(ok?1:0);state[k].last=new Date().toISOString();if(!ok)state[k].rating='again';saveState();updateKpis()}
@@ -433,8 +433,8 @@ function showReview(){show('review');let list=$('reviewList');let entries=cards.
 function exportSession(){let blob=new Blob([JSON.stringify({exportedAt:new Date().toISOString(),state},null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='solo_studying_session.json';a.click();URL.revokeObjectURL(a.href)}
 function importDeck(file){let r=new FileReader();r.onload=()=>{try{let d=JSON.parse(r.result);cards=d.cards||d;if(!Array.isArray(cards))throw Error('No cards array');cards.forEach(c=>{c.diagnosis=c.diagnosis||c.answer||'Unknown';c.presentation=c.presentation||c.clinical_vignette_summary||c.prompt||'';c.quick_recall=c.quick_recall||c.educational_objective||c.presentation;c.system=c.system||c.sys||''});toast('Deck loaded: '+cards.length);updateKpis()}catch(e){toast('Import failed')}};r.readAsText(file)}
 window.addEventListener('mousemove',e=>{cursor={x:e.clientX,y:e.clientY};let g=$('cursorGlow');if(g){g.style.left=cursor.x+'px';g.style.top=cursor.y+'px'}});window.addEventListener('touchmove',e=>{let t=e.touches[0];if(t){cursor={x:t.clientX,y:t.clientY};let g=$('cursorGlow');if(g){g.style.left=cursor.x+'px';g.style.top=cursor.y+'px'}}},{passive:true});
-window.addEventListener('keydown',e=>{if(e.key==='Escape'){if(mode==='home')return;pauseGame();return} if(mode==='solo'&&!paused){if(['ArrowLeft','a','A'].includes(e.key)){selected=Math.max(0,selected-1);updateSoloVisuals()} if(['ArrowRight','d','D'].includes(e.key)){selected=Math.min(3,selected+1);updateSoloVisuals()} if(['Enter',' '].includes(e.key))selectSolo(selected); let n=parseInt(e.key); if(n>=1&&n<=4)selectSolo(n-1); if(['a','b','c','d','A','B','C','D'].includes(e.key)&&!['a','A','d','D'].includes(e.key))selectSolo('abcd'.indexOf(e.key.toLowerCase()))} if(mode==='domain'&&!paused){let n=parseInt(e.key); if(n>=1&&n<=4)selectDomain(n-1); if(['a','b','c','d','A','B','C','D'].includes(e.key))selectDomain('abcd'.indexOf(e.key.toLowerCase()))}});
-function wire(){document.querySelectorAll('[data-home]').forEach(b=>b.onclick=home);$('startSolo').onclick=startSolo;$('startDomain').onclick=startDomain;$('spacedBtn').onclick=showReview;$('exportBtn').onclick=exportSession;$('settingsBtn').onclick=()=>show('settings');$('soloPause').onclick=pauseGame;$('domainPause').onclick=pauseGame;$('pauseResume').onclick=resumeGame;$('pauseHome').onclick=home;$('endHome').onclick=()=>{$('end').classList.add('hidden');home()};$('endRestart').onclick=()=>{$('end').classList.add('hidden');mode==='domain'?startDomain():startSolo()};$('modalClose').onclick=()=>$('modal').classList.add('hidden');$('soloFull').onclick=fullCard;$('domainFull').onclick=fullCard;$('leftBtn').onclick=()=>{selected=Math.max(0,selected-1);updateSoloVisuals()};$('rightBtn').onclick=()=>{selected=Math.min(3,selected+1);updateSoloVisuals()};$('selectBtn').onclick=()=>selectSolo(selected);$('clearBtn').onclick=()=>{state={};saveState();updateKpis();showReview()};$('applyBtn').onclick=()=>{deckMode=$('deckMode').value;promptField=$('promptField').value;autoSelect=$('autoSelect').checked;bionicOn=$('bionicToggle').checked;toast('Applied')};$('deckFile').onchange=e=>{let f=e.target.files[0];if(f)importDeck(f)}}
+window.addEventListener('keydown',e=>{if(document.activeElement&&(/^(TEXTAREA|INPUT|SELECT)$/i.test(document.activeElement.tagName)||document.activeElement.isContentEditable))return;if(e.key==='Escape'){if(mode==='home')return;pauseGame();return} if(mode==='solo'&&!paused){if(['ArrowLeft','a','A'].includes(e.key)){selected=Math.max(0,selected-1);updateSoloVisuals()} if(['ArrowRight','d','D'].includes(e.key)){selected=Math.min(3,selected+1);updateSoloVisuals()} if(['Enter',' '].includes(e.key))selectSolo(selected); let n=parseInt(e.key); if(n>=1&&n<=4)selectSolo(n-1); if(['a','b','c','d','A','B','C','D'].includes(e.key)&&!['a','A','d','D'].includes(e.key))selectSolo('abcd'.indexOf(e.key.toLowerCase()))} if(mode==='domain'&&!paused){let n=parseInt(e.key); if(n>=1&&n<=4)selectDomain(n-1); if(['a','b','c','d','A','B','C','D'].includes(e.key))selectDomain('abcd'.indexOf(e.key.toLowerCase()))}});
+function wire(){const on=(id,fn)=>{const el=$(id);if(el)el.onclick=fn};document.querySelectorAll('[data-home]').forEach(b=>b.onclick=home);on('startSolo',startSolo);on('startDomain',startDomain);on('settingsBtn',()=>show('settings'));on('soloPause',pauseGame);on('domainPause',pauseGame);on('pauseResume',resumeGame);on('pauseHome',home);on('endHome',()=>{$('end').classList.add('hidden');home()});on('endRestart',()=>{$('end').classList.add('hidden');mode==='domain'?startDomain():startSolo()});on('modalClose',()=>$('modal').classList.add('hidden'));on('soloFull',fullCard);on('domainFull',fullCard);on('leftBtn',()=>{selected=Math.max(0,selected-1);updateSoloVisuals()});on('rightBtn',()=>{selected=Math.min(3,selected+1);updateSoloVisuals()});on('selectBtn',()=>selectSolo(selected));on('clearBtn',()=>{state={};saveState();updateKpis();showReview()});on('applyBtn',()=>{deckMode=$('deckMode').value;promptField=$('promptField').value;autoSelect=$('autoSelect').checked;bionicOn=$('bionicToggle').checked;toast('Applied')});const deck=$('deckFile');if(deck)deck.onchange=e=>{let f=e.target.files[0];if(f)importDeck(f)}}
 
 
 /* v17.5.8 behavior patch: better Domain orb proportions + click-outside-to-continue. */
@@ -701,6 +701,7 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
     $('settings')?.addEventListener('click',e=>{ if(e.target.id==='settings') home(); });
     $('modal')?.addEventListener('click',e=>{ if(e.target.id==='modal') $('modal').classList.add('hidden'); });
     document.addEventListener('keydown',e=>{
+      if(document.activeElement&&(/^(TEXTAREA|INPUT|SELECT)$/i.test(document.activeElement.tagName)||document.activeElement.isContentEditable)&&['Enter',' ','ArrowRight'].includes(e.key)) return;
       if(!($('settings')?.classList.contains('hidden'))){
         if(e.key==='Escape' || (e.key==='Enter' && !['INPUT','SELECT','TEXTAREA'].includes(document.activeElement?.tagName||''))){ e.preventDefault(); home(); }
         return;
@@ -1310,16 +1311,13 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
     const oldGrid=box.querySelector('.grid2'); if(oldGrid){oldGrid.classList.add('v175152-setup');}
     const controls=box.querySelector(':scope > .controls');
     const play=document.createElement('details');play.className='v175152-panel';play.open=true;play.innerHTML='<summary>Play Setup</summary><div class="v175152-inner"></div>';
-    const data=document.createElement('details');data.className='v175152-panel';data.innerHTML='<summary>Card Data · Import / Export / Merge</summary><div class="v175152-inner"><div class="v175152-hint">Exports preserve source cards and merge-safe progress: pins, review ratings, tags, and selected Shadow Dungeon state.</div><div class="v175152-file"><label>Import / Replace PUBLIC JSON <input id="deckFile2" type="file" accept=".json,application/json"></label></div><div class="v175152-file"><label>Merge cards JSON <input id="mergeFile2" type="file" accept=".json,application/json"></label></div><div class="v175152-file"><label>Import progress / merge <input id="progressFile2" type="file" accept=".json,application/json"></label></div><div class="v175152-actions"><button id="exportCardsOnly2" class="btn">Export cards only</button><button id="exportProgress2" class="btn">Export progress patch</button><button id="exportMergeInfo2" class="btn">Export merge info</button><button id="exportEntire2" class="btn">Export entire JSON</button></div></div>';
+    const data=document.createElement('details');data.className='v175152-panel';data.innerHTML='<summary>Advanced: Merge / Progress Import</summary><div class="v175152-inner"><div class="v175152-hint">Merge cards or restore progress separately from the main deck upload row.</div><div class="v175152-file"><label>Merge cards JSON <input id="mergeFile2" type="file" accept=".json,application/json"></label></div><div class="v175152-file"><label>Import progress / merge <input id="progressFile2" type="file" accept=".json,application/json"></label></div><div class="v175152-actions"><button id="exportProgress2" class="btn">Export Progress</button><button id="exportMergeInfo2" class="btn">Export merge info</button></div></div>';
     if(oldGrid){oldGrid.parentNode.insertBefore(play,oldGrid);play.querySelector('.v175152-inner').appendChild(oldGrid);}
     if(controls){controls.parentNode.insertBefore(data,controls);}else{box.appendChild(data)}
-    q('deckFile2').onchange=e=>{const f=e.target.files[0];if(f)importDeckFile(f,false)};
     q('mergeFile2').onchange=e=>{const f=e.target.files[0];if(f)importDeckFile(f,true)};
     q('progressFile2').onchange=e=>{const f=e.target.files[0];if(f)importProgressFile(f)};
-	    q('exportCardsOnly2').onclick=()=>downloadJSON({metadata:{app:'Solo Studying',version:'v17.5.15.2',exportedAt:new Date().toISOString(),type:'cards_with_progress'},cards:getCards(),state:currentState()},'solo_studying_cards_with_progress_v17_5_15_2.json');
     q('exportProgress2').onclick=()=>downloadJSON({metadata:{app:'Solo Studying',version:'v17.5.15.2',exportedAt:new Date().toISOString(),type:'progress_patch'},state:currentState()},'solo_studying_progress_patch_v17_5_15_2.json');
     q('exportMergeInfo2').onclick=()=>downloadJSON({metadata:{app:'Solo Studying',version:'v17.5.15.2',exportedAt:new Date().toISOString(),cards:getCards().length,progressRecords:Object.keys(currentState()).length,mergeRule:'cards by id/qid; progress state merged by key; pins union-safe'}},'solo_studying_merge_info_v17_5_15_2.json');
-    q('exportEntire2').onclick=()=>downloadJSON({metadata:{app:'Solo Studying',version:'v17.5.15.2',exportedAt:new Date().toISOString(),type:'entire_bundle'},cards:getCards(),state:currentState()},'solo_studying_entire_bundle_v17_5_15_2.json');
   }
   function filterShadowCards(){
     const st=currentState(), cs=getCards();
@@ -1364,7 +1362,7 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
     renderShadowDungeonList();
   };
   const oldWire=window.wire;
-  function init(){enhanceHome();enhanceSettings(); if(q('spacedBtn'))q('spacedBtn').onclick=window.showReview; if(q('shadowBtn'))q('shadowBtn').onclick=window.showShadowDungeon; if(q('settingsBtn'))q('settingsBtn').onclick=()=>{show('settings');enhanceSettings();}; if(q('gearBtn'))q('gearBtn').onclick=()=>{show('settings');enhanceSettings();};}
+  function init(){enhanceHome();enhanceSettings(); if(q('shadowBtn'))q('shadowBtn').onclick=window.showShadowDungeon; if(q('settingsBtn'))q('settingsBtn').onclick=()=>{show('settings');enhanceSettings();}; if(q('gearBtn'))q('gearBtn').onclick=()=>{show('settings');enhanceSettings();};}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init); else init();
 })();
 </script>
@@ -1496,7 +1494,6 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
       };
     }
     const cb=q('spacedToggle'); if(cb && !cb.dataset.v175153){cb.dataset.v175153='1'; cb.onchange=saveSpacedToggle;}
-    const df2=q('deckFile2'); if(df2 && !df2.dataset.v175153){df2.dataset.v175153='1'; df2.setAttribute('accept','.json,.csv,application/json,text/csv'); df2.onchange=e=>importFileAny(e.target.files&&e.target.files[0],false);}
     const mf2=q('mergeFile2'); if(mf2 && !mf2.dataset.v175153){mf2.dataset.v175153='1'; mf2.setAttribute('accept','.json,.csv,application/json,text/csv'); mf2.onchange=e=>importFileAny(e.target.files&&e.target.files[0],true);}
   }
   function revealVisible(which='solo'){const id=which==='solo'?'soloReveal':'domainReveal'; const r=q(id); return r && !r.classList.contains('hidden');}
@@ -1529,6 +1526,7 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
     if(q('domain') && !q('domain').classList.contains('hidden') && revealVisible('domain') && !isInteractiveTarget(e) && !e.target.closest('#domainReveal')){ e.preventDefault(); continueFromReveal('domain'); }
   }, true);
   document.addEventListener('keydown',e=>{
+    if(document.activeElement&&(/^(TEXTAREA|INPUT|SELECT)$/i.test(document.activeElement.tagName)||document.activeElement.isContentEditable)&&['Enter',' ','ArrowRight'].includes(e.key)) return;
     if(!q('settings')?.classList.contains('hidden')){
       if(e.key==='Escape' || (e.key==='Enter' && !['INPUT','SELECT','TEXTAREA'].includes(document.activeElement?.tagName||''))){e.preventDefault(); saveSpacedToggle(); home();}
       return;
@@ -1639,6 +1637,7 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
     if(mode==='domain' && revealVisible('domain') && !e.target.closest('button,input,select,textarea,a,#domainReveal')){e.preventDefault(); continueReveal('domain');}
   },true);
   document.addEventListener('keydown',e=>{
+    if(document.activeElement&&(/^(TEXTAREA|INPUT|SELECT)$/i.test(document.activeElement.tagName)||document.activeElement.isContentEditable)&&['Enter',' ','ArrowRight'].includes(e.key)) return;
     if(!q('settings')?.classList.contains('hidden') && (e.key==='Escape'||e.key==='Enter')){e.preventDefault(); returnToPrior(); return;}
     if((e.key==='Enter'||e.key==='ArrowRight'||e.key===' ') && mode==='solo' && continueReveal('solo')){e.preventDefault(); return;}
     if((e.key==='Enter'||e.key==='ArrowRight'||e.key===' ') && mode==='domain' && continueReveal('domain')){e.preventDefault(); return;}
@@ -1713,6 +1712,9 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
   function stateFor(c){try{return state[c.id||c.qid]||{}}catch(e){return {}}}
   function isReview(c){const s=stateFor(c); return !!(s.pinned || s.rating==='again' || s.rating==='hard' || s.due || s.flagged);}
   function ensureHomePanel(){
+    const existing=q('homePlayPanel175155');
+    if(existing) existing.remove();
+    return;
     const home=document.querySelector('#home .homeWrap'); if(!home || q('homePlayPanel175155')) return;
     const panel=document.createElement('section'); panel.id='homePlayPanel175155'; panel.className='homePlayPanel';
     panel.innerHTML=`<div><label>Study by</label><select id="homeScope175155"><option value="all">All cards</option><option value="review">Review deck: flagged / missed / hard</option><option value="pinned">Flagged / pinned only</option><option value="due">Due-weighted review</option></select></div><div><label>System</label><select id="homeSystem175155"><option value="all">All systems</option></select></div><div><label>Tags</label><select id="homeTag175155"><option value="all">All tags</option></select></div><button id="homeReviewDeck175155" class="btn primary">Review deck</button><div class="homeDeckNote">Use this row to filter Solo Studying and Knowledge Expansion before starting. Review deck pulls pinned, missed, hard, due, or flagged cards.</div>`;
@@ -1762,7 +1764,6 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
   const oldStartDomain=window.startDomain||startDomain; window.startDomain=startDomain=function(){if(!hasCardsOrWarn()){show('home');return;} oldStartDomain();};
   function patchButtons(){
     if(q('startSolo')) q('startSolo').onclick=startSolo; if(q('startDomain')) q('startDomain').onclick=startDomain;
-    const sbtn=q('spacedBtn'); if(sbtn) sbtn.textContent='Spaced Repetition / Review';
   }
   const oldImport=window.importFileAny || window.importDeck;
   if(oldImport){ window.importFileAny=function(file,merge){ oldImport(file,merge); setTimeout(()=>{refreshHomeFilters();},350); }; window.importDeck=window.importFileAny; }
@@ -2033,6 +2034,7 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
     }
     ['solo','domain'].forEach(which=>{const el=q(which); if(el && !el.dataset.v175157Click){el.dataset.v175157Click='1'; el.addEventListener('click',e=>clickRevealAdvance(e,which));}});
     document.addEventListener('keydown',(e)=>{
+      if(document.activeElement&&(/^(TEXTAREA|INPUT|SELECT)$/i.test(document.activeElement.tagName)||document.activeElement.isContentEditable)&&['Enter',' ','ArrowRight'].includes(e.key)) return;
       if(!q('settings')?.classList.contains('hidden')){ if(e.key==='Escape' || e.key==='Enter'){ if(!['INPUT','SELECT','TEXTAREA'].includes(document.activeElement?.tagName||'')){e.preventDefault(); returnFromSettings();} } return; }
       if(!q('pause')?.classList.contains('hidden')){ if(e.key==='Escape'||e.key==='Enter'){e.preventDefault(); resumeGame();} return; }
       if((e.key==='ArrowRight'||e.key==='Enter'||e.key===' ') && window.mode==='solo' && !q('soloReveal')?.classList.contains('hidden')){e.preventDefault(); try{clearTimeout(answerAutoAdvanceHandle)}catch(_){}; advance('solo');}
@@ -2187,7 +2189,7 @@ body:not(.hideContinueHint175158) .continueHint175158{display:block!important;ma
   }
   function ratingsHTML175158(){
     return ratingsOn()
-      ? '<div class="ratingBar"><button class="btn" data-rate="pin">Pin</button><button class="btn red" data-rate="again">No Idea</button><button class="btn" data-rate="hard">Hard</button><button class="btn" data-rate="good">Good</button><button class="btn primary" data-rate="easy">EASY</button><button class="btn primary" data-rate="continue">Continue</button></div>'
+      ? '<div class="ratingBar"><button class="btn" data-rate="pin">Pin</button><button class="btn buryBtn352" data-rate="bury">Bury</button><button class="btn againBtn352" data-rate="again">Again</button><button class="btn" data-rate="hard">Hard</button><button class="btn" data-rate="good">Good</button><button class="btn primary" data-rate="easy">EASY</button><button class="btn primary" data-rate="continue">Continue</button></div>'
       : '<div class="ratingBar"><button class="btn primary" data-rate="continue">Continue</button><span class="btn">Next card in 7s</span></div>';
   }
   const priorBind=window.bindRatings||bindRatings;
@@ -2226,12 +2228,11 @@ body:not(.hideContinueHint175158) .continueHint175158{display:block!important;ma
     if(zones[0]) zones[0].innerHTML='<span class="dropTitle175158">CSV FILE: PROMPT = COLUMN A / PRESENTATION; ANSWER = COLUMN C / EDUCATIONAL OBJECTIVE</span><b>Drag / drop JSON or CSV here</b><small>Drop to replace current deck. This fixes CSV imports so MCQ choices use the answer/objective, not repeated question prompts.</small>';
     if(zones[1]) zones[1].innerHTML='<span class="dropTitle175158">FLASH CARDS</span><b>Drag / drop JSON or CSV here</b><small>Drop to replace the current deck. Use the import/export panel below for merge/export workflows.</small>';
     // Widen file accepts and labels.
-    ['deckFile','deckFile2','mergeFile2'].forEach(id=>{const el=byId(id); if(el){el.setAttribute('accept','.json,.csv,application/json,text/csv'); el.onchange=e=>importAny175158(e.target.files&&e.target.files[0], id==='mergeFile2');}});
-    const f1=byId('deckFile2'); if(f1){const label=f1.closest('label'); if(label && !label.dataset.v175158){label.dataset.v175158='1'; label.childNodes[0].textContent='Import / Replace JSON or CSV ';}}
+    ['deckFile','mergeFile2'].forEach(id=>{const el=byId(id); if(el){el.setAttribute('accept','.json,.csv,application/json,text/csv'); el.onchange=e=>importAny175158(e.target.files&&e.target.files[0], id==='mergeFile2');}});
     const f2=byId('mergeFile2'); if(f2){const label=f2.closest('label'); if(label && !label.dataset.v175158){label.dataset.v175158='1'; label.childNodes[0].textContent='Merge cards JSON or CSV ';}}
     if(!byId('exportCSV175158')){
       const btn=document.createElement('button'); btn.id='exportCSV175158'; btn.className='btn v175158-csv-export'; btn.textContent='Export cards CSV'; btn.onclick=exportCardsCSV175158;
-      (byId('exportCardsOnly2')?.parentNode || box.querySelector('.controls') || box).appendChild(btn);
+      (box.querySelector('.controls') || box).appendChild(btn);
     }
     if(!byId('hideHintToggle175158')){
       const row=document.createElement('div'); row.className='field';
@@ -2481,7 +2482,6 @@ body:not(.hideContinueHint175158) .continueHint175158{display:block!important;ma
       controls.dataset.v175159='1'; controls.classList.add('homeMainActions175159');
       controls.innerHTML=`
         <button id="shadowBtn" class="btn">Shadow Dungeon</button>
-        <button id="spacedBtn" class="btn">Spaced Repetition / Review</button>
         <div class="importExportWrap175159">
           <button id="importExportToggle175159" class="btn">Import/Export settings ▾</button>
           <div id="importExportDropdown175159" class="importExportMenu175159 hidden">
@@ -2497,7 +2497,6 @@ body:not(.hideContinueHint175158) .continueHint175158{display:block!important;ma
         </div>`;
     }
     const shadow=q('shadowBtn'); if(shadow) shadow.onclick=openShadow;
-    const spaced=q('spacedBtn'); if(spaced) spaced.onclick=openReview;
     const toggle=q('importExportToggle175159'); if(toggle) toggle.onclick=(e)=>{e.stopPropagation(); q('importExportDropdown175159')?.classList.toggle('hidden');};
     const os=q('openSettings175159'); if(os) os.onclick=()=>{closeMenu(); openSettings();};
     const ir=q('menuImportReplace175159'); if(ir) ir.onchange=e=>{closeMenu(); importFile(e.target.files&&e.target.files[0],false); e.target.value='';};
@@ -2642,6 +2641,7 @@ body:not(.hideContinueHint175158) .continueHint175158{display:block!important;ma
     if(window.__v1751511_keys) return; window.__v1751511_keys=true;
     let last=0;
     document.addEventListener('keydown',e=>{
+      if(document.activeElement&&(/^(TEXTAREA|INPUT|SELECT)$/i.test(document.activeElement.tagName)||document.activeElement.isContentEditable)&&['Enter',' ','ArrowRight'].includes(e.key)) return;
       if(e.key!=='Enter' && e.key!==' ') return;
       const now=Date.now();
       const notify=$('notify');
@@ -2851,6 +2851,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   function keyboardGuard(){
     if(window.__v1751512_keyguard) return; window.__v1751512_keyguard=true;
     document.addEventListener('keydown',function(e){
+      if(document.activeElement&&(/^(TEXTAREA|INPUT|SELECT)$/i.test(document.activeElement.tagName)||document.activeElement.isContentEditable)&&['Enter',' ','ArrowRight'].includes(e.key)) return;
       const key=e.key;
       const notify=$('notify');
       if(notify && !notify.classList.contains('hidden') && (key==='Enter'||key===' '||key==='ArrowRight')){
@@ -3062,7 +3063,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     if(domain && !domain.querySelector('.modeSub')){
       const sub = document.createElement('span');
       sub.className = 'modeSub';
-      sub.textContent = 'Spaced Repetition';
+      sub.textContent = 'Orb select';
       domain.appendChild(sub);
     }
   }
@@ -3075,20 +3076,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     }
   }
   function installDomainOrderSelector(){
-    const homeWrap = document.querySelector('#home .homeWrap');
-    const controls = homeWrap?.querySelector(':scope > .controls');
-    if(!homeWrap || !controls || document.getElementById('domainOrderSelectFinal')) return;
-    const wrap = document.createElement('div');
-    wrap.className = 'reviewOrderWrapFinal';
-    wrap.innerHTML = '<label for="domainOrderSelectFinal">Knowledge Expansion order</label><select id="domainOrderSelectFinal"><option value="new-first">New cards first</option><option value="reviewed-first">Reviewed cards first</option></select>';
-    controls.after(wrap);
-    const sel = wrap.querySelector('select');
-    sel.value = domainOrderMode;
-    sel.onchange = () => {
-      domainOrderMode = sel.value;
-      localStorage.setItem('knowledgeExpansion_domainOrder_v1751513', domainOrderMode);
-      if(typeof toast==='function') toast('Knowledge Expansion order updated');
-    };
+    document.getElementById('domainOrderSelect'+'Final')?.closest('.reviewOrderWrapFinal')?.remove();
   }
 
   const oldCardPool = window.cardPool || cardPool;
@@ -3162,6 +3150,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   };
 
   document.addEventListener('keydown', function(e){
+    if(document.activeElement&&(/^(TEXTAREA|INPUT|SELECT)$/i.test(document.activeElement.tagName)||document.activeElement.isContentEditable)&&['Enter',' ','ArrowRight'].includes(e.key)) return;
     const notifyOpen = !$('notify')?.classList.contains('hidden');
     if(notifyOpen && (e.key==='Enter' || e.key===' ')){
       e.preventDefault(); e.stopImmediatePropagation();
@@ -3551,7 +3540,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   const priorReveal = window.reveal || (typeof reveal !== 'undefined' ? reveal : null);
   if(priorReveal){ window.reveal = reveal = function(which,ok){ const out = priorReveal(which,ok); setTimeout(()=>{ removeDuplicateHints(); rebindRevealButtons(); },0); setTimeout(()=>{ removeDuplicateHints(); rebindRevealButtons(); },120); return out; }; }
   document.addEventListener('click', function(e){ if(revealOpen('solo') && !inInteractive(e)){ e.preventDefault(); e.stopPropagation(); advanceReveal('solo'); return; } if(revealOpen('domain') && !inInteractive(e)){ e.preventDefault(); e.stopPropagation(); advanceReveal('domain'); return; } }, true);
-  document.addEventListener('keydown', function(e){ if(['Enter','ArrowRight',' '].includes(e.key)){ if(revealOpen('solo')){ e.preventDefault(); e.stopImmediatePropagation(); advanceReveal('solo'); return; } if(revealOpen('domain')){ e.preventDefault(); e.stopImmediatePropagation(); advanceReveal('domain'); return; } } }, true);
+  document.addEventListener('keydown', function(e){ if(document.activeElement&&(/^(TEXTAREA|INPUT|SELECT)$/i.test(document.activeElement.tagName)||document.activeElement.isContentEditable)) return; if(['Enter','ArrowRight',' '].includes(e.key)){ if(revealOpen('solo')){ e.preventDefault(); e.stopImmediatePropagation(); advanceReveal('solo'); return; } if(revealOpen('domain')){ e.preventDefault(); e.stopImmediatePropagation(); advanceReveal('domain'); return; } } }, true);
   function ensureNewOption(){ const sel=$('homeScope175155'); if(!sel) return; if(![...sel.options].some(o=>o.value==='new')){ const opt=document.createElement('option'); opt.value='new'; opt.textContent='New cards — not reviewed'; sel.insertBefore(opt, sel.options[1] || null); } sel.onchange = function(){ window.homeFilters = window.homeFilters || {}; window.homeFilters.scope = sel.value; }; }
   const priorCardPool = window.cardPool || (typeof cardPool !== 'undefined' ? cardPool : null);
   if(priorCardPool){ window.cardPool = cardPool = function(){ let arr = priorCardPool() || []; const f = window.homeFilters || {}; if(f.scope === 'new'){ arr = (cards||[]).filter(c=>cleanSafe(c.diagnosis || c.answer) && cleanSafe(typeof getPrompt==='function'?getPrompt(c):(c.prompt||c.presentation||c.clinical_vignette_summary)) && !stateFor(c).seen); if(f.system && f.system!=='all') arr=arr.filter(c=>cleanSafe(c.system||c.sys||c.subject)===f.system); if(f.tag && f.tag!=='all'){ arr=arr.filter(c=>{let t=c.tags||[]; if(typeof t==='string')t=t.split(/[|,;]/); return t.map(cleanSafe).includes(f.tag);}); } } if(!arr.length && f.scope==='new'){ try{ toast('No new cards match this filter'); }catch(e){} return (cards||[]).filter(c=>cleanSafe(c.diagnosis || c.answer) && cleanSafe(typeof getPrompt==='function'?getPrompt(c):(c.prompt||c.presentation||c.clinical_vignette_summary))); } return arr.length ? arr : (cards||[]); }; }
@@ -3646,7 +3635,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   window.nextCard = nextCard = function(){ const pool=cardPool(); if(!pool||!pool.length)return; current=pool[index%pool.length]; index++; makeChoices(); };
   function continueReveal(which){ if(now()<revealClickLock161) return; revealClickLock161=now()+350; try{ advance(which); }catch(e){ console.warn(e); } }
   document.addEventListener('click', e=>{ const inside=e.target.closest('.reveal,.modal,.pause,.notification,.end,.hud,button,input,select,textarea,.settings .box'); if(inside)return; if(soloRevealOpen()){e.preventDefault();e.stopPropagation();continueReveal('solo');} else if(domainRevealOpen()){e.preventDefault();e.stopPropagation();continueReveal('domain');} }, true);
-  document.addEventListener('keydown', e=>{ if(['Enter','ArrowRight',' '].includes(e.key)){ if(soloRevealOpen()){e.preventDefault();e.stopImmediatePropagation();continueReveal('solo');} else if(domainRevealOpen()){e.preventDefault();e.stopImmediatePropagation();continueReveal('domain');} else if(domainOpen() && now()>=domainReadyAt161){e.preventDefault();e.stopImmediatePropagation();selectNearestOrb161();} } }, true);
+  document.addEventListener('keydown', e=>{ if(document.activeElement&&(/^(TEXTAREA|INPUT|SELECT)$/i.test(document.activeElement.tagName)||document.activeElement.isContentEditable)) return; if(['Enter','ArrowRight',' '].includes(e.key)){ if(soloRevealOpen()){e.preventDefault();e.stopImmediatePropagation();continueReveal('solo');} else if(domainRevealOpen()){e.preventDefault();e.stopImmediatePropagation();continueReveal('domain');} else if(domainOpen() && now()>=domainReadyAt161){e.preventDefault();e.stopImmediatePropagation();selectNearestOrb161();} } }, true);
   function readyLabel161(){ let h=$('domainReady17515161'); if(!h){h=document.createElement('div');h.id='domainReady17515161';h.className='hidden';$('domain')?.appendChild(h);} h.classList.remove('hidden'); let n=3; h.textContent=''+n; clearInterval(warmupHandle161); warmupHandle161=setInterval(()=>{n--; if(n<=0){clearInterval(warmupHandle161);h.textContent='';setTimeout(()=>h.classList.add('hidden'),1000);} else h.textContent=''+n;},1000); }
   function drawSlash161(x1,y1,x2,y2){ const len=Math.hypot(x2-x1,y2-y1); if(len<3)return; const s=document.createElement('i'); s.className='domainSlash17515161'; s.style.left=x1+'px'; s.style.top=y1+'px'; s.style.width=len+'px'; s.style.transform='rotate('+Math.atan2(y2-y1,x2-x1)+'rad)'; document.body.appendChild(s); setTimeout(()=>s.remove(),420); const d=document.createElement('i'); d.className='domainSlashDot17515161'; d.style.left=x2+'px'; d.style.top=y2+'px'; document.body.appendChild(d); setTimeout(()=>d.remove(),420); }
   function distSeg(px,py,x1,y1,x2,y2){ const vx=x2-x1,vy=y2-y1,wx=px-x1,wy=py-y1,c1=vx*wx+vy*wy; if(c1<=0)return Math.hypot(px-x1,py-y1); const c2=vx*vx+vy*vy; if(c2<=c1)return Math.hypot(px-x2,py-y2); const b=c1/c2; return Math.hypot(px-(x1+b*vx),py-(y1+b*vy)); }
@@ -4124,9 +4113,9 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 
 
 
-<!-- v17.5.16.4 — pause dedupe + Shadow Dungeon pinned/wrong 5s patch
+<!-- v17.5.16.4 - pause dedupe + Shadow Dungeon pinned/wrong timing patch
      Keeps existing question/answer/auto-select automation intact; only changes pause overlay cleanup,
-     Shadow Dungeon pool behavior, and Shadow Dungeon drop duration from 7s to 5s. -->
+     Shadow Dungeon pool behavior, and Shadow Dungeon shared Solo timing. -->
 <style id="v175164-shadow-pause-css">
   #pause .controls .pauseSettingsDuplicate175164{display:none!important;}
   #pauseSettings175164{display:inline-flex!important;align-items:center!important;justify-content:center!important;}
@@ -4138,12 +4127,12 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 </style>
 <script id="v175164-shadow-pause-js">
 (function(){
-  const PATCH_VERSION='v17.5.16.4-shadow-dungeon-5s';
+  const PATCH_VERSION='v17.5.16.4-shadow-dungeon';
   try{
     document.title='COZY ARCADE BOARD PREP-MEDICINE';
     if(window.DATA && DATA.metadata){
       DATA.metadata.version='v17.5.16.4';
-      DATA.metadata.shadow_dungeon='Pinned + wrong/No-Idea cards; 5-second drop; click answer to select.';
+      DATA.metadata.shadow_dungeon='Pinned + missed cards; uses Solo Studying timing; click answer to select.';
       DATA.metadata.pause_patch='Duplicate Settings button removed from Esc/Pause overlay.';
     }
   }catch(e){}
@@ -4200,11 +4189,11 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     const hub=document.querySelector('.shadowDungeonHub');
     if(hub && !q('shadowInfo175164')){
       const info=document.createElement('details'); info.id='shadowInfo175164'; info.className='shadowInfo175164';
-      info.innerHTML='<summary>Information</summary><p>Shadow Dungeon reviews only pinned cards plus wrong/No Idea cards. Game 1 uses a 5-second drop here. Click an answer box to select; arrows still move the runner.</p>';
+      info.innerHTML='<summary>Information</summary><p>Shadow Dungeon reviews pinned and missed cards using the same timing as Solo Studying. Click an answer box to select; arrows still move the runner.</p>';
       const sub=hub.querySelector('.shadowDungeonSub');
       (sub&&sub.parentNode?sub:hub).insertAdjacentElement(sub?'afterend':'afterbegin', info);
     }
-    const start=q('shadowStartFirst'); if(start){start.textContent='Start Shadow Dungeon review'; start.classList.add('shadow5s175164');}
+    const start=q('shadowStartFirst'); if(start){start.textContent='Start Shadow Dungeon'; start.classList.add('shadow5s175164');}
     const list=q('reviewList');
     if(list && window.__shadowDungeonActive175164!==true){
       // keep list focused on pinned/wrong whenever the Shadow Dungeon tab is visible
@@ -4218,10 +4207,10 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     }
   }
 
-  // Ensure entering Shadow Dungeon uses the 5-second review mode.
+  // Ensure entering Shadow Dungeon uses the review mode.
   document.addEventListener('click',function(e){
     if(e.target.closest('#startSolo,#startDomain,#home [data-home],#endRestart')) setShadow(false);
-    if(e.target.closest('#spacedBtn,#shadowBtn,#shadowTabDungeon,#shadowTabFlagged,#shadowStartFirst')){ setShadow(true); setTimeout(polishShadowDungeonUI,80); }
+    if(e.target.closest('#shadowBtn,#shadowTabDungeon,#shadowTabFlagged,#shadowStartFirst')){ setShadow(true); setTimeout(polishShadowDungeonUI,80); }
     if(e.target.closest('#reviewList .reviewItem')) setShadow(true);
   },true);
 
@@ -4252,8 +4241,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   const oldStartDomain=window.startDomain || (typeof startDomain!=='undefined'?startDomain:null);
   if(oldStartDomain){ window.startDomain = startDomain = function(){ setShadow(false); return oldStartDomain.apply(this,arguments); }; }
 
-  /* Dynamic Solo drop: 7s normally, 5s in Shadow Dungeon. This mirrors the existing final Solo renderer,
-     but swaps the duration based on __shadowDungeonActive175164. */
+  /* Dynamic Solo drop mirrors the existing final Solo renderer and uses the shared game timing. */
   let raf175164=null, dropStart175164=0, currentY175164=0, dropDistance175164=360, startTop175164=255;
   function dropMs(){ return (Number(window.__cozyQuestionMs351)||((Math.max(3,Math.min(10,Number(localStorage.getItem('cozyQuestionSeconds351')||5)||5)))*1000)); }
   function revealOpen(){ const r=q('soloReveal'); return r && !r.classList.contains('hidden'); }
@@ -4301,7 +4289,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     const warn=q('soloDropWarn175151'); if(warn){ warn.classList.remove('on'); warn.textContent=''; }
     timerMax=dropMs()/1000; timer=timerMax;
     const hint=document.querySelector('.soloHint');
-    if(hint) hint.textContent = window.__shadowDungeonActive175164 ? 'Shadow Dungeon • 5s • click answer to select • ← / → move' : '← / → move • click answer or 1–4 select • timer auto-locks selected answer';
+    if(hint) hint.textContent = window.__shadowDungeonActive175164 ? 'Shadow Dungeon • click answer to select • ← / → move' : '← / → move • click answer or 1–4 select • timer auto-locks selected answer';
     raf175164=requestAnimationFrame(tick);
   }
 
@@ -5149,7 +5137,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     }
   }
   function bindImportControls(){
-    ['deckFile','deckFile2','mergeFile2'].forEach(id=>{
+    ['deckFile','mergeFile2'].forEach(id=>{
       const el=q(id); if(el){ el.setAttribute('accept','.json,.csv,application/json,text/csv'); el.onchange=e=>importAnyFinal1751523(e.target.files&&e.target.files[0], id==='mergeFile2'); }
     });
     qa('.dropZone175153').forEach((dz,idx)=>{
@@ -5538,17 +5526,11 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   }
 
   function showExitPrompt17526(onSaveHome,onCancel){
-    if(exitInProgress17526){ onSaveHome&&onSaveHome(); return; }
-    let overlay=q('progressExitOverlay17526');
-    if(!overlay){
-      overlay=document.createElement('div'); overlay.id='progressExitOverlay17526'; overlay.className='progressExitOverlay17526 hidden';
-      overlay.innerHTML=`<div class="progressExitBox17526"><h2>Save progress?</h2><p>Export a progress file or save locally before leaving this game/session.</p><div class="controls"><button id="saveProgressHome17526" class="btn primary">Save Progress File + Home</button><button id="localSaveHome17526" class="btn">Save Local + Home</button><button id="cancelExit17526" class="btn red">Cancel</button></div></div>`;
-      document.body.appendChild(overlay);
-    }
-    overlay.classList.remove('hidden');
-    q('saveProgressHome17526').onclick=()=>{ exportProgress17526(); overlay.classList.add('hidden'); exitInProgress17526=true; onSaveHome&&onSaveHome(); exitInProgress17526=false; };
-    q('localSaveHome17526').onclick=()=>{ try{ if(typeof saveState==='function') saveState(); }catch(e){} overlay.classList.add('hidden'); exitInProgress17526=true; onSaveHome&&onSaveHome(); exitInProgress17526=false; };
-    q('cancelExit17526').onclick=()=>{ overlay.classList.add('hidden'); onCancel&&onCancel(); };
+    try{ if(typeof saveState==='function') saveState(); }catch(e){}
+    q('pause')?.classList.add('hidden');
+    exitInProgress17526=true;
+    onSaveHome&&onSaveHome();
+    exitInProgress17526=false;
   }
   function shouldPromptExit(){
     if(exitInProgress17526) return false;
@@ -5572,9 +5554,8 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   }catch(e){}
   function patchExitButtons(){
     document.querySelectorAll('[data-home]').forEach(btn=>{ btn.onclick=()=>home(); });
-    if(q('pauseHome')) q('pauseHome').onclick=()=>home();
+    if(q('pauseHome')) q('pauseHome').onclick=()=>{try{if(typeof saveState==='function') saveState();}catch(e){} q('pause')?.classList.add('hidden'); home(true);};
     if(q('endHome')) q('endHome').onclick=()=>home();
-    if(q('exportBtn')) q('exportBtn').onclick=exportProgress17526;
   }
 
   function boot(){ installReviewLaunchPanel(); wrapStarts(); installProgressSettings(); patchExitButtons(); classifyPromptBox('solo'); classifyPromptBox('domain'); }
@@ -5696,8 +5677,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     const solo=q('startSolo'), domain=q('startDomain');
     if(solo) solo.onclick=(e)=>{e&&e.preventDefault&&e.preventDefault(); launchWithTabs('solo');};
     if(domain) domain.onclick=(e)=>{e&&e.preventDefault&&e.preventDefault(); launchWithTabs('domain');};
-    // Export hook remains available from Settings and top export button.
-    if(q('exportBtn') && window.exportProgress17526) q('exportBtn').onclick=window.exportProgress17526;
+    // Export hook remains available from Settings and pause screen.
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot17527); else boot17527();
   setTimeout(boot17527,250); setTimeout(boot17527,900);
@@ -5915,11 +5895,11 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 .heroTitle{letter-spacing:.08em!important;font-size:clamp(42px,6vw,78px)!important;line-height:1.02!important;max-width:1100px}.heroSub{font-family:Orbitron,monospace;text-transform:uppercase;letter-spacing:.18em;color:#9feaff;font-weight:900;margin-top:14px}.modeCaption{margin:14px 0 0;color:#aeb8cf;font-weight:900;letter-spacing:.04em;line-height:1.35}.modeCard:nth-child(1){border-color:rgba(103,232,249,.20)}.modeCard:nth-child(2){border-color:rgba(167,139,250,.24)}
 .pauseBox{width:min(860px,92vw)!important;min-height:320px!important;background:linear-gradient(180deg,rgba(3,10,24,.90),rgba(4,8,20,.82))!important}.pauseBox .notifyLabel{font-size:clamp(28px,4vw,48px)!important;color:#bffbff!important}.pauseBox .controls .btn{min-width:160px}.settingsGear,.homeTopBtn{box-shadow:0 0 24px rgba(103,232,249,.10)!important}.hudPill{backdrop-filter:blur(14px)}
 /* PUBLIC Expansion-style reveal card: compact top diagnosis + full educational objective area */
-.reveal{width:min(1040px,92vw)!important;text-align:left!important;border-radius:26px!important;background:linear-gradient(180deg,rgba(7,9,25,.96),rgba(8,12,32,.94))!important;border:1px solid rgba(103,232,249,.26)!important;box-shadow:0 28px 96px rgba(0,0,0,.58), inset 0 0 44px rgba(103,232,249,.04)!important}.reveal h2{font-family:Orbitron,monospace;text-transform:uppercase;letter-spacing:.16em;color:#9feaff;font-size:18px!important;margin-bottom:8px!important}.dx{font-size:clamp(32px,4vw,54px)!important;color:#f5f7ff!important;letter-spacing:-.03em}.trigger{border-left:4px solid #67e8f9!important;background:rgba(103,232,249,.06)!important;color:#eef7ff!important;font-size:18px}.trigger:before{content:'EDUCATIONAL OBJECTIVE';display:block;font-family:Orbitron,monospace;font-size:11px;letter-spacing:.20em;color:#67e8f9;margin-bottom:8px}.ratingBar{justify-content:flex-start!important}.ratingBar .btn[data-rate="pin"]{border-color:#facc15;color:#fff5cc}.ratingBar .btn[data-rate="again"]{border-color:#fb5876}.ratingBar .btn[data-rate="continue"]{margin-left:auto}
+.reveal{width:min(1040px,92vw)!important;text-align:left!important;border-radius:26px!important;background:linear-gradient(180deg,rgba(7,9,25,.96),rgba(8,12,32,.94))!important;border:1px solid rgba(103,232,249,.26)!important;box-shadow:0 28px 96px rgba(0,0,0,.58), inset 0 0 44px rgba(103,232,249,.04)!important}.reveal h2{font-family:Orbitron,monospace;text-transform:uppercase;letter-spacing:.16em;color:#9feaff;font-size:18px!important;margin-bottom:8px!important}.dx{font-size:clamp(32px,4vw,54px)!important;color:#f5f7ff!important;letter-spacing:-.03em}.trigger{border-left:4px solid #67e8f9!important;background:rgba(103,232,249,.06)!important;color:#eef7ff!important;font-size:18px}.trigger:before{content:'EDUCATIONAL OBJECTIVE';display:block;font-family:Orbitron,monospace;font-size:11px;letter-spacing:.20em;color:#67e8f9;margin-bottom:8px}.ratingBar{justify-content:flex-start!important}.ratingBar .btn[data-rate="pin"]{border-color:#facc15;color:#fff5cc}.ratingBar .btn[data-rate="again"]{border-color:#fb5876}.ratingBar .btn[data-rate="continue"]{display:none!important;margin:0}
 /* Pretty blue swipe / selection feedback */
 .orb.selected,.choice.selected{outline:2px solid rgba(103,232,249,.85)!important;box-shadow:0 0 0 4px rgba(103,232,249,.12),0 0 42px rgba(103,232,249,.28)!important}.swipeFlash{position:fixed;z-index:180;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none;font-family:Orbitron,monospace;font-weight:950;letter-spacing:.22em;color:#dffbff;text-shadow:0 0 22px #67e8f9;border:1px solid rgba(103,232,249,.35);border-radius:999px;padding:12px 22px;background:rgba(4,12,28,.72);animation:swipeFlash .52s ease-out forwards}@keyframes swipeFlash{to{opacity:0;transform:translate(-50%,-60%) scale(1.08)}}
 .mobileControls{display:flex!important}.mobileControls .btn{min-width:56px}.domain .mobileControls{display:flex!important}.domainTouchPad{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:62;display:flex;gap:8px;align-items:center;justify-content:center}.domainTouchPad .btn{min-width:54px}.domain .orb{transition:left .08s linear,top .08s linear,outline .12s,box-shadow .12s,transform .12s}.domain .orb.selected{transform:scale(1.04)}
-@media(max-width:820px){.heroTitle{font-size:34px!important;letter-spacing:.05em!important}.heroSub{font-size:12px}.ratingBar .btn[data-rate="continue"]{margin-left:0}.reveal{max-height:78vh!important}.trigger{font-size:15px}.domainTouchPad{bottom:8px}.domainTouchPad .btn{padding:9px 10px}}
+@media(max-width:820px){.heroTitle{font-size:34px!important;letter-spacing:.05em!important}.heroSub{font-size:12px}.ratingBar .btn[data-rate="continue"]{display:none!important}.reveal{max-height:78vh!important}.trigger{font-size:15px}.domainTouchPad{bottom:8px}.domainTouchPad .btn{padding:9px 10px}}
 </style>
 <script id="cozyArcadeBehaviorPatch">
 (function(){
@@ -5958,6 +5938,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   if(oldRenderSolo){ window.renderSolo = renderSolo = function(){ oldRenderSolo(); setTimeout(()=>setSelectedIndex(selected||0),30); }; }
   // Capture arrow keys before older handlers: up/down/left/right work for both games; Enter/Space selects.
   window.addEventListener('keydown', function(e){
+    if(document.activeElement&&(/^(TEXTAREA|INPUT|SELECT)$/i.test(document.activeElement.tagName)||document.activeElement.isContentEditable)) return;
     if(!['solo','domain'].includes(mode) || paused) return;
     const key=e.key;
     if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Enter',' '].includes(key)){ e.preventDefault(); e.stopImmediatePropagation(); }
@@ -6026,6 +6007,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     };
   }
   window.addEventListener('keydown', function(e){
+    if(document.activeElement&&(/^(TEXTAREA|INPUT|SELECT)$/i.test(document.activeElement.tagName)||document.activeElement.isContentEditable)) return;
     const which = (typeof mode!=='undefined' && mode==='domain') ? 'domain' : 'solo';
     const root = which==='domain' ? $('domainReveal') : $('soloReveal');
     if(visible(root)){
@@ -6221,7 +6203,18 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     {id:'loyal_shield',display_name:'Loyal Shield',short_title:'The Guardian Warden',core_learning_need:'Preservation - I learn through meaning and emotional memory.',reward_style:'Echo-Streak',success_message:'Protected. This fact will not be lost.',miss_message:'Shield down. Restore one signal. The protection holds.',five_correct_message:'{system} patient protection: {pct}% recall · {n} signals shielded.',ten_correct_message:'Guardian rune unlocked. The next board trigger is visible.',weak_system_message:'{system} protection gap at {pct}%. A 5-card shield drill is ready.',fifty_correct_message:'Healing orb anchored. One lifesaving signal permanently protected:',cosmetic_theme:'warm cloth / guardian robe / healing orb staff'},
     {id:'adaptive_sentinel',display_name:'Adaptive Sentinel',short_title:'The Default Mode',core_learning_need:'Adaptive - choose what fits today.',reward_style:'System Surge',success_message:'Signal stabilized. Recall pathway reinforced.',miss_message:'You found the current edge of recall. Stabilize one more signal.',five_correct_message:'{system} mastery - {pct}% this session · {n} correct.',ten_correct_message:'Board Trigger Unlocked. Preview: next card trigger visible.',weak_system_message:'{system} accuracy this session: {pct}%. A 5-card stabilization drill is ready.',fifty_correct_message:'Sigil Echo. One legendary recall anchored:',cosmetic_theme:'neutral / adaptive / any'}
   ];
-  let selectedPersonaId=localStorage.getItem('cozy_persona')||'adaptive_sentinel';
+  const PERSONA_KEY351='cozy_arcade_persona_v1';
+  const PERSONA_SCOPE351={
+    limitless_scholar:'new',
+    veiled_warden:'review',
+    protocol_executor:'all',
+    phantom_razor:'random',
+    theory_weaver:'new',
+    vision_commander:'due',
+    loyal_shield:'review',
+    adaptive_sentinel:'all'
+  };
+  let selectedPersonaId=localStorage.getItem(PERSONA_KEY351)||localStorage.getItem('cozy_persona')||'adaptive_sentinel';
   window.PERSONAS=PERSONAS; window.KNOWLEDGE_PULSE=KNOWLEDGE_PULSE;
   Event.prototype.stopImmediatePropagation=function(){
     try{
@@ -6237,8 +6230,16 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   }
   function setPersona(id){
     selectedPersonaId=id;
-    try{localStorage.setItem('cozy_persona',id);}catch(e){}
+    try{localStorage.setItem(PERSONA_KEY351,id); localStorage.setItem('cozy_persona',id);}catch(e){}
+    window.homeFilters=window.homeFilters||{scope:'all',system:'all',tag:'all'};
+    window.homeFilters.scope=PERSONA_SCOPE351[id]||'all';
+    const scopeSel=$('browseScope351')||$('homeScope175155');
+    if(scopeSel){
+      scopeSel.value=window.homeFilters.scope;
+      scopeSel.dispatchEvent(new Event('change',{bubbles:true}));
+    }
     renderPersonaSelections351();
+    updatePersonaHome351();
     const p=getActivePersona();
     showPulseToast('Study Mode Set', p.display_name+' - '+p.short_title, 'cyan');
   }
@@ -6337,14 +6338,14 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   }
   function anchorWeakSystem351(){
     const weak=getWeakestSystem();
-    if(!weak){showPulseToast('Anchor for Tomorrow','Not enough system data yet. Finish a few more cards first.','gold'); return;}
+    if(!weak){showPulseToast('Anchor Weak System','Not enough system data yet. Finish a few more cards first.','gold'); return;}
     let n=0;
     (cards||[]).forEach(c=>{
       if(systemOf351(c)!==weak.system || n>=5) return;
       const k=cardKey(c); state[k]=state[k]||{}; state[k].pinned=true; n++;
     });
     try{saveState(); updateKpis();}catch(e){}
-    showPulseToast('Anchor for Tomorrow',n+' '+weak.system+' cards pinned for Shadow Dungeon.','gold');
+    showPulseToast('Anchor Weak System',n+' '+weak.system+' cards pinned for Shadow Dungeon.','gold');
   }
 
   function forceTitle351(){
@@ -6510,19 +6511,28 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     const panel=document.createElement('section');
     panel.id='homeActions351';
     panel.className='homeActions351';
-    panel.innerHTML='<h3>Review Deck</h3><div class="reviewBrowse351"><div><label>Study by</label><select id="browseScope351"><option value="new">New cards - not reviewed</option><option value="random">Random - all cards</option><option value="random-new">Random - new cards</option><option value="review">Review deck: pinned / missed / hard</option><option value="hard">Hard only</option><option value="pinned">Pinned only</option><option value="tagged">Tagged selected</option><option value="due">Due-weighted review</option><option value="all">All cards</option></select></div><div><label>System</label><select id="browseSystem351"><option value="all">All systems</option></select></div><div><label>Tags</label><select id="browseTag351"><option value="all">All tags</option></select></div><button id="browseReview351" class="btn primary">Review deck</button></div><div class="homeModeButtons351"><button id="shadow351" class="btn homeBig351"><span class="keepLine351">Shadow Dungeon:</span> <span class="keepLine351">5 Second Grind</span><small>Review pinned and incorrect cards</small></button><button id="spaced351" class="btn homeBig351">Spaced Repetition<small>Beta spaced repetition</small></button><button id="gameplay351" class="btn primary homeBig351">Settings and Game Play<small>Controls, import/export, prompt AI</small></button></div>';
+    panel.innerHTML='<h3>Review Deck</h3><div id="personaHome351" class="personaHome351"></div><div class="reviewBrowse351"><div><label>General Study Mode</label><select id="browseScope351"><option value="new">New cards - not reviewed</option><option value="random">Random - all cards</option><option value="random-new">Random - new cards</option><option value="review">Review deck: pinned / missed / hard</option><option value="hard">Hard only</option><option value="pinned">Pinned only</option><option value="tagged">Tagged selected</option><option value="due">Due-weighted review</option><option value="all">All cards</option></select></div><div><label>System</label><select id="browseSystem351"><option value="all">All systems</option></select></div><div><label>Tags</label><select id="browseTag351"><option value="all">All tags</option></select></div><button id="browseReview351" class="btn primary">Review deck</button></div><div class="homeModeButtons351"><button id="shadow351" class="btn homeBig351"><span class="keepLine351">Shadow Dungeon</span><small>Review pinned and missed cards</small></button></div>';
     const modes=homeWrap.querySelector('.modeGrid');
     (modes||kpis||homeWrap).insertAdjacentElement('afterend',panel);
     const oldScope=$('homeScope175155'), oldSys=$('homeSystem175155'), oldTag=$('homeTag175155');
     const bs=$('browseScope351'), by=$('browseSystem351'), bt=$('browseTag351');
-    if(oldScope&&bs){bs.value=oldScope.value||'new'; bs.onchange=()=>{oldScope.value=bs.value; oldScope.dispatchEvent(new Event('change',{bubbles:true}));};}
-    if(oldSys&&by){by.innerHTML=oldSys.innerHTML; by.value=oldSys.value; by.onchange=()=>{oldSys.value=by.value; oldSys.dispatchEvent(new Event('change',{bubbles:true}));};}
-    if(oldTag&&bt){bt.innerHTML=oldTag.innerHTML; bt.value=oldTag.value; bt.onchange=()=>{oldTag.value=bt.value; oldTag.dispatchEvent(new Event('change',{bubbles:true}));};}
+    const systems=[...new Set((cards||[]).map(c=>clean(c.system||c.sys||c.subject)).filter(Boolean))].sort();
+    const tags=[...new Set((cards||[]).flatMap(c=>tagsOf(c)).filter(Boolean))].sort();
+    if(bs){bs.value=(oldScope&&oldScope.value)||window.homeFilters.scope||'new'; bs.onchange=()=>{window.homeFilters.scope=bs.value; if(oldScope){oldScope.value=bs.value; oldScope.dispatchEvent(new Event('change',{bubbles:true}));}};}
+    if(by){by.innerHTML=(oldSys&&oldSys.innerHTML)||'<option value="all">All systems</option>'+systems.map(s=>'<option value="'+s.replace(/"/g,'&quot;')+'">'+s+'</option>').join(''); by.value=(oldSys&&oldSys.value)||window.homeFilters.system||'all'; by.onchange=()=>{window.homeFilters.system=by.value; if(oldSys){oldSys.value=by.value; oldSys.dispatchEvent(new Event('change',{bubbles:true}));}};}
+    if(bt){bt.innerHTML=(oldTag&&oldTag.innerHTML)||'<option value="all">All tags</option>'+tags.map(t=>'<option value="'+t.replace(/"/g,'&quot;')+'">'+t+'</option>').join(''); bt.value=(oldTag&&oldTag.value)||window.homeFilters.tag||'all'; bt.onchange=()=>{window.homeFilters.tag=bt.value; if(oldTag){oldTag.value=bt.value; oldTag.dispatchEvent(new Event('change',{bubbles:true}));}};}
     $('browseReview351').onclick=()=>{try{if(typeof showReview==='function') showReview(); else startSolo();}catch(e){startSolo();}};
     $('shadow351').onclick=openShadowSetup351;
-    $('spaced351').onclick=()=>{if(oldScope){oldScope.value='due'; oldScope.dispatchEvent(new Event('change',{bubbles:true}));} try{if(typeof showReview==='function') showReview(); else startSolo();}catch(e){}};
-    $('gameplay351').onclick=openGameplayHub;
+    updatePersonaHome351();
     document.querySelectorAll('button').forEach(b=>{if(/Import\/Export settings/i.test(b.textContent||'')) b.textContent='Import / Export';});
+  }
+
+  function updatePersonaHome351(){
+    const slot=$('personaHome351');
+    if(!slot) return;
+    const p=getActivePersona();
+    slot.innerHTML='<span>Study Mode: <b>'+escapeHTML(p.display_name)+'</b></span><button id="choosePersona351" class="btn" type="button">Choose Study Mode</button>';
+    $('choosePersona351').onclick=showPersonaSelector351;
   }
 
   function ensureGameplayHub(){
@@ -6531,7 +6541,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     hub=document.createElement('div');
     hub.id='gameplayHub351';
     hub.className='screen settings hidden';
-    hub.innerHTML='<div class="box gameplayPanel351"><div class="controls"><button class="btn" id="gameplayHome351">Home</button><button class="btn primary" id="openImport351">Import / Export</button><button class="btn primary" id="applyGameplay351">Apply</button><button class="btn" id="closeGameplay351">Close Settings</button></div><div class="gameplayCard351"><h2>Settings and Game Play</h2><label>Gameplay</label><select id="gameplayMode351"><option>Solo Studying controls</option><option>Knowledge Expansion controls</option><option>Shadow Dungeon: 5 Second Grind</option><option>Answer card controls</option><option>Import / export workflow</option></select><div class="inlineSettings351"><label class="toggleLine351"><input id="gameplayBionic351" type="checkbox"> Toggle Bionic Reading</label><div><label>Game timing</label><select id="questionTime351"><option value="3">3 seconds</option><option value="4">4 seconds</option><option value="5">5 seconds</option><option value="6">6 seconds</option><option value="7">7 seconds</option><option value="8">8 seconds</option><option value="9">9 seconds</option><option value="10">10 seconds</option></select></div></div><p><span class="kbd351">Enter</span><span class="kbd351">Right</span> continue. <span class="kbd351">1</span> Weak Signal, <span class="kbd351">2</span> Moderate, <span class="kbd351">3</span> Strong, <span class="kbd351">4</span> Anchored. <span class="kbd351">Down</span> opens Full Card. <span class="kbd351">Up</span> closes Full Card.</p><p>Timing controls the review pace across games. Knowledge Expansion arrows map to top, right, bottom, left; Enter, slash, or click selects after the brief prompt lock.</p></div><div class="gameplayGrid351"><div class="gameplayCard351"><h3>Prompt AI</h3><p>Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade card schema, then upload locally or export for GitHub.</p><textarea class="promptBox351" readonly>Convert the uploaded deck into Cozy Arcade Board Prep Medicine JSON using the current DB mapping: old presentation maps to current prompt / presentation_CLEAN; old educational_objective maps to current answer / reveal; diagnosis remains the answer choice; board_trigger remains board_trigger; tags/system map to current tags and sys. Preserve one_thing, level_1_presentation, level_2_three_second_exposure, quick_recall, treatment, next_step, and explanation when present. Return valid JSON with { metadata, cards } only. Do not rewrite medical content.</textarea></div><div class="gameplayCard351"><h3>Import / Export</h3><p>Input CSV / JSON / APKG / flashcard text. Export JSON or CSV. Use the converted JSON for local upload, GitHub Pages, or offline study.</p><div class="controls"><label class="btn primary" for="deckUpload351">Upload Deck JSON/CSV</label><input id="deckUpload351" class="hiddenFile351" type="file" accept=".json,.csv,application/json,text/csv"><button class="btn" id="openSettings351">Open import settings</button><button class="btn" id="exportJson351">Export JSON</button><button class="btn" id="exportCsv351">Export CSV</button><button class="btn" id="mergeProgress351">Merge Progress</button></div></div></div></div>';
+    hub.innerHTML='<div class="box gameplayPanel351"><div class="controls"><button class="btn" id="gameplayHome351">Home</button><button class="btn primary" id="openImport351">Advanced: Merge / Progress Import</button><button class="btn primary" id="applyGameplay351">Apply</button><button class="btn" id="closeGameplay351">Close Settings</button></div><div class="gameplayCard351"><h2>Settings</h2><label>Gameplay</label><select id="gameplayMode351"><option>Solo Studying controls</option><option>Knowledge Expansion controls</option><option>Shadow Dungeon</option><option>Answer card controls</option><option>Import / export workflow</option></select><div class="inlineSettings351"><label class="toggleLine351"><input id="gameplayBionic351" type="checkbox"> Toggle Bionic Reading</label><div><label>Game timing</label><select id="questionTime351"><option value="3">3 seconds</option><option value="4">4 seconds</option><option value="5">5 seconds</option><option value="6">6 seconds</option><option value="7">7 seconds</option><option value="8">8 seconds</option><option value="9">9 seconds</option><option value="10">10 seconds</option></select></div></div><p><span class="kbd351">Enter</span><span class="kbd351">Right</span> choose Good and continue. <span class="kbd351">1</span> Again, <span class="kbd351">2</span> Hard, <span class="kbd351">3</span> Good, <span class="kbd351">4</span> Easy. <span class="kbd351">Down</span> opens Full Card. <span class="kbd351">Up</span> closes Full Card.</p><p>Timing controls the review pace across games. Knowledge Expansion arrows map to top, right, bottom, left; Enter, slash, or click selects after the brief prompt lock.</p></div><div class="gameplayGrid351"><div class="gameplayCard351"><h3>Prompt AI</h3><p>Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade card schema.</p><textarea class="promptBox351" readonly>Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade\ncard schema. \nReturn valid JSON only:\n{\n  "meta": { "schema": "cozy-arcade-v3" },\n  "cards": [\n    {\n      "qid": "unique-id",\n      "sys": "CV",\n      "diagnosis": "correct answer/topic",\n      "presentation": "question, prompt, or vignette",\n      "one_thing": "single highest-yield takeaway",\n      "educational_objective": "full teaching point if available",\n      "board_trigger": "IF finding → THINK diagnosis → ACTION",\n      "explanation": "long explanation if available",\n      "tags": []\n    }\n  ]\n}\nDo not rewrite medical content. Map sys/system fields to card.sys.</textarea></div></div></div>';
     document.body.appendChild(hub);
     $('gameplayHome351').onclick=()=>{hub.classList.add('hidden'); try{show('home');}catch(e){} try{paused=false;}catch(e){}};
     $('closeGameplay351').onclick=()=>closeGameplayHub351();
@@ -6584,7 +6594,30 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     container.appendChild(panel);
     renderPersonaSelections351();
   }
+  function showPersonaSelector351(){
+    let ov=$('personaOnboard351');
+    if(!ov){
+      ov=document.createElement('div');
+      ov.id='personaOnboard351';
+      ov.className='personaOnboard351';
+      ov.innerHTML='<div class="personaOnboardBox351"><h2>Study Mode</h2><p style="color:#cbd7ef;font-weight:850">Choose what fits today. You can still override the Review Deck filters.</p><div class="personaGrid351"></div></div>';
+      const grid=ov.querySelector('.personaGrid351');
+      PERSONAS.forEach(p=>{
+        const btn=document.createElement('button');
+        btn.className='personaCard351';
+        btn.type='button';
+        btn.dataset.personaId=p.id;
+        btn.innerHTML='<b>'+escapeHTML(p.display_name)+'</b><small>'+escapeHTML(p.short_title)+'</small><small>'+escapeHTML(p.core_learning_need)+'</small>';
+        btn.onclick=()=>{setPersona(p.id); ov.classList.add('hidden');};
+        grid.appendChild(btn);
+      });
+      document.body.appendChild(ov);
+    }
+    renderPersonaSelections351();
+    ov.classList.remove('hidden');
+  }
   function ensurePersonaOnboarding351(){
+    return;
     let hasPersona=false;
     try{hasPersona=!!localStorage.getItem('cozy_persona');}catch(e){}
     if(hasPersona || $('personaOnboard351')) return;
@@ -6679,7 +6712,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     ov=document.createElement('div');
     ov.id='shadowSetup351';
     ov.className='shadowSetup351 hidden';
-    ov.innerHTML='<div class="shadowBox351"><h2>Shadow Dungeon: 5 Second Grind</h2><p>Fast automatic review for pinned, incorrect, hard, or scheduled cards. Pick the review set and game type.</p><div class="shadowGrid351"><div><label>Option review</label><select id="shadowScope351"><option value="review">Review pinned and incorrect cards</option><option value="pinned">Pinned only</option><option value="due">Review scheduled - beta spaced repetition</option><option value="random-new">Random new cards</option></select></div><div><label>Type</label><select id="shadowType351"><option value="solo">Solo Studying: Runner</option><option value="domain">Knowledge Expansion: orb select</option></select></div><div><label>Game timing</label><select id="shadowDropSeconds351"><option value="3">3 seconds</option><option value="4">4 seconds</option><option value="5">5 seconds</option><option value="6">6 seconds</option><option value="7">7 seconds</option><option value="8">8 seconds</option><option value="9">9 seconds</option><option value="10">10 seconds</option></select></div><div><label>Review scheduled</label><select id="shadowSchedule351"><option value="due">Beta spaced repetition</option><option value="review">Pinned / missed / hard</option></select></div></div><div class="controls"><button id="shadowStart351" class="btn primary">Start 5 Second Grind</button><button id="shadowCancel351" class="btn red">Cancel</button></div></div>';
+    ov.innerHTML='<div class="shadowBox351"><h2>Shadow Dungeon</h2><p>Review pinned, missed, hard, or scheduled cards with the same timing as Solo Studying.</p><div class="shadowGrid351"><div><label>Option review</label><select id="shadowScope351"><option value="review">Review pinned and missed cards</option><option value="pinned">Pinned only</option><option value="due">Review scheduled - beta spaced repetition</option><option value="random-new">Random new cards</option></select></div><div><label>Type</label><select id="shadowType351"><option value="solo">Solo Studying: Runner</option><option value="domain">Knowledge Expansion: orb select</option></select></div><div><label>Game timing</label><select id="shadowDropSeconds351"><option value="3">3 seconds</option><option value="4">4 seconds</option><option value="5">5 seconds</option><option value="6">6 seconds</option><option value="7">7 seconds</option><option value="8">8 seconds</option><option value="9">9 seconds</option><option value="10">10 seconds</option></select></div><div><label>Review scheduled</label><select id="shadowSchedule351"><option value="due">Beta spaced repetition</option><option value="review">Pinned / missed / hard</option></select></div></div><div class="controls"><button id="shadowStart351" class="btn primary">Start Shadow Dungeon</button><button id="shadowCancel351" class="btn red">Cancel</button></div></div>';
     document.body.appendChild(ov);
     $('shadowCancel351').onclick=()=>ov.classList.add('hidden');
     const dropSel=$('shadowDropSeconds351');
@@ -6720,9 +6753,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   }
 
   function shadowDropSeconds351(){
-    let n=7;
-    try{n=Number(localStorage.getItem('cozyShadowDropSeconds351')||7)||7;}catch(e){}
-    return Math.max(3,Math.min(10,n));
+    return questionSeconds351();
   }
 
   function progressPayload351(){
@@ -6910,26 +6941,12 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 
   function ensureSaveProgress351(){
     let ov=$('saveProgress351');
-    if(ov) return ov;
-    ov=document.createElement('div');
-    ov.id='saveProgress351';
-    ov.className='saveProgress351 hidden';
-    ov.innerHTML='<div class="saveBox351"><h2>Save Progress?</h2><p>Save locally for the smoothest return, export a progress file for backup, or return to gameplay.</p><div id="sessionSummarySlot351"></div><div class="controls"><button id="saveLocal351" class="btn primary">Save Local + Home</button><button id="exportProgress351Btn" class="btn">Export Progress + Home</button><button id="anchorTomorrow351" class="btn">Anchor for Tomorrow</button><button id="returnGameplay351" class="btn">Return to Gameplay</button><button id="homeIcon351" class="btn">⌂ Home</button><button id="cancelSave351" class="btn red">Cancel</button></div></div>';
-    document.body.appendChild(ov);
-    $('saveLocal351').onclick=()=>{try{saveState();}catch(e){} ov.classList.add('hidden'); goHome351();};
-    $('exportProgress351Btn').onclick=()=>{try{saveState(); exportProgress351();}catch(e){} ov.classList.add('hidden'); goHome351();};
-    $('anchorTomorrow351').onclick=()=>anchorWeakSystem351();
-    $('returnGameplay351').onclick=()=>{ov.classList.add('hidden'); try{paused=false;}catch(e){}};
-    $('homeIcon351').onclick=()=>{ov.classList.add('hidden'); goHome351();};
-    $('cancelSave351').onclick=()=>ov.classList.add('hidden');
-    ov.addEventListener('click',e=>{if(e.target===ov) ov.classList.add('hidden');});
-    return ov;
+    if(ov) ov.remove();
+    return null;
   }
 
   function showSaveProgress351(){
-    const ov=ensureSaveProgress351();
-    const slot=$('sessionSummarySlot351'); if(slot) slot.innerHTML=sessionSummaryHTML351();
-    ov.classList.remove('hidden');
+    goHome351();
   }
 
   function patchProgressSettings351(){
@@ -6962,11 +6979,6 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     if(csvBtn) csvBtn.onclick=exportDeckCsv351;
     const mergeBtn=$('mergeProgress351');
     if(mergeBtn) mergeBtn.onclick=selectMergeProgress351;
-    const topExport=$('exportBtn');
-    if(topExport && !topExport.dataset.cozyProgress351){
-      topExport.dataset.cozyProgress351='1';
-      topExport.onclick=exportProgress351;
-    }
   }
 
   function ensureBionic351(){
@@ -7271,7 +7283,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     const runner=$('runner');
     if(runner) runner.classList.add('soloStableRunner351');
     const duration=soloDropDurationMs351();
-    const hold=shadowActive351?3000:0;
+    const hold=0;
     timerMax=duration/1000;
     timer=timerMax;
     setSoloDropProgress351(0);
@@ -7366,7 +7378,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 
   window.ratingsHTML=function(){
     const pinned=!!((state||{})[cardKey(current)]&&(state||{})[cardKey(current)].pinned);
-    return '<div class="ratingBar" title="?"><button class="btn '+(pinned?'pinActive350':'')+'" data-rate="pin">'+(pinned?'Unpin':'Pin')+'</button><button class="btn red" data-rate="again">Weak Signal</button><button class="btn" data-rate="hard">Moderate</button><button class="btn" data-rate="good">Strong</button><button class="btn primary" data-rate="easy">Anchored</button><button class="btn primary" data-rate="continue">Continue</button><span class="signalTip351">?</span></div>';
+    return '<div class="ratingBar" title="?"><button class="btn '+(pinned?'pinActive350':'')+'" data-rate="pin">'+(pinned?'Unpin':'Pin')+'</button><button class="btn buryBtn352" data-rate="bury">Bury</button><button class="btn againBtn352" data-rate="again">Again</button><button class="btn" data-rate="hard">Hard</button><button class="btn" data-rate="good">Good</button><button class="btn primary" data-rate="easy">EASY</button><button class="btn primary" data-rate="continue">Continue</button></div>';
   };
 
   window.bindRatings=function(which){
@@ -7447,7 +7459,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       clearTimeout(shadowAnswerTimer351);
       let clock=root.querySelector('.shadowAnswerClock351');
       if(!clock){clock=document.createElement('div'); clock.className='shadowAnswerClock351'; ratings.insertAdjacentElement('afterend',clock);}
-      let left=7;
+      let left=2;
       clock.textContent='Shadow auto-advance in '+left+'s';
       const tick=()=>{
         if(!visible(root) || !shadowActive351) return;
@@ -7462,6 +7474,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 
   let continueGuard350=0;
   function handleRevealKey(e){
+    if(document.activeElement&&(/^(TEXTAREA|INPUT|SELECT)$/i.test(document.activeElement.tagName)||document.activeElement.isContentEditable)) return false;
     const which=activeReveal();
     if(which){
       const box=ensureFull(which);
@@ -7487,6 +7500,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   }
 
   window.addEventListener('keydown',function(e){
+    if(document.activeElement&&(/^(TEXTAREA|INPUT|SELECT)$/i.test(document.activeElement.tagName)||document.activeElement.isContentEditable)) return;
     if(e.key==='Escape' && closeOpenSettings351()){
       e.preventDefault();
       nativeStopImmediate.call(e);
@@ -7512,6 +7526,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   },true);
 
   document.addEventListener('keydown',function(e){
+    if(document.activeElement&&(/^(TEXTAREA|INPUT|SELECT)$/i.test(document.activeElement.tagName)||document.activeElement.isContentEditable)) return;
     if(e.key==='Escape' && closeOpenSettings351()){
       e.preventDefault();
       nativeStopImmediate.call(e);
@@ -7526,6 +7541,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   },true);
 
   window.addEventListener('keypress',function(e){
+    if(document.activeElement&&(/^(TEXTAREA|INPUT|SELECT)$/i.test(document.activeElement.tagName)||document.activeElement.isContentEditable)) return;
     if(activeReveal()){handleRevealKey(e); return;}
     if(domainPlaying351() && (e.key==='/' || e.key==='?' || e.key==='Slash' || e.code==='Slash')){
       e.preventDefault();
@@ -7535,6 +7551,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   },true);
 
   window.addEventListener('keyup',function(e){
+    if(document.activeElement&&(/^(TEXTAREA|INPUT|SELECT)$/i.test(document.activeElement.tagName)||document.activeElement.isContentEditable)) return;
     if(activeReveal()){handleRevealKey(e); return;}
     if(isGameActive351() && e.key==='Escape'){
       e.preventDefault();
@@ -7856,7 +7873,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       [/signals anchored today/gi, 'energy earned today'],
       [/Signal strength = how stable is this recall\?/g, ''],
       [/This is a resonance style, not a diagnosis\.\s*/g, ''],
-      [/Weak Signal/g, 'Hard'],
+      [/Weak Signal/g, 'Again'],
       [/Moderate/g, 'Hard'],
       [/Strong/g, 'Good'],
       [/Anchored/g, 'EASY']
@@ -8096,7 +8113,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       pinned = !!st.pinned;
       buried = !!st.buried;
     }catch(_){}
-    return '<div class="ratingBar"><button class="btn '+(pinned?'pinActive350':'')+'" data-rate="pin">'+(pinned?'Unpin':'Pin')+'</button><button class="btn buryBtn352 '+(buried?'buryActive352':'')+'" data-rate="bury">'+(buried?'Suspended':'Bury')+'</button><button class="btn" data-rate="hard">Hard</button><button class="btn" data-rate="good">Good</button><button class="btn primary" data-rate="easy">EASY</button><button class="btn primary" data-rate="continue">Continue</button></div>';
+    return '<div class="ratingBar"><button class="btn '+(pinned?'pinActive350':'')+'" data-rate="pin">'+(pinned?'Unpin':'Pin')+'</button><button class="btn buryBtn352 '+(buried?'buryActive352':'')+'" data-rate="bury">'+(buried?'Suspended':'Bury')+'</button><button class="btn againBtn352" data-rate="again">Again</button><button class="btn" data-rate="hard">Hard</button><button class="btn" data-rate="good">Good</button><button class="btn primary" data-rate="easy">EASY</button><button class="btn primary" data-rate="continue">Continue</button></div>';
   }
   function installRatings(){
     try{
@@ -8261,8 +8278,6 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       managedShowReview.__reviewManager352 = true;
       window.showReview = managedShowReview;
       try{ showReview = managedShowReview; }catch(_){}
-      const spaced = $('spacedBtn');
-      if(spaced) spaced.onclick = managedShowReview;
       const browse = $('browseReview351');
       if(browse) browse.onclick = managedShowReview;
     }catch(_){}
@@ -8300,7 +8315,8 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       tools.addEventListener('change', renderReviewManager352, true);
       tools.addEventListener('input', renderReviewManager352, true);
     }
-    const preferred = (document.documentElement.dataset.cozyLaunchScope || ($('browseScope351') && $('browseScope351').value) || 'review');
+    const preferredRaw = (document.documentElement.dataset.cozyLaunchScope || ($('browseScope351') && $('browseScope351').value) || 'review');
+    const preferred = preferredRaw === 'random_new' ? 'random-new' : preferredRaw === 'random_all' ? 'random' : preferredRaw === 'review_deck' ? 'review' : preferredRaw === 'new_first' ? 'new' : preferredRaw;
     const scopeSel = $('reviewScope352');
     const sortSel = $('reviewSort352');
     const systemSel = $('reviewSystem352');
@@ -8523,7 +8539,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
         }
       }, true);
     }
-    ['gearBtn','settingsBtn','gameplay351','openSettings351','openImport351'].forEach(id => {
+    ['gearBtn','settingsBtn','openSettings351','openImport351'].forEach(id => {
       const el = $(id);
       if(el && !el.dataset.settingsRemember352){
         el.dataset.settingsRemember352 = '1';
@@ -8835,17 +8851,17 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     panel.id="limitlessHomeImport";
     panel.className="limitlessHomeControls";
     panel.style.cssText="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;align-items:center";
-    panel.innerHTML='<label class="btn primary" for="limitlessHomeDeckFile">Upload JSON Deck</label><input id="limitlessHomeDeckFile" type="file" accept=".json,.csv,application/json,text/csv" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0"><button id="limitlessExampleDeck" class="btn" type="button">Download Example JSON</button><span class="btn" id="limitlessImportStatus">Local deck storage</span>';
+    panel.innerHTML='<label class="btn primary" for="limitlessHomeDeckFile">Upload JSON Deck</label><input id="limitlessHomeDeckFile" type="file" accept=".json,.csv,application/json,text/csv" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0"><button id="limitlessExampleDeck" class="btn" type="button">Download JSON</button><span class="btn" id="limitlessImportStatus" aria-disabled="true"></span>';
     const anchor=home.querySelector(".kpis")||home.lastElementChild;
     if(anchor) home.insertBefore(panel,anchor);
     else home.appendChild(panel);
     const example=document.getElementById("limitlessExampleDeck");
-    if(example) example.onclick=downloadExampleDeck;
+    if(example) example.onclick=()=>{ if(typeof window.exportProgress351==='function') window.exportProgress351(); else downloadExampleDeck(); };
   }
   function wire(){
     normalizeDeck();
     ensureHomeImport();
-    ['limitlessHomeDeckFile','deckUpload351','deckFile','deckFile2','menuImportReplace175159','menuImportMerge175159'].forEach(id=>{
+    ['limitlessHomeDeckFile','deckUpload351','deckFile','menuImportReplace175159','menuImportMerge175159'].forEach(id=>{
       const el=document.getElementById(id);
       if(!el || el.__limitlessImportPatch) return;
       el.__limitlessImportPatch=true;
@@ -8872,8 +8888,8 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 #limitlessHomeImport .btn{min-height:64px!important;border-radius:999px!important;font-size:clamp(18px,1.55vw,25px)!important;font-weight:950!important;line-height:1.1!important;white-space:normal!important;text-align:center!important}
 #limitlessHomeImport .primary{color:#03111e!important}
 #limitlessHomeDeckFile{position:absolute!important;left:-9999px!important;width:1px!important;height:1px!important;opacity:0!important}
-#limitlessLocalDeckStorage{cursor:pointer}
-#limitlessImportStatus{display:none!important}
+#limitlessLocalDeckStorage{cursor:default;pointer-events:none!important}
+#limitlessImportStatus{pointer-events:none!important}
 #home .modeGrid{order:3!important}
 #home .homeActions351{order:4!important}
 #home .kpis{order:5!important}
@@ -8893,7 +8909,26 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   const META_KEY='cozy_arcade_limitless_meta_v1';
   const USER_ONE_THING_KEY='cozy_user_one_thing_v1';
   const AI_SHORT='Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade card schema.';
-  const AI_LONG='Convert the uploaded deck into Cozy Arcade Board Prep Medicine JSON using the current DB mapping: old presentation maps to current prompt / presentation_CLEAN; educational_objective maps to current answer / reveal; diagnosis remains the answer choice/Reveal title; board_trigger; tags/system map to current tags and sys. Preserve one_thing, level_1_presentation, level_2_three_second_exposure, quick_recall, treatment, next_step, and explanation when present. Return valid JSON with { metadata, cards } only. Do not rewrite medical content.';
+  const AI_LONG=`Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade
+card schema. 
+Return valid JSON only:
+{
+  "meta": { "schema": "cozy-arcade-v3" },
+  "cards": [
+    {
+      "qid": "unique-id",
+      "sys": "CV",
+      "diagnosis": "correct answer/topic",
+      "presentation": "question, prompt, or vignette",
+      "one_thing": "single highest-yield takeaway",
+      "educational_objective": "full teaching point if available",
+      "board_trigger": "IF finding → THINK diagnosis → ACTION",
+      "explanation": "long explanation if available",
+      "tags": []
+    }
+  ]
+}
+Do not rewrite medical content. Map sys/system fields to card.sys.`;
   const clean=v=>String(v==null?'':v).replace(/NOT SPECIFIED IN SOURCE/g,'').replace(/\s+/g,' ').trim();
 	  const first=(...xs)=>xs.find(x=>clean(x))||'';
 	  const esc=s=>String(s==null?'':s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
@@ -9098,19 +9133,22 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   }
   function updateImportButtons(){
     const n=appCards().length;
-    document.querySelectorAll('#limitlessExampleDeck,#exportJson351').forEach(btn=>{if(btn&&btn.id==='limitlessExampleDeck') btn.textContent=n?'Download JSON':'Download Example JSON';});
+    document.querySelectorAll('#limitlessExampleDeck,#exportJson351').forEach(btn=>{if(btn&&btn.id==='limitlessExampleDeck') btn.textContent='Download JSON';});
     const local=document.getElementById('limitlessLocalDeckStorage');
-    if(local) local.textContent=n?'Review local deck':'Local deck storage';
+    if(local){
+      local.textContent=n?(n+' cards'):'';
+      local.onclick=null;
+      local.style.pointerEvents='none';
+      local.setAttribute('aria-disabled','true');
+    }
   }
   function ensureImportPanel(){
     const home=document.querySelector('#home .homeWrap');
     if(!home) return;
     let panel=document.getElementById('limitlessHomeImport');
     if(!panel){panel=document.createElement('div'); panel.id='limitlessHomeImport'; panel.className='limitlessHomeControls'; home.insertBefore(panel,home.querySelector('.modeGrid')||home.firstChild);}
-    panel.innerHTML='<label class="btn primary" for="limitlessHomeDeckFile">Upload JSON Deck</label><input id="limitlessHomeDeckFile" type="file" accept=".json,.csv,application/json,text/csv"><button id="limitlessExampleDeck" class="btn" type="button">Download Example JSON</button><button id="limitlessLocalDeckStorage" class="btn" type="button">Local deck storage</button>';
-    const ex=document.getElementById('limitlessExampleDeck'); if(ex) ex.onclick=downloadJson;
-    const local=document.getElementById('limitlessLocalDeckStorage');
-    if(local) local.onclick=function(){const n=appCards().length; if(!n){try{toast('Upload a deck first');}catch(e){} return;} try{show('review'); renderReviewDeck();}catch(e){location.hash='#review';}};
+    panel.innerHTML='<label class="btn primary" for="limitlessHomeDeckFile">Upload JSON Deck</label><input id="limitlessHomeDeckFile" type="file" accept=".json,.csv,application/json,text/csv"><button id="limitlessExampleDeck" class="btn" type="button">Download JSON</button><span id="limitlessImportStatus" class="btn"></span>';
+    const ex=document.getElementById('limitlessExampleDeck'); if(ex) ex.onclick=()=>{ if(typeof window.exportProgress351==='function') window.exportProgress351(); else downloadJson(); };
     updateImportButtons();
   }
   function renderReviewDeck(){
@@ -9157,7 +9195,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     try{if(Array.isArray(cards)) setCards(cards.map(normalizeSourceCard));}catch(e){}
     ensureImportPanel();
     patchPromptAi();
-    ['limitlessHomeDeckFile','deckUpload351','deckFile','deckFile2','menuImportReplace175159','menuImportMerge175159'].forEach(id=>{
+    ['limitlessHomeDeckFile','deckUpload351','deckFile','menuImportReplace175159','menuImportMerge175159'].forEach(id=>{
       const el=document.getElementById(id);
       if(!el||el.dataset.sourceMappingImport==='1') return;
       el.dataset.sourceMappingImport='1';
@@ -9475,14 +9513,8 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
           </div>
         </section>
         <details class="drawerPanel351" open>
-          <summary>Card Data - Import / Export / Merge</summary>
+          <summary>Advanced: Merge / Progress Import</summary>
           <div id="drawerDataStatus351" class="drawerStats351"></div>
-          <div class="drawerActions351">
-            <label class="drawerFileLabel351" for="drawerDeckUpload351">Upload JSON Deck</label>
-            <input id="drawerDeckUpload351" type="file" accept=".json,.csv,application/json,text/csv" style="display:none">
-            <button class="btn primary" id="drawerExample351" type="button">Download Example JSON</button>
-            <button class="btn" id="drawerExport351" type="button">Export JSON</button>
-          </div>
         </details>
         <section class="drawerPanel351">
           <h3>Gameplay Controls</h3>
@@ -9497,9 +9529,6 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     document.body.appendChild(drawer);
     q('closeDrawer351').onclick = closeDrawer351;
     q('testModeToggle351').onchange = updateDrawer351;
-    q('drawerDeckUpload351').onchange = ev => { const file = ev.target.files?.[0]; importFile351(file); try{ ev.target.value = ''; }catch(_){} setTimeout(updateDrawer351, 500); };
-    q('drawerExample351').onclick = downloadExample351;
-    q('drawerExport351').onclick = exportDeck351;
     q('drawerApply351').onclick = applyDrawer351;
     q('drawerFullSettings351').onclick = () => { closeDrawer351(); try{ if(typeof show === 'function') show('settings'); else q('settings')?.classList.remove('hidden'); }catch(_){ q('settings')?.classList.remove('hidden'); } };
     return drawer;
@@ -9558,18 +9587,18 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   }
 
   function bindTriggers351(){
-    ['gameplay351','gearBtn','settingsBtn'].forEach(id => {
+    ['gearBtn','settingsBtn'].forEach(id => {
       const el = q(id);
       if(!el) return;
       el.classList.remove('primary');
       el.onclick = openDrawer351;
     });
     const homeExample = q('limitlessExampleDeck');
-    if(homeExample) homeExample.onclick = downloadExample351;
+    if(homeExample) homeExample.onclick = () => { if(typeof window.exportProgress351 === 'function') window.exportProgress351(); else downloadExample351(); };
   }
 
   document.addEventListener('click', ev => {
-    const trigger = ev.target?.closest?.('#gameplay351,#gearBtn,#settingsBtn');
+    const trigger = ev.target?.closest?.('#gearBtn,#settingsBtn');
     if(trigger) openDrawer351(ev);
   }, true);
   document.addEventListener('keydown', ev => {
@@ -9742,9 +9771,24 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   const XP_KEY = 'cozyCorrect351';
   const RANKS = ['rank-e','rank-d','rank-b','rank-a','rank-s','rank-apex','rank-monarch'];
   const PROMPT_TEXT = `Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade
-card schema. Preserve one_thing, level_1_presentation,
-level_2_three_second_exposure, quick_recall, treatment, next_step, and
-explanation when present. Return valid JSON with { metadata, cards } only.
+card schema. 
+Return valid JSON only:
+{
+  "meta": { "schema": "cozy-arcade-v3" },
+  "cards": [
+    {
+      "qid": "unique-id",
+      "sys": "CV",
+      "diagnosis": "correct answer/topic",
+      "presentation": "question, prompt, or vignette",
+      "one_thing": "single highest-yield takeaway",
+      "educational_objective": "full teaching point if available",
+      "board_trigger": "IF finding → THINK diagnosis → ACTION",
+      "explanation": "long explanation if available",
+      "tags": []
+    }
+  ]
+}
 Do not rewrite medical content. Map sys/system fields to card.sys.`;
   const RUNNER_ANIMATION = 'runnerSprint 420ms steps(4) infinite, narutoSpriteBob .34s ease-in-out infinite alternate';
 
@@ -9899,7 +9943,7 @@ Do not rewrite medical content. Map sys/system fields to card.sys.`;
   }
 
   document.addEventListener('click', ev => {
-    if (ev.target?.closest?.('#gameplay351,#gearBtn,#settingsBtn')) {
+    if (ev.target?.closest?.('#gearBtn,#settingsBtn')) {
       setTimeout(() => {
         watchDrawer();
         injectIfDrawerOpen();
@@ -10502,6 +10546,263 @@ function fixCanonicalDisplayTitle351() {
 .oneThing350.oneThingEditing351 .oneThingToggle351 {
   display: none !important;
 }
+#limitlessImportStatus,
+#limitlessLocalDeckStorage{
+  background:rgba(103,232,249,.07)!important;
+  border:1px solid rgba(103,232,249,.32)!important;
+  color:#9fe8ff!important;
+  letter-spacing:.12em!important;
+  font-size:12px!important;
+  font-weight:900!important;
+  pointer-events:none!important;
+  cursor:default!important;
+  min-width:100px!important;
+  text-align:center!important;
+  border-radius:999px!important;
+}
+#limitlessImportStatus:empty::before,
+#limitlessLocalDeckStorage:empty::before{
+  content:'Progress \2197';
+  opacity:.55;
+  font-size:11px;
+  letter-spacing:.14em;
+}
+#limitlessImportStatus{
+  pointer-events:auto!important;
+  cursor:pointer!important;
+}
+.ratingBar{
+  display:flex!important;
+  align-items:center!important;
+  gap:8px!important;
+  flex-wrap:nowrap!important;
+  justify-content:flex-start!important;
+}
+.ratingBar .btn[data-rate="continue"]{
+  display:none!important;
+  margin:0!important;
+}
+.ratingBar .againBtn352,
+.ratingBar .btn[data-rate="again"]{
+  background:rgba(251,88,118,.14)!important;
+  border-color:rgba(251,88,118,.65)!important;
+  color:#ffc0c8!important;
+}
+.ratingBar .btn[data-rate="bury"]{
+  font-size:11px!important;
+  padding:5px 9px!important;
+  border-color:rgba(160,160,210,.30)!important;
+  color:#a8b2cc!important;
+}
+.signalTip351{
+  display:none!important;
+  width:0!important;
+  overflow:hidden!important;
+}
+.ratingBar .fullInlineBtn{
+  margin-left:auto!important;
+  flex-shrink:0!important;
+  background:rgba(103,232,249,.12)!important;
+  border-color:rgba(103,232,249,.55)!important;
+  color:#9fe8ff!important;
+}
+/* Hide the Shadow auto-advance clock — it clutters the reveal UI */
+.shadowAnswerClock351{
+  font-size:11px!important;
+  color:rgba(103,232,249,.35)!important;
+  text-align:center!important;
+  letter-spacing:.10em!important;
+  margin-top:6px!important;
+}
+
+/* v370 home layout reorder */
+#home .homeWrap{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:14px!important;
+}
+#home .homeWrap > .hero{
+  min-height:150px!important;
+  padding:24px 32px!important;
+  border-radius:24px!important;
+}
+#home .heroTitle{
+  font-size:clamp(44px,5.8vw,76px)!important;
+  letter-spacing:.20em!important;
+}
+#home .heroSub{
+  margin-top:8px!important;
+}
+#home .modeGrid{
+  gap:14px!important;
+  margin-top:0!important;
+}
+#home .modeCard{
+  min-height:128px!important;
+  padding:22px 24px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+#home .modeIcon{
+  font-size:22px!important;
+  margin-bottom:12px!important;
+}
+#home .modeTitle{
+  font-size:clamp(24px,3vw,34px)!important;
+}
+#home .modeCaption{
+  margin:6px 0 0!important;
+}
+#home .homeWrap > .hero{order:1!important;}
+#home .homeWrap > .modeGrid{order:2!important;}
+#home #cozySMSection370{order:3!important;}
+#home #cozySDSection370{order:4!important;}
+#home #homeActions351{order:5!important;}
+#home #limitlessHomeImport,
+#home .limitlessHomeControls{order:6!important;margin-top:0!important;}
+#home .homeWrap > .kpis{order:7!important;}
+#home .homeWrap > .controls{display:none!important;}
+
+#homeActions351 #personaHome351,
+#homeActions351 .personaHome351{display:none!important;}
+#homeActions351 .homeModeButtons351{display:none!important;}
+
+#homeActions351{position:relative!important;}
+#homeActions351 h3{
+  font-family:Orbitron,monospace!important;
+  letter-spacing:.20em!important;
+  text-transform:uppercase!important;
+  color:#67e8f9!important;
+  font-size:clamp(18px,2vw,28px)!important;
+  margin-bottom:12px!important;
+  display:inline-block!important;
+}
+#browseReview351{
+  position:absolute!important;
+  top:18px!important;
+  right:18px!important;
+}
+
+[id="domainOrderSelectFinal"],
+[id="expansionOrderPhase3"],
+label[for="domainOrderSelectFinal"],
+label[for="expansionOrderPhase3"],
+.domainOrderRow352,
+#homeActions351 label:has(+ #domainOrderSelectFinal),
+#homeActions351 label:has(+ #expansionOrderPhase3){
+  display:none!important;
+}
+
+#cozySMSection370{
+  border:1px solid rgba(103,232,249,.22)!important;
+  border-radius:16px!important;
+  background:rgba(103,232,249,.04)!important;
+  padding:14px 18px!important;
+  cursor:pointer!important;
+  transition:border-color .18s!important;
+  text-align:left!important;
+  width:100%!important;
+}
+#cozySMSection370:hover{border-color:rgba(103,232,249,.48)!important;}
+#cozySMSection370 .smLabel370{
+  font-family:Orbitron,monospace;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.20em;
+  text-transform:uppercase;
+  color:#67e8f9;
+  margin-bottom:4px;
+  display:block;
+}
+#cozySMSection370 .smValue370{
+  font-size:15px;
+  font-weight:950;
+  color:#9fe8ff;
+  letter-spacing:.06em;
+}
+#cozySMSection370 .smArrow370{
+  color:rgba(103,232,249,.45);
+  font-size:12px;
+  margin-left:4px;
+}
+
+#cozySDSection370{
+  border:1px solid rgba(100,60,180,.50)!important;
+  border-radius:16px!important;
+  background:rgba(15,8,36,.80)!important;
+  padding:16px 20px!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:16px!important;
+  cursor:pointer!important;
+  transition:border-color .18s!important;
+  text-align:left!important;
+  width:100%!important;
+}
+#cozySDSection370:hover{border-color:rgba(140,80,240,.70)!important;}
+#cozySDSection370 .sdIcon370{
+  width:48px;
+  height:48px;
+  border-radius:10px;
+  border:1px solid rgba(120,60,180,.45);
+  background:rgba(80,40,120,.35);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#d7c6ff;
+  font-size:24px;
+  flex:0 0 auto;
+}
+#cozySDSection370 .sdTitle370{
+  display:block;
+  color:#f3eeff;
+  font-size:21px;
+  font-weight:950;
+  line-height:1.1;
+}
+#cozySDSection370 .sdSub370{
+  display:block;
+  color:rgba(207,188,255,.78);
+  font-size:13px;
+  font-weight:850;
+  margin-top:4px;
+}
+
+#homeActions351 .reviewBrowse351{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:10px!important;
+  padding-top:12px!important;
+}
+#homeActions351 .reviewBrowse351 > div{
+  min-width:0!important;
+}
+#homeActions351 .reviewBrowse351 label{
+  font-family:Orbitron,monospace!important;
+  letter-spacing:.16em!important;
+  text-transform:uppercase!important;
+  color:rgba(185,196,230,.62)!important;
+  font-size:10px!important;
+}
+#homeActions351 .reviewBrowse351 select{
+  width:100%!important;
+}
+@media(max-width:760px){
+  #browseReview351{
+    position:static!important;
+    margin-left:auto!important;
+    display:flex!important;
+    width:max-content!important;
+  }
+  #homeActions351 .reviewBrowse351{
+    grid-template-columns:1fr!important;
+  }
+  #cozySDSection370{
+    padding:14px 16px!important;
+  }
+}
 </style>
 <script id="cozy-one-thing-stable-dropdown-js">
 function fixStableOneThingDropdown351() {
@@ -10624,13 +10925,37 @@ function fixStableOneThingDropdown351() {
 
   function canonicalCardId(card) {
     return clean(card?.qid_unique)
+      || clean(card?.qid)
       || clean(card?.card_id)
+      || clean(card?.id)
+      || (card?.presentation && card?.diagnosis ? hashStr(`${card.presentation}|${card.diagnosis}`) : null)
       || clean(card?.json_id)
       || clean(card?.original_qid)
-      || clean(card?.qid)
-      || clean(card?.id)
       || clean(card?.legacy_id)
       || hashStr(`${card?.presentation || card?.prompt || ''}::${card?.diagnosis || card?.answer || ''}`);
+  }
+
+  const SYS_MAP_PHASE3 = {
+    cv: 'CV', id: 'ID', gi: 'GI', endo: 'ENDO', neuro: 'NEURO',
+    rheum: 'RHEUM', renal: 'RENAL', psych: 'PSYCH', derm: 'DERM',
+    pulm: 'PULM', 'pulm/cc': 'PULM', 'puml/cc': 'PULM',
+    heme: 'HEM/ONC', 'hem/onc': 'HEM/ONC', 'heme/onc': 'HEM/ONC', hemonc: 'HEM/ONC',
+    'ob/gyn': 'OB/GYN', ob: 'OB/GYN', repro: 'OB/GYN',
+    ent: 'ENT', ethics: 'ETHICS', biostats: 'STATS', stats: 'STATS',
+    ophtho: 'OPHTHO', allergy: 'ALLERGY', urology: 'UROLOGY',
+    emergency: 'EMERGENCY', tox: 'TOX'
+  };
+
+  function normSysPhase3(value) {
+    let text = clean(value);
+    if (!text) return '';
+    if (text.includes(';')) text = text.split(';')[0];
+    const key = text.trim().toLowerCase();
+    return SYS_MAP_PHASE3[key] || text.trim().toUpperCase();
+  }
+
+  function normTestPhase3(value) {
+    return clean(value).replace(/^Test:\s*/i, 'TEST ').replace(/^Test\s+/i, 'TEST ');
   }
 
   function defaultProgress(cardId) {
@@ -10676,6 +11001,10 @@ function fixStableOneThingDropdown351() {
     const id = canonicalCardId(card);
     card.card_id = id;
     if (!clean(card.qid_unique) && clean(card.qid)) card.qid_unique = clean(card.qid);
+    const sys = normSysPhase3(card.sys || card.system || card.subject || '');
+    if (sys) card.sys = card.system = card.subject = sys;
+    const test = normTestPhase3(card.test || card.source_sheet || '');
+    if (test) card.test = test;
     return card;
   }
 
@@ -10809,8 +11138,10 @@ function fixStableOneThingDropdown351() {
 
   function exportProgressMap() {
     const out = {};
-    Object.keys(phase3State.progress || {}).forEach(cardId => {
-      const p = Object.assign(defaultProgress(cardId), phase3State.progress[cardId] || {}, { card_id: cardId });
+    const deduped = deduplicateProgress(phase3State.progress || {}, appCards());
+    Object.keys(deduped || {}).forEach(cardId => {
+      const p = syncProgressAliases(Object.assign(defaultProgress(cardId), deduped[cardId] || {}, { card_id: cardId }));
+      phase3State.progress[cardId] = p;
       out[cardId] = {
         card_id: p.card_id,
         seen_count: Number(p.seen_count || 0),
@@ -10837,21 +11168,81 @@ function fixStableOneThingDropdown351() {
 
   function savePhase3State() {
     phase3State.progress = phase3State.progress || {};
+    phase3State.progress = deduplicateProgress(phase3State.progress, appCards());
     phase3State.deck_fingerprint = deckFingerprint();
     try { localStorage.setItem(STATE_KEY, JSON.stringify(Object.assign({}, phase3State, { progress: exportProgressMap() }))); } catch (_) {}
     try { state = phase3State.progress; } catch (_) {}
     window.cozyPhase3State = phase3State;
+    try { Object.defineProperty(phase3State, 'session', { value: session, configurable: true, enumerable: false }); } catch (_) { phase3State.session = session; }
+    window.phase3State = phase3State;
     window.cozyPhase3Session = session;
+  }
+
+  function hasMoreSrsData(candidate, existing) {
+    if (!existing) return true;
+    const cScore = Number(candidate.reviewed_count || 0) + (candidate.last_rating ? 10 : 0) + (candidate.pinned ? 8 : 0) + (Number(candidate.interval_days || 0) > 0 ? 5 : 0);
+    const eScore = Number(existing.reviewed_count || 0) + (existing.last_rating ? 10 : 0) + (existing.pinned ? 8 : 0) + (Number(existing.interval_days || 0) > 0 ? 5 : 0);
+    return cScore > eScore;
+  }
+
+  function deduplicateProgress(rawProgress, loadedCards = appCards()) {
+    const byAlias = {};
+    (loadedCards || []).forEach(card => {
+      const canon = canonicalCardId(card);
+      [card?.qid_unique, card?.qid, card?.card_id, card?.id, card?.json_id, card?.original_qid, card?.legacy_id]
+        .map(clean)
+        .filter(Boolean)
+        .forEach(key => { byAlias[key] = canon; });
+    });
+    const cleanProgress = {};
+    Object.entries(rawProgress || {}).forEach(([key, value]) => {
+      const realKey = byAlias[key] || key;
+      if (/^abim-\d+/i.test(realKey) && !byAlias[key]) return;
+      const incoming = syncProgressAliases(Object.assign({}, value || {}, { card_id: realKey }));
+      const existing = cleanProgress[realKey];
+      if (!existing) cleanProgress[realKey] = incoming;
+      else if (hasMoreSrsData(incoming, existing)) {
+        cleanProgress[realKey] = syncProgressAliases(Object.assign({}, existing, incoming, {
+          card_id: realKey,
+          pinned: !!(incoming.pinned || existing.pinned),
+          repair_point: !!(incoming.repair_point || existing.repair_point),
+          interval_days: Math.max(Number(incoming.interval_days || 0), Number(existing.interval_days || 0))
+        }));
+      } else {
+        cleanProgress[realKey] = syncProgressAliases(Object.assign({}, incoming, existing, {
+          card_id: realKey,
+          pinned: !!(incoming.pinned || existing.pinned),
+          repair_point: !!(incoming.repair_point || existing.repair_point),
+          interval_days: Math.max(Number(incoming.interval_days || 0), Number(existing.interval_days || 0))
+        }));
+      }
+    });
+    return cleanProgress;
   }
 
   function getProgress(cardId) {
     phase3State.progress = phase3State.progress || {};
-    return phase3State.progress[cardId] || defaultProgress(cardId);
+    return syncProgressAliases(phase3State.progress[cardId] || defaultProgress(cardId));
+  }
+
+  function syncProgressAliases(progress) {
+    if (!progress || typeof progress !== 'object') return progress;
+    if (progress.rating && !progress.last_rating) progress.last_rating = progress.rating;
+    if (progress.last && !progress.last_seen_at) progress.last_seen_at = progress.last;
+    if (progress.reviewed && !progress.reviewed_count) progress.reviewed_count = Number(progress.reviewed || 0) || 0;
+    if (progress.correct && !progress.correct_count) progress.correct_count = Number(progress.correct || 0) || 0;
+    if (progress.seen && !progress.seen_count) progress.seen_count = 1;
+    progress.seen = Number(progress.seen_count || 0) > 0;
+    progress.reviewed = Number(progress.reviewed_count || 0);
+    progress.correct = Number(progress.correct_count || 0);
+    progress.rating = progress.last_rating || progress.rating || null;
+    progress.last = progress.last_seen_at || progress.last || null;
+    return progress;
   }
 
   function setProgress(cardId, patch) {
     phase3State.progress = phase3State.progress || {};
-    const next = Object.assign({}, getProgress(cardId), patch || {}, { card_id: cardId, updated_at: nowIso() });
+    const next = syncProgressAliases(Object.assign({}, getProgress(cardId), patch || {}, { card_id: cardId, updated_at: nowIso() }));
     phase3State.progress[cardId] = next;
     savePhase3State();
     return next;
@@ -10883,7 +11274,7 @@ function fixStableOneThingDropdown351() {
     if (rating === 'again') return intervalLabel(0, 10);
     if (rating === 'hard') return intervalLabel(Math.max(1, Math.round(interval * 1.2) || 1));
     if (rating === 'good') return intervalLabel(interval <= 0 ? 1 : Math.max(1, Math.round(interval * ease)));
-    if (rating === 'easy') return intervalLabel(interval <= 0 ? 4 : Math.max(4, Math.round(interval * (ease + 0.15) * 1.3)));
+    if (rating === 'easy') return intervalLabel(interval <= 0 ? 4 : Math.max(4, Math.round(interval * Math.min(4.0, ease + 0.15) * 1.6)));
     return '';
   }
 
@@ -10916,7 +11307,7 @@ function fixStableOneThingDropdown351() {
       buried = false;
       nextDue = addMinutes(now, 10);
     } else if (rating === 'hard') {
-      stage = stage === 'new' ? 'learning' : 'review';
+      stage = 'review';
       interval = Math.max(1, Math.round(interval * 1.2) || 1);
       ease = Math.max(1.3, ease - 0.15);
       repair = true;
@@ -10930,7 +11321,7 @@ function fixStableOneThingDropdown351() {
       nextDue = addDays(now, interval);
     } else if (rating === 'easy') {
       stage = 'review';
-      ease += 0.15;
+      ease = Math.min(4.0, ease + 0.15);
       interval = interval <= 0 ? 4 : Math.max(4, Math.round(interval * ease * 1.3));
       repair = false;
       buried = true;
@@ -10941,7 +11332,7 @@ function fixStableOneThingDropdown351() {
 
     session.seenThisSession.add(cardId);
     if (buried) session.buriedToday.add(cardId);
-    setProgress(cardId, {
+    const next = setProgress(cardId, {
       seen_count: Number(p.seen_count || 0) + 1,
       reviewed_count: Number(p.reviewed_count || 0) + 1,
       correct_count: Number(p.correct_count || 0) + (rating === 'good' || rating === 'easy' ? 1 : 0),
@@ -10954,9 +11345,10 @@ function fixStableOneThingDropdown351() {
       ease_factor: ease,
       lapses,
       repair_point: repair,
-      buried,
+      buried: false,
       updated_at: now.toISOString()
     });
+    if (rating === 'again') console.log('[SRS] again fired for', cardId, next);
   }
 
   function shuffleCards(arr) {
@@ -11019,7 +11411,8 @@ function fixStableOneThingDropdown351() {
 
   function selectedOrder(gameType) {
     const explicit = document.documentElement.dataset.cozyLaunchScope || '';
-    const general = q('browseScope351')?.value || q('generalStudyMode351')?.value || '';
+    const hf = window.homeFilters || {};
+    const general = hf.scope || q('browseScope351')?.value || q('generalStudyMode351')?.value || '';
     const expansion = q('expansionOrderPhase3')?.value || '';
     if (gameType === 'expansion') return normalizeMode(expansion || phase3State.settings.expansion_order || general || explicit || 'new_first');
     return normalizeMode(general || explicit || phase3State.settings.solo_order || 'random_new');
@@ -11082,11 +11475,18 @@ function fixStableOneThingDropdown351() {
       arr = normalizeDeckIdentities().filter(c => progressForCard(c).suspended);
     }
 
+    if (!arr.length && ['due', 'review_deck', 'pinned', 'hard', 'suspended'].includes(selected)) return [];
+
     if (selected === 'random_new') {
       const active = arr.filter(c => !session.buriedToday.has(canonicalCardId(c)));
       return active.length ? active : arr;
     }
-    return splitBuriedToBack(arr.length ? arr : basePlayableCards());
+    const ordered = splitBuriedToBack(arr.length ? arr : basePlayableCards());
+    const active = ordered.filter(c => {
+      const id = canonicalCardId(c);
+      return !session.buriedToday.has(id) && !getProgress(id).buried;
+    });
+    return active.length ? active : ordered;
   }
 
   function poolKey(gameType) {
@@ -11113,6 +11513,20 @@ function fixStableOneThingDropdown351() {
     if (q('pinCount')) q('pinCount').textContent = vals.filter(p => p.pinned).length;
   }
 
+  function ensureDebugPanelPhase3() {
+    const enabled = localStorage.getItem('cozy_debug') === '1';
+    let panel = q('cozyDebugPanelPhase3');
+    if (!enabled) { if (panel) panel.remove(); return; }
+    if (!panel) {
+      panel = document.createElement('aside');
+      panel.id = 'cozyDebugPanelPhase3';
+      panel.style.cssText = 'position:fixed;right:12px;bottom:12px;z-index:99999;max-width:320px;padding:12px 14px;border:1px solid rgba(103,232,249,.45);border-radius:14px;background:rgba(3,7,19,.92);color:#dffbff;font:12px/1.4 ui-monospace,Menlo,monospace;box-shadow:0 0 22px rgba(103,232,249,.18)';
+      document.body.appendChild(panel);
+    }
+    const progress = Object.values(phase3State.progress || {});
+    panel.innerHTML = '<b>Cozy debug</b><br>cards: ' + appCards().length + '<br>progress: ' + progress.length + '<br>reviewed: ' + progress.filter(p => Number(p.reviewed_count || 0) > 0).length + '<br>pinned: ' + progress.filter(p => p.pinned).length;
+  }
+
   function answerFor(card) { return clean(card?.diagnosis || card?.answer || card?.title || card?.topic); }
   function promptFor(card) { return clean(card?.presentation || card?.prompt || card?.quick_recall || card?.educational_objective || card?.clinical_vignette); }
 
@@ -11135,9 +11549,10 @@ function fixStableOneThingDropdown351() {
   }
 
   function progressPayload() {
+    const progress = deduplicateProgress(exportProgressMap(), appCards());
     return {
       metadata: { type: 'progress', deck_fingerprint: deckFingerprint(), exported_at: nowIso(), schema_version: '3.0' },
-      progress: exportProgressMap()
+      progress
     };
   }
 
@@ -11158,7 +11573,7 @@ function fixStableOneThingDropdown351() {
     return {
       metadata: { type: 'deck_with_progress', deck_fingerprint: deckFingerprint(), exported_at: nowIso(), schema_version: '3.0' },
       cards: cleanDeckPayload().cards,
-      progress: exportProgressMap()
+      progress: phase3State.progress || {}
     };
   }
 
@@ -11174,7 +11589,11 @@ function fixStableOneThingDropdown351() {
   }
 
   function exportCleanDeck() { downloadJson('cozy_arcade_clean_deck.json', cleanDeckPayload()); }
-  function exportProgressOnly() { downloadJson('cozy_arcade_progress_only.json', progressPayload()); }
+  function exportProgressOnly() {
+    savePhase3State();
+    updateKpisPhase3();
+    downloadJson('cozy_arcade_progress_' + new Date().toISOString().slice(0, 10) + '.json', progressPayload());
+  }
   function exportDeckWithProgress() { downloadJson('cozy_arcade_deck_with_progress_backup.json', backupPayload()); }
   function exportSessionSummary() {
     const vals = Object.values(phase3State.progress || {});
@@ -11214,15 +11633,28 @@ function fixStableOneThingDropdown351() {
       importedCards = normalized.length;
       phase3State.deck_label = label || obj?.metadata?.deck_label || obj?.meta?.deck_label || phase3State.deck_label;
       phase3State.deck_fingerprint = deckFingerprint(normalized);
+      normalized.forEach(card => {
+        const cardId = canonicalCardId(card);
+        phase3State.progress[cardId] = syncProgressAliases(Object.assign(defaultProgress(cardId), phase3State.progress[cardId] || {}, {
+          card_id: cardId,
+          source: phase3State.progress[cardId]?.source || 'uploaded',
+          loadedAt: phase3State.progress[cardId]?.loadedAt || nowIso()
+        }));
+      });
     }
-    const progressSource = obj?.progress ? { progress: obj.progress } : (obj?.state ? { state: obj.state } : null);
+    const progressSource = obj?.progress ? { progress: deduplicateProgress(obj.progress, appCards()) } : (obj?.state ? { state: deduplicateProgress(obj.state, appCards()) } : null);
     const migrated = progressSource ? migrateLegacyProgress(progressSource, appCards()) : {};
     Object.keys(migrated).forEach(cardId => {
-      phase3State.progress[cardId] = Object.assign(defaultProgress(cardId), phase3State.progress[cardId] || {}, migrated[cardId], { card_id: cardId });
+      const ex = phase3State.progress[cardId] || {};
+      const inc = migrated[cardId] || {};
+      const exS = Number(ex.reviewed_count||0)+(ex.last_rating?10:0)+(ex.pinned?8:0)+(Number(ex.interval_days||0)>0?5:0);
+      const inS = Number(inc.reviewed_count||0)+(inc.last_rating?10:0)+(inc.pinned?8:0)+(Number(inc.interval_days||0)>0?5:0);
+      const win = inS > exS ? inc : ex;
+      phase3State.progress[cardId] = syncProgressAliases(Object.assign(defaultProgress(cardId), win, { card_id: cardId, pinned: ex.pinned || inc.pinned }));
     });
     savePhase3State();
     updateKpisPhase3();
-    try { toast(importedCards ? 'Imported ' + importedCards + ' cards' : 'Progress merged'); } catch (_) {}
+    try { toast(importedCards ? 'Imported ' + importedCards + ' cards' : 'Progress restored: ' + Object.keys(migrated).length + ' cards updated'); } catch (_) {}
     return { cards: importedCards, progress: Object.keys(migrated).length };
   }
 
@@ -11237,7 +11669,7 @@ function fixStableOneThingDropdown351() {
   }
 
   function wireFileInputs() {
-    ['limitlessHomeDeckFile', 'deckFile', 'deckFile2', 'deckUpload351', 'mergeFile2', 'progressFile2'].forEach(id => {
+    ['limitlessHomeDeckFile', 'deckFile',  'deckUpload351', 'mergeFile2', 'progressFile2'].forEach(id => {
       const el = q(id);
       if (!el || el.dataset.phase3Input === '1') return;
       const clone = el.cloneNode(true);
@@ -11284,7 +11716,7 @@ function fixStableOneThingDropdown351() {
         updateKpisPhase3();
       };
     }
-    const anchor = q('browseReview351')?.closest('.reviewBrowse351') || q('homeActions351');
+    const anchor = q('browseReview351')?.closest('.reviewBrowse351');
     if (anchor && !q('expansionOrderPhase3')) {
       const wrap = document.createElement('div');
       wrap.innerHTML = '<label>Knowledge Expansion Order</label><select id="expansionOrderPhase3">' + optionHtml(phase3State.settings.expansion_order) + '</select>';
@@ -11295,25 +11727,50 @@ function fixStableOneThingDropdown351() {
         session.poolKey = '';
       };
     }
-    if (q('limitlessExampleDeck')) q('limitlessExampleDeck').textContent = 'Download Clean Deck JSON';
-    if (q('exportBtn')) { q('exportBtn').textContent = 'Export Progress'; q('exportBtn').onclick = exportProgressOnly; }
+    if (q('limitlessExampleDeck')) q('limitlessExampleDeck').textContent = 'Download JSON';
     if (q('pauseExport')) { q('pauseExport').textContent = 'Export Progress'; q('pauseExport').onclick = exportProgressOnly; }
-    if (q('drawerExport351')) { q('drawerExport351').textContent = 'Download Clean Deck JSON'; q('drawerExport351').onclick = exportCleanDeck; }
-    if (q('exportJson351')) { q('exportJson351').textContent = 'Download Clean Deck JSON'; q('exportJson351').onclick = exportCleanDeck; }
-    if (q('limitlessExampleDeck')) q('limitlessExampleDeck').onclick = exportCleanDeck;
+    if (q('drawerExport351')) q('drawerExport351').remove();
+    if (q('exportJson351')) { q('exportJson351').textContent = 'Download JSON'; q('exportJson351').onclick = exportCleanDeck; }
+    if (q('limitlessExampleDeck')) q('limitlessExampleDeck').onclick = exportProgressOnly;
     if (q('settingsExportProgress351')) q('settingsExportProgress351').onclick = exportProgressOnly;
-    if (q('exportCardsOnly2')) { q('exportCardsOnly2').textContent = 'Download Clean Deck JSON'; q('exportCardsOnly2').onclick = exportCleanDeck; }
     if (q('exportProgress2')) { q('exportProgress2').textContent = 'Export Progress Only'; q('exportProgress2').onclick = exportProgressOnly; }
-    if (q('exportEntire2')) { q('exportEntire2').textContent = 'Export Deck + Progress Backup'; q('exportEntire2').onclick = exportDeckWithProgress; }
-    if (q('exportMergeInfo2')) { q('exportMergeInfo2').textContent = 'Export Session Summary'; q('exportMergeInfo2').onclick = exportSessionSummary; }
-    if (q('exportProgress351Btn')) q('exportProgress351Btn').onclick = () => { exportProgressOnly(); q('saveProgress351')?.classList.add('hidden'); try { home(true); } catch (_) {} };
+    if (q('exportMergeInfo2')) { q('exportMergeInfo2').textContent = 'Export Progress Summary'; q('exportMergeInfo2').onclick = exportSessionSummary; }
     if (q('browseReview351')) q('browseReview351').onclick = () => { showReviewPhase3(); };
-    if (q('spacedBtn')) q('spacedBtn').onclick = () => showReviewPhase3('due');
+    if (q('settingsBtn')) q('settingsBtn').textContent = 'Settings';
+    let progressBtn = document.getElementById('limitlessImportStatus');
+    const localDeckStorage = document.getElementById('limitlessLocalDeckStorage');
+    if (!progressBtn && localDeckStorage) {
+      localDeckStorage.id = 'limitlessImportStatus';
+      progressBtn = localDeckStorage;
+    }
+    if (localDeckStorage) {
+      const n = appCards().length;
+      localDeckStorage.textContent = n ? (n + ' cards') : '';
+      localDeckStorage.onclick = null;
+      localDeckStorage.style.pointerEvents = 'none';
+      localDeckStorage.setAttribute('aria-disabled','true');
+    }
+    if (progressBtn) {
+      const n = appCards().length;
+      progressBtn.textContent = n ? `Progress ↗ (${n} cards)` : 'Progress ↗';
+      progressBtn.removeAttribute('aria-disabled');
+      progressBtn.style.pointerEvents = 'auto';
+      progressBtn.style.cursor = 'pointer';
+      progressBtn.onclick = () => {
+        window.open('progress_beta.html', '_blank');
+      };
+    }
   }
 
   function showReviewPhase3(mode) {
     try { show('review'); } catch (_) {}
-    renderReviewList(normalizeMode(mode || q('browseScope351')?.value || 'review_deck'));
+    const normalized = normalizeMode(mode || q('browseScope351')?.value || 'review_deck');
+    const reviewScope = normalized === 'random_new' ? 'random-new' : normalized === 'random_all' ? 'random' : normalized === 'review_deck' ? 'review' : normalized === 'new_first' ? 'new' : normalized;
+    document.documentElement.dataset.cozyLaunchScope = reviewScope;
+    if (q('reviewScope352')) q('reviewScope352').value = reviewScope;
+    window.__reviewRefreshScope352 = true;
+    if (typeof window.renderReviewManager352 === 'function') window.renderReviewManager352();
+    else renderReviewList(normalized);
   }
 
   function runCozySmokeTestsPhase3() {
@@ -11343,7 +11800,7 @@ function fixStableOneThingDropdown351() {
     window.rateCard = rateCard;
     window.getStudyPool = getStudyPool;
     window.migrateLegacyProgress = migrateLegacyProgress;
-    window.cozyPhase3 = { exportCleanDeck, exportProgressOnly, exportDeckWithProgress, exportSessionSummary, importObjectPhase3, cleanDeckPayload, progressPayload, backupPayload, getStudyPool, clearSessionBuried, wireUi };
+    window.cozyPhase3 = { exportCleanDeck, exportProgressOnly, exportDeckWithProgress, importObjectPhase3, cleanDeckPayload, progressPayload, backupPayload, getStudyPool, clearSessionBuried, wireUi };
     window.cozyProgressPayload351 = progressPayload;
     window.mergeProgressObject351 = obj => {
       const migrated = migrateLegacyProgress(obj?.progress ? { progress: obj.progress } : obj, appCards());
@@ -11354,6 +11811,7 @@ function fixStableOneThingDropdown351() {
     };
     window.cozyParseJson351 = parseJsonLoose;
     window.runCozySmokeTests = runCozySmokeTestsPhase3;
+    window.appCards = appCards;
     window.importLimitlessDeck = importObjectPhase3;
     window.importLimitlessFile = importFilePhase3;
     window.exportSession = exportProgressOnly;
@@ -11375,7 +11833,7 @@ function fixStableOneThingDropdown351() {
     window.ratingsHTML = ratingsHTML = () => {
       let pinned = false, buried = false;
       try { const st = getProgress(canonicalCardId(current || {})); pinned = !!st.pinned; buried = !!st.buried; } catch (_) {}
-      return '<div class="ratingBar"><button class="btn ' + (pinned ? 'pinActive350' : '') + '" data-rate="pin">' + (pinned ? 'Unpin' : 'Pin') + '</button><button class="btn buryBtn352 ' + (buried ? 'buryActive352' : '') + '" data-rate="bury">' + (buried ? 'Suspended' : 'Bury') + '</button><button class="btn red" data-rate="again">Again · ' + previewInterval(current, 'again') + '</button><button class="btn" data-rate="hard">Hard · ' + previewInterval(current, 'hard') + '</button><button class="btn" data-rate="good">Good · ' + previewInterval(current, 'good') + '</button><button class="btn primary" data-rate="easy">Easy · ' + previewInterval(current, 'easy') + '</button><button class="btn primary" data-rate="continue">Continue</button></div>';
+      return '<div class="ratingBar"><button class="btn ' + (pinned ? 'pinActive350' : '') + '" data-rate="pin">' + (pinned ? 'Unpin' : 'Pin') + '</button><button class="btn buryBtn352 ' + (buried ? 'buryActive352' : '') + '" data-rate="bury">' + (buried ? 'Suspended' : 'Bury') + '</button><button class="btn againBtn352 ratingBtn again" data-rate="again" data-rating="again">Again</button><button class="btn ratingBtn hard" data-rate="hard" data-rating="hard">Hard</button><button class="btn ratingBtn good" data-rate="good" data-rating="good">Good</button><button class="btn primary ratingBtn easy" data-rate="easy" data-rating="easy">EASY</button><button class="btn primary" data-rate="continue">Continue</button></div>';
     };
     window.cardPool = cardPool = () => sessionPool(mode === 'domain' ? 'expansion' : 'solo');
     window.nextCard = nextCard = () => {
@@ -11408,6 +11866,7 @@ function fixStableOneThingDropdown351() {
     wireFileInputs();
     wireUi();
     updateKpisPhase3();
+    ensureDebugPanelPhase3();
   }
 
   install();
@@ -11415,6 +11874,45 @@ function fixStableOneThingDropdown351() {
   setTimeout(install, 100);
   setTimeout(install, 600);
   setInterval(() => { wireFileInputs(); wireUi(); updateKpisPhase3(); }, 1000);
+
+  function cozyHomeLayout370() {
+    const homeWrap = document.querySelector('#home .homeWrap');
+    if (!homeWrap) return;
+    const modeGrid = homeWrap.querySelector(':scope > .modeGrid');
+    const homeActions = q('homeActions351');
+    if (!q('cozySMSection370')) {
+      const study = document.createElement('button');
+      study.id = 'cozySMSection370';
+      study.type = 'button';
+      study.innerHTML = '<span class="smLabel370">Study Mode</span><span class="smValue370">Limitless Scholar</span><span class="smArrow370">&#9662;</span>';
+      (homeActions || modeGrid || homeWrap).insertAdjacentElement(homeActions ? 'beforebegin' : 'afterend', study);
+    }
+    if (!q('cozySDSection370')) {
+      const shadow = document.createElement('button');
+      shadow.id = 'cozySDSection370';
+      shadow.type = 'button';
+      shadow.innerHTML = '<span class="sdIcon370">&#9789;</span><span><span class="sdTitle370">Shadow Dungeon</span><span class="sdSub370">Review pinned and missed cards</span></span>';
+      (homeActions || modeGrid || homeWrap).insertAdjacentElement(homeActions ? 'beforebegin' : 'afterend', shadow);
+    }
+    const persona = typeof getActivePersona === 'function' ? getActivePersona() : null;
+    const label = persona && (persona.display_name || persona.name) ? (persona.display_name || persona.name) : (q('personaHome351')?.querySelector('b')?.textContent || 'Limitless Scholar');
+    const studyValue = q('cozySMSection370')?.querySelector('.smValue370');
+    if (studyValue) studyValue.textContent = label;
+    if (q('cozySMSection370')) q('cozySMSection370').onclick = () => {
+      if (q('choosePersona351')) q('choosePersona351').click();
+      else if (typeof showPersonaSelector351 === 'function') showPersonaSelector351();
+    };
+    if (q('cozySDSection370')) q('cozySDSection370').onclick = () => {
+      if (q('shadow351')) q('shadow351').click();
+      else if (typeof openShadowSetup351 === 'function') openShadowSetup351();
+    };
+  }
+
+  cozyHomeLayout370();
+  document.addEventListener('DOMContentLoaded', cozyHomeLayout370);
+  setTimeout(cozyHomeLayout370, 100);
+  setTimeout(cozyHomeLayout370, 700);
+  setInterval(cozyHomeLayout370, 1200);
 })();
 </script>
 </body></html>

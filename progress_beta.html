@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Neural Atlas β — Cozy Arcade Board Prep</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=DM+Sans:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#030713;--cyan:#67e8f9;--blue:#0ea5e9;--purple:#a855f7;
+  --bg2:#05091a;--bg3:#071228;--bg-glass:rgba(5,9,24,.82);
+  --blue2:#4163ff;--magenta:#e040fb;--green:#22c55e;--amber:#f59e0b;
+  --red:#ef4444;--orange:#f97316;
+  --text:#e9f4ff;--text2:#7a86a0;
+  --border:rgba(103,232,249,.18);--border-dim:rgba(103,232,249,.07);
+  --glow-cyan:0 0 18px rgba(103,232,249,.45),0 0 36px rgba(103,232,249,.15);
+  --glow-blue:0 0 28px rgba(14,165,233,.5),0 0 56px rgba(14,165,233,.18);
+  --sidebar-w:340px;--topbar-h:52px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,sans-serif;font-size:13px;-webkit-font-smoothing:antialiased;}
+
+/* TOP BAR */
+#topbar{position:fixed;top:0;left:0;right:0;height:var(--topbar-h);display:flex;align-items:center;gap:10px;padding:0 14px;background:rgba(3,7,19,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);z-index:200;}
+#topbar-title{font-family:'Orbitron',monospace;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--cyan);text-shadow:var(--glow-cyan);white-space:nowrap;flex-shrink:0;}
+#topbar-sub{flex:1;font-size:10px;color:var(--text2);letter-spacing:.06em;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#topbar-btns{display:flex;gap:6px;flex-shrink:0;align-items:center;}
+
+/* Upload pill */
+#upload-pill{position:relative;display:inline-flex;}
+#upload-pill input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0;}
+#upload-label{display:inline-block;border-radius:999px;padding:5px 11px;border:1px solid rgba(103,232,249,.45);background:rgba(103,232,249,.08);color:var(--cyan);font-weight:900;cursor:pointer;font-size:10px;letter-spacing:.06em;font-family:inherit;white-space:nowrap;transition:border-color .14s,background .14s;}
+#upload-label:hover{background:rgba(103,232,249,.15);}
+#upload-status{font-size:9px;color:var(--text2);margin-left:4px;white-space:nowrap;}
+
+/* BUTTONS */
+.btn{border-radius:999px;padding:5px 12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:var(--text);font-weight:900;cursor:pointer;font-size:11px;letter-spacing:.06em;font-family:inherit;transition:border-color .14s,background .14s;white-space:nowrap;}
+.btn:hover{border-color:var(--cyan);background:rgba(103,232,249,.09)}
+.btn.primary{background:linear-gradient(135deg,var(--blue),var(--cyan));color:#020611;border-color:transparent;}
+.btn.sm{padding:4px 9px;font-size:10px}
+
+/* APP SHELL */
+#app{position:fixed;top:var(--topbar-h);left:0;right:0;bottom:0;display:flex;}
+
+/* CANVAS */
+#canvas-wrap{flex:1;position:relative;overflow:hidden;cursor:grab;background:radial-gradient(ellipse at 50% 40%,rgba(14,165,233,.07) 0%,transparent 60%);}
+#canvas-wrap:active{cursor:grabbing}
+#atlas{position:absolute;top:0;left:0;width:100%;height:100%}
+#hud{position:absolute;top:12px;left:14px;font-family:'Orbitron',monospace;font-size:8px;letter-spacing:.14em;color:rgba(103,232,249,.35);pointer-events:none;z-index:30;line-height:1.9;}
+#zoom-hint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);font-size:10px;color:rgba(255,255,255,.2);pointer-events:none;z-index:30;letter-spacing:.06em;font-weight:700;white-space:nowrap;}
+#sys-banner{position:absolute;top:12px;left:50%;transform:translateX(-50%);background:rgba(5,9,26,.88);border:1px solid var(--border);border-radius:999px;padding:5px 14px;font-size:11px;font-weight:900;letter-spacing:.1em;color:var(--cyan);pointer-events:none;z-index:40;opacity:0;transition:opacity .25s;white-space:nowrap;backdrop-filter:blur(8px);}
+#sys-banner.visible{opacity:1}
+#zoom-ctrls{position:absolute;bottom:14px;right:14px;display:flex;flex-direction:column;gap:5px;z-index:40;}
+.zoom-btn{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:rgba(5,9,24,.8);color:var(--text);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
+.zoom-btn:hover{border-color:var(--cyan);}
+
+/* SIDEBAR */
+#sidebar{width:var(--sidebar-w);flex-shrink:0;display:flex;flex-direction:column;background:var(--bg-glass);border-left:1px solid var(--border);overflow:hidden;}
+#sb-head{padding:14px 16px 12px;border-bottom:1px solid var(--border-dim);flex-shrink:0;}
+#sb-title{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:.22em;color:var(--cyan);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
+#sb-scroll{flex:1;overflow-y:auto;padding:12px 16px 24px;scrollbar-width:thin;scrollbar-color:rgba(103,232,249,.18) transparent;}
+#sb-scroll::-webkit-scrollbar{width:3px}
+#sb-scroll::-webkit-scrollbar-thumb{background:rgba(103,232,249,.18);border-radius:2px}
+
+/* Ring cluster */
+.ring-cluster{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.ring-cluster svg{flex-shrink:0}
+.ring-meta{flex:1}
+.ring-big{font-family:'Orbitron',monospace;font-size:26px;font-weight:900;color:var(--cyan);text-shadow:var(--glow-cyan);line-height:1;display:block;}
+.ring-label{font-size:9px;letter-spacing:.16em;color:var(--text2);text-transform:uppercase;margin-top:3px;display:block;}
+
+/* Energy bar */
+.energy-wrap{margin-bottom:14px}
+.energy-row{display:flex;justify-content:space-between;font-size:10px;color:var(--text2);margin-bottom:4px}
+.energy-row span{color:var(--cyan);font-weight:900}
+.energy-track{background:rgba(255,255,255,.06);border-radius:999px;height:5px;overflow:hidden}
+.energy-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--blue),var(--cyan));box-shadow:0 0 8px rgba(103,232,249,.5);transition:width .9s cubic-bezier(.22,1,.36,1);}
+
+/* KPI grid */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:14px}
+.kpi-card{border:1px solid rgba(160,160,210,.12);border-radius:10px;background:rgba(255,255,255,.03);padding:9px 11px;}
+.kpi-card.hi{border-color:rgba(103,232,249,.28);background:rgba(103,232,249,.05)}
+.kpi-card.warn{border-color:rgba(239,68,68,.32);background:rgba(239,68,68,.06)}
+.kpi-n{font-family:'Orbitron',monospace;font-size:20px;font-weight:900;display:block;line-height:1;}
+.kpi-l{font-size:9px;color:var(--text2);letter-spacing:.1em;text-transform:uppercase;display:block;margin-top:3px;}
+
+/* Section headers */
+.s-head{font-size:9px;letter-spacing:.18em;color:var(--text2);text-transform:uppercase;margin:14px 0 7px;font-weight:900;display:flex;align-items:center;justify-content:space-between;}
+.accent{color:var(--cyan)}
+
+/* Legend */
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px;}
+.leg-item{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text2);}
+.leg-dot{width:8px;height:8px;border-radius:50%;}
+
+/* Forecast */
+.forecast-row{display:flex;gap:5px;align-items:flex-end;height:72px;margin-bottom:10px;}
+.fc-bar{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;flex:1;}
+.bar{width:100%;border-radius:3px 3px 0 0;min-height:3px;transition:height .5s ease;}
+.cnt{font-size:9px;font-weight:900;color:var(--cyan);}
+.dl{font-size:8px;color:var(--text2);}
+
+/* Sys list */
+.sys-list{display:flex;flex-direction:column;gap:4px;margin-bottom:6px}
+.sys-row{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;border:1px solid transparent;cursor:pointer;transition:border-color .12s,background .12s;}
+.sys-row:hover{border-color:var(--border);background:rgba(103,232,249,.04)}
+.sys-row.active{border-color:var(--cyan);background:rgba(103,232,249,.08)}
+.sys-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sys-name{font-weight:900;font-size:11px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sys-stat{font-size:10px;color:var(--text2);white-space:nowrap}
+
+/* Search + filter */
+.search-row{margin-bottom:7px}
+.search-input{width:100%;padding:7px 11px;border-radius:8px;border:1px solid var(--border-dim);background:rgba(255,255,255,.04);color:var(--text);font-size:11px;font-family:inherit;outline:none;}
+.search-input:focus{border-color:var(--cyan);}
+.filter-row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;}
+.filter-btn{padding:3px 9px;border-radius:999px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:var(--text2);font-size:10px;cursor:pointer;font-family:inherit;font-weight:700;transition:border-color .12s,color .12s;}
+.filter-btn:hover{border-color:var(--border);color:var(--text);}
+.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(103,232,249,.08);}
+
+/* Mini table */
+.mini-table{width:100%;border-collapse:collapse;font-size:10px;}
+.mini-table th{color:var(--text2);font-weight:900;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:5px 6px;border-bottom:1px solid var(--border-dim);text-align:left;}
+.mini-table td{padding:5px 6px;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle;cursor:pointer;}
+.mini-table tr:hover td{background:rgba(103,232,249,.04);}
+.pill{display:inline-block;padding:1px 5px;border-radius:4px;font-size:9px;font-weight:900;letter-spacing:.07em;}
+.p-new{background:rgba(103,232,249,.15);color:var(--cyan);}
+.p-rev{background:rgba(34,197,94,.15);color:#22c55e;}
+.p-rel{background:rgba(239,68,68,.15);color:#ef4444;}
+.p-ovr{color:#ef4444;font-weight:900;}
+.p-tdy{color:#f59e0b;font-weight:900;}
+.p-fut{color:var(--text2);}
+
+/* CARD DETAIL PANEL */
+#card-detail{display:none;position:absolute;inset:0;z-index:100;background:var(--bg-glass);backdrop-filter:blur(18px);overflow-y:auto;padding:16px;border-left:1px solid var(--border);}
+#card-detail.open{display:block;}
+.cd-close{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.cd-close-btn{background:none;border:1px solid var(--border);border-radius:999px;color:var(--text2);cursor:pointer;font-size:11px;padding:4px 10px;font-family:inherit;}
+.cd-close-btn:hover{color:var(--cyan);border-color:var(--cyan);}
+.cd-id{font-size:9px;letter-spacing:.18em;color:var(--text2);text-transform:uppercase;margin-bottom:4px;}
+.cd-sys{display:inline-block;font-size:9px;font-weight:900;padding:2px 8px;border-radius:999px;margin-bottom:12px;}
+.cd-section{margin-bottom:12px;}
+.cd-label{font-size:9px;letter-spacing:.14em;color:var(--text2);text-transform:uppercase;margin-bottom:4px;font-weight:900;}
+.cd-q{font-size:12px;line-height:1.6;color:var(--text);background:rgba(103,232,249,.05);border:1px solid var(--border-dim);border-radius:8px;padding:10px 12px;}
+.cd-ans{font-size:12px;font-weight:900;color:var(--cyan);background:rgba(103,232,249,.08);border:1px solid rgba(103,232,249,.25);border-radius:8px;padding:10px 12px;}
+.cd-body{font-size:11px;line-height:1.65;color:var(--text2);background:rgba(255,255,255,.03);border-radius:8px;padding:10px 12px;border:1px solid var(--border-dim);}
+.cd-star{font-size:11px;line-height:1.6;color:#f59e0b;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.22);border-radius:8px;padding:10px 12px;}
+.cd-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px;}
+.cd-stat{text-align:center;background:rgba(255,255,255,.04);border-radius:8px;padding:8px 4px;border:1px solid var(--border-dim);}
+.cd-stat-n{font-family:'Orbitron',monospace;font-size:15px;font-weight:900;display:block;}
+.cd-stat-l{font-size:8px;letter-spacing:.1em;color:var(--text2);text-transform:uppercase;}
+.cd-flags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.cd-flag{font-size:9px;padding:3px 8px;border-radius:999px;font-weight:900;}
+.cd-flag.pinned{background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.35);color:#c084fc;}
+.cd-flag.repair{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;}
+.cd-flag.suspended{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#f87171;}
+.cd-flag.leech{background:rgba(107,33,168,.12);border:1px solid rgba(107,33,168,.3);color:#c084fc;}
+.cd-flag.due{background:rgba(251,88,118,.12);border:1px solid rgba(251,88,118,.3);color:#fb5876;}
+
+/* Diagnostic */
+#diag-box{display:none;margin-top:14px;}
+#diag-out{font-size:9.5px;line-height:1.7;color:var(--text2);white-space:pre-wrap;background:rgba(255,255,255,.03);border:1px solid var(--border-dim);border-radius:8px;padding:10px;}
+
+/* Toast */
+#toast{display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(5,9,24,.95);border:1px solid var(--border);border-radius:999px;padding:8px 18px;font-size:11px;font-weight:700;color:var(--cyan);z-index:9999;backdrop-filter:blur(8px);}
+
+/* Import overlay */
+#import-drop{display:none;position:fixed;inset:0;z-index:9000;background:rgba(3,7,19,.88);backdrop-filter:blur(8px);align-items:center;justify-content:center;flex-direction:column;gap:16px;}
+#import-drop.show{display:flex;}
+#import-drop-box{border:2px dashed var(--cyan);border-radius:16px;padding:40px 60px;text-align:center;}
+#import-drop-title{font-family:'Orbitron',monospace;font-size:14px;color:var(--cyan);margin-bottom:8px;}
+#import-drop-sub{font-size:11px;color:var(--text2);}
+
+/* Mobile */
+@media(max-width:700px){
+  :root{--sidebar-w:100%}
+  #app{flex-direction:column}
+  #canvas-wrap{height:52vh}
+  #sidebar{width:100%;height:48vh;border-left:none;border-top:1px solid var(--border);}
+}
+@media(max-width:420px){
+  :root{--sidebar-w:100%}
+  #topbar-sub{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <div id="topbar-title">⬡ Neural Atlas <span style="font-size:9px;opacity:.6;font-weight:700">β</span></div>
+  <div id="topbar-sub">Atlas of Forgetting · Clinical Signal Map · Cozy Arcade Board Prep</div>
+  <div id="topbar-btns">
+    <a href="index.html" style="text-decoration:none"><button class="btn sm">← App</button></a>
+    <!-- Upload progress JSON -->
+    <div id="upload-pill">
+      <label id="upload-label" for="upload-file">⬆ Import JSON</label>
+      <input type="file" id="upload-file" accept=".json" onchange="handleFileUpload(event)">
+    </div>
+    <span id="upload-status"></span>
+    <button class="btn sm" onclick="fullRefresh()">↻</button>
+    <button class="btn sm" onclick="runDiagnostic()">Diag</button>
+    <button class="btn primary sm" onclick="exportProgressOnly()">Export</button>
+    <button class="btn sm" onclick="exportFullBackup()">Backup</button>
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div id="app">
+
+  <!-- CANVAS -->
+  <div id="canvas-wrap"
+    ondragover="e=>{e.preventDefault();document.getElementById('import-drop').classList.add('show');}"
+    ondragleave="document.getElementById('import-drop').classList.remove('show')"
+    ondrop="handleDrop(event)">
+    <canvas id="atlas"></canvas>
+    <div id="hud"></div>
+    <div id="zoom-hint">scroll to zoom · drag to pan · click a node</div>
+    <div id="sys-banner"></div>
+    <div id="zoom-ctrls">
+      <button class="zoom-btn" onclick="adjustZoom(1.25)">+</button>
+      <button class="zoom-btn" onclick="adjustZoom(0.8)">−</button>
+      <button class="zoom-btn" style="font-size:12px" onclick="resetView()">⌖</button>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+
+    <!-- CARD DETAIL PANEL (overlays sidebar scroll) -->
+    <div id="card-detail">
+      <div class="cd-close">
+        <span style="font-family:'Orbitron',monospace;font-size:9px;letter-spacing:.2em;color:var(--cyan);">SIGNAL DETAIL</span>
+        <button class="cd-close-btn" onclick="closeCardDetail()">✕ Close</button>
+      </div>
+      <div id="cd-content"></div>
+    </div>
+
+    <div id="sb-head">
+      <div id="sb-title">
+        <span id="sb-title-text">Signal Intelligence</span>
+        <button class="btn sm" id="clear-sys-btn" onclick="clearSelection()" style="display:none">✕ Clear</button>
+      </div>
+
+      <!-- Retention ring -->
+      <div class="ring-cluster">
+        <svg width="60" height="60" viewBox="0 0 60 60">
+          <circle cx="30" cy="30" r="24" fill="none" stroke="rgba(103,232,249,.1)" stroke-width="5"/>
+          <circle id="ret-circle" cx="30" cy="30" r="24"
+            fill="none" stroke="url(#rg)" stroke-width="5"
+            stroke-dasharray="150.8" stroke-dashoffset="150.8"
+            stroke-linecap="round" transform="rotate(-90 30 30)"/>
+          <defs>
+            <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#0ea5e9"/>
+              <stop offset="100%" stop-color="#67e8f9"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="ring-meta">
+          <span class="ring-big" id="k-total">—</span>
+          <span class="ring-label">Total Signals</span>
+        </div>
+      </div>
+
+      <!-- Energy bar -->
+      <div class="energy-wrap">
+        <div class="energy-row">
+          <span>Signal Energy (Retention)</span>
+          <span id="k-ret">—</span>
+        </div>
+        <div class="energy-track">
+          <div class="energy-fill" id="energy-fill" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="sb-scroll">
+      <!-- KPI grid -->
+      <div class="kpi-grid">
+        <div class="kpi-card hi"><span class="kpi-n" id="k-due">—</span><span class="kpi-l">Due Now</span></div>
+        <div class="kpi-card"><span class="kpi-n" id="k-new">—</span><span class="kpi-l">New</span></div>
+        <div class="kpi-card warn"><span class="kpi-n" id="k-repair">—</span><span class="kpi-l">Repair Points</span></div>
+        <div class="kpi-card"><span class="kpi-n" id="k-pinned">—</span><span class="kpi-l">Pinned</span></div>
+        <div class="kpi-card warn"><span class="kpi-n" id="k-leech">—</span><span class="kpi-l">Leeches ≥4</span></div>
+        <div class="kpi-card"><span class="kpi-n" id="k-due7">—</span><span class="kpi-l">Due 7d</span></div>
+      </div>
+
+      <!-- Legend -->
+      <div class="s-head">Node Key</div>
+      <div class="legend">
+        <div class="leg-item"><div class="leg-dot" style="background:#22c55e"></div>Mastered ≥85%</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#f97316"></div>In Progress</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#ef4444"></div>Repair Needed</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#a855f7"></div>Heavy Pins</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#fb5876;width:6px;height:6px;outline:1.5px solid #fb5876"></div>Due indicator</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#4163ff"></div>Not Started</div>
+      </div>
+
+      <!-- 7-day forecast -->
+      <div class="s-head">7-Day Due Forecast</div>
+      <div class="forecast-row" id="forecast-row"></div>
+
+      <!-- System signals -->
+      <div class="s-head">
+        System Signals
+        <span class="accent" id="sys-count-badge"></span>
+      </div>
+      <div class="sys-list" id="sys-list"></div>
+
+      <!-- Card browser -->
+      <div class="s-head" style="margin-top:16px">
+        Card Browser
+        <span id="browser-count" style="color:var(--text2);font-size:9px;font-weight:400;letter-spacing:.06em;text-transform:none;"></span>
+      </div>
+      <div class="search-row">
+        <input class="search-input" id="search-input"
+          placeholder="Search card ID, system, or diagnosis…"
+          oninput="renderTable()">
+      </div>
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+        <button class="filter-btn" onclick="setFilter('due',this)">Due</button>
+        <button class="filter-btn" onclick="setFilter('new',this)">New</button>
+        <button class="filter-btn" onclick="setFilter('review',this)">Review</button>
+        <button class="filter-btn" onclick="setFilter('pinned',this)">📌</button>
+        <button class="filter-btn" onclick="setFilter('repair',this)">⚠</button>
+        <button class="filter-btn" onclick="setFilter('leech',this)">💀</button>
+        <button class="filter-btn" onclick="setFilter('suspended',this)">🚫</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="mini-table">
+          <thead>
+            <tr>
+              <th>Card ID</th><th>Sys</th><th>Stage</th><th>Due</th><th>⚑</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+
+      <!-- Diagnostic -->
+      <div id="diag-box">
+        <div class="s-head" style="margin:14px 0 8px">Diagnostic Report</div>
+        <pre id="diag-out"></pre>
+      </div>
+
+    </div><!-- /sb-scroll -->
+  </div><!-- /sidebar -->
+</div><!-- /app -->
+
+<!-- Import drop overlay -->
+<div id="import-drop">
+  <div id="import-drop-box">
+    <div id="import-drop-title">⬡ Drop Progress JSON</div>
+    <div id="import-drop-sub">Drop your cozy_arcade_progress_*.json or deck JSON file</div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION A: DATA LAYER
+   Reads localStorage keys (same as main app).
+   Also accepts JSON upload — populates progress + deckMap.
+   ═══════════════════════════════════════════════════════════ */
+
+const STATE_KEYS = [
+  'cozy_arcade_progress_v1',
+  'soloStudyingState_v1757',
+  'cazy_v3'
+];
+
+// In-memory deck card map: card_id → card object (populated by deck upload)
+let deckMap = {};
+
+// System color palette (matches main app normalization)
+const SYS_COLORS = {
+  'CV':'#ef4444','CARDIOLOGY':'#ef4444','CARD':'#ef4444',
+  'GI':'#f97316','GASTROENTEROLOGY':'#f97316',
+  'ID':'#84cc16','INFECTIOUS DISEASE':'#84cc16','INFECTIOUS':'#84cc16',
+  'ENDO':'#a855f7','ENDOCRINE':'#a855f7','ENDOCRINOLOGY':'#a855f7',
+  'PULM':'#3b82f6','PULMONOLOGY':'#3b82f6','PULM/CCM':'#3b82f6',
+  'NEPHRO':'#06b6d4','NEPHROLOGY':'#06b6d4','RENAL':'#06b6d4',
+  'NEURO':'#f59e0b','NEUROLOGY':'#f59e0b',
+  'ONC':'#ec4899','ONCOLOGY':'#ec4899','HEM/ONC':'#ec4899',
+  'RHEUM':'#10b981','RHEUMATOLOGY':'#10b981',
+  'HEM':'#6366f1','HEMATOLOGY':'#6366f1',
+  'DERM':'#fbbf24','DERMATOLOGY':'#fbbf24',
+  'PSYCH':'#8b5cf6','PSYCHIATRY':'#8b5cf6',
+  'MSK':'#78716c','MUSCULOSKELETAL':'#78716c',
+  'GYN':'#f43f5e','OB/GYN':'#f43f5e','GYNECOLOGY':'#f43f5e',
+  'GERIATRICS':'#94a3b8','PALLIATIVE':'#94a3b8',
+  'ETHICS':'#d97706','STATS':'#0891b2',
+  'ENT':'#7c3aed','OPHTHO':'#2563eb','ALLERGY':'#16a34a',
+  '—':'#4163ff','UNKNOWN':'#4163ff',
+};
+
+function normSys(s) {
+  if (!s) return '—';
+  return String(s).trim().toUpperCase();
+}
+
+function sysColor(sys) {
+  const n = normSys(sys);
+  return SYS_COLORS[n] || SYS_COLORS[sys] || '#4163ff';
+}
+
+// ── Read progress from localStorage ──────────────────────────
+function readProgress() {
+  for (const k of STATE_KEYS) {
+    try {
+      const r = localStorage.getItem(k);
+      if (!r) continue;
+      const p = JSON.parse(r);
+      if (p?.progress && typeof p.progress === 'object') return p.progress;
+      if (typeof p === 'object' && !Array.isArray(p) && p !== null) {
+        // Check if values look like progress records
+        const vals = Object.values(p);
+        if (vals.length > 0 && (vals[0].stage || vals[0].seen_count !== undefined)) return p;
+      }
+    } catch(_) {}
+  }
+  return {};
+}
+
+// ── File upload handler (progress JSON or deck JSON) ─────────
+function handleFileUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => ingestJSON(ev.target.result, file.name);
+  reader.readAsText(file);
+  e.target.value = ''; // reset so same file can be re-selected
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('import-drop').classList.remove('show');
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => ingestJSON(ev.target.result, file.name);
+  reader.readAsText(file);
+}
+
+function ingestJSON(text, filename) {
+  try {
+    const obj = JSON.parse(text);
+    // Detect file type
+    if (obj?.metadata?.type === 'progress' && obj.progress) {
+      // === PROGRESS FILE ===
+      progress = obj.progress;
+      // Try to save to localStorage for persistence
+      try {
+        const stored = { metadata: obj.metadata, progress };
+        localStorage.setItem('cozy_arcade_progress_v1', JSON.stringify(stored));
+      } catch(_) {}
+      // Re-merge sys from deckMap if available
+      mergeSysFromDeck();
+      showUploadStatus(`✓ ${Object.keys(progress).length} signals loaded`, '#22c55e');
+      fullRefreshDisplay();
+      return;
+    }
+
+    // Detect deck format: { meta, cards: [...] } or { cards: [...] }
+    const cardsArr = obj.cards || (Array.isArray(obj) ? obj : null);
+    if (cardsArr && Array.isArray(cardsArr) && cardsArr.length > 0 && cardsArr[0].qid_unique) {
+      // === DECK FILE ===
+      deckMap = {};
+      cardsArr.forEach(c => {
+        const id = c.qid_unique || c.qid;
+        if (id) deckMap[id] = c;
+      });
+      mergeSysFromDeck();
+      showUploadStatus(`✓ Deck: ${cardsArr.length} cards`, '#67e8f9');
+      fullRefreshDisplay();
+      return;
+    }
+
+    // Generic progress object (flat map of card records)
+    const vals = Object.values(obj);
+    if (vals.length > 0 && vals[0].stage) {
+      progress = obj;
+      mergeSysFromDeck();
+      showUploadStatus(`✓ ${vals.length} signals`, '#22c55e');
+      fullRefreshDisplay();
+      return;
+    }
+
+    showUploadStatus('⚠ Unrecognized format', '#ef4444');
+  } catch(err) {
+    showUploadStatus('⚠ Parse error: ' + err.message.slice(0,40), '#ef4444');
+  }
+}
+
+// Merge sys field from deckMap into progress entries
+function mergeSysFromDeck() {
+  if (!Object.keys(deckMap).length) return;
+  Object.entries(progress).forEach(([id, p]) => {
+    if (!p.sys) {
+      const card = deckMap[id];
+      if (card?.sys) p.sys = normSys(card.sys);
+    }
+  });
+}
+
+function showUploadStatus(msg, color) {
+  const el = document.getElementById('upload-status');
+  if (el) { el.textContent = msg; el.style.color = color || 'var(--cyan)'; }
+  setTimeout(() => { if (el) el.textContent = ''; }, 4000);
+}
+
+// ── SRS helpers ───────────────────────────────────────────────
+function isDue(p) {
+  if (!p || p.stage === 'new') return false;
+  if (!p.seen_count && !p.reviewed_count) return false;
+  if (!p.next_due_at) return (p.seen_count || p.reviewed_count) > 0;
+  return new Date(p.next_due_at) <= new Date();
+}
+function isLeech(p) { return Number(p?.lapses || 0) >= 4; }
+
+function retentionPct(vals) {
+  const r = vals.filter(p => Number(p.reviewed_count || p.reviewed || 0) > 0);
+  if (!r.length) return null;
+  const c = r.reduce((s,p) => s + Number(p.correct_count || p.correct || 0), 0);
+  const t = r.reduce((s,p) => s + Number(p.reviewed_count || p.reviewed || 0), 0);
+  return t ? Math.round(c / t * 100) : null;
+}
+
+function masteryPct(vals) {
+  if (!vals.length) return 0;
+  return Math.round(vals.filter(p => Number(p.seen_count || 0) > 0 || p.seen).length / vals.length * 100);
+}
+
+// ── Build sys map ─────────────────────────────────────────────
+function buildSysMap(prog) {
+  const m = {};
+  Object.entries(prog).forEach(([id, p]) => {
+    const rawSys = p.sys || '—';
+    const s = rawSys === '—' ? '—' : normSys(rawSys);
+    if (!m[s]) m[s] = { total:0, reviewed:0, due:0, new:0, pinned:0, repair:0, leech:0, cards:[] };
+    m[s].total++;
+    m[s].cards.push({ id, p });
+    if (Number(p.seen_count || 0) > 0 || p.seen) m[s].reviewed++;
+    else m[s].new++;
+    if (isDue(p)) m[s].due++;
+    if (p.pinned) m[s].pinned++;
+    if (p.repair_point) m[s].repair++;
+    if (isLeech(p)) m[s].leech++;
+  });
+  return m;
+}
+
+function nodeColor(sys, d) {
+  if (!d || !d.total) return sysColor(sys);
+  if (d.repair / d.total > 0.18) return '#ef4444';
+  if (d.pinned / d.total > 0.15) return '#a855f7';
+  const pct = d.reviewed / d.total;
+  if (pct >= 0.85) return '#22c55e';
+  if (pct >= 0.55) return '#f97316';
+  if (pct >= 0.25) return '#fbbf24';
+  return sysColor(sys);
+}
+
+function saveProgress() {
+  for (const k of STATE_KEYS) {
+    try {
+      const r = localStorage.getItem(k);
+      if (!r) continue;
+      const p = JSON.parse(r);
+      if (p?.progress) { p.progress = progress; localStorage.setItem(k, JSON.stringify(p)); return; }
+    } catch(_) {}
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION B: GRAPH MODEL
+   ═══════════════════════════════════════════════════════════ */
+let nodes = [];
+let edges = [];
+
+function buildGraph(sysMap) {
+  nodes = [];
+  edges = [];
+
+  nodes.push({
+    id:'__core__', label:'CORE', x:0, y:0, vx:0, vy:0,
+    r:44, color:'#0ea5e9', sysColor:'#0ea5e9',
+    isCore:true, data:null
+  });
+
+  const sysList = Object.keys(sysMap).filter(s => s !== '—' || sysMap['—']?.total > 0);
+  if (!sysList.length) return;
+
+  const angleStep = (Math.PI * 2) / sysList.length;
+  sysList.forEach((sys, i) => {
+    const d = sysMap[sys];
+    const angle = i * angleStep - Math.PI / 2;
+    const dist = 170 + Math.min(d.total * 1.8, 90);
+    const r = Math.max(13, Math.min(36, 9 + Math.sqrt(d.total) * 3.2));
+    const jitter = () => (Math.random() - 0.5) * 50;
+
+    nodes.push({
+      id: sys, label: sys,
+      x: Math.cos(angle)*dist + jitter(),
+      y: Math.sin(angle)*dist + jitter(),
+      vx:0, vy:0, r,
+      color: nodeColor(sys, d),
+      sysColor: sysColor(sys),
+      isCore: false, data: d,
+      ctrlOX: (Math.random()-0.5)*60,
+      ctrlOY: (Math.random()-0.5)*60,
+    });
+
+    edges.push({ a:'__core__', b:sys, strength:0.035, isCoreEdge:true });
+    if (i > 0 && Math.random() < 0.30) {
+      const j = Math.floor(Math.random()*i);
+      edges.push({ a:sys, b:sysList[j], strength:0.008, isCoreEdge:false });
+    }
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION C: FORCE SIMULATION
+   ═══════════════════════════════════════════════════════════ */
+const FORCE = { repel:5200, damp:0.80, center:0.009, maxV:6 };
+
+function runForces(steps) {
+  for (let s = 0; s < steps; s++) {
+    for (let i = 1; i < nodes.length; i++) {
+      for (let j = i+1; j < nodes.length; j++) {
+        const a=nodes[i], b=nodes[j];
+        const dx=b.x-a.x, dy=b.y-a.y;
+        const d2=dx*dx+dy*dy||1;
+        const minD=a.r+b.r+50;
+        if (d2>(minD*4)*(minD*4)) continue;
+        const f=FORCE.repel/d2, d=Math.sqrt(d2);
+        const fx=(dx/d)*f, fy=(dy/d)*f;
+        a.vx-=fx; a.vy-=fy; b.vx+=fx; b.vy+=fy;
+      }
+    }
+    for (const e of edges) {
+      const a=nodes.find(n=>n.id===e.a), b=nodes.find(n=>n.id===e.b);
+      if (!a||!b) continue;
+      const dx=b.x-a.x, dy=b.y-a.y;
+      const d=Math.sqrt(dx*dx+dy*dy)||1;
+      const target=e.isCoreEdge?185:130;
+      const f=(d-target)*e.strength;
+      const fx=(dx/d)*f, fy=(dy/d)*f;
+      if (!a.isCore){a.vx+=fx;a.vy+=fy;}
+      if (!b.isCore){b.vx-=fx;b.vy-=fy;}
+    }
+    for (const n of nodes) {
+      if (n.isCore) continue;
+      n.vx-=n.x*FORCE.center; n.vy-=n.y*FORCE.center;
+      n.vx*=FORCE.damp; n.vy*=FORCE.damp;
+      n.vx=Math.max(-FORCE.maxV,Math.min(FORCE.maxV,n.vx));
+      n.vy=Math.max(-FORCE.maxV,Math.min(FORCE.maxV,n.vy));
+      n.x+=n.vx; n.y+=n.vy;
+    }
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION D: CANVAS RENDERER
+   ═══════════════════════════════════════════════════════════ */
+const canvas = document.getElementById('atlas');
+const ctx = canvas.getContext('2d');
+let W=0, H=0, camX=0, camY=0, camZ=1;
+let tick=0, hovNode=null, rafId=null;
+const reduced = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+const STARS = Array.from({length:70}, () => ({
+  x:Math.random(), y:Math.random(),
+  r:0.3+Math.random()*0.9,
+  phase:Math.random()*Math.PI*2,
+}));
+let particles = [];
+
+function spawnParticles(wx,wy,color,n=10) {
+  if (reduced) return;
+  for (let i=0;i<n;i++) {
+    const a=Math.random()*Math.PI*2, spd=0.6+Math.random()*2.8;
+    particles.push({x:wx,y:wy,vx:Math.cos(a)*spd,vy:Math.sin(a)*spd,life:1,
+      decay:0.016+Math.random()*0.028,r:1.2+Math.random()*2.8,color});
+  }
+}
+
+function tickParticles() {
+  for (let i=particles.length-1;i>=0;i--) {
+    const p=particles[i];
+    p.x+=p.vx;p.y+=p.vy;p.vx*=0.958;p.vy*=0.958;p.life-=p.decay;
+    if (p.life<=0) particles.splice(i,1);
+  }
+}
+
+function w2s(wx,wy) { return {x:(wx+camX)*camZ+W/2,y:(wy+camY)*camZ+H/2}; }
+
+function drawBG() {
+  ctx.clearRect(0,0,W,H);
+  const g=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.max(W,H)*0.7);
+  g.addColorStop(0,'rgba(8,14,38,.96)');g.addColorStop(0.45,'rgba(5,9,24,.98)');g.addColorStop(1,'rgba(2,4,13,1)');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  if (!reduced) {
+    for (const s of STARS) {
+      const a=0.15+0.22*Math.sin(tick*0.012+s.phase);
+      ctx.beginPath();ctx.arc(s.x*W,s.y*H,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(190,215,255,${a})`;ctx.fill();
+    }
+    const codes=['sys.CV::4','GI.route[2]','ID.culture+','endo.HbA1c','neuro.MRI','pulm.PFTs','nephro.GFR','rheum.ANA'];
+    ctx.font='9px monospace';
+    codes.forEach((c,i)=>{
+      const t=tick*0.0018+i*0.9;
+      const px=40+(i*139)%(Math.max(W-100,100));
+      const py=H*0.08+60*Math.sin(t);
+      ctx.fillStyle=`rgba(103,232,249,${0.03+0.015*Math.sin(t*1.3)})`;
+      ctx.fillText(c,px,py);
+    });
+  }
+}
+
+function drawEdges() {
+  for (const e of edges) {
+    const na=nodes.find(n=>n.id===e.a), nb=nodes.find(n=>n.id===e.b);
+    if (!na||!nb) continue;
+    const pa=w2s(na.x,na.y), pb=w2s(nb.x,nb.y);
+    const cx=(pa.x+pb.x)/2+(nb.ctrlOX||0)*camZ;
+    const cy=(pa.y+pb.y)/2+(nb.ctrlOY||0)*camZ;
+    const grd=ctx.createLinearGradient(pa.x,pa.y,pb.x,pb.y);
+    grd.addColorStop(0,e.isCoreEdge?'rgba(103,232,249,0.28)':'rgba(103,232,249,0.06)');
+    grd.addColorStop(1,hexRgba(nb.sysColor,e.isCoreEdge?0.18:0.07));
+    ctx.beginPath();ctx.moveTo(pa.x,pa.y);ctx.quadraticCurveTo(cx,cy,pb.x,pb.y);
+    ctx.strokeStyle=grd;ctx.lineWidth=e.isCoreEdge?0.85:0.4;ctx.stroke();
+  }
+}
+
+function drawNodes() {
+  for (const n of nodes) {
+    const {x:sx,y:sy}=w2s(n.x,n.y), r=n.r*camZ;
+    if (sx<-r*3||sx>W+r*3||sy<-r*3||sy>H+r*3) continue;
+    n.isCore?drawCore(sx,sy,r):drawSysNode(n,sx,sy,r);
+  }
+}
+
+function drawCore(sx,sy,r) {
+  const pulse=reduced?1:0.88+0.12*Math.sin(tick*0.048);
+  const pr=r*pulse;
+  if (!reduced) {
+    for (let i=3;i>=1;i--) {
+      const rr=pr*(1+i*0.75);
+      const g=ctx.createRadialGradient(sx,sy,0,sx,sy,rr);
+      g.addColorStop(0,`rgba(14,165,233,${0.07/i})`);g.addColorStop(1,'rgba(14,165,233,0)');
+      ctx.beginPath();ctx.arc(sx,sy,rr,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+    }
+  }
+  const bg=ctx.createRadialGradient(sx-pr*0.18,sy-pr*0.18,0,sx,sy,pr);
+  bg.addColorStop(0,'rgba(220,245,255,0.95)');bg.addColorStop(0.22,'rgba(103,232,249,0.88)');
+  bg.addColorStop(0.6,'rgba(14,165,233,0.7)');bg.addColorStop(1,'rgba(14,165,233,0)');
+  ctx.beginPath();ctx.arc(sx,sy,pr,0,Math.PI*2);ctx.fillStyle=bg;ctx.fill();
+  const vals=Object.values(progress);
+  const mp=masteryPct(vals);
+  ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.font=`900 ${Math.max(8,r*0.3)}px Orbitron,monospace`;
+  ctx.fillStyle='rgba(0,16,24,0.85)';ctx.fillText(mp+'%',sx,sy);ctx.restore();
+}
+
+function drawSysNode(n,sx,sy,r) {
+  const hov=hovNode===n.id, sel=selectedSys===n.id, d=n.data||{};
+  const glR=r*(hov?2.3:1.7);
+  const g=ctx.createRadialGradient(sx,sy,r*0.4,sx,sy,glR);
+  g.addColorStop(0,hexRgba(n.color,hov?0.48:0.18));g.addColorStop(1,hexRgba(n.color,0));
+  ctx.beginPath();ctx.arc(sx,sy,glR,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+  const bg=ctx.createRadialGradient(sx-r*0.18,sy-r*0.18,0,sx,sy,r);
+  bg.addColorStop(0,hexRgba(n.color,0.9));bg.addColorStop(0.65,hexRgba(n.color,0.7));bg.addColorStop(1,hexRgba(n.color,0.25));
+  ctx.beginPath();ctx.arc(sx,sy,r,0,Math.PI*2);ctx.fillStyle=bg;ctx.fill();
+  if (sel||hov) {
+    ctx.beginPath();ctx.arc(sx,sy,r+2.5,0,Math.PI*2);
+    ctx.strokeStyle=sel?'#67e8f9':hexRgba(n.color,0.85);ctx.lineWidth=1.5;ctx.stroke();
+  }
+  if (d.due>0) {
+    ctx.beginPath();ctx.arc(sx+r*0.65,sy-r*0.65,Math.max(3.5,r*0.28),0,Math.PI*2);
+    ctx.fillStyle='#fb5876';ctx.fill();
+  }
+  if (r>5) {
+    const fs=Math.max(7,Math.min(10.5,r*0.52));
+    ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.font=`900 ${fs}px "DM Sans",sans-serif`;
+    ctx.fillStyle=r>14?'rgba(0,10,10,0.8)':'rgba(255,255,255,0.88)';
+    ctx.fillText(n.label.length>9?n.label.slice(0,8)+'…':n.label,sx,sy);ctx.restore();
+  }
+  if (hov||sel) {
+    const txt=`${d.total||0} signals · ${d.reviewed||0} studied · ${d.due||0} due`;
+    ctx.font='700 9px "DM Sans",monospace';
+    const tw=ctx.measureText(txt).width, bw=tw+16, bh=17;
+    const bx=sx-bw/2, by=sy-r*camZ-22;
+    ctx.fillStyle='rgba(5,9,26,.9)';rRect(ctx,bx,by,bw,bh,4);ctx.fill();
+    ctx.strokeStyle='rgba(103,232,249,.28)';ctx.lineWidth=0.6;rRect(ctx,bx,by,bw,bh,4);ctx.stroke();
+    ctx.fillStyle='#9fe8ff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(txt,sx,by+bh/2);
+  }
+}
+
+function rRect(ctx,x,y,w,h,r){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+}
+
+function drawParticles() {
+  for (const p of particles) {
+    const {x:sx,y:sy}=w2s(p.x,p.y);
+    ctx.beginPath();ctx.arc(sx,sy,p.r,0,Math.PI*2);
+    ctx.fillStyle=hexRgba(p.color,p.life*0.65);ctx.fill();
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION E: RENDER LOOP
+   ═══════════════════════════════════════════════════════════ */
+function render() {
+  tick++;
+  const forceSteps=tick<120?5:tick<300?2:1;
+  if (!reduced) runForces(forceSteps);
+  if (!reduced&&tick%20===0) {
+    const core=nodes[0];
+    if (core) spawnParticles(core.x,core.y,'#0ea5e9',3);
+  }
+  tickParticles();drawBG();drawEdges();drawNodes();drawParticles();updateHUD();
+  rafId=requestAnimationFrame(render);
+}
+
+function updateHUD() {
+  const el=document.getElementById('hud');if (!el) return;
+  const total=Object.keys(progress).length;
+  const due=Object.values(progress).filter(isDue).length;
+  const rate=total?(due/total*100).toFixed(1):'0.0';
+  el.textContent=`ATLAS_v3 · nodes:${nodes.length} · signals:${total}\nfiring:${rate}% · zoom:${camZ.toFixed(2)} · Δ:${tick}`;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION F: INPUT — Pan / Zoom / Click / Touch
+   ═══════════════════════════════════════════════════════════ */
+let drag=false,dsx=0,dsy=0,dcx=0,dcy=0,touchDist0=0;
+
+function getNodeAt(sx,sy) {
+  for (let i=nodes.length-1;i>=0;i--) {
+    const n=nodes[i], p=w2s(n.x,n.y), r=n.r*camZ;
+    const dx=sx-p.x, dy=sy-p.y;
+    if (dx*dx+dy*dy<=r*r) return n;
+  }
+  return null;
+}
+
+canvas.addEventListener('mousemove',e=>{
+  const r=canvas.getBoundingClientRect();
+  const sx=e.clientX-r.left,sy=e.clientY-r.top;
+  if (drag){camX=dcx+(sx-dsx)/camZ;camY=dcy+(sy-dsy)/camZ;return;}
+  const hit=getNodeAt(sx,sy), prev=hovNode;
+  hovNode=hit?hit.id:null;
+  if (hit&&hit.id!==prev&&!hit.isCore&&hit.data) spawnParticles(hit.x,hit.y,hit.color,7);
+  canvas.style.cursor=hit?'pointer':'grab';
+});
+
+canvas.addEventListener('mousedown',e=>{
+  const r=canvas.getBoundingClientRect();
+  dsx=e.clientX-r.left;dsy=e.clientY-r.top;dcx=camX;dcy=camY;
+  drag=true;canvas.style.cursor='grabbing';
+});
+
+canvas.addEventListener('mouseup',e=>{
+  const r=canvas.getBoundingClientRect();
+  const sx=e.clientX-r.left,sy=e.clientY-r.top;
+  const moved=Math.abs(sx-dsx)+Math.abs(sy-dsy);
+  drag=false;canvas.style.cursor='grab';
+  if (moved<6){const hit=getNodeAt(sx,sy);if (hit) handleNodeClick(hit);}
+});
+
+canvas.addEventListener('mouseleave',()=>{drag=false;});
+
+canvas.addEventListener('wheel',e=>{
+  e.preventDefault();
+  const f=e.deltaY>0?0.87:1.15;
+  camZ=Math.max(0.15,Math.min(5,camZ*f));
+},{passive:false});
+
+canvas.addEventListener('touchstart',e=>{
+  e.preventDefault();
+  if (e.touches.length===1){
+    const r=canvas.getBoundingClientRect();
+    dsx=e.touches[0].clientX-r.left;dsy=e.touches[0].clientY-r.top;
+    dcx=camX;dcy=camY;drag=true;
+  } else if (e.touches.length===2){
+    drag=false;
+    const dx=e.touches[0].clientX-e.touches[1].clientX;
+    const dy=e.touches[0].clientY-e.touches[1].clientY;
+    touchDist0=Math.sqrt(dx*dx+dy*dy);
+  }
+},{passive:false});
+
+canvas.addEventListener('touchmove',e=>{
+  e.preventDefault();
+  const r=canvas.getBoundingClientRect();
+  if (e.touches.length===1&&drag){
+    camX=dcx+(e.touches[0].clientX-r.left-dsx)/camZ;
+    camY=dcy+(e.touches[0].clientY-r.top-dsy)/camZ;
+  } else if (e.touches.length===2&&touchDist0){
+    const dx=e.touches[0].clientX-e.touches[1].clientX;
+    const dy=e.touches[0].clientY-e.touches[1].clientY;
+    const d=Math.sqrt(dx*dx+dy*dy);
+    camZ=Math.max(0.15,Math.min(5,camZ*(d/touchDist0)));
+    touchDist0=d;
+  }
+},{passive:false});
+
+canvas.addEventListener('touchend',()=>{drag=false;touchDist0=0;});
+
+function adjustZoom(f){camZ=Math.max(0.15,Math.min(5,camZ*f));}
+function resetView(){camX=0;camY=0;camZ=1;}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION G: NODE CLICK + SIDEBAR UPDATE
+   ═══════════════════════════════════════════════════════════ */
+function handleNodeClick(node) {
+  if (node.isCore){clearSelection();return;}
+  selectedSys=node.id;
+  spawnParticles(node.x,node.y,node.color,22);
+  smoothPanTo(node);
+  updateSysBanner(node);
+  highlightSysRow(node.id);
+  renderTable();
+  setTimeout(()=>document.getElementById('sb-scroll').scrollTop=9999,100);
+}
+
+function smoothPanTo(node) {
+  const tx=-node.x, ty=-node.y, sx0=camX, sy0=camY;
+  let t=0;
+  const iv=setInterval(()=>{
+    t=Math.min(1,t+0.07);
+    const ease=1-Math.pow(1-t,3);
+    camX=sx0+(tx-sx0)*ease;camY=sy0+(ty-sy0)*ease;
+    if (t>=1) clearInterval(iv);
+  },16);
+}
+
+function updateSysBanner(node) {
+  const el=document.getElementById('sys-banner');if (!el) return;
+  const d=node.data||{};
+  el.textContent=`${node.label}  ·  ${d.total||0} signals  ·  ${d.due||0} due`;
+  el.classList.add('visible');
+}
+
+function highlightSysRow(sys) {
+  document.querySelectorAll('.sys-row').forEach(el=>el.classList.toggle('active',el.dataset.sys===sys));
+  document.getElementById('sb-title-text').textContent=sys;
+  document.getElementById('clear-sys-btn').style.display='';
+}
+
+function clearSelection() {
+  selectedSys=null;
+  document.querySelectorAll('.sys-row').forEach(el=>el.classList.remove('active'));
+  document.getElementById('sys-banner').classList.remove('visible');
+  document.getElementById('sb-title-text').textContent='Signal Intelligence';
+  document.getElementById('clear-sys-btn').style.display='none';
+  currentFilter='all';
+  document.querySelectorAll('.filter-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
+  renderTable();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION H: CARD DETAIL PANEL
+   Click a row in the table → full card info
+   ═══════════════════════════════════════════════════════════ */
+function openCardDetail(cardId) {
+  const p = progress[cardId];
+  if (!p) return;
+  const card = deckMap[cardId] || {};
+  const now = new Date();
+
+  // Determine sys color
+  const sys = p.sys || card.sys || '—';
+  const sc = sysColor(sys);
+
+  // Compute due display
+  let dueStr = '—';
+  if (p.next_due_at) {
+    const diff = new Date(p.next_due_at) - now;
+    if (diff < 0) dueStr = '🔴 Overdue';
+    else if (diff < 86400000) dueStr = '🟡 Today';
+    else dueStr = `in ${Math.ceil(diff/86400000)} days`;
+  }
+
+  const flags = [];
+  if (p.pinned) flags.push('<span class="cd-flag pinned">📌 Pinned</span>');
+  if (p.repair_point) flags.push('<span class="cd-flag repair">⚠ Repair Point</span>');
+  if (p.suspended || p.buried) flags.push('<span class="cd-flag suspended">🚫 Buried/Suspended</span>');
+  if (isLeech(p)) flags.push('<span class="cd-flag leech">💀 Leech</span>');
+  if (isDue(p)) flags.push('<span class="cd-flag due">⚡ Due Now</span>');
+
+  const retPct = p.reviewed_count > 0 ? Math.round((p.correct_count||0)/p.reviewed_count*100) : null;
+
+  // Strip personal takeaway prefix from one_thing
+  const oneThingRaw = card.one_thing || '';
+  const oneThing = oneThingRaw.replace(/^⭐\s*ONETHING\s*TAKEAWAY:\s*/i,'').replace(/^⭐\s*PERSONAL\s*TAKEAWAY:\s*/i,'').trim();
+
+  document.getElementById('cd-content').innerHTML = `
+    <div class="cd-id">Card ID: ${esc(cardId)}</div>
+    <div>
+      <span class="cd-sys" style="background:${hexRgba(sc,0.18)};border:1px solid ${hexRgba(sc,0.4)};color:${sc}">${esc(sys)}</span>
+      ${card.test ? `<span style="font-size:9px;color:var(--text2);margin-left:8px">${esc(card.test)}</span>` : ''}
+    </div>
+
+    ${card.presentation ? `
+    <div class="cd-section">
+      <div class="cd-label">Presentation (Question)</div>
+      <div class="cd-q">${esc(card.presentation)}</div>
+    </div>` : ''}
+
+    ${card.diagnosis ? `
+    <div class="cd-section">
+      <div class="cd-label">Diagnosis / Answer</div>
+      <div class="cd-ans">${esc(card.diagnosis)}</div>
+    </div>` : ''}
+
+    ${oneThing ? `
+    <div class="cd-section">
+      <div class="cd-label">⭐ One Thing</div>
+      <div class="cd-star">${esc(oneThing)}</div>
+    </div>` : ''}
+
+    ${card.board_trigger ? `
+    <div class="cd-section">
+      <div class="cd-label">Board Trigger</div>
+      <div class="cd-body">${esc(card.board_trigger)}</div>
+    </div>` : ''}
+
+    ${card.educational_objective ? `
+    <div class="cd-section">
+      <div class="cd-label">Educational Objective</div>
+      <div class="cd-body">${esc(card.educational_objective)}</div>
+    </div>` : ''}
+
+    ${card.why_not_others ? `
+    <div class="cd-section">
+      <div class="cd-label">Why Not Others</div>
+      <div class="cd-body">${esc(card.why_not_others)}</div>
+    </div>` : ''}
+
+    <div class="cd-section">
+      <div class="cd-label">SRS Signal</div>
+      <div class="cd-stats">
+        <div class="cd-stat">
+          <span class="cd-stat-n" style="color:var(--cyan)">${p.seen_count||0}</span>
+          <span class="cd-stat-l">Seen</span>
+        </div>
+        <div class="cd-stat">
+          <span class="cd-stat-n" style="color:#22c55e">${p.correct_count||0}</span>
+          <span class="cd-stat-l">Correct</span>
+        </div>
+        <div class="cd-stat">
+          <span class="cd-stat-n" style="color:#ef4444">${p.wrong_count||0}</span>
+          <span class="cd-stat-l">Wrong</span>
+        </div>
+        <div class="cd-stat">
+          <span class="cd-stat-n" style="color:${retPct===null?'var(--text2)':retPct>=70?'#22c55e':'#ef4444'}">${retPct!==null?retPct+'%':'—'}</span>
+          <span class="cd-stat-l">Retention</span>
+        </div>
+        <div class="cd-stat">
+          <span class="cd-stat-n" style="color:var(--amber)">${p.ease_factor?Number(p.ease_factor).toFixed(2):'—'}</span>
+          <span class="cd-stat-l">Ease</span>
+        </div>
+        <div class="cd-stat">
+          <span class="cd-stat-n" style="color:var(--text2)">${p.lapses||0}</span>
+          <span class="cd-stat-l">Lapses</span>
+        </div>
+      </div>
+      <div style="margin-top:10px;font-size:10px;color:var(--text2)">
+        <span style="font-weight:900;color:var(--text)">Stage:</span> <span style="color:${p.stage==='review'?'#22c55e':p.stage==='relearning'?'#ef4444':'var(--cyan)'}">${p.stage||'new'}</span>
+        &nbsp;·&nbsp;
+        <span style="font-weight:900;color:var(--text)">Due:</span> ${dueStr}
+        &nbsp;·&nbsp;
+        <span style="font-weight:900;color:var(--text)">Interval:</span> ${p.interval_days||0}d
+        ${p.last_rating ? `&nbsp;·&nbsp;<span style="font-weight:900;color:var(--text)">Last:</span> ${p.last_rating}` : ''}
+      </div>
+    </div>
+
+    ${flags.length ? `<div class="cd-flags">${flags.join('')}</div>` : ''}
+  `;
+
+  document.getElementById('card-detail').classList.add('open');
+}
+
+function closeCardDetail() {
+  document.getElementById('card-detail').classList.remove('open');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION I: SIDEBAR RENDERS
+   ═══════════════════════════════════════════════════════════ */
+function renderKpis() {
+  const vals=Object.values(progress);
+  const now=new Date(), in7=new Date(now.getTime()+7*86400000);
+  const total=vals.length;
+  const due=vals.filter(isDue).length;
+
+  // FIX: 'new' = seen_count===0 AND stage==='new'
+  const newC=vals.filter(p=>(!p.seen_count||p.seen_count===0)&&p.stage==='new').length;
+  const pinned=vals.filter(p=>p.pinned).length;
+  const repair=vals.filter(p=>p.repair_point).length;
+  const leech=vals.filter(isLeech).length;
+  const due7=vals.filter(p=>{
+    if (!p.next_due_at||p.stage==='new') return false;
+    const d=new Date(p.next_due_at);
+    return d>=now&&d<=in7;
+  }).length;
+  const ret=retentionPct(vals);
+
+  set('k-total',total||'—');set('k-due',due);set('k-new',newC);
+  set('k-pinned',pinned);set('k-repair',repair);set('k-leech',leech);set('k-due7',due7);
+  set('k-ret',ret!==null?ret+'%':'—');
+
+  const ef=document.getElementById('energy-fill');
+  if (ef) ef.style.width=(ret||0)+'%';
+  const rc=document.getElementById('ret-circle');
+  if (rc) rc.style.strokeDashoffset=150.8*(1-masteryPct(vals)/100);
+}
+
+function renderSysList() {
+  const sorted=Object.entries(sysMap).sort((a,b)=>b[1].total-a[1].total);
+  const container=document.getElementById('sys-list');
+  const badge=document.getElementById('sys-count-badge');
+  if (!container) return;
+  if (badge) badge.textContent=sorted.length+' systems';
+  container.innerHTML=sorted.map(([sys,d])=>{
+    const color=nodeColor(sys,d);
+    const mp=d.total?Math.round(d.reviewed/d.total*100):0;
+    return `<div class="sys-row" data-sys="${esc(sys)}" onclick="clickSys('${esc(sys)}')" title="${esc(sys)}: ${d.total} cards, ${mp}% studied, ${d.due} due">
+      <div class="sys-dot" style="background:${color}"></div>
+      <span class="sys-name">${esc(sys)}</span>
+      <span class="sys-stat">${d.total} · ${mp}% · ${d.due}↑</span>
+    </div>`;
+  }).join('');
+}
+
+function renderForecast() {
+  const vals=Object.values(progress), now=new Date();
+  const days=Array.from({length:7},(_,i)=>{
+    const d=new Date(now.getTime()+i*86400000);
+    return {label:i===0?'Now':['Su','Mo','Tu','We','Th','Fr','Sa'][d.getDay()],count:0};
+  });
+  vals.forEach(p=>{
+    if (!p.next_due_at||p.stage==='new') return;
+    const due=new Date(p.next_due_at);
+    for (let i=0;i<7;i++) {
+      const s=new Date(now.getTime()+i*86400000);s.setHours(0,0,0,0);
+      const e=new Date(now.getTime()+i*86400000);e.setHours(23,59,59,999);
+      if (due>=s&&due<=e){days[i].count++;break;}
+    }
+  });
+  const max=Math.max(...days.map(d=>d.count),1);
+  const container=document.getElementById('forecast-row');if (!container) return;
+  container.innerHTML=days.map((d,i)=>
+    `<div class="fc-bar">
+      <div class="bar" style="height:${Math.max(3,Math.round(d.count/max*54))}px;background:${i===0?'rgba(251,88,118,.55)':'rgba(103,232,249,.22)'}"></div>
+      <div class="cnt">${d.count}</div>
+      <div class="dl">${d.label}</div>
+    </div>`).join('');
+}
+
+function renderTable() {
+  const q=(document.getElementById('search-input')?.value||'').toLowerCase();
+  const now=new Date();
+  let rows=Object.entries(progress).map(([id,p])=>({id,p}));
+
+  if (selectedSys) rows=rows.filter(({p})=>(p.sys?normSys(p.sys):p.sys||'—')===selectedSys||(p.sys===selectedSys));
+
+  switch(currentFilter) {
+    case 'due':       rows=rows.filter(({p})=>isDue(p)); break;
+    case 'new':       rows=rows.filter(({p})=>(!p.seen_count||p.seen_count===0)&&p.stage==='new'); break;
+    case 'review':    rows=rows.filter(({p})=>p.stage==='review'); break;
+    case 'pinned':    rows=rows.filter(({p})=>p.pinned); break;
+    case 'repair':    rows=rows.filter(({p})=>p.repair_point); break;
+    case 'leech':     rows=rows.filter(({p})=>isLeech(p)); break;
+    case 'suspended': rows=rows.filter(({p})=>p.suspended||p.buried); break;
+  }
+
+  if (q) rows=rows.filter(({id,p})=>{
+    const card=deckMap[id]||{};
+    return id.toLowerCase().includes(q)||
+      (p.sys||'').toLowerCase().includes(q)||
+      (card.diagnosis||'').toLowerCase().includes(q)||
+      (card.presentation||'').toLowerCase().includes(q);
+  });
+
+  rows.sort((a,b)=>{
+    const da=a.p.next_due_at?new Date(a.p.next_due_at):new Date(9e15);
+    const db=b.p.next_due_at?new Date(b.p.next_due_at):new Date(9e15);
+    return da-db;
+  });
+
+  set('browser-count',rows.length+' signals');
+
+  const MAX=250, body=document.getElementById('table-body');
+  if (!body) return;
+  body.innerHTML=rows.slice(0,MAX).map(({id,p})=>{
+    const due=p.next_due_at?new Date(p.next_due_at):null;
+    let ds='—', dc='';
+    if (due) {
+      const diff=due-now;
+      if (diff<0){ds='OVR';dc='p-ovr';}
+      else if(diff<864e5){ds='TDY';dc='p-tdy';}
+      else{ds=Math.ceil(diff/864e5)+'d';dc='p-fut';}
+    }
+    const st=p.stage||'new';
+    const stPill=`p-${st.slice(0,3)}`;
+    const flags=[p.pinned?'📌':'',p.repair_point?'⚠':'',isLeech(p)?'💀':'',p.suspended||p.buried?'🚫':''].filter(Boolean).join('');
+    const sid=id.length>22?id.slice(0,22)+'…':id;
+    const sys=p.sys||'—';
+    return `<tr onclick="openCardDetail('${esc(id)}')" title="Click for full card · ${esc(id)}">
+      <td style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(sid)}</td>
+      <td style="font-size:9px;color:${sysColor(sys)};font-weight:900;white-space:nowrap">${esc(sys)}</td>
+      <td><span class="pill ${stPill}">${st.slice(0,3)}</span></td>
+      <td class="${dc}" style="font-size:10px;font-weight:900">${ds}</td>
+      <td style="white-space:nowrap">${flags}</td>
+    </tr>`;
+  }).join('');
+  if (rows.length>MAX) {
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td colspan="5" style="color:var(--text2);text-align:center;padding:8px;font-size:10px">…${rows.length-MAX} more · use search to filter</td>`;
+    body.appendChild(tr);
+  }
+}
+
+function clickSys(sys) {
+  const node=nodes.find(n=>n.id===sys);
+  if (node) handleNodeClick(node);
+}
+
+function setFilter(f,el) {
+  currentFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderTable();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION J: EXPORT + DIAGNOSTIC
+   ═══════════════════════════════════════════════════════════ */
+function exportProgressOnly() {
+  dl('cozy_arcade_progress_'+dateStr()+'.json',{
+    metadata:{type:'progress',exported_at:new Date().toISOString(),
+      schema_version:'3.0',source:'neural_atlas_beta'},progress
+  });
+  showToast('Progress exported');
+}
+
+function exportFullBackup() {
+  let raw={};
+  for (const k of STATE_KEYS){try{const r=localStorage.getItem(k);if(r){raw=JSON.parse(r);break;}}catch(_){}}
+  dl('cozy_arcade_full_backup_'+dateStr()+'.json',{
+    metadata:{type:'deck_with_progress',exported_at:new Date().toISOString(),
+      schema_version:'3.0',source:'neural_atlas_full'},
+    raw_state:raw,progress
+  });
+  showToast('Full backup exported');
+}
+
+function runDiagnostic() {
+  const vals=Object.values(progress), issues=[];
+  vals.forEach(p=>{
+    const id=(p.card_id||'?').slice(0,22);
+    if (!p.seen_count&&p.last_seen_at) issues.push(`⚠ [${id}] new card has last_seen_at`);
+    if (Number(p.reviewed_count||0)>0&&!p.last_rating) issues.push(`⚠ [${id}] reviewed but no last_rating`);
+    if (p.stage==='review'&&!p.next_due_at) issues.push(`⚠ [${id}] review stage, no next_due_at`);
+    if (isLeech(p)) issues.push(`💀 [${id}] leech: ${p.lapses} lapses`);
+    if (Number(p.ease_factor||2.5)<1.4) issues.push(`🔴 [${id}] ease critically low: ${p.ease_factor}`);
+  });
+  const ret=retentionPct(vals);
+  const seenVals=vals.filter(p=>p.seen_count>0||p.seen);
+  const stageBreak={new:0,review:0,relearning:0};
+  vals.forEach(p=>{stageBreak[p.stage||'new']=(stageBreak[p.stage||'new']||0)+1;});
+  const noSys=vals.filter(p=>!p.sys||p.sys==='—').length;
+
+  const report=[
+    `=== NEURAL ATLAS DIAGNOSTIC — ${new Date().toLocaleString()} ===`,
+    `Signals: ${vals.length}  ·  Systems: ${Object.keys(sysMap).length}`,
+    `Stages: new=${stageBreak.new||0}  review=${stageBreak.review||0}  relearning=${stageBreak.relearning||0}`,
+    `Seen: ${seenVals.length}  ·  No-sys: ${noSys} (upload deck JSON to map)`,
+    `Issues: ${issues.length}  ·  Leeches (≥4): ${vals.filter(isLeech).length}`,
+    `Low ease (<2.0): ${vals.filter(p=>Number(p.ease_factor||2.5)<2.0).length}`,
+    `Retention: ${ret??'N/A'}%`,
+    '',
+    ...(issues.length?issues:['✅ No issues found']),
+    '',
+    noSys>0?`ℹ Upload your deck JSON to map ${noSys} card(s) to their organ system.`:''
+  ].filter(l=>l!=='').join('\n');
+
+  const box=document.getElementById('diag-box'), out=document.getElementById('diag-out');
+  if (box&&out){box.style.display='block';out.textContent=report;box.scrollIntoView({behavior:'smooth'});}
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION K: UTILITIES
+   ═══════════════════════════════════════════════════════════ */
+function hexRgba(hex,a) {
+  if (!hex||hex[0]!=='#') return `rgba(103,232,249,${a})`;
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
+function dateStr(){return new Date().toISOString().slice(0,10);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function dl(name,obj){
+  const a=Object.assign(document.createElement('a'),{
+    href:URL.createObjectURL(new Blob([JSON.stringify(obj,null,2)],{type:'application/json'})),
+    download:name
+  });
+  document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+}
+function showToast(msg){
+  const e=document.getElementById('toast');if(!e)return;
+  e.textContent=msg;e.style.display='block';
+  setTimeout(()=>e.style.display='none',2500);
+}
+
+function resize() {
+  const wrap=document.getElementById('canvas-wrap');
+  const dpr=window.devicePixelRatio||1;
+  W=wrap.offsetWidth;H=wrap.offsetHeight;
+  canvas.width=W*dpr;canvas.height=H*dpr;
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
+  ctx.scale(dpr,dpr);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION L: APPLICATION STATE + INIT
+   ═══════════════════════════════════════════════════════════ */
+let progress={}, sysMap={}, selectedSys=null, currentFilter='all';
+
+function fullRefreshDisplay() {
+  sysMap=buildSysMap(progress);
+  buildGraph(sysMap);
+  clearSelection();
+  renderKpis();
+  renderSysList();
+  renderForecast();
+  renderTable();
+}
+
+function fullRefresh() {
+  progress=readProgress();
+  fullRefreshDisplay();
+  showToast('Atlas refreshed ↻');
+}
+
+// Listen for postMessage from main app
+window.addEventListener('message',e=>{
+  if (e.data==='atlas:refresh'||e.data?.type==='atlas:refresh') fullRefresh();
+});
+
+// Listen for localStorage changes from main app (same-origin)
+window.addEventListener('storage',e=>{
+  if (STATE_KEYS.includes(e.key)) fullRefresh();
+});
+
+function init() {
+  resize();
+  window.addEventListener('resize',resize);
+
+  progress=readProgress();
+  mergeSysFromDeck();
+  sysMap=buildSysMap(progress);
+  buildGraph(sysMap);
+
+  if (reduced) runForces(800);
+
+  renderKpis();
+  renderSysList();
+  renderForecast();
+  renderTable();
+
+  if (rafId) cancelAnimationFrame(rafId);
+  render();
+
+  const n=Object.keys(progress).length;
+  if (!n) {
+    showToast('No signals — upload progress JSON or open main app first');
+    document.getElementById('upload-status').textContent='⬆ Upload your progress JSON to begin';
+    document.getElementById('upload-status').style.color='var(--cyan)';
+  } else {
+    showToast(`${n} signals loaded`);
+  }
+}
+
+init();
+
+/*
+  ═══════════════════════════════════════════════════════════
+  BUG FIX NOTES (vs prior version):
+
+  FIX 1 — Import handler added (was missing entirely):
+    handleFileUpload() → reads progress JSON or deck JSON from
+    file input, populates progress + deckMap, calls fullRefreshDisplay().
+    Drag-and-drop supported via handleDrop().
+
+  FIX 2 — sys field mapped from deck:
+    mergeSysFromDeck() cross-references deckMap[card_id].sys
+    into progress entries. Without the deck upload, all cards
+    fall under '—' because progress JSON has no sys field.
+    Upload the deck JSON first (or simultaneously) to get
+    system-colored constellation nodes.
+
+  FIX 3 — 'new' KPI count was wrong:
+    Previously: !p.seen_count || p.stage==='new'
+    Fix: (!p.seen_count||p.seen_count===0) && p.stage==='new'
+    Cards with seen_count=0 but stage='review' (orphan records
+    from old sessions) no longer counted as new.
+
+  FIX 4 — sys normalization:
+    normSys() uppercases sys values for consistent color mapping.
+    SYS_COLORS keys expanded to match ABIM normalization.
+
+  FIX 5 — Card detail panel (NEW FEATURE):
+    Clicking any row in the card browser opens a full card detail
+    overlay showing: presentation, diagnosis, one_thing, board_trigger,
+    educational_objective, why_not_others, SRS stats, flags.
+    Requires deck JSON to be uploaded (or available in localStorage).
+
+  FIX 6 — Table filter: selectedSys handles normSys mismatch.
+
+  FIX 7 — Search extended to diagnosis + presentation text.
+
+  INTEGRATION: Same localStorage keys, zero schema changes.
+  postMessage('atlas:refresh') supported for iframe mode.
+  ═══════════════════════════════════════════════════════════
+*/
+</script>
+</body>
+</html>
