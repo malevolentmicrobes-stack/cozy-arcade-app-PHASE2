@@ -10609,6 +10609,195 @@ function fixCanonicalDisplayTitle351() {
   letter-spacing:.10em!important;
   margin-top:6px!important;
 }
+
+/* v370 home layout reorder */
+#home .homeWrap{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:14px!important;
+}
+#home .homeWrap > .hero{
+  min-height:150px!important;
+  padding:24px 32px!important;
+  border-radius:24px!important;
+}
+#home .heroTitle{
+  font-size:clamp(44px,5.8vw,76px)!important;
+  letter-spacing:.20em!important;
+}
+#home .heroSub{
+  margin-top:8px!important;
+}
+#home .modeGrid{
+  gap:14px!important;
+  margin-top:0!important;
+}
+#home .modeCard{
+  min-height:128px!important;
+  padding:22px 24px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+#home .modeIcon{
+  font-size:22px!important;
+  margin-bottom:12px!important;
+}
+#home .modeTitle{
+  font-size:clamp(24px,3vw,34px)!important;
+}
+#home .modeCaption{
+  margin:6px 0 0!important;
+}
+#home .homeWrap > .hero{order:1!important;}
+#home .homeWrap > .modeGrid{order:2!important;}
+#home #cozySMSection370{order:3!important;}
+#home #cozySDSection370{order:4!important;}
+#home #homeActions351{order:5!important;}
+#home #limitlessHomeImport,
+#home .limitlessHomeControls{order:6!important;margin-top:0!important;}
+#home .homeWrap > .kpis{order:7!important;}
+#home .homeWrap > .controls{display:none!important;}
+
+#homeActions351 #personaHome351,
+#homeActions351 .personaHome351{display:none!important;}
+#homeActions351 .homeModeButtons351{display:none!important;}
+
+#homeActions351{position:relative!important;}
+#homeActions351 h3{
+  font-family:Orbitron,monospace!important;
+  letter-spacing:.20em!important;
+  text-transform:uppercase!important;
+  color:#67e8f9!important;
+  font-size:clamp(18px,2vw,28px)!important;
+  margin-bottom:12px!important;
+  display:inline-block!important;
+}
+#browseReview351{
+  position:absolute!important;
+  top:18px!important;
+  right:18px!important;
+}
+
+[id="domainOrderSelectFinal"],
+[id="expansionOrderPhase3"],
+label[for="domainOrderSelectFinal"],
+label[for="expansionOrderPhase3"],
+.domainOrderRow352,
+#homeActions351 label:has(+ #domainOrderSelectFinal),
+#homeActions351 label:has(+ #expansionOrderPhase3){
+  display:none!important;
+}
+
+#cozySMSection370{
+  border:1px solid rgba(103,232,249,.22)!important;
+  border-radius:16px!important;
+  background:rgba(103,232,249,.04)!important;
+  padding:14px 18px!important;
+  cursor:pointer!important;
+  transition:border-color .18s!important;
+  text-align:left!important;
+  width:100%!important;
+}
+#cozySMSection370:hover{border-color:rgba(103,232,249,.48)!important;}
+#cozySMSection370 .smLabel370{
+  font-family:Orbitron,monospace;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.20em;
+  text-transform:uppercase;
+  color:#67e8f9;
+  margin-bottom:4px;
+  display:block;
+}
+#cozySMSection370 .smValue370{
+  font-size:15px;
+  font-weight:950;
+  color:#9fe8ff;
+  letter-spacing:.06em;
+}
+#cozySMSection370 .smArrow370{
+  color:rgba(103,232,249,.45);
+  font-size:12px;
+  margin-left:4px;
+}
+
+#cozySDSection370{
+  border:1px solid rgba(100,60,180,.50)!important;
+  border-radius:16px!important;
+  background:rgba(15,8,36,.80)!important;
+  padding:16px 20px!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:16px!important;
+  cursor:pointer!important;
+  transition:border-color .18s!important;
+  text-align:left!important;
+  width:100%!important;
+}
+#cozySDSection370:hover{border-color:rgba(140,80,240,.70)!important;}
+#cozySDSection370 .sdIcon370{
+  width:48px;
+  height:48px;
+  border-radius:10px;
+  border:1px solid rgba(120,60,180,.45);
+  background:rgba(80,40,120,.35);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#d7c6ff;
+  font-size:24px;
+  flex:0 0 auto;
+}
+#cozySDSection370 .sdTitle370{
+  display:block;
+  color:#f3eeff;
+  font-size:21px;
+  font-weight:950;
+  line-height:1.1;
+}
+#cozySDSection370 .sdSub370{
+  display:block;
+  color:rgba(207,188,255,.78);
+  font-size:13px;
+  font-weight:850;
+  margin-top:4px;
+}
+
+#homeActions351 .reviewBrowse351{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:10px!important;
+  padding-top:12px!important;
+}
+#homeActions351 .reviewBrowse351 > div{
+  min-width:0!important;
+}
+#homeActions351 .reviewBrowse351 label{
+  font-family:Orbitron,monospace!important;
+  letter-spacing:.16em!important;
+  text-transform:uppercase!important;
+  color:rgba(185,196,230,.62)!important;
+  font-size:10px!important;
+}
+#homeActions351 .reviewBrowse351 select{
+  width:100%!important;
+}
+@media(max-width:760px){
+  #browseReview351{
+    position:static!important;
+    margin-left:auto!important;
+    display:flex!important;
+    width:max-content!important;
+  }
+  #homeActions351 .reviewBrowse351{
+    grid-template-columns:1fr!important;
+  }
+  #cozySDSection370{
+    padding:14px 16px!important;
+  }
+}
 </style>
 <script id="cozy-one-thing-stable-dropdown-js">
 function fixStableOneThingDropdown351() {
@@ -11650,6 +11839,45 @@ function fixStableOneThingDropdown351() {
   setTimeout(install, 100);
   setTimeout(install, 600);
   setInterval(() => { wireFileInputs(); wireUi(); updateKpisPhase3(); }, 1000);
+
+  function cozyHomeLayout370() {
+    const homeWrap = document.querySelector('#home .homeWrap');
+    if (!homeWrap) return;
+    const modeGrid = homeWrap.querySelector(':scope > .modeGrid');
+    const homeActions = q('homeActions351');
+    if (!q('cozySMSection370')) {
+      const study = document.createElement('button');
+      study.id = 'cozySMSection370';
+      study.type = 'button';
+      study.innerHTML = '<span class="smLabel370">Study Mode</span><span class="smValue370">Limitless Scholar</span><span class="smArrow370">&#9662;</span>';
+      (homeActions || modeGrid || homeWrap).insertAdjacentElement(homeActions ? 'beforebegin' : 'afterend', study);
+    }
+    if (!q('cozySDSection370')) {
+      const shadow = document.createElement('button');
+      shadow.id = 'cozySDSection370';
+      shadow.type = 'button';
+      shadow.innerHTML = '<span class="sdIcon370">&#9789;</span><span><span class="sdTitle370">Shadow Dungeon</span><span class="sdSub370">Review pinned and missed cards</span></span>';
+      (homeActions || modeGrid || homeWrap).insertAdjacentElement(homeActions ? 'beforebegin' : 'afterend', shadow);
+    }
+    const persona = typeof getActivePersona === 'function' ? getActivePersona() : null;
+    const label = persona && (persona.display_name || persona.name) ? (persona.display_name || persona.name) : (q('personaHome351')?.querySelector('b')?.textContent || 'Limitless Scholar');
+    const studyValue = q('cozySMSection370')?.querySelector('.smValue370');
+    if (studyValue) studyValue.textContent = label;
+    if (q('cozySMSection370')) q('cozySMSection370').onclick = () => {
+      if (q('choosePersona351')) q('choosePersona351').click();
+      else if (typeof showPersonaSelector351 === 'function') showPersonaSelector351();
+    };
+    if (q('cozySDSection370')) q('cozySDSection370').onclick = () => {
+      if (q('shadow351')) q('shadow351').click();
+      else if (typeof openShadowSetup351 === 'function') openShadowSetup351();
+    };
+  }
+
+  cozyHomeLayout370();
+  document.addEventListener('DOMContentLoaded', cozyHomeLayout370);
+  setTimeout(cozyHomeLayout370, 100);
+  setTimeout(cozyHomeLayout370, 700);
+  setInterval(cozyHomeLayout370, 1200);
 })();
 </script>
 </body></html>
