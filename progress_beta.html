@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cozy Arcade — Progress Beta</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=DM+Sans:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%;background:#030713;color:#e9f4ff;font-family:'DM Sans',system-ui,sans-serif;font-size:14px}
+body{padding:20px;background:radial-gradient(circle at 50% -10%,rgba(65,99,255,.18),transparent 32%),linear-gradient(180deg,#09081a,#050714 60%,#02050d)}
+h1{font-family:Orbitron,monospace;text-transform:uppercase;letter-spacing:.18em}
+.page{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:14px 20px;border:1px solid rgba(103,232,249,.22);border-radius:16px;background:rgba(5,9,24,.72)}
+.header-btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border-radius:999px;padding:8px 14px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#edf7ff;font-weight:900;cursor:pointer;font-size:12px;letter-spacing:.06em;font-family:inherit;transition:border-color .15s}
+.btn:hover{border-color:rgba(103,232,249,.5)}
+.btn.primary{background:linear-gradient(135deg,#0ea5e9,#67e8f9);color:#020611;border-color:transparent}
+.btn.small{padding:5px 10px;font-size:11px}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.kpi-card{border:1px solid rgba(160,160,210,.18);border-radius:14px;background:rgba(255,255,255,.04);padding:14px 16px}
+.kpi-card.hi{border-color:rgba(103,232,249,.35);background:rgba(103,232,249,.06)}
+.kpi-card.warn{border-color:rgba(251,88,118,.4);background:rgba(251,88,118,.07)}
+.kpi-n{font-size:26px;font-weight:900;display:block;color:#f0f4ff}
+.kpi-l{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#7a86a0;margin-top:4px;display:block}
+.box{border:1px solid rgba(103,232,249,.18);border-radius:16px;background:rgba(5,9,24,.72);padding:18px 20px}
+.box-title{font-size:13px;font-weight:900;letter-spacing:.18em;color:#67e8f9;margin-bottom:14px;text-transform:uppercase}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.filter-btn{padding:5px 12px;border-radius:999px;border:1px solid rgba(160,160,210,.22);background:rgba(255,255,255,.04);color:#b0bcd4;font-size:11px;font-weight:900;cursor:pointer;letter-spacing:.06em;transition:all .14s;font-family:inherit}
+.filter-btn.active{border-color:#67e8f9;background:rgba(103,232,249,.12);color:#9fe8ff}
+.search-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.search-input{flex:1;min-width:180px;background:rgba(255,255,255,.05);border:1px solid rgba(160,160,210,.2);border-radius:10px;color:#e9f4ff;padding:8px 12px;font-family:inherit;font-size:13px}
+.search-input:focus{outline:none;border-color:rgba(103,232,249,.4)}
+select.sort-sel{background:rgba(255,255,255,.05);border:1px solid rgba(160,160,210,.2);border-radius:10px;color:#e9f4ff;padding:8px 10px;font-family:inherit;font-size:12px}
+.card-table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:7px 10px;font-size:10px;letter-spacing:.12em;color:#5a6580;text-transform:uppercase;border-bottom:1px solid rgba(160,160,210,.14);font-weight:900;white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.05);vertical-align:middle}
+tr:hover td{background:rgba(255,255,255,.03)}
+.stage-pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:900;letter-spacing:.06em}
+.stage-new{background:rgba(160,160,210,.12);color:#8fa0c0}
+.stage-review{background:rgba(103,232,249,.12);color:#67e8f9}
+.stage-relearning{background:rgba(251,88,118,.14);color:#fca5a5}
+.r-again{background:rgba(251,88,118,.14);color:#fca5a5;display:inline-block;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:900}
+.r-hard{background:rgba(255,165,0,.12);color:#fcd34d;display:inline-block;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:900}
+.r-good{background:rgba(103,232,249,.10);color:#67e8f9;display:inline-block;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:900}
+.r-easy{background:rgba(34,197,94,.10);color:#6ee7b7;display:inline-block;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:900}
+.ease-low{color:#fb5876}.ease-ok{color:#e9f4ff}.ease-high{color:#6ee7b7}
+.due-overdue{color:#fb5876;font-weight:900}.due-today{color:#fcd34d;font-weight:900}.due-future{color:#6ee7b7}
+.sys-grid{display:flex;flex-wrap:wrap;gap:7px}
+.sys-pill{padding:5px 12px;border-radius:999px;border:1px solid rgba(160,160,210,.18);background:rgba(255,255,255,.04);font-size:11px;font-weight:900;display:flex;align-items:center;gap:6px}
+.sys-pill b{color:#f0f4ff}.sys-pill span{color:#7a86a0;font-size:10px}
+.forecast-row{display:flex;gap:6px;flex-wrap:wrap}
+.fc-bar{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:40px}
+.fc-bar .bar{width:32px;min-height:4px;background:rgba(103,232,249,.22);border-radius:4px}
+.fc-bar .day-lbl{font-size:9px;color:#5a6580;letter-spacing:.06em}
+.fc-bar .cnt{font-size:10px;font-weight:900;color:#9fe8ff}
+.toast-msg{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#071124;border:1px solid rgba(103,232,249,.25);border-radius:999px;padding:10px 18px;font-weight:900;z-index:200;display:none}
+.undo-bar{display:none;position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:rgba(10,15,35,.92);border:1px solid rgba(103,232,249,.3);border-radius:999px;padding:10px 18px;font-size:13px;font-weight:900;z-index:100;gap:10px;align-items:center}
+.undo-bar.visible{display:flex}
+.info-badge{font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,.08);color:#7a86a0;font-weight:900;margin-left:8px}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <h1>Progress <span style="color:#67e8f9">Beta</span></h1>
+    <div style="font-size:11px;color:#5a6580">Reads from same localStorage as main app · open in same browser</div>
+    <div class="header-btns">
+      <button class="btn primary" onclick="exportProgressOnly()">Export Progress</button>
+      <button class="btn" onclick="exportFullBackup()">Full Backup</button>
+      <button class="btn small" onclick="runDiagnostic()">Diagnostic</button>
+      <button class="btn small" onclick="loadAll()">↻ Refresh</button>
+    </div>
+  </div>
+
+  <div class="kpi-grid" id="kpiGrid">
+    <div class="kpi-card hi"><span class="kpi-n" id="kTotal">—</span><span class="kpi-l">Total Cards</span></div>
+    <div class="kpi-card"><span class="kpi-n" id="kReviewed">—</span><span class="kpi-l">Reviewed</span></div>
+    <div class="kpi-card"><span class="kpi-n" id="kNew">—</span><span class="kpi-l">New</span></div>
+    <div class="kpi-card hi"><span class="kpi-n" id="kDue">—</span><span class="kpi-l">Due Now</span></div>
+    <div class="kpi-card"><span class="kpi-n" id="kDue7">—</span><span class="kpi-l">Due 7d</span></div>
+    <div class="kpi-card"><span class="kpi-n" id="kPinned">—</span><span class="kpi-l">Pinned</span></div>
+    <div class="kpi-card warn"><span class="kpi-n" id="kRepair">—</span><span class="kpi-l">Repair Points</span></div>
+    <div class="kpi-card warn"><span class="kpi-n" id="kLeech">—</span><span class="kpi-l">Leeches ≥4</span></div>
+    <div class="kpi-card"><span class="kpi-n" id="kRet">—</span><span class="kpi-l">Retention %</span></div>
+  </div>
+
+  <div class="box">
+    <div class="box-title">System Breakdown</div>
+    <div class="sys-grid" id="sysGrid">Loading…</div>
+  </div>
+
+  <div class="box">
+    <div class="box-title">Due Next 7 Days</div>
+    <div class="forecast-row" id="forecastRow">Loading…</div>
+  </div>
+
+  <div class="box">
+    <div class="box-title">Card Browser <span class="info-badge" id="browserCount"></span></div>
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+      <button class="filter-btn" onclick="setFilter('due',this)">Due Now</button>
+      <button class="filter-btn" onclick="setFilter('new',this)">New</button>
+      <button class="filter-btn" onclick="setFilter('review',this)">Review</button>
+      <button class="filter-btn" onclick="setFilter('relearning',this)">Relearning</button>
+      <button class="filter-btn" onclick="setFilter('pinned',this)">📌 Pinned</button>
+      <button class="filter-btn" onclick="setFilter('repair',this)">⚠ Repair</button>
+      <button class="filter-btn" onclick="setFilter('leech',this)">💀 Leeches</button>
+      <button class="filter-btn" onclick="setFilter('suspended',this)">🚫 Suspended</button>
+      <button class="filter-btn" onclick="setFilter('ease_low',this)">Low Ease</button>
+    </div>
+    <div class="search-row">
+      <input class="search-input" id="searchInput" placeholder="Search card ID, sys…" oninput="renderTable()">
+      <select class="sort-sel" id="sortSel" onchange="renderTable()">
+        <option value="due">Sort: Due date</option>
+        <option value="lapses">Sort: Lapses ↓</option>
+        <option value="ease">Sort: Ease ↑</option>
+        <option value="interval">Sort: Interval ↓</option>
+        <option value="last_seen">Sort: Last seen</option>
+      </select>
+    </div>
+    <div class="card-table-wrap">
+      <table>
+        <thead><tr><th>Card ID</th><th>Stage</th><th>Last Rating</th><th>Interval</th><th>Ease</th><th>Lapses</th><th>Due</th><th>Flags</th><th>Reset</th></tr></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="box" id="diagBox" style="display:none">
+    <div class="box-title">Diagnostic</div>
+    <pre id="diagOut" style="white-space:pre-wrap;font-size:12px;color:#c0d4f0;line-height:1.6"></pre>
+  </div>
+</div>
+
+<div class="undo-bar" id="undoBar">
+  Undo? <span id="undoT">10s</span>
+  <button class="btn small" onclick="doUndo()">Undo</button>
+  <button class="btn small" onclick="hideUndo()">✕</button>
+</div>
+<div class="toast-msg" id="toast"></div>
+
+<script>
+'use strict';
+const STATE_KEYS=['cozy_arcade_progress_v1','soloStudyingState_v1757','cazy_v3'];
+let progress={}, currentFilter='all', undoStack=[], undoTimer=null;
+
+function loadAll(){progress=readProgress();renderKpis();renderSys();renderForecast();renderTable();}
+
+function readProgress(){
+  for(const k of STATE_KEYS){
+    try{const r=localStorage.getItem(k);if(!r)continue;const p=JSON.parse(r);if(p?.progress&&typeof p.progress==='object')return p.progress;if(typeof p==='object'&&!Array.isArray(p))return p;}catch(_){}
+  }
+  return {};
+}
+
+function isDue(p){if(!p||p.stage==='new'||!p.seen_count)return false;if(!p.next_due_at)return p.seen_count>0;return new Date(p.next_due_at)<=new Date();}
+function isLeech(p){return Number(p?.lapses||0)>=4;}
+function retention(vals){const r=vals.filter(p=>Number(p.reviewed_count||0)>0);if(!r.length)return null;const c=r.reduce((s,p)=>s+Number(p.correct_count||0),0);const t=r.reduce((s,p)=>s+Number(p.reviewed_count||0),0);return t?Math.round(c/t*100):null;}
+
+function renderKpis(){
+  const vals=Object.values(progress);const now=new Date();const in7=new Date(now.getTime()+7*86400000);
+  set('kTotal',vals.length||'—');set('kReviewed',vals.filter(p=>Number(p.seen_count||0)>0).length);
+  set('kNew',vals.filter(p=>!p.seen_count||p.stage==='new').length);set('kDue',vals.filter(isDue).length);
+  set('kDue7',vals.filter(p=>{if(!p.next_due_at||p.stage==='new')return false;const d=new Date(p.next_due_at);return d>=now&&d<=in7;}).length);
+  set('kPinned',vals.filter(p=>p.pinned).length);set('kRepair',vals.filter(p=>p.repair_point).length);
+  set('kLeech',vals.filter(isLeech).length);const ret=retention(vals);set('kRet',ret!==null?ret+'%':'—');
+}
+
+function renderSys(){
+  const m={};Object.values(progress).forEach(p=>{const s=p.sys||'—';if(!m[s])m[s]={t:0,r:0,d:0};m[s].t++;if(Number(p.seen_count||0)>0)m[s].r++;if(isDue(p))m[s].d++;});
+  const g=document.getElementById('sysGrid');
+  const sorted=Object.entries(m).sort((a,b)=>b[1].t-a[1].t);
+  g.innerHTML=sorted.length?sorted.map(([s,d])=>`<div class="sys-pill"><b>${s}</b><span>${d.r}/${d.t}${d.d?' · '+d.d+' due':''}</span></div>`).join(''):'No data yet.';
+}
+
+function renderForecast(){
+  const vals=Object.values(progress);const now=new Date();
+  const days=Array.from({length:7},(_,i)=>{const d=new Date(now.getTime()+i*86400000);return{label:i===0?'Today':['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()],count:0};});
+  vals.forEach(p=>{if(!p.next_due_at||p.stage==='new')return;const due=new Date(p.next_due_at);for(let i=0;i<7;i++){const s=new Date(now.getTime()+i*86400000);s.setHours(0,0,0,0);const e=new Date(now.getTime()+i*86400000);e.setHours(23,59,59,999);if(due>=s&&due<=e){days[i].count++;break;}}});
+  const max=Math.max(...days.map(d=>d.count),1);
+  document.getElementById('forecastRow').innerHTML=days.map(d=>`<div class="fc-bar"><div class="bar" style="height:${Math.max(4,Math.round(d.count/max*48))}px"></div><div class="cnt">${d.count}</div><div class="day-lbl">${d.label}</div></div>`).join('');
+}
+
+function setFilter(f,el){currentFilter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');renderTable();}
+
+function renderTable(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  const sort=document.getElementById('sortSel').value;
+  const now=new Date();
+  let rows=Object.entries(progress).map(([id,p])=>({id,p}));
+  rows=rows.filter(({id,p})=>{
+    switch(currentFilter){case 'due':return isDue(p);case 'new':return !p.seen_count||p.stage==='new';case 'review':return p.stage==='review';case 'relearning':return p.stage==='relearning';case 'pinned':return p.pinned;case 'repair':return p.repair_point;case 'leech':return isLeech(p);case 'suspended':return p.suspended;case 'ease_low':return Number(p.ease_factor||2.5)<2.0;default:return true;}
+  });
+  if(q)rows=rows.filter(({id,p})=>id.toLowerCase().includes(q)||(p.sys||'').toLowerCase().includes(q)||(p.last_rating||'').includes(q));
+  rows.sort((a,b)=>{switch(sort){case 'lapses':return Number(b.p.lapses||0)-Number(a.p.lapses||0);case 'ease':return Number(a.p.ease_factor||2.5)-Number(b.p.ease_factor||2.5);case 'interval':return Number(b.p.interval_days||0)-Number(a.p.interval_days||0);case 'last_seen':return(b.p.last_seen_at||'').localeCompare(a.p.last_seen_at||'');default:{const da=a.p.next_due_at?new Date(a.p.next_due_at):new Date(9e15);const db=b.p.next_due_at?new Date(b.p.next_due_at):new Date(9e15);return da-db;}}});
+  document.getElementById('browserCount').textContent=rows.length+' cards';
+  const MAX=200;
+  const body=document.getElementById('tableBody');
+  body.innerHTML=rows.slice(0,MAX).map(({id,p})=>{
+    const due=p.next_due_at?new Date(p.next_due_at):null;let dueStr='—',dueCls='';
+    if(due){const diff=due-now;if(diff<0){dueStr='Overdue';dueCls='due-overdue';}else if(diff<86400000){dueStr='Today';dueCls='due-today';}else{dueStr=Math.ceil(diff/86400000)+'d';dueCls='due-future';}}
+    const stage=p.stage||'new';
+    const ease=Number(p.ease_factor||2.5);const easeCls=ease<2.0?'ease-low':ease>2.8?'ease-high':'ease-ok';
+    const flags=[p.pinned?'📌':'',p.repair_point?'⚠':'',isLeech(p)?'💀':'',p.suspended?'🚫':''].filter(Boolean).join(' ');
+    const sid=id.length>30?id.slice(0,30)+'…':id;
+    const lr=p.last_rating?`<span class="r-${p.last_rating}">${p.last_rating}</span>`:'—';
+    return`<tr><td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(id)}">${esc(sid)}</td><td><span class="stage-pill stage-${stage}">${stage}</span></td><td>${lr}</td><td>${Number(p.interval_days||0)}d</td><td class="${easeCls}">${ease.toFixed(2)}</td><td>${Number(p.lapses||0)}</td><td class="${dueCls}">${dueStr}</td><td>${flags}</td><td><button class="btn small" onclick="resetCard('${esc(id)}')">↺</button></td></tr>`;
+  }).join('');
+  if(rows.length>MAX){const tr=document.createElement('tr');tr.innerHTML=`<td colspan="9" style="color:#5a6580;text-align:center;padding:10px">…${rows.length-MAX} more — use filters/search</td>`;body.appendChild(tr);}
+}
+
+function resetCard(id){
+  if(!progress[id])return;
+  undoStack.push({id,snap:JSON.stringify(progress[id])});
+  Object.assign(progress[id],{stage:'new',last_rating:null,last_seen_at:null,next_due_at:null,interval_days:0,ease_factor:2.5,lapses:0,seen_count:0,reviewed_count:0,correct_count:0,wrong_count:0,repair_point:false,buried:false,suspended:false});
+  saveProgress();showToast('Card reset to New');showUndo();renderTable();renderKpis();
+}
+
+function doUndo(){
+  if(!undoStack.length)return;
+  const{id,snap}=undoStack.pop();
+  try{progress[id]=JSON.parse(snap);saveProgress();showToast('Undo done');renderTable();renderKpis();}catch(_){}
+  hideUndo();
+}
+
+function showUndo(){clearTimeout(undoTimer);let t=10;set('undoT',t+'s');document.getElementById('undoBar').classList.add('visible');undoTimer=setInterval(()=>{t--;set('undoT',t+'s');if(t<=0)hideUndo();},1000);}
+function hideUndo(){clearTimeout(undoTimer);document.getElementById('undoBar').classList.remove('visible');}
+
+function saveProgress(){
+  for(const k of STATE_KEYS){
+    try{const r=localStorage.getItem(k);if(!r)continue;const p=JSON.parse(r);if(p?.progress){p.progress=progress;localStorage.setItem(k,JSON.stringify(p));return;}}catch(_){}
+  }
+}
+
+function exportProgressOnly(){const out={metadata:{type:'progress',exported_at:new Date().toISOString(),schema_version:'3.0',source:'progress_beta'},progress};dl('cozy_arcade_progress_'+ds()+'.json',out);showToast('Progress exported');}
+function exportFullBackup(){
+  let raw={};for(const k of STATE_KEYS){try{const r=localStorage.getItem(k);if(r){raw=JSON.parse(r);break;}}catch(_){}}
+  dl('cozy_arcade_full_backup_'+ds()+'.json',{metadata:{type:'deck_with_progress',exported_at:new Date().toISOString(),schema_version:'3.0',source:'progress_beta_full'},raw_state:raw,progress});showToast('Full backup exported');
+}
+
+function runDiagnostic(){
+  const vals=Object.values(progress);const issues=[];
+  vals.forEach(p=>{const id=(p.card_id||'?').slice(0,22);
+    if(!p.seen_count&&p.last_seen_at)issues.push(`⚠ [${id}] new card has last_seen_at`);
+    if(Number(p.reviewed_count||0)>0&&!p.last_rating)issues.push(`⚠ [${id}] reviewed but no last_rating`);
+    if(p.stage==='review'&&!p.next_due_at)issues.push(`⚠ [${id}] review stage but no next_due_at`);
+    if(p.stage==='review'&&Number(p.interval_days||0)===0&&p.last_rating!=='again')issues.push(`⚠ [${id}] review stage but interval=0`);
+    if(p.buried&&!p.buried_until)issues.push(`ℹ [${id}] buried=true, no buried_until (session-buried)`);
+    if(isLeech(p))issues.push(`💀 [${id}] leech: ${p.lapses} lapses`);
+    if(Number(p.ease_factor||2.5)<1.4)issues.push(`🔴 [${id}] ease critically low: ${p.ease_factor}`);
+  });
+  const report=[`=== DIAGNOSTIC — ${new Date().toLocaleString()} ===`,`Cards: ${vals.length}`,`Issues: ${issues.length}`,`Leeches (≥4): ${vals.filter(isLeech).length}`,`Low ease (<2.0): ${vals.filter(p=>Number(p.ease_factor||2.5)<2.0).length}`,`Retention: ${retention(vals)??'N/A'}%`,'',...(issues.length?issues:['✅ No issues found'])].join('\n');
+  const b=document.getElementById('diagBox');b.style.display='block';document.getElementById('diagOut').textContent=report;b.scrollIntoView({behavior:'smooth'});
+}
+
+function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
+function ds(){return new Date().toISOString().slice(0,10);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function dl(name,obj){const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([JSON.stringify(obj,null,2)],{type:'application/json'})),download:name});document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);}
+function showToast(msg){const e=document.getElementById('toast');e.textContent=msg;e.style.display='block';setTimeout(()=>e.style.display='none',2500);}
+
+loadAll();
+</script>
+</body>
+</html>
