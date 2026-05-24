@@ -6753,9 +6753,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   }
 
   function shadowDropSeconds351(){
-    let n=7;
-    try{n=Number(localStorage.getItem('cozyQuestionSeconds351')||$('soloTimerInput')?.value||7)||7;}catch(e){}
-    return Math.max(3,Math.min(10,n));
+    return questionSeconds351();
   }
 
   function progressPayload351(){
@@ -7285,7 +7283,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     const runner=$('runner');
     if(runner) runner.classList.add('soloStableRunner351');
     const duration=soloDropDurationMs351();
-    const hold=shadowActive351?3000:0;
+    const hold=0;
     timerMax=duration/1000;
     timer=timerMax;
     setSoloDropProgress351(0);
@@ -7494,7 +7492,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       if(e.key==='Enter' || e.key===' ' || e.key==='ArrowRight' || e.key==='Right'){
         e.preventDefault();
         const now=Date.now();
-        if(now-continueGuard350>450){continueGuard350=now; try{rate(current,'good');}catch(err){} continueReveal(which);}
+        if(now-continueGuard350>450){continueGuard350=now; continueReveal(which);}
         return;
       }
     }
@@ -10602,6 +10600,14 @@ function fixCanonicalDisplayTitle351() {
   background:rgba(103,232,249,.12)!important;
   border-color:rgba(103,232,249,.55)!important;
   color:#9fe8ff!important;
+}
+/* Hide the Shadow auto-advance clock — it clutters the reveal UI */
+.shadowAnswerClock351{
+  font-size:11px!important;
+  color:rgba(103,232,249,.35)!important;
+  text-align:center!important;
+  letter-spacing:.10em!important;
+  margin-top:6px!important;
 }
 </style>
 <script id="cozy-one-thing-stable-dropdown-js">
