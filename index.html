@@ -9134,19 +9134,20 @@ Do not rewrite medical content. Map sys/system fields to card.sys.`;
   function updateImportButtons(){
     const n=appCards().length;
     document.querySelectorAll('#limitlessExampleDeck,#exportJson351').forEach(btn=>{if(btn&&btn.id==='limitlessExampleDeck') btn.textContent='Download JSON';});
-    document.querySelectorAll('#limitlessLocalDeckStorage,#limitlessImportStatus').forEach(local=>{
+    const local=document.getElementById('limitlessLocalDeckStorage');
+    if(local){
       local.textContent=n?(n+' cards'):'';
       local.onclick=null;
       local.style.pointerEvents='none';
       local.setAttribute('aria-disabled','true');
-    });
+    }
   }
   function ensureImportPanel(){
     const home=document.querySelector('#home .homeWrap');
     if(!home) return;
     let panel=document.getElementById('limitlessHomeImport');
     if(!panel){panel=document.createElement('div'); panel.id='limitlessHomeImport'; panel.className='limitlessHomeControls'; home.insertBefore(panel,home.querySelector('.modeGrid')||home.firstChild);}
-    panel.innerHTML='<label class="btn primary" for="limitlessHomeDeckFile">Upload JSON Deck</label><input id="limitlessHomeDeckFile" type="file" accept=".json,.csv,application/json,text/csv"><button id="limitlessExampleDeck" class="btn" type="button">Download JSON</button><span id="limitlessLocalDeckStorage" class="btn" aria-disabled="true"></span>';
+    panel.innerHTML='<label class="btn primary" for="limitlessHomeDeckFile">Upload JSON Deck</label><input id="limitlessHomeDeckFile" type="file" accept=".json,.csv,application/json,text/csv"><button id="limitlessExampleDeck" class="btn" type="button">Download JSON</button><span id="limitlessImportStatus" class="btn"></span>';
     const ex=document.getElementById('limitlessExampleDeck'); if(ex) ex.onclick=()=>{ if(typeof window.exportProgress351==='function') window.exportProgress351(); else downloadJson(); };
     updateImportButtons();
   }
@@ -10566,6 +10567,10 @@ function fixCanonicalDisplayTitle351() {
   font-size:11px;
   letter-spacing:.14em;
 }
+#limitlessImportStatus{
+  pointer-events:auto!important;
+  cursor:pointer!important;
+}
 .ratingBar{
   display:flex!important;
   align-items:center!important;
@@ -11732,13 +11737,29 @@ function fixStableOneThingDropdown351() {
     if (q('exportMergeInfo2')) { q('exportMergeInfo2').textContent = 'Export Progress Summary'; q('exportMergeInfo2').onclick = exportSessionSummary; }
     if (q('browseReview351')) q('browseReview351').onclick = () => { showReviewPhase3(); };
     if (q('settingsBtn')) q('settingsBtn').textContent = 'Settings';
-    document.querySelectorAll('#limitlessImportStatus,#limitlessLocalDeckStorage').forEach(el => {
+    let progressBtn = document.getElementById('limitlessImportStatus');
+    const localDeckStorage = document.getElementById('limitlessLocalDeckStorage');
+    if (!progressBtn && localDeckStorage) {
+      localDeckStorage.id = 'limitlessImportStatus';
+      progressBtn = localDeckStorage;
+    }
+    if (localDeckStorage) {
       const n = appCards().length;
-      el.textContent = n ? (n + ' cards') : '';
-      el.onclick = null;
-      el.style.pointerEvents = 'none';
-      el.setAttribute('aria-disabled','true');
-    });
+      localDeckStorage.textContent = n ? (n + ' cards') : '';
+      localDeckStorage.onclick = null;
+      localDeckStorage.style.pointerEvents = 'none';
+      localDeckStorage.setAttribute('aria-disabled','true');
+    }
+    if (progressBtn) {
+      const n = appCards().length;
+      progressBtn.textContent = n ? `Progress ↗ (${n} cards)` : 'Progress ↗';
+      progressBtn.removeAttribute('aria-disabled');
+      progressBtn.style.pointerEvents = 'auto';
+      progressBtn.style.cursor = 'pointer';
+      progressBtn.onclick = () => {
+        window.open('progress_beta.html', '_blank');
+      };
+    }
   }
 
   function showReviewPhase3(mode) {
