@@ -1,36 +1,4 @@
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
-._*
-
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-
-# Editors / IDEs
-.vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
-
-# Node / Python
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-__pycache__/
-*.py[cod]
-*.pyo
-venv/
-.venv/
-
-# Secrets / local environment
-.env
-.env.local
-.env.*.local
-secrets.*
+# This repo uses .gitignore. Keep this copy only as a readable reference.
 
 # Private decks and source databases - keep these off public branches
 mgh_whitebook_cards_v17_index.json
@@ -44,39 +12,30 @@ ABIM_JSON_SCHEMA_REFERENCE.txt
 COZY_ARCADE_BOARD_PREP_MEDICINE_WEB_v3_5_3_ABIM*.html
 COZY_ARCADE_MGH*.html
 
-# Backups, temp, and app exports
-*.bak
-*.bak_card_id_*
-*.tmp
-*.swp
-*~
+# App exports and local backups
 *_entire_bundle_*.json
 *_progress_patch_*.json
 *_cards_only_*.json
 *_shadow_dungeon_subset_*.json
 solo_studying_*.json
-
-# Logs
+*.bak
+*.tmp
 *.log
 
-# Local SRS / Atlas validation fixtures - keep private, allow Graphify
-test-fixtures/srs/*.json
+# Deck backups and progress exports
+cozy_arcade_deck_with_progress_backup*.json
+cozy_arcade_progress_*.json
+*_backup*.json
+*_progress_backup*.json
 
-# macOS metadata
-.DS_Store
-
-# Graphify generated/cache files
-graphify-out/cache/
-graphify-out/graph.json
-graphify-out/manifest.json
-graphify-out/.graphify_*
-
-# Local assistant/tool config and duplicate working folders
-.agents/
-.codex/
-cozy-arcade-app-PHASE2/
-
-# Local planning/media not for repo
+# Continuity prompts and RTF docs (local planning files)
 *.rtf
-Study Mode Selectable.png
-AGENTS.md
+*MASTER_CONTINUITY*.rtf
+*CONTINUITY_PROMPT*.rtf
+
+# Status and planning docs (keep in repo only if intentional)
+# Uncomment to ignore:
+# COZY_ARCADE_PROJECT_STATUS*.md
+
+# Reference copy of gitignore (Git only reads .gitignore)
+gitignore.txt
