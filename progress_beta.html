@@ -1510,6 +1510,12 @@ function init() {
   window.addEventListener('resize',resize);
 
   atlasLoadDeck();
+  if (sessionStorage.getItem('cozy_atlas_pending_refresh')) {
+    sessionStorage.removeItem('cozy_atlas_pending_refresh');
+    atlasLoadDeck();
+    mergeSysFromDeck();
+    fullRefreshDisplay();
+  }
   progress=readProgress();
   mergeSysFromDeck();
   sysMap=buildSysMap(progress);

@@ -11899,14 +11899,16 @@ function fixStableOneThingDropdown351() {
               const id = c?.qid_unique || c?.qid || c?.card_id || c?.id;
               return id ? { qid_unique: id, sys: c?.sys || c?.system || '—' } : null;
             }).filter(Boolean);
-            localStorage.setItem('cozy_arcade_limitless_cards_v1', JSON.stringify({
+            const payload = JSON.stringify({
               metadata: {
                 deck_label: phase3State?.deck_label || 'Cozy Arcade Board Prep Medicine',
                 stored_at: nowIso ? nowIso() : new Date().toISOString(),
                 atlas_cache_mode: 'sys-map only'
               },
               cards: sysMap
-            }));
+            });
+            localStorage.setItem('cozy_arcade_limitless_cards_v1', payload);
+            sessionStorage.setItem('cozy_atlas_pending_refresh', '1');
           }
         } catch(_) {}
         window.open('progress_beta.html', '_blank');
