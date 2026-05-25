@@ -472,27 +472,71 @@ function hydrateDeckMap(cardsArr) {
   });
 }
 
+function atlasCompactCard(c, minimal) {
+  const fields = minimal
+    ? ['qid','qid_unique','card_id','original_qid','legacy_id','sys','diagnosis']
+    : ['qid','qid_unique','card_id','original_qid','legacy_id','sys','diagnosis','presentation','one_thing','board_trigger','educational_objective'];
+  const out = {};
+  fields.forEach(k => {
+    if (c && c[k] !== undefined && c[k] !== null && String(c[k]).length) out[k] = c[k];
+  });
+  return out;
+}
+
+function writeAtlasDeckCache(metadata, cardsArr) {
+  const stamp = { stored_at: new Date().toISOString(), cards_embedded: cardsArr.length };
+  const attempts = [
+    { mode: 'full deck cache', cards: cardsArr },
+    { mode: 'compact deck cache', cards: cardsArr.map(c => atlasCompactCard(c, false)) },
+    { mode: 'atlas-minimal deck cache', cards: cardsArr.map(c => atlasCompactCard(c, true)) }
+  ];
+  let lastErr = null;
+  for (const attempt of attempts) {
+    try {
+      localStorage.setItem(DECK_STORAGE_KEY, JSON.stringify({
+        metadata: Object.assign({}, metadata, stamp, { atlas_cache_mode: attempt.mode }),
+        cards: attempt.cards
+      }));
+      if (attempt.mode !== 'full deck cache') {
+        console.info('Neural Atlas used ' + attempt.mode + ' due to browser storage quota.');
+      }
+      return attempt;
+    } catch(err) {
+      lastErr = err;
+    }
+  }
+  console.warn('Neural Atlas deck cache could not be persisted.', lastErr);
+  return { mode: 'deck cache unavailable', cards: [] };
+}
+
 function storeHydratedPayload(obj, cardsArr, incomingProgress) {
   const metadata = obj?.metadata || obj?.meta || {};
-  try {
-    localStorage.setItem(DECK_STORAGE_KEY, JSON.stringify({
-      metadata: Object.assign({}, metadata, { stored_at: new Date().toISOString(), cards_embedded: cardsArr.length }),
-      cards: cardsArr
-    }));
-  } catch(_) {}
+  const deckCache = writeAtlasDeckCache(metadata, cardsArr);
   try {
     localStorage.setItem(MAIN_STATE_KEY, JSON.stringify({
       schema_version: metadata.schema_version || '3.0',
       deck_label: metadata.deck_label || metadata.name || 'Cozy Arcade Board Prep Medicine',
       imported_at: new Date().toISOString(),
-      metadata,
+      metadata: Object.assign({}, metadata, { atlas_cache_mode: deckCache.mode }),
+      cards: deckCache.mode === 'full deck cache' ? undefined : deckCache.cards,
       progress: incomingProgress
     }));
-  } catch(_) {}
+  } catch(_) {
+    try {
+      localStorage.setItem(MAIN_STATE_KEY, JSON.stringify({
+        schema_version: metadata.schema_version || '3.0',
+        deck_label: metadata.deck_label || metadata.name || 'Cozy Arcade Board Prep Medicine',
+        imported_at: new Date().toISOString(),
+        metadata: Object.assign({}, metadata, { atlas_cache_mode: deckCache.mode, cards_stored_in: DECK_STORAGE_KEY }),
+        progress: incomingProgress
+      }));
+    } catch(_) {}
+  }
   try {
     localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify({ metadata: Object.assign({}, metadata, { type:'progress' }), progress: incomingProgress }));
   } catch(_) {}
   try { localStorage.setItem('soloStudyingState_v1757', JSON.stringify(incomingProgress)); } catch(_) {}
+  return deckCache.mode;
 }
 
 // ── File upload handler (progress JSON or deck JSON) ─────────
@@ -525,9 +569,10 @@ function ingestJSON(text, filename) {
     if (cardsArr && Array.isArray(cardsArr) && cardsArr.length > 0 && incomingProgress && (type === 'deck_with_progress' || type === 'full_gamestate' || obj.progress || obj.state)) {
       progress = incomingProgress;
       hydrateDeckMap(cardsArr);
-      storeHydratedPayload(obj, cardsArr, progress);
+      const cacheMode = storeHydratedPayload(obj, cardsArr, progress);
       mergeSysFromDeck();
-      showUploadStatus(`✓ Deck + progress: ${cardsArr.length} cards, ${Object.keys(progress).length} signals`, '#22c55e');
+      const compactNote = cacheMode && cacheMode !== 'full deck cache' ? ` · ${cacheMode}` : '';
+      showUploadStatus(`✓ Deck + progress: ${cardsArr.length} cards, ${Object.keys(progress).length} signals${compactNote}`, '#22c55e');
       fullRefreshDisplay();
       return;
     }
