@@ -39,3 +39,7 @@ cozy_arcade_progress_*.json
 
 # Reference copy of gitignore (Git only reads .gitignore)
 gitignore.txt
+
+# macOS metadata (regenerates on folder access)
+.DS_Store
+**/.DS_Store
