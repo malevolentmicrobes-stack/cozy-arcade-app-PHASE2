@@ -58,3 +58,6 @@ solo_studying_*.json
 
 # Logs
 *.log
+
+# Local SRS / Atlas validation fixtures - keep private, allow Graphify
+test-fixtures/srs/*.json

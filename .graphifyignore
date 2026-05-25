@@ -4,14 +4,15 @@ node_modules/
 dist/
 build/
 
+archive/
+old/
+drafts/
+backup/
+status_old/
 cozy-arcade-app-PHASE2/
 cozy-arcade-app/
 cozy-arcade/
-*copy*/
 
-*.md
-*.txt
-*.json
 *.png
 *.jpg
 *.jpeg
@@ -22,9 +23,6 @@ cozy-arcade/
 *.webm
 *.xlsx
 *.csv
-
-archive/
-old/
-drafts/
-backup/
-index_PRIOR.html
+*.bak
+*.tmp
+*.log
