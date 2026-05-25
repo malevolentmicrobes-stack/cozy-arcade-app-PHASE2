@@ -488,7 +488,12 @@ function writeAtlasDeckCache(metadata, cardsArr) {
   const attempts = [
     { mode: 'full deck cache', cards: cardsArr },
     { mode: 'compact deck cache', cards: cardsArr.map(c => atlasCompactCard(c, false)) },
-    { mode: 'atlas-minimal deck cache', cards: cardsArr.map(c => atlasCompactCard(c, true)) }
+    { mode: 'atlas-minimal deck cache', cards: cardsArr.map(c => atlasCompactCard(c, true)) },
+    { mode: 'sys-map only', cards: cardsArr.map(c => {
+        const id = c?.qid_unique || c?.qid || c?.card_id || c?.id;
+        return id ? { qid_unique: id, sys: c?.sys || '—' } : null;
+      }).filter(Boolean)
+    }
   ];
   let lastErr = null;
   for (const attempt of attempts) {
