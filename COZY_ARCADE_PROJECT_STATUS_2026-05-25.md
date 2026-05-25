@@ -1,10 +1,35 @@
 # Cozy Arcade Board Prep Medicine — Project Status
 
-**Date:** May 25, 2026 (updated ~1pm)
+**Date:** May 25, 2026 (updated ~2pm)
 **Repo:** `cozy-arcade-app- PHASE2` · `malevolentmicrobes-stack/cozy-arcade-app`
 **Primary files:** `index.html` (10,604+ lines), `progress_beta.html`
 **Git HEAD:** `ab9d206` — Install Graphify Claude project context
 **Origin sync:** ✅ Local = origin/main (clean working tree)
+
+---
+
+## ⚡ Premortem Corrections (read before any terminal session)
+
+| # | Correction |
+|---|---|
+| 1 | Phase 2 mobile shell is **already done** — commit `5b2154e` on origin/main, pulled via rebase. Do not treat as pending. |
+| 2 | Git is **clean and synced** at `ab9d206`. Nothing to push. |
+| 3 | **Active Task A** = Atlas/deck hydration persistence. Run this first. |
+| 4 | **Active Task B** = SRS Again timing. Run this second, browser-first. |
+| 5 | Task B must NOT start until Task A is diagnosed and patched. |
+| 6 | SRS math (`rate()`, `rateCard()`) is protected and verified 13/13. Do not rewrite. |
+| 7 | Task B always starts with `window.runSRSValidation()` in browser — not a Codex grep task. |
+
+**Immediate next terminal session order:**
+```
+1. Confirm .gitignore exists (not just gitignore.txt) and private files are ignored
+   → git check-ignore -v <exported JSON> <RTF continuity prompt>
+2. graphify update .
+3. Task A diagnosis only — no edits
+4. Patch only if exact failing branch confirmed
+5. Browser validate Atlas reload with deck_with_progress
+6. Then Task B browser-first SRS Again timing
+```
 
 ---
 
@@ -99,18 +124,25 @@
 
 **Terminal prompt — Task A (diagnosis only, no edits):**
 ```
-Use Graphify first if helpful. Run: graphify update .
+Premortem check first:
+- Phase 2 mobile shell is already done (5b2154e). Do not revisit.
+- Git is clean at ab9d206. No pending push.
+- Task A = Atlas hydration diagnosis only. No edits.
+- Task B (SRS) does not start until Task A is resolved.
 
-Read:
-1. CLAUDE.md
-2. COZY_ARCADE_PROJECT_STATUS_2026-05-25.md
-3. graphify-out/GRAPH_REPORT.md
+Step 0 — Verify .gitignore:
+- Confirm .gitignore exists (not just gitignore.txt)
+- Run: git check-ignore -v cozy_arcade_deck_with_progress_backup*.json
+- Run: git check-ignore -v *MASTER_CONTINUITY*.rtf
+- Report what is and isn't ignored
 
-Task: Atlas/deck hydration diagnosis. Do not edit files.
+Step 1:
+graphify update .
 
-Inspect only index.html and progress_beta.html.
+Step 2:
+Read: CLAUDE.md, COZY_ARCADE_PROJECT_STATUS_2026-05-25.md, graphify-out/GRAPH_REPORT.md
 
-Check:
+Step 3 — Inspect only index.html and progress_beta.html:
 1. When main app opens Progress, does it first persist cards to cozy_arcade_limitless_cards_v1?
 2. Does it persist progress to cozy_arcade_state_v3 and cozy_arcade_progress_v1?
 3. Does progress_beta.html read cozy_arcade_limitless_cards_v1 before building system nodes?
@@ -121,10 +153,11 @@ Check:
 8. Does Atlas top-bar Import JSON language bias users toward progress-only import?
 
 Output:
+- .gitignore status (ignored / not ignored / missing)
 - exact failing branch/function
-- whether this is persistence, classification, quota, or same-origin
+- whether failure is: quota, classification, same-origin, or fallback-cache
 - smallest safe patch description
-- no edits yet
+- no edits
 ```
 
 **Commit gate (when patch is ready):**
@@ -284,3 +317,132 @@ Energy per rating: easy=30, good=20, hard=10, again=4.
 > Graphify = AST + graph traversal over the actual repo. Use it in terminal.
 > Claude web = judgment, planning, status synthesis. Does not see your repo unless you upload files.
 
+
+---
+
+## Iron Rules — DO NOT TOUCH (from MASTER_CONTINUITY_PROMPT v3)
+
+These functions/elements must never be rewritten or renamed. Any Codex output that modifies them must be rejected.
+
+| Function / Element | Reason |
+|---|---|
+| `rate()` | Core SRS engine — any rewrite breaks all ratings |
+| `rateCard()` | SM-2 math — verified 13/13 tests passing |
+| `advance()` | Card progression — rewriting causes reveal glitches |
+| `fullCard()` | Full Card toggle — wired via `fullInlineBtn` at runtime |
+| `saveState()` | localStorage persistence — key is `soloStudyingState_v1757` |
+| `updateKpis()` | Live KPI counters — called after every state change |
+| `canonicalCardId()` | Progress key deduplication — `qid_unique → qid → hash` |
+| `importDeck()` | Deck loading with merge support |
+| One Thing textarea | `data-rate` keydown guard must remain; spacebar must not advance |
+| `id="soloFull"` / `id="domainFull"` | Full Card — do not remove |
+| `id="runner"` | Runner sprite — renaming breaks CSS animations |
+| `id="choiceRow"` | Answer row — CSS drop animation targets this id |
+
+**localStorage keys — NEVER change these:**
+- `soloStudyingState_v1757` — base game state
+- `cozy_arcade_progress_v1` — Phase 3 progress records
+- `cozy_arcade_persona_v1` — persona selection
+- `cozyQuestionSeconds351` — timer setting
+- `cozy_arcade_limitless_cards_v1` — deck card data (Atlas contract)
+
+**Architecture rules:**
+1. Search the ENTIRE file for every target string — fix ALL instances (same function may appear in base HTML + 2–4 later injection blocks)
+2. Do NOT add a new script block — edit existing blocks in-place
+3. All changes must be additive or in-place only — never destructive
+4. `node --check` on ALL script blocks must pass before any commit
+5. If a visual change requires new JS, skip and report it — do not invent new logic
+
+**Reject any Codex output containing these patterns:**
+
+| Pattern | Problem |
+|---|---|
+| `card.presentation` used as answer | Mapping swap — presentation IS the question |
+| `educational_objective` as question | Same swap — reject immediately |
+| `rate()` or `rateCard()` rewritten | Breaks SM-2 math and 13/13 test suite |
+| localStorage key changed | State permanently lost |
+| `stage = 'learning'` in rateCard | Invalid stage — only `new` / `review` / `relearning` |
+| `id="soloFull"` or `id="domainFull"` removed | Full Card breaks entirely |
+| New script block added at bottom | Violates patch architecture |
+| `abim-NNN` keys written anywhere | Progress key collision |
+
+---
+
+## SM-2 SRS Spec (verified 13/13 — do not re-implement)
+
+| Rating | ease_factor Δ | interval formula | stage after | repair_point |
+|--------|--------------|-----------------|-------------|-------------|
+| again | −0.20 | 0 days (relearn in 10 min) | relearning | true |
+| hard | −0.15 | max(1, round(i × 1.2)) | review | true |
+| good | ±0 | i≤0 → 1d else max(1, round(i×e)) | review | false |
+| easy | +0.15 | i≤0 → 4d else max(4, round(i×e×1.3)) | review | false |
+| pin | none | unchanged | unchanged | unchanged |
+
+ease_factor: floor 1.3 · default 2.5 · ceiling 4.0
+
+**Browser validation (run in console, not in Codex):**
+```
+window.runSRSValidation()   → must output: ✅ SRS: 13/13 passed
+window.runCozySmokeTests()  → must output: 20/20 passed
+```
+
+---
+
+## Correction to Task B — SRS Validation Protocol
+
+> ⚠️ Error in previous status draft: Task B was framed as a Claude Code terminal grep task.
+> The master continuity prompt explicitly says: **"Run in browser only (not Codex) → console test suite."**
+
+**Correct Task B protocol:**
+
+**Step 1 — Browser first (always):**
+```
+1. Open index.html in Chrome/Firefox
+2. Upload your deck
+3. Open DevTools console
+4. Run: window.runSRSValidation()   → expect 13/13
+5. Run: window.runCozySmokeTests()  → expect 20/20
+6. Play one card, rate Again
+7. Check in console: Does card reappear immediately? Or in 10 minutes?
+```
+
+**Step 2 — Only if browser test fails, then use Claude Code terminal:**
+```
+Use Graphify first. Run: graphify update .
+
+Read:
+1. CLAUDE.md
+2. COZY_ARCADE_PROJECT_STATUS_2026-05-25.md
+
+SM-2 math is already verified 13/13. Do NOT re-verify rateCard() math.
+
+Specific failing test: [paste exact console output / symptom here]
+
+Inspect only the failing function — suspected: isDue()
+
+Check ONLY:
+- Does isDue() check next_due_at first?
+- Or does repair_point/stage='relearning' override timing immediately?
+
+Output:
+- exact line/function where timing gate fails
+- smallest safe patch (no edits unless approved)
+- no other changes
+```
+
+**Step 3 — If patch confirmed safe:**
+- Apply in-place edit only (no new script block)
+- `node --check` all script blocks
+- `git diff --check`
+- Browser retest: `window.runSRSValidation()` → 13/13
+- Commit: `Fix isDue: respect next_due_at for relearning cards`
+
+---
+
+## User-Facing Docs Status
+
+| File | Status |
+|------|--------|
+| `HOW_TO_CREATE_YOUR_OWN_CARDS (1).md` | ✅ Canonical — v3 schema, full field reference, AI conversion + manual methods |
+| `HOW_TO_CREATE_YOUR_OWN_CARDS(1).md` | Older/simpler version — superseded by v3 above |
+| `5_23_MASTER_CONTINUITY_PROMPT.rtf` | ✅ Iron rules reference — last validated commit `053b14c`. Update Section 5 to reflect commits through `ab9d206`. |
