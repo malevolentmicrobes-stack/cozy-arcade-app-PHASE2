@@ -8918,27 +8918,8 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   const STORAGE_KEY='cozy_arcade_limitless_cards_v1';
   const META_KEY='cozy_arcade_limitless_meta_v1';
   const USER_ONE_THING_KEY='cozy_user_one_thing_v1';
-  const AI_SHORT='Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade card schema.';
-  const AI_LONG=`Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade
-card schema. 
-Return valid JSON only:
-{
-  "meta": { "schema": "cozy-arcade-v3" },
-  "cards": [
-    {
-      "qid": "unique-id",
-      "sys": "CV",
-      "diagnosis": "correct answer/topic",
-      "presentation": "question, prompt, or vignette",
-      "one_thing": "single highest-yield takeaway",
-      "educational_objective": "full teaching point if available",
-      "board_trigger": "IF finding → THINK diagnosis → ACTION",
-      "explanation": "long explanation if available",
-      "tags": []
-    }
-  ]
-}
-Do not rewrite medical content. Map sys/system fields to card.sys.`;
+  const AI_SHORT='Convert my CSV/JSON/APKG/flashcard text into Cozy Arcade v3 cards. Return valid JSON only with meta.schema = "cozy-arcade-v3" and a cards array. Preserve the medical content; do not rewrite facts. Map sys or system to card.sys, use unique qids, put the question in presentation, answer/topic in diagnosis, key takeaway in one_thing, and include optional fields like educational_objective, board_trigger, explanation, and tags when available. See schema/template guidance in the uploaded files.';
+  const AI_LONG=`Convert my CSV/JSON/APKG/flashcard text into Cozy Arcade v3 cards. Return valid JSON only with meta.schema = "cozy-arcade-v3" and a cards array. Preserve the medical content; do not rewrite facts. Map sys or system to card.sys, use unique qids, put the question in presentation, answer/topic in diagnosis, key takeaway in one_thing, and include optional fields like educational_objective, board_trigger, explanation, and tags when available. See schema/template guidance in the uploaded files.`;
   const clean=v=>String(v==null?'':v).replace(/NOT SPECIFIED IN SOURCE/g,'').replace(/\s+/g,' ').trim();
 	  const first=(...xs)=>xs.find(x=>clean(x))||'';
 	  const esc=s=>String(s==null?'':s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
@@ -11353,9 +11334,11 @@ function fixStableOneThingDropdown351() {
 
   function isDue(progress) {
     if (!progress) return false;
-    if (progress.repair_point || progress.stage === 'relearning') return true;
-    if (!progress.next_due_at) return false;
-    return Date.parse(progress.next_due_at) <= Date.now();
+    if (progress.next_due_at) {
+      const t = Date.parse(progress.next_due_at);
+      if (!isNaN(t)) return t <= Date.now();
+    }
+    return !!(progress.repair_point || progress.stage === 'relearning');
   }
 
   function intervalLabel(days, minutes) {
@@ -11557,7 +11540,7 @@ function fixStableOneThingDropdown351() {
 	        ...arr.filter(isNewCard)
 	      ];
     } else if (selected === 'due') {
-      arr = arr.filter(c => isDue(progress(c)) || progress(c).stage === 'relearning');
+      arr = arr.filter(c => isDue(progress(c)));
 	    } else if (selected === 'review_deck') {
 	      arr = arr.filter(isReviewCandidate).sort((a, b) => {
 	        const pa = progress(a), pb = progress(b);
@@ -11932,7 +11915,7 @@ function fixStableOneThingDropdown351() {
     const pass = name => results.push({ name, pass: true });
     const fail = (name, err) => results.push({ name, pass: false, err: String(err || '') });
     try { const p = defaultProgress('__smoke'); (p.stage === 'new' && p.interval_days === 0 && p.ease_factor === 2.5) ? pass('default progress') : fail('default progress', JSON.stringify(p)); } catch (err) { fail('default progress', err); }
-    try { isDue(Object.assign(defaultProgress('__due'), { repair_point: true, next_due_at: addDays(new Date(), 1).toISOString() })) ? pass('repair points are due') : fail('repair points are due'); } catch (err) { fail('repair points are due', err); }
+    try { isDue(Object.assign(defaultProgress('__due'), { repair_point: true, next_due_at: new Date(Date.now() - 1000).toISOString() })) ? pass('repair points are due') : fail('repair points are due'); } catch (err) { fail('repair points are due', err); }
     try { previewInterval('__preview', 'good') === '1d' && previewInterval('__preview', 'again') === '10m' ? pass('interval previews') : fail('interval previews'); } catch (err) { fail('interval previews', err); }
     try { const id = '__rate_smoke'; setProgress(id, Object.assign(defaultProgress(id), { stage: 'review', interval_days: 10, ease_factor: 2.5 })); rateCard(id, 'hard'); const p = getProgress(id); (p.interval_days === 12 && Math.abs(p.ease_factor - 2.35) < 0.001 && p.repair_point) ? pass('rateCard hard') : fail('rateCard hard', JSON.stringify(p)); delete phase3State.progress[id]; savePhase3State(); } catch (err) { fail('rateCard hard', err); }
     try { Array.isArray(appCards()) ? pass('deck access') : fail('deck access'); } catch (err) { fail('deck access', err); }

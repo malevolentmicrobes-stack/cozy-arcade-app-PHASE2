@@ -3,7 +3,7 @@
 **Date:** May 25, 2026 (updated ~2pm)
 **Repo:** `cozy-arcade-app- PHASE2` · `malevolentmicrobes-stack/cozy-arcade-app`
 **Primary files:** `index.html` (10,604+ lines), `progress_beta.html`
-**Git HEAD:** `ab9d206` — Install Graphify Claude project context
+**Git HEAD:** `4af9aed` — fix(atlas): sessionStorage refresh flag for Safari file:// localStorage isolation
 **Origin sync:** ✅ Local = origin/main (clean working tree)
 
 ---
@@ -107,64 +107,48 @@
 
 ## Active: Task A — Atlas / Deck Hydration Fix
 
-**Status:** 🔶 Diagnosed. Surgical patch designed. Not yet applied.
+**Status:** 🔶 Partially patched. One final patch remaining. Credits exhausted — resume next session.
 **Priority:** HIGH — blocks full Atlas reload persistence.
 
-**Symptom:** Atlas shows progress-only state (22-signal) instead of full deck+progress (full system nodes) after reload.
+**Symptom:** Atlas shows progress-only state ("No deck loaded") instead of full system nodes after reload or Progress button click.
 
-**Root cause differential (confirmed most likely first):**
+**Confirmed root cause:** `QuotaExceededError` silently swallowed in all three deck-write paths. Full deck (~10MB, 1249 cards) exceeds 5MB localStorage quota.
 
-| # | Cause | Likelihood |
-|---|-------|-----------|
-| B | `QuotaExceededError` silently swallowed — ~9.3MB deck fails `localStorage.setItem`, Atlas falls back to progress-only on reload | **Highest** |
-| E | Atlas `ingestJSON()` classifies `deck_with_progress` as progress-only (checks `progress` key first, returns early, skips `cards[]`) | High |
-| A | `index.html` and `progress_beta.html` running from different origins/paths (file:// vs localhost) — localStorage not shared | Medium |
-| C | Atlas import UI language biases user to drop progress-only JSON instead of `deck_with_progress` | Medium |
-| D | `isDue()` / pool uses `repair_point` flag to make card immediately due, overriding `next_due_at` | Medium (overlaps Task B) |
+**Patches already applied (committed and pushed):**
 
-**Terminal prompt — Task A (diagnosis only, no edits):**
-```
-Premortem check first:
-- Phase 2 mobile shell is already done (5b2154e). Do not revisit.
-- Git is clean at ab9d206. No pending push.
-- Task A = Atlas hydration diagnosis only. No edits.
-- Task B (SRS) does not start until Task A is resolved.
+| Commit | File | Fix |
+|--------|------|-----|
+| `318f1ce` | `progress_beta.html` | `writeAtlasDeckCache`: added 4th `sys-map only` attempt when full/compact/minimal all fail quota |
+| `bae4f2e` | `index.html` | Progress button onclick: flush compact sys-map to `cozy_arcade_limitless_cards_v1` before `window.open` |
+| `4af9aed` | both | Serialize to `payload` var; add (now-confirmed-broken) `sessionStorage` retry flag |
 
-Step 0 — Verify .gitignore:
-- Confirm .gitignore exists (not just gitignore.txt)
-- Run: git check-ignore -v cozy_arcade_deck_with_progress_backup*.json
-- Run: git check-ignore -v *MASTER_CONTINUITY*.rtf
-- Report what is and isn't ignored
+**Confirmed still broken:**
+- `sessionStorage` is tab-scoped — flag written in index.html tab A is invisible to progress_beta.html tab B. The retry block in `init()` (lines 1513–1518) **never executes**.
+- Silent `catch(_){}` at line 11913 of index.html hides any `localStorage.setItem` failure for the compact sys-map write.
+- If localStorage quota is full at click time, nothing is written and Atlas opens with empty deckMap.
 
-Step 1:
-graphify update .
+**Next patch (one in-place edit, index.html only):**
 
-Step 2:
-Read: CLAUDE.md, COZY_ARCADE_PROJECT_STATUS_2026-05-25.md, graphify-out/GRAPH_REPORT.md
+In the Progress button onclick handler (around line 11894), make these three changes:
+1. Add `localStorage.removeItem('cozy_arcade_limitless_cards_v1');` before the `localStorage.setItem` — clears stale/oversized prior value to free quota before writing the compact sys-map.
+2. Remove `sessionStorage.setItem('cozy_atlas_pending_refresh', '1');` — dead code.
+3. Replace `catch(_){}` with named catch + `console.warn` + `alert` so quota failures surface to the user.
 
-Step 3 — Inspect only index.html and progress_beta.html:
-1. When main app opens Progress, does it first persist cards to cozy_arcade_limitless_cards_v1?
-2. Does it persist progress to cozy_arcade_state_v3 and cozy_arcade_progress_v1?
-3. Does progress_beta.html read cozy_arcade_limitless_cards_v1 before building system nodes?
-4. Does progress_beta.html ingest deck_with_progress before progress-only handling?
-5. Does any localStorage.setItem for the full deck silently catch QuotaExceededError?
-6. Is there a compact/atlas-minimal fallback if the full deck is too large?
-7. Are index.html and progress_beta.html assumed to be same-origin?
-8. Does Atlas top-bar Import JSON language bias users toward progress-only import?
+Also remove the dead sessionStorage retry block from `progress_beta.html` init() (lines 1513–1518).
 
-Output:
-- .gitignore status (ignored / not ignored / missing)
-- exact failing branch/function
-- whether failure is: quota, classification, same-origin, or fallback-cache
-- smallest safe patch description
-- no edits
-```
-
-**Commit gate (when patch is ready):**
+**Commit gate:**
 - [ ] `git diff --check -- index.html progress_beta.html` passes
-- [ ] Import `deck_with_progress` → reload → Atlas shows full system nodes (not 22-signal)
-- [ ] No Phase 1.1 / 1.2 regressions
-- [ ] Suggested message: `Fix localStorage quota: atlas-minimal fallback on oversized deck`
+- [ ] Import `deck_with_progress` → click Progress → `Object.keys(deckMap).length > 0` in Atlas console
+- [ ] "No deck loaded" hint is hidden
+- [ ] System nodes render
+- [ ] `localStorage.getItem('cozy_arcade_limitless_cards_v1')` is compact sys-map, not full 10MB deck
+- [ ] No `QuotaExceededError` in console
+- [ ] Suggested message: `fix(atlas): removeItem before sys-map write + surface quota errors`
+
+**Do NOT touch:**
+- `setAppCards()` (line 11061) — leave full-deck write attempt as-is, it already fails silently and that's acceptable
+- `rating/rateCard()/rate()` — SRS math verified 13/13, protected
+- import/export schema, progress schema, medical card content
 
 ---
 
