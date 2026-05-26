@@ -1,16 +1,16 @@
 # Graph Report - cozy-arcade-app- PHASE2  (2026-05-26)
 
 ## Corpus Check
-- 28 files · ~2,621,666 words
+- 29 files · ~2,623,038 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1713 nodes · 1703 edges · 87 communities (81 shown, 6 thin omitted)
+- 1733 nodes · 1723 edges · 88 communities (82 shown, 6 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `d162708c`
+- Built from commit: `abbedb41`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -101,6 +101,7 @@
 - [[_COMMUNITY_Community 84|Community 84]]
 - [[_COMMUNITY_Community 85|Community 85]]
 - [[_COMMUNITY_Community 86|Community 86]]
+- [[_COMMUNITY_Community 87|Community 87]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `11 - 13303` - 24 edges
@@ -117,7 +118,7 @@
 ## Surprising Connections (you probably didn't know these)
 - None detected - all connections are within the same source files.
 
-## Communities (87 total, 6 thin omitted)
+## Communities (88 total, 6 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.04
@@ -192,8 +193,8 @@ Cohesion: 0.08
 Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
 
 ### Community 20 - "Community 20"
-Cohesion: 0.04
-Nodes (44): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+36 more)
+Cohesion: 0.08
+Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
 
 ### Community 21 - "Community 21"
 Cohesion: 0.08
@@ -212,8 +213,8 @@ Cohesion: 0.08
 Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
 
 ### Community 25 - "Community 25"
-Cohesion: 0.08
-Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
+Cohesion: 0.04
+Nodes (44): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+36 more)
 
 ### Community 26 - "Community 26"
 Cohesion: 0.08
@@ -316,8 +317,8 @@ Cohesion: 0.08
 Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
 
 ### Community 56 - "Community 56"
-Cohesion: 0.08
-Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
+Cohesion: 0.04
+Nodes (44): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+36 more)
 
 ### Community 57 - "Community 57"
 Cohesion: 0.08
@@ -356,8 +357,8 @@ Cohesion: 0.08
 Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
 
 ### Community 66 - "Community 66"
-Cohesion: 0.04
-Nodes (44): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+36 more)
+Cohesion: 0.08
+Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
 
 ### Community 67 - "Community 67"
 Cohesion: 0.08
@@ -424,8 +425,8 @@ Cohesion: 0.40
 Nodes (5): 1A. CSS Consolidation, 1B. JS Consolidation, code:css (/* === 1. CSS VARIABLES / ROOT === */), code:js (// === SECTION 1: APP DATA (DATA object, cards, state) ===), Phase 1 — Consolidate Without Breaking (1–2 sessions)
 
 ### Community 83 - "Community 83"
-Cohesion: 0.06
-Nodes (35): #1 — `selectSolo` is overridden 13 times; stale timer handles cause double-advance, #2 — `bindRatings` accumulates duplicate click handlers across the 12-deep reveal chain, #3 — Timer setting in Settings has no effect (Apply never writes `cozyQuestionSeconds351`), #4 — `bionicOn` default regression + 3-key split-brain persistence, #5 — `makeChoices()` return value used as array assignment in `startCard()`, A. Bionic Reading Initialization, A. File 2 vs File 3 (Old Prior vs Earlier Prior), B. File 3 vs File 4 (Earlier Prior vs Blank Import) (+27 more)
+Cohesion: 0.05
+Nodes (38): #1 — `selectSolo` is overridden 13 times; stale timer handles cause double-advance, #2 — `bindRatings` accumulates duplicate click handlers across the 12-deep reveal chain, #3 — Timer setting in Settings has no effect (Apply never writes `cozyQuestionSeconds351`), #4 — `bionicOn` default regression + 3-key split-brain persistence, #5 — `makeChoices()` return value used as array assignment in `startCard()`, A. Bionic Reading Initialization, A. File 2 vs File 3 (Old Prior vs Earlier Prior), B. File 3 vs File 4 (Earlier Prior vs Blank Import) (+30 more)
 
 ### Community 84 - "Community 84"
 Cohesion: 0.22
@@ -433,28 +434,32 @@ Nodes (8): Behavior rules, code:block1 (/goal                        # show curr
 
 ### Community 85 - "Community 85"
 Cohesion: 0.25
-Nodes (7): Active Goal, Advancement Rules, Blocked Goals Queue (next after P3), code:block1 (condition: browser:console validation suite after Steps 1–8), Gate Condition, Gate Log, Project Goal Tracker
+Nodes (8): Active Goal, Advancement Rules, Blocked Goals Queue (next after P3), code:block1 (condition: browser:console validation after Step 3), Gate Condition, Gate Condition (Step 3), Gate Log, Project Goal Tracker
 
 ### Community 86 - "Community 86"
 Cohesion: 0.29
 Nodes (6): code:block1 (W = [0.4072,1.1829,3.1262,15.4722,7.2102,0.5316,1.0651,0.058), code:block2 (READ FIRST before any edits:), Error Catalog, Exact Test Vectors (computed from reference weights), FSRS v5 Implementation — Safe Validation Prompt, Session Prompt (paste into Claude Code terminal)
 
+### Community 87 - "Community 87"
+Cohesion: 0.12
+Nodes (15): Active Constraints (never violate), Architecture Notes (Current), Complete — Step 2: Consolidate bionicOn, Completed This Session (2026-05-26), Cozy Arcade Board Prep — Project Status, Current Phase: P-RC Rectifier (Steps 2–5 active), Deferred (after P-RC), Immediate — Steps 3–5 (+7 more)
+
 ## Knowledge Gaps
-- **1385 isolated node(s):** `schema`, `version`, `description`, `total`, `required_fields` (+1380 more)
+- **1398 isolated node(s):** `schema`, `version`, `description`, `total`, `required_fields` (+1393 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **6 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `progress` connect `Community 66` to `Community 54`, `Community 55`, `Community 56`, `Community 57`, `Community 58`, `Community 59`, `Community 60`, `Community 61`, `Community 62`, `Community 63`, `Community 64`, `Community 65`, `Community 67`, `Community 68`, `Community 69`, `Community 70`, `Community 71`, `Community 72`, `Community 73`?**
-  _High betweenness centrality (0.095) - this node is a cross-community bridge._
-- **Why does `progress` connect `Community 20` to `Community 16`, `Community 17`, `Community 18`, `Community 19`, `Community 21`, `Community 22`, `Community 23`, `Community 24`, `Community 25`, `Community 26`, `Community 27`, `Community 28`, `Community 29`, `Community 30`, `Community 31`, `Community 32`, `Community 33`, `Community 34`, `Community 35`?**
-  _High betweenness centrality (0.064) - this node is a cross-community bridge._
-- **Why does `card-0001` connect `Community 67` to `Community 66`?**
+- **Why does `progress` connect `Community 56` to `Community 54`, `Community 55`, `Community 57`, `Community 58`, `Community 59`, `Community 60`, `Community 61`, `Community 62`, `Community 63`, `Community 64`, `Community 65`, `Community 66`, `Community 67`, `Community 68`, `Community 69`, `Community 70`, `Community 71`, `Community 72`, `Community 73`?**
+  _High betweenness centrality (0.094) - this node is a cross-community bridge._
+- **Why does `progress` connect `Community 25` to `Community 16`, `Community 17`, `Community 18`, `Community 19`, `Community 20`, `Community 21`, `Community 22`, `Community 23`, `Community 24`, `Community 26`, `Community 27`, `Community 28`, `Community 29`, `Community 30`, `Community 31`, `Community 32`, `Community 33`, `Community 34`, `Community 35`?**
+  _High betweenness centrality (0.063) - this node is a cross-community bridge._
+- **Why does `card-0001` connect `Community 67` to `Community 56`?**
   _High betweenness centrality (0.016) - this node is a cross-community bridge._
 - **What connects `schema`, `version`, `description` to the rest of the system?**
-  _1385 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1398 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.0425531914893617 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**

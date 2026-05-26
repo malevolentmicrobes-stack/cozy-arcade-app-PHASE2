@@ -4,6 +4,7 @@
 ---
 
 - 2026-05-26 Codex: Browser-validated Steps 1+6-8 plus undo review; `makeChoices`, no double-advance, `loopSolo`, legacy choiceRow classes, FSRS 17/17, and smoke 6/6 all pass.
+- 2026-05-26 Codex: Browser-validated Step 2 bionic consolidation; fresh default true, ON/OFF single-key round-trip, no `cozyBionic351` writes, FSRS 17/17, and smoke 6/6 all pass.
 
 ## File Inventory
 
@@ -491,4 +492,22 @@ If fails (2+): Duplicate Continue buttons from multi-patch injection (Step 14 in
 | `window.runFSRSValidation()` | ✅ 17/17 |
 | `window.runCozySmokeTests()` | ✅ 6/6 |
 
-**Next:** Step 2 — consolidate `bionicOn` to `bionicOn_v1751523` only; set default `true`.
+### Step 2 — DONE 2026-05-26
+
+**What was executed:**
+- Changed base `bionicOn` default to `true`.
+- Consolidated all `localStorage.getItem/setItem('cozyBionic351')` paths to `bionicOn_v1751523`.
+- Updated bionic hydration defaults so missing storage means ON, not OFF.
+- Created/updated the settings drawer at boot so `drawerBionic351` is available and mirrors the single key after reload.
+
+**Validation results (browser, 2026-05-26):**
+| Check | Result |
+|-------|--------|
+| Fresh load after `localStorage.clear()` → `bionicOn === true` | ✅ PASS |
+| `bionicOn_v1751523='1'` reload → `bionicOn` true + drawer checked | ✅ PASS |
+| `bionicOn_v1751523='0'` reload → `bionicOn` false + drawer unchecked | ✅ PASS |
+| Applying bionic toggle writes only `bionicOn_v1751523` | ✅ PASS |
+| `window.runFSRSValidation()` | ✅ 17/17 |
+| `window.runCozySmokeTests()` | ✅ 6/6 |
+
+**Next:** Step 3 — fix the `patchSettingsText()` 1200ms interval so it does not race settings state.
