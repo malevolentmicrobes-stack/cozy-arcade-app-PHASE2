@@ -1123,7 +1123,7 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
     const apply=q('applyBtn'); if(apply && !apply.dataset.v175153){
       apply.dataset.v175153='1';
       apply.onclick=()=>{
-        try{deckMode=q('deckMode')?.value||deckMode; promptField=q('promptField')?.value||promptField; autoSelect=!!q('autoSelect')?.checked; bionicOn=!!q('bionicToggle')?.checked;}catch(e){}
+        try{deckMode=q('deckMode')?.value||deckMode; promptField=q('promptField')?.value||promptField; autoSelect=!!q('autoSelect')?.checked; bionicOn=!!q('bionicToggle')?.checked; localStorage.setItem('bionicOn_v1751523',bionicOn?'1':'0');}catch(e){}
         saveSpacedToggle(); toastSafe('Applied');
       };
     }
@@ -1291,7 +1291,7 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
     }
     let old=q('settingsContinue175153'); if(old) old.onclick=returnToPrior;
     if(!q('settingsContinue175154')){const b=document.createElement('button'); b.id='settingsContinue175154'; b.className='btn primary'; b.textContent='Continue'; b.onclick=returnToPrior; (box.querySelector('.controls')||box).appendChild(b);}
-    const apply=q('applyBtn'); if(apply) apply.onclick=()=>{deckMode=q('deckMode')?.value||deckMode; promptField='presentation'; autoSelect=!!q('autoSelect')?.checked; bionicOn=!!q('bionicToggle')?.checked; saveSpacing(); safeToast('Applied');};
+    const apply=q('applyBtn'); if(apply) apply.onclick=()=>{deckMode=q('deckMode')?.value||deckMode; promptField='presentation'; autoSelect=!!q('autoSelect')?.checked; bionicOn=!!q('bionicToggle')?.checked; try{localStorage.setItem('bionicOn_v1751523',bionicOn?'1':'0');}catch(e){} saveSpacing(); safeToast('Applied');};
     const cb=q('spacedToggle'); if(cb){cb.onchange=saveSpacing;}
   }
   const gear=q('gearBtn'); if(gear) gear.onclick=openSettings;
