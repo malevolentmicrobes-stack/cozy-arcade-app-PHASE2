@@ -3,8 +3,8 @@
 **Date:** 2026-05-26 (updated this session)
 **Repo:** `cozy-arcade-app- PHASE2` · `malevolentmicrobes-stack/cozy-arcade-app`
 **Primary files:** `index.html` (~12,811 lines), `progress_beta.html`
-**Git HEAD (main):** `20b166a` — fix(shadow-dungeon): gear double-fire + fallback guard
-**Origin sync:** ✅ Local = origin/main · public branch = `c889df9` (live site updated)
+**Git HEAD (main):** `0a4f9d3` — feat(fsrs): replace rateCard SM-2 math with FSRS v5
+**Origin sync:** ✅ Local = origin/main · public branch = `d4bc5c5` (live site updated — both remotes)
 
 ### Two-Repo Deployment Map
 
@@ -89,6 +89,56 @@ curl -s "https://malevolentmicrobes-stack.github.io/cozy-arcade-app-PHASE2/" | g
 ---
 
 ## Completed Log
+
+### This Session — P3 FSRS v5 Full Implementation (2026-05-26)
+**Status:** ✅ Committed `0a4f9d3`, pushed to `origin/main`, `origin/public`, `phase2/public`.
+
+**What changed:**
+
+| File | Change |
+|------|--------|
+| `index.html` | Phase 1–2: FSRS helpers + `runFSRSValidation()` inserted (`d2ba918`) |
+| `index.html` | Phase 4: `rateCard()` SM-2 math replaced with FSRS v5 (`0a4f9d3`) |
+| `index.html` | `previewInterval()` updated to use FSRS stability formula |
+| `GOAL.md` | Gate log updated; active goal advanced to P3.5 |
+
+**FSRS v5 helpers added (lines 11370–11437):**
+- `FSRS_W` — 19 default weights (open-spaced-repetition/fsrs5)
+- `fsrsInitStability(r)` / `fsrsInitDifficulty(r)` — first-review values from weights
+- `fsrsRetrievability(elapsedDays, S)` — R = exp(ln(0.9) × t/S)
+- `fsrsRecallStability(D, S, Rv, r)` — stability after successful recall
+- `fsrsForgetStability(D, S, Rv)` — stability after lapse (again)
+- `fsrsUpdateDifficulty(D, r)` — mean-reversion difficulty update
+- `fsrsNextInterval(S)` — interval = max(1, round(S))
+- `window.runFSRSValidation()` — 17-assertion validation suite
+
+**`rateCard()` replacement logic:**
+```
+isNew  = !p.stability && !p.interval_days
+prevS  = p.stability || max(interval_days, 1)   ← SM-2 migration path
+prevD  = p.difficulty || 5.0
+
+again  → isNew ? initStability : forgetStability  |  stage='relearning', 10m timer
+hard/good/easy → isNew ? initStability : recallStability  |  stage='review', interval=round(newS)
+
+setProgress() now writes: stability, difficulty, retrievability, ease_factor=2.5 (frozen for compat)
+```
+
+**Key design notes:**
+- `W[15] = 0.0` — hard penalty = 0, intentional FSRS v5 design (hard recalls don't penalize stability)
+- `ease_factor` kept at 2.5 always — SM-2 compat field, no longer drives scheduling
+- SM-2 cards without `stability` silently migrate: `prevS = max(interval_days, 1)`, `prevD = 5.0`
+- `previewInterval()` uses same FSRS path as `rateCard()` — previews now match actual scheduling
+
+**Validation (browser confirmed 2026-05-26):**
+```
+window.runFSRSValidation()   → ✅ FSRS: 17/17 passed
+window.runCozySmokeTests()   → ✅ { passed: 6, total: 6 }
+```
+
+**P3 gate:** ✅ PASSED. Active goal advanced to P3.5 — due-count widget.
+
+---
 
 ### This Session — Step-by-Step Build Plan + Premortem (2026-05-26)
 **Status:** ✅ Committed and pushed.
