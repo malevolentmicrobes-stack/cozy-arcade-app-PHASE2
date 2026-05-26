@@ -50,7 +50,7 @@
 
 ## Architecture Notes (Current)
 
-- **Single localStorage key per setting:** `cozyBionic351` → needs consolidation to `bionicOn_v1751523` (Step 2 still pending)
+- **Single localStorage key per setting:** `cozyBionic351` consolidated to `bionicOn_v1751523` (Step 2 complete)
 - **Drop mechanic:** v175151 only — RAF loop, `startTop` geometry from prompt bottom, `dropDistance` from track height. `loopSolo()` is now a no-op (clears base ticker).
 - **FSRS v5:** 19 weights, `stability`/`difficulty`/`retrievability` fields on progress. `previewInterval('good')` → `'3d'` for new cards. `W[15]=0.0` (hard penalty intentionally zero).
 - **Undo:** `window.__cozyLastReviewUndo372` holds one-deep snapshot; cleared after use. `window.undoReview()` is the API.
@@ -62,8 +62,8 @@
 | Step | Description | Status |
 |------|-------------|--------|
 | 1 | Fix `makeChoices` return value | ✅ DONE `d162708` |
-| 2 | Consolidate `bionicOn` to `bionicOn_v1751523`, default `true` | 🔄 ACTIVE |
-| 3 | Fix `patchSettingsText()` 1200ms loop — read single key | ⏳ PENDING |
+| 2 | Consolidate `bionicOn` to `bionicOn_v1751523`, default `true` | ✅ DONE |
+| 3 | Fix `patchSettingsText()` 1200ms loop — read single key | 🔄 ACTIVE |
 | 4 | Fix Apply button → write `cozyQuestionSeconds351` | ⏳ PENDING |
 | 5 | Normalize `timerMax` literals throughout | ⏳ PENDING |
 | 6 | `stopAllDropTimers()` + `loopSolo` override | ✅ DONE `d162708` |
@@ -75,14 +75,14 @@
 
 ## Next Steps (ordered)
 
-### Immediate — Step 2: Consolidate bionicOn
-1. Change `bionicOn=false` → `bionicOn=true` at base declaration (line 388 area)
-2. Find all reads of `cozyBionic351` — change to `bionicOn_v1751523`
-3. Find all writes of `cozyBionic351` — change to `bionicOn_v1751523`
-4. Remove the `patchSettingsText()` setInterval read of `bionicOn_v1751523` race (Step 3 follows)
-5. Verify: `localStorage.clear(); location.reload()` → `bionicOn === true`
+### Complete — Step 2: Consolidate bionicOn
+1. `bionicOn=false` → `bionicOn=true` at base declaration
+2. All localStorage reads/writes use `bionicOn_v1751523`
+3. No `cozyBionic351` key is written by Apply/drawer paths
+4. Drawer checkbox initializes at boot and mirrors `bionicOn_v1751523`
+5. Verified: fresh load default true, ON/OFF round-trip, FSRS 17/17, smoke 6/6
 
-### After Step 2 — Steps 3–5
+### Immediate — Steps 3–5
 - **Step 3:** Fix 1200ms `patchSettingsText()` interval to read `bionicOn_v1751523` only
 - **Step 4:** Add `localStorage.setItem('cozyQuestionSeconds351', soloTimerInput.value)` to Apply handler
 - **Step 5:** Remove hardcoded `7` timerMax literals

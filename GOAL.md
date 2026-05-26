@@ -2,21 +2,21 @@
 
 ## Active Goal
 
-**Goal:** P-RC Rectifier — Step 2: consolidate `bionicOn` to single key + correct default
+**Goal:** P-RC Rectifier — Step 3: fix `patchSettingsText()` 1200ms interval
 **Phase:** P-RC (Rectifier)
 **Reference:** `Chronological_Patch_Hx_RECTIFIER_PLAN_2026_05_26.md` — authoritative step list
 **Status:** IN PROGRESS
 
-**Completed (Steps 1 + 6–8):** ✅ DONE 2026-05-26
+**Completed (Steps 1, 2, 6–8):** ✅ DONE 2026-05-26
 - ✅ Step 1: `makeChoices` return value fixed — choices always Array(4), never undefined
 - ✅ Step 6: `stopAllDropTimers()` + `loopSolo` override added to v175151
 - ✅ Step 7: v17513 drop overrides + v17514 style+script deleted
 - ✅ Step 8: v17515 style+script deleted (primary double-advance source eliminated)
 - ✅ Bonus: Undo review (Cmd/Ctrl+Z + iOS shake) added via `v175372-rectifier-undo-makechoices-smoke`
+- ✅ Step 2: `bionicOn` consolidated to `bionicOn_v1751523` only; fresh-load default is `true`
 
-**Next priority (Steps 2–5):**
-- **Step 2 ← ACTIVE:** Consolidate `bionicOn` to `bionicOn_v1751523` only; set default `true`
-- Step 3: Fix `patchSettingsText()` 1200ms setInterval to read single key
+**Next priority (Steps 3–5):**
+- **Step 3 ← ACTIVE:** Fix `patchSettingsText()` 1200ms setInterval to read single key
 - Step 4: Fix Apply button to write `cozyQuestionSeconds351`
 - Step 5: Normalize remaining `timerMax` hardcoded literals
 
@@ -26,20 +26,19 @@
 
 ---
 
-## Gate Condition (Step 2)
+## Gate Condition (Step 3)
 
 ```
-condition: browser:console validation after Step 2
+condition: browser:console validation after Step 3
 expected:
-  1. localStorage.clear(); location.reload() → bionicOn === true on fresh load
-  2. localStorage.setItem('bionicOn_v1751523','1'); location.reload() → bionicOn === true, drawer checkbox checked
-  3. localStorage.setItem('bionicOn_v1751523','0'); location.reload() → bionicOn === false, drawer checkbox unchecked
-  4. cozyBionic351 key no longer read or written (grep localStorage.setItem in console → only bionicOn_v1751523)
-  5. window.runFSRSValidation() → 17/17 still passing
-  6. window.runCozySmokeTests() → 6/6 still passing
+  1. patchSettingsText does not force bionic state from stale/null storage during its 1200ms loop
+  2. drawer/base bionic toggles stay synchronized after repeated interval ticks
+  3. localStorage still contains only bionicOn_v1751523 for bionic state
+  4. window.runFSRSValidation() → 17/17 still passing
+  5. window.runCozySmokeTests() → 6/6 still passing
 ```
 
-**To unblock:** Run Step 2 Codex console prompts → all pass → add gate log entry → advance to Step 3.
+**To unblock:** Run Step 3 Codex console prompts → all pass → add gate log entry → advance to Step 4.
 
 ---
 
@@ -77,3 +76,4 @@ expected:
 | 2026-05-26 | P3 FSRS Phase 4 | `rateCard()` SM-2 replaced with FSRS v5 math | ✅ PASSED — `0a4f9d3`, runFSRSValidation() 17/17 + runCozySmokeTests() 6/6 |
 | 2026-05-26 | P-RC Audit | 4-file diagnostic comparison, 20-step rectifier plan written | ✅ DONE — `Chronological_Patch_Hx_RECTIFIER_PLAN_2026_05_26.md` |
 | 2026-05-26 | P-RC Steps 1+6–8 | makeChoices fix + v17513/14/15 deleted + undo + validated | ✅ PASSED — `d162708`+`8741251`, FSRS 17/17, smoke 6/6, no double-advance |
+| 2026-05-26 | P-RC Step 2 | bionic default + single-key round-trip + stale-key audit | ✅ PASSED — bionicOn true fresh-load, ON/OFF round-trip, only `bionicOn_v1751523`, FSRS 17/17, smoke 6/6 |
