@@ -399,7 +399,7 @@ function getPrompt(c){if(promptField==='presentation')return c.presentation||c.c
 function cardPool(){let arr=cards.filter(c=>clean(c.diagnosis)&&clean(getPrompt(c))); if(deckMode==='pinned')arr=arr.filter(c=>state[c.id||c.qid]?.pinned); if(deckMode==='due')arr.sort((a,b)=>dueScore(b)-dueScore(a)); if(deckMode==='random')arr=shuffle(arr); return arr.length?arr:cards}
 function dueScore(c){let s=state[c.id||c.qid]||{}; return (s.pinned?1000:0)+(s.rating==='again'?500:0)+(s.seen?0:100)}
 function nextCard(){let pool=cardPool(); current=pool[index%pool.length]; index++; makeChoices();}
-function makeChoices(){let dx=clean(current.diagnosis); let others=shuffle(cards.map(c=>clean(c.diagnosis)).filter(d=>d&&d!==dx)); choices=shuffle([dx,...[...new Set(others)].slice(0,3)]); selected=Math.max(0,choices.indexOf(dx));}
+function makeChoices(){let dx=clean(current.diagnosis); let others=shuffle(cards.map(c=>clean(c.diagnosis)).filter(d=>d&&d!==dx)); choices=shuffle([dx,...[...new Set(others)].slice(0,3)]); selected=Math.floor(Math.random()*4);}
 function shuffle(a){a=[...a]; for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function notify(body,cb){$('notifyBody').textContent=body;$('notify').classList.remove('hidden');let n=5;$('notifyTimer').textContent=n+'s';clearInterval(ticker);let done=false;let finish=()=>{if(done)return;done=true;clearInterval(ticker);$('notify').classList.add('hidden');cb&&cb()};$('notifyContinue').onclick=finish;ticker=setInterval(()=>{n--;$('notifyTimer').textContent=n+'s';if(n<=0)finish()},1000)}
 function startSolo(){notify('Gate opening.',()=>{show('solo'); resetRun(); renderSolo(); loopSolo();})}
@@ -1752,7 +1752,7 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
     let dx=clean(current.diagnosis || current.answer || '');
     let source=filteredCardsBase(); if(source.length<4) source=cards||[];
     let others=shuffle(source.map(c=>clean(c.diagnosis)).filter(d=>d&&d!==dx));
-    choices=shuffle([dx,...[...new Set(others)].slice(0,3)]); selected=Math.max(0,choices.indexOf(dx));
+    choices=shuffle([dx,...[...new Set(others)].slice(0,3)]); selected=Math.floor(Math.random()*4);
   };
   function hasCardsOrWarn(){
     if((cards||[]).length) return true;
@@ -4399,7 +4399,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     const src=(cards||[]).map(c=>safeClean(window.getAnswerChoiceText(c))).filter(d=>d&&d!==dx);
     const unique=[...new Set(shuffle(src))].slice(0,3);
     choices=shuffle([dx,...unique]);
-    selected=Math.max(0,choices.indexOf(dx));
+    selected=Math.floor(Math.random()*4);
   };
   window.nextCard = nextCard = function(){ const pool=cardPool(); current=pool[index%pool.length]; index++; makeChoices(); };
   window.reveal = reveal = function(which,ok){
@@ -5770,7 +5770,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     try{src=shuffle(src);}catch(e){src=src.sort(()=>Math.random()-.5);}
     choices=[dx,...src.slice(0,3)];
     try{choices=shuffle(choices);}catch(e){choices=choices.sort(()=>Math.random()-.5);}
-    selected=Math.max(0,choices.indexOf(dx));
+    selected=Math.floor(Math.random()*4);
   };
   const oldNext=window.nextCard || (typeof nextCard!=='undefined'?nextCard:null);
   window.nextCard = nextCard = function(){
@@ -12089,8 +12089,8 @@ function fixStableOneThingDropdown351() {
         failed.forEach(f => console.warn(`${f.name}: got ${f.val}, expected ${f.expected}`));
         console.groupEnd();
       }
-      console.log(`${passed === 13 ? '✅' : '❌'} SRS: ${passed}/13 passed`);
-      return { passed, total: 13, failed };
+      console.log(`${passed === results.length ? '✅' : '❌'} SRS: ${passed}/${results.length} passed`);
+      return { passed, total: results.length, failed };
     }
     window.runSRSValidation = runSRSValidation;
     window.runCozySmokeTests = runCozySmokeTestsPhase3;
