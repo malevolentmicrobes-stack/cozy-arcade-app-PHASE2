@@ -6394,7 +6394,16 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     patchImportExport351();
   }
 
-  function stateFor(c){try{return (state||{})[cardKey(c)]||{};}catch(e){return {};}}
+	  function stateFor(c){
+	    try{
+	      const keys=[c&&c.qid_unique,c&&c.card_id,c&&c.qid,c&&c.id,c&&c.original_qid,c&&c.legacy_id,c&&c.json_id,cardKey(c)].map(clean).filter(Boolean);
+	      for(const key of keys){ if((state||{})[key]) return state[key]; }
+	    }catch(e){}
+	    return {};
+	  }
+	  function reviewedFor(c){const s=stateFor(c); return !!(s.seen||s.reviewed===true||Number(s.seen_count||0)>0||Number(s.reviewed||0)>0||Number(s.reviewed_count||0)>0||s.rating||s.last_rating||s.stage==='review'||s.stage==='learning'||s.stage==='relearning');}
+	  function newFor(c){const s=stateFor(c); return !s.buried&&!s.suspended&&!reviewedFor(c);}
+	  function reviewFor(c){const s=stateFor(c); return !!(s.pinned||s.repair_point||s.buried||s.suspended||s.rating==='again'||s.rating==='hard'||s.last_rating==='again'||s.last_rating==='hard'||s.wrong||s.missed||s.flagged||s.lastCorrect===false);}
   function tagsOf(c){
     const raw=c&&c.tags;
     if(Array.isArray(raw)) return raw.map(clean).filter(Boolean);
@@ -6458,11 +6467,11 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       if(tag&&tag!=='all') arr=arr.filter(c=>tagsOf(c).includes(tag));
       const scope=scopeValue();
       const launchTag=document.documentElement.dataset.cozyLaunchTag || '';
-      if(scope==='new') arr=arr.filter(c=>!stateFor(c).seen);
-      if(scope==='random') arr=shuffle350(arr);
-      if(scope==='random-new') arr=shuffle350(arr.filter(c=>!stateFor(c).seen));
-      if(scope==='review'||scope==='wrong') arr=arr.filter(c=>{const s=stateFor(c); return s.pinned||s.rating==='again'||s.rating==='hard'||s.wrong||s.missed||s.lastCorrect===false;});
-      if(scope==='hard') arr=arr.filter(c=>stateFor(c).rating==='hard');
+	      if(scope==='new') arr=arr.filter(newFor);
+	      if(scope==='random') arr=shuffle350(arr);
+	      if(scope==='random-new') arr=shuffle350(arr.filter(newFor));
+	      if(scope==='review'||scope==='wrong') arr=arr.filter(reviewFor);
+	      if(scope==='hard') arr=arr.filter(c=>stateFor(c).rating==='hard'||stateFor(c).last_rating==='hard'||stateFor(c).rating==='again'||stateFor(c).last_rating==='again'||stateFor(c).repair_point);
       if(scope==='pinned') arr=arr.filter(c=>stateFor(c).pinned);
       if(scope==='due') arr=[...arr].sort((a,b)=>dueScore350(b)-dueScore350(a));
       if(scope==='tagged'){
@@ -6472,7 +6481,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       if(scope==='inorder') arr=[...arr].sort((a,b)=>(Number(a.id)||0)-(Number(b.id)||0));
       const strictScopes=['review','wrong','hard','pinned','tagged'];
       if(!arr.length && strictScopes.includes(scope)) return [];
-      if(!arr.length) arr=(cards||[]).filter(c=>clean(answer(c))&&clean(prompt(c)));
+	      if(!arr.length && !['new','random-new'].includes(scope)) arr=(cards||[]).filter(c=>clean(answer(c))&&clean(prompt(c)));
       return arr.length?arr:(cards||[]);
     };
   }
@@ -8909,27 +8918,8 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   const STORAGE_KEY='cozy_arcade_limitless_cards_v1';
   const META_KEY='cozy_arcade_limitless_meta_v1';
   const USER_ONE_THING_KEY='cozy_user_one_thing_v1';
-  const AI_SHORT='Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade card schema.';
-  const AI_LONG=`Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade
-card schema. 
-Return valid JSON only:
-{
-  "meta": { "schema": "cozy-arcade-v3" },
-  "cards": [
-    {
-      "qid": "unique-id",
-      "sys": "CV",
-      "diagnosis": "correct answer/topic",
-      "presentation": "question, prompt, or vignette",
-      "one_thing": "single highest-yield takeaway",
-      "educational_objective": "full teaching point if available",
-      "board_trigger": "IF finding → THINK diagnosis → ACTION",
-      "explanation": "long explanation if available",
-      "tags": []
-    }
-  ]
-}
-Do not rewrite medical content. Map sys/system fields to card.sys.`;
+  const AI_SHORT='Convert my CSV/JSON/APKG/flashcard text into Cozy Arcade v3 cards. Return valid JSON only with meta.schema = "cozy-arcade-v3" and a cards array. Preserve the medical content; do not rewrite facts. Map sys or system to card.sys, use unique qids, put the question in presentation, answer/topic in diagnosis, key takeaway in one_thing, and include optional fields like educational_objective, board_trigger, explanation, and tags when available. See schema/template guidance in the uploaded files.';
+  const AI_LONG=`Convert my CSV/JSON/APKG/flashcard text into Cozy Arcade v3 cards. Return valid JSON only with meta.schema = "cozy-arcade-v3" and a cards array. Preserve the medical content; do not rewrite facts. Map sys or system to card.sys, use unique qids, put the question in presentation, answer/topic in diagnosis, key takeaway in one_thing, and include optional fields like educational_objective, board_trigger, explanation, and tags when available. See schema/template guidance in the uploaded files.`;
   const clean=v=>String(v==null?'':v).replace(/NOT SPECIFIED IN SOURCE/g,'').replace(/\s+/g,' ').trim();
 	  const first=(...xs)=>xs.find(x=>clean(x))||'';
 	  const esc=s=>String(s==null?'':s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
@@ -9136,7 +9126,8 @@ Do not rewrite medical content. Map sys/system fields to card.sys.`;
     const n=appCards().length;
     document.querySelectorAll('#limitlessExampleDeck,#exportJson351').forEach(btn=>{if(btn&&btn.id==='limitlessExampleDeck') btn.textContent='Download Deck';});
     const local=document.getElementById('limitlessLocalDeckStorage');
-    if(local){
+    const progress=document.getElementById('limitlessImportStatus');
+    if(local && local!==progress){
       local.textContent=n?(n+' cards'):'';
       local.onclick=null;
       local.style.pointerEvents='none';
@@ -9148,7 +9139,12 @@ Do not rewrite medical content. Map sys/system fields to card.sys.`;
     if(!home) return;
     let panel=document.getElementById('limitlessHomeImport');
     if(!panel){panel=document.createElement('div'); panel.id='limitlessHomeImport'; panel.className='limitlessHomeControls'; home.insertBefore(panel,home.querySelector('.modeGrid')||home.firstChild);}
-    panel.innerHTML='<label class="btn primary" for="limitlessHomeDeckFile">Upload Deck</label><input id="limitlessHomeDeckFile" type="file" accept=".json,.csv,application/json,text/csv"><button id="limitlessExampleDeck" class="btn" type="button">Download Deck</button><span id="limitlessImportStatus" class="btn"></span>';
+    if(!panel.querySelector('label[for="limitlessHomeDeckFile"]')) panel.insertAdjacentHTML('beforeend','<label class="btn primary" for="limitlessHomeDeckFile">Upload Deck</label>');
+    if(!document.getElementById('limitlessHomeDeckFile')) panel.insertAdjacentHTML('beforeend','<input id="limitlessHomeDeckFile" type="file" accept=".json,.csv,application/json,text/csv" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">');
+    if(!document.getElementById('limitlessExampleDeck')) panel.insertAdjacentHTML('beforeend','<button id="limitlessExampleDeck" class="btn" type="button">Download Deck</button>');
+    let progress=document.getElementById('limitlessImportStatus');
+    if(!progress){ progress=document.createElement('span'); progress.id='limitlessImportStatus'; progress.className='btn'; }
+    if(progress.parentElement!==panel) panel.appendChild(progress);
     const ex=document.getElementById('limitlessExampleDeck'); if(ex) ex.onclick=()=>{ if(window.cozyPhase3&&typeof window.cozyPhase3.exportDeckWithProgress==='function') window.cozyPhase3.exportDeckWithProgress(); else if(typeof window.exportProgress351==='function') window.exportProgress351(); else downloadJson(); };
     updateImportButtons();
   }
@@ -10284,14 +10280,14 @@ function fixOneThingEditorOverflow351() {
     return cleanValue(card && (card.prompt || card.presentation || card.clinical_vignette_summary || card.quick_recall || card.educational_objective || card.level_1));
   };
   const keyFor = card => cleanValue(card && (card.qid_unique || card.card_id || card.id || card.json_id || card.qid || card.diagnosis || card.answer));
-  const stateForCard = card => {
-    try { if (typeof cardState === 'function') return cardState(card) || {}; } catch (_) {}
-    const keys = [card?.qid_unique, card?.card_id, card?.id, card?.json_id, card?.qid, card?.diagnosis, card?.answer].map(cleanValue).filter(Boolean);
-    try {
-      for (const key of keys) if (state && state[key]) return state[key];
-    } catch (_) {}
-    return {};
-  };
+	  const stateForCard = card => {
+	    try { if (typeof cardState === 'function') return cardState(card) || {}; } catch (_) {}
+	    const keys = [card?.qid_unique, card?.card_id, card?.qid, card?.id, card?.original_qid, card?.legacy_id, card?.json_id, card?.diagnosis, card?.answer].map(cleanValue).filter(Boolean);
+	    try {
+	      for (const key of keys) if (state && state[key]) return state[key];
+	    } catch (_) {}
+	    return {};
+	  };
   const tagsOf = card => {
     let tags = card?.tags || [];
     if (typeof tags === 'string') tags = tags.split(/[|,;]/);
@@ -10302,10 +10298,14 @@ function fixOneThingEditorOverflow351() {
     const st = stateForCard(card);
     return !!(st.buried || st.suspended || st.apkg_status === 'suspended' || st.rating === 'bury');
   };
-  const isSeen = card => {
-    const st = stateForCard(card);
-    return !!(st.seen || st.reviewed || st.last || st.last_rating_at || st.rating || st.correct || st.incorrect);
-  };
+	  const isSeen = card => {
+	    const st = stateForCard(card);
+	    return !!(st.seen || st.reviewed === true || Number(st.seen_count || 0) > 0 || Number(st.reviewed || 0) > 0 || Number(st.reviewed_count || 0) > 0 || st.last || st.last_rating_at || st.rating || st.last_rating || st.correct || st.incorrect || st.stage === 'review' || st.stage === 'learning' || st.stage === 'relearning');
+	  };
+	  const isReviewCandidateHot = card => {
+	    const st = stateForCard(card);
+	    return !!(st.pinned || st.repair_point || st.buried || st.suspended || st.rating === 'again' || st.rating === 'hard' || st.last_rating === 'again' || st.last_rating === 'hard' || st.wrong || st.missed || st.flagged || st.lastCorrect === false);
+	  };
   const dueScoreHot = card => {
     try { if (typeof dueScore352 === 'function') return dueScore352(card); } catch (_) {}
     try { if (typeof dueScore350 === 'function') return dueScore350(card); } catch (_) {}
@@ -10341,7 +10341,11 @@ function fixOneThingEditorOverflow351() {
     const settings = q('deckMode')?.value || '';
     let globalMode = '';
     try { globalMode = typeof deckMode !== 'undefined' ? deckMode : ''; } catch (_) {}
-    const value = explicit || browse || settings || globalMode || 'all';
+    const value = (explicit && !(explicit === 'all' && browse && browse !== 'all')) ? explicit : (browse || settings || globalMode || 'all');
+    if (value === 'random_new') return 'random-new';
+    if (value === 'random_all') return 'random';
+    if (value === 'review_deck') return 'review';
+    if (value === 'new_only') return 'new';
     if (value === 'sequential') return 'all';
     if (value === 'inorder') return 'all';
     return value;
@@ -10375,21 +10379,18 @@ function fixOneThingEditorOverflow351() {
     else if (scope === 'random-new') arr = shuffleStable(arr.filter(card => !isSeen(card)));
     else if (scope === 'random') arr = shuffleStable(arr);
     else if (scope === 'pinned') arr = arr.filter(card => !!stateForCard(card).pinned);
-    else if (scope === 'hard') arr = arr.filter(card => stateForCard(card).rating === 'hard');
-    else if (scope === 'review' || scope === 'wrong') {
-      arr = arr.filter(card => {
-        const st = stateForCard(card);
-        return !!(st.pinned || st.rating === 'again' || st.rating === 'hard' || st.wrong || st.missed || st.flagged || st.lastCorrect === false);
-      });
+	    else if (scope === 'hard') arr = arr.filter(card => stateForCard(card).rating === 'hard' || stateForCard(card).last_rating === 'hard');
+	    else if (scope === 'review' || scope === 'wrong') {
+	      arr = arr.filter(isReviewCandidateHot);
     } else if (scope === 'due') {
       arr = [...arr].sort((a, b) => dueScoreHot(b) - dueScoreHot(a));
     } else if (scope === 'tagged') {
       arr = tag && tag !== 'all' ? arr.filter(card => tagsOf(card).includes(tag)) : arr.filter(card => tagsOf(card).length);
     }
 
-    if (!arr.length && (scope === 'random-new' || scope === 'new')) arr = baseCards();
-    return arr.length ? arr : baseCards();
-  }
+	    if (!arr.length && ['random-new','new','review','wrong','hard','pinned','tagged'].includes(scope)) return [];
+	    return arr.length ? arr : baseCards();
+	  }
 
   let sessionKey = '';
   let sessionPool = [];
@@ -11118,18 +11119,25 @@ function fixStableOneThingDropdown351() {
     });
   }
 
-  function buildIdentityLookup(cardsList) {
-    const lookup = new Map();
-    cardsList.forEach((card, idx) => {
-      const canonical = canonicalCardId(card);
-      [card?.qid_unique, card?.card_id, card?.json_id, card?.original_qid, card?.qid, card?.id, card?.legacy_id]
-        .map(clean)
-        .filter(Boolean)
-        .forEach(key => lookup.set(key, canonical));
-      lookup.set(String(idx + 1), canonical);
-    });
-    return lookup;
-  }
+	  function buildIdentityLookup(cardsList) {
+	    const lookup = new Map();
+	    cardsList.forEach((card, idx) => {
+	      const canonical = canonicalCardId(card);
+	      [card?.qid_unique, card?.card_id, card?.json_id, card?.original_qid, card?.qid, card?.id, card?.legacy_id]
+	        .map(clean)
+	        .filter(Boolean)
+	        .forEach(key => lookup.set(key, canonical));
+	      lookup.set(String(idx + 1), canonical);
+	    });
+	    return lookup;
+	  }
+
+	  function getCardIdentityKeys(card) {
+	    return [canonicalCardId(card), card?.qid_unique, card?.card_id, card?.qid, card?.id, card?.original_qid, card?.legacy_id, card?.json_id]
+	      .map(clean)
+	      .filter(Boolean)
+	      .filter((key, idx, arr) => arr.indexOf(key) === idx);
+	  }
 
   function migrateLegacyProgress(oldState, cardsList = appCards()) {
     const progress = {};
@@ -11216,14 +11224,17 @@ function fixStableOneThingDropdown351() {
     return out;
   }
 
-  function savePhase3State() {
-    phase3State.progress = phase3State.progress || {};
-    phase3State.progress = deduplicateProgress(phase3State.progress, appCards());
-    phase3State.deck_fingerprint = deckFingerprint();
-    try { localStorage.setItem(STATE_KEY, JSON.stringify(Object.assign({}, phase3State, { progress: exportProgressMap() }))); } catch (_) {}
-    try { state = phase3State.progress; } catch (_) {}
-    window.cozyPhase3State = phase3State;
-    try { Object.defineProperty(phase3State, 'session', { value: session, configurable: true, enumerable: false }); } catch (_) { phase3State.session = session; }
+	  function savePhase3State() {
+	    phase3State.progress = phase3State.progress || {};
+	    phase3State.progress = deduplicateProgress(phase3State.progress, appCards());
+	    phase3State.deck_fingerprint = deckFingerprint();
+	    const exportedProgress = exportProgressMap();
+	    try { localStorage.setItem(STATE_KEY, JSON.stringify(Object.assign({}, phase3State, { progress: exportedProgress }))); } catch (_) {}
+	    LEGACY_STATE_KEYS.forEach(key => { try { localStorage.setItem(key, JSON.stringify(exportedProgress)); } catch (_) {} });
+	    try { localStorage.setItem('cozy_arcade_progress_v1', JSON.stringify({ metadata: { type: 'progress', deck_fingerprint: deckFingerprint(), exported_at: nowIso(), schema_version: '3.0' }, progress: exportedProgress })); } catch (_) {}
+	    try { state = phase3State.progress; } catch (_) {}
+	    window.cozyPhase3State = phase3State;
+	    try { Object.defineProperty(phase3State, 'session', { value: session, configurable: true, enumerable: false }); } catch (_) { phase3State.session = session; }
     window.phase3State = phase3State;
     window.cozyPhase3Session = session;
   }
@@ -11298,15 +11309,43 @@ function fixStableOneThingDropdown351() {
     return next;
   }
 
-  function progressForCard(card) {
-    return getProgress(canonicalCardId(card));
+	  function progressForCard(card) {
+	    phase3State.progress = phase3State.progress || {};
+	    for (const key of getCardIdentityKeys(card)) {
+	      if (phase3State.progress[key]) return syncProgressAliases(phase3State.progress[key]);
+	    }
+	    return getProgress(canonicalCardId(card));
+	  }
+
+	  function isReviewedCard(card) {
+	    const p = progressForCard(card);
+	    return !!(p.seen || p.reviewed === true || Number(p.seen_count || 0) > 0 || Number(p.reviewed || 0) > 0 || Number(p.reviewed_count || 0) > 0 || p.rating || p.last_rating || p.stage === 'review' || p.stage === 'learning' || p.stage === 'relearning');
+	  }
+
+	  function isNewCard(card) {
+	    const p = progressForCard(card);
+	    return !p.buried && !p.suspended && !isReviewedCard(card);
+	  }
+
+  function isReviewCandidate(card) {
+    const p = progressForCard(card);
+    return !!(p.pinned || p.repair_point || p.buried || p.suspended || p.rating === 'again' || p.rating === 'hard' || p.last_rating === 'again' || p.last_rating === 'hard' || p.wrong || p.missed || p.flagged || p.lastCorrect === false);
+  }
+
+  function hasFutureDue(progress) {
+    if (!progress || !progress.next_due_at) return false;
+    const t = Date.parse(progress.next_due_at);
+    return !isNaN(t) && t > Date.now();
   }
 
   function isDue(progress) {
     if (!progress) return false;
-    if (progress.repair_point || progress.stage === 'relearning') return true;
-    if (!progress.next_due_at) return false;
-    return Date.parse(progress.next_due_at) <= Date.now();
+    if (progress.next_due_at) {
+      const t = Date.parse(progress.next_due_at);
+      if (!isNaN(t)) return t <= Date.now();
+    }
+    if ((progress.stage === 'review' || progress.stage === 'relearning') && !progress.next_due_at) return true;
+    return !!(progress.repair_point);
   }
 
   function intervalLabel(days, minutes) {
@@ -11436,21 +11475,22 @@ function fixStableOneThingDropdown351() {
     savePhase3State();
   }
 
-  function normalizeMode(mode) {
-    const map = {
-      new: 'new_first',
-      all: 'new_first',
-      sequential: 'new_first',
-      random: 'random_all',
-      'random-new': 'random_new',
+	  function normalizeMode(mode) {
+	    const map = {
+	      new: 'new_only',
+	      all: 'new_first',
+	      sequential: 'new_first',
+	      random: 'random_all',
+	      'random-new': 'random_new',
       review: 'review_deck',
       wrong: 'review_deck',
       hard: 'hard',
       pinned: 'pinned',
       due: 'due',
       reviewed: 'reviewed_first',
-      reviewed_first: 'reviewed_first',
-      new_first: 'new_first',
+	      reviewed_first: 'reviewed_first',
+	      new_only: 'new_only',
+	      new_first: 'new_first',
       random_all: 'random_all',
       random_new: 'random_new',
       review_deck: 'review_deck',
@@ -11468,14 +11508,14 @@ function fixStableOneThingDropdown351() {
     return normalizeMode(general || explicit || phase3State.settings.solo_order || 'random_new');
   }
 
-  function basePlayableCards() {
-    return normalizeDeckIdentities().filter(card => {
-      const p = progressForCard(card);
-      const diagnosis = clean(card.diagnosis || card.answer);
-      const prompt = clean(card.presentation || card.prompt || card.quick_recall || card.educational_objective);
-      return diagnosis && prompt && !p.suspended;
-    });
-  }
+	  function basePlayableCards() {
+	    return normalizeDeckIdentities().filter(card => {
+	      const p = progressForCard(card);
+	      const diagnosis = clean(card.diagnosis || card.answer);
+	      const prompt = clean(card.presentation || card.prompt || card.quick_recall || card.educational_objective);
+	      return diagnosis && prompt && !p.suspended && !p.buried;
+	    });
+	  }
 
   function getStudyPool(mode, gameType) {
     const selected = normalizeMode(mode || selectedOrder(gameType));
@@ -11489,54 +11529,86 @@ function fixStableOneThingDropdown351() {
       return String(pa.last_seen_at || '').localeCompare(String(pb.last_seen_at || ''));
     };
 
-    if (selected === 'new_first') {
-      arr = [
-        ...arr.filter(c => progress(c).stage === 'new' || !progress(c).seen_count),
-        ...arr.filter(c => isDue(progress(c)) && progress(c).seen_count),
-        ...arr.filter(c => progress(c).seen_count && !isDue(progress(c)))
-      ];
-    } else if (selected === 'random_all') {
-      arr = shuffleCards(arr);
-    } else if (selected === 'random_new') {
-      const fresh = arr.filter(c => progress(c).stage === 'new' || !progress(c).seen_count);
-      arr = shuffleCards(fresh.length ? fresh : arr);
-    } else if (selected === 'reviewed_first') {
-      arr = [
-        ...arr.filter(c => progress(c).seen_count).sort(dueSort),
-        ...arr.filter(c => !progress(c).seen_count)
-      ];
+	    if (selected === 'new_only') {
+	      arr = arr.filter(isNewCard);
+	    } else if (selected === 'new_first') {
+	      arr = [
+	        ...arr.filter(isNewCard),
+	        ...arr.filter(c => isDue(progress(c)) && isReviewedCard(c)),
+	        ...arr.filter(c => !isDue(progress(c)) && progress(c).stage === 'relearning')
+	      ];
+	    } else if (selected === 'random_all') {
+	      arr = shuffleCards(arr);
+	    } else if (selected === 'random_new') {
+	      arr = shuffleCards(arr.filter(isNewCard));
+	    } else if (selected === 'reviewed_first') {
+	      arr = [
+	        ...arr.filter(c => isReviewedCard(c) && isDue(progress(c))).sort(dueSort),
+	        ...arr.filter(isNewCard)
+	      ];
     } else if (selected === 'due') {
-      arr = arr.filter(c => isDue(progress(c)) || progress(c).stage === 'relearning');
-    } else if (selected === 'review_deck') {
-      arr = arr.filter(c => {
-        const p = progress(c);
-        return p.pinned || p.repair_point || p.last_rating === 'again' || p.last_rating === 'hard';
-      }).sort((a, b) => {
-        const pa = progress(a), pb = progress(b);
-        const score = p => (p.pinned ? 0 : p.repair_point ? 1 : 2);
+      arr = arr.filter(c => isDue(progress(c)));
+	    } else if (selected === 'review_deck') {
+	      arr = normalizeDeckIdentities().filter(c => !progressForCard(c).suspended).filter(c => {
+	        const p = progressForCard(c);
+	        return isReviewCandidate(c) && (!hasFutureDue(p) || isDue(p));
+	      }).sort((a, b) => {
+	        const pa = progress(a), pb = progress(b);
+	        const score = p => (p.pinned ? 0 : p.repair_point ? 1 : 2);
         if (score(pa) !== score(pb)) return score(pa) - score(pb);
         return String(pa.last_seen_at || '').localeCompare(String(pb.last_seen_at || ''));
       });
+      return arr;
     } else if (selected === 'pinned') {
       arr = arr.filter(c => progress(c).pinned);
-    } else if (selected === 'hard') {
-      arr = arr.filter(c => progress(c).repair_point || progress(c).last_rating === 'hard' || progress(c).last_rating === 'again');
+	    } else if (selected === 'hard') {
+	      arr = arr.filter(c => {
+	        const p = progress(c);
+	        return (p.repair_point || p.last_rating === 'hard' || p.last_rating === 'again' || p.rating === 'hard' || p.rating === 'again') && !hasFutureDue(p);
+	      });
     } else if (selected === 'suspended') {
       arr = normalizeDeckIdentities().filter(c => progressForCard(c).suspended);
     }
 
-    if (!arr.length && ['due', 'review_deck', 'pinned', 'hard', 'suspended'].includes(selected)) return [];
+	    if (!arr.length && ['new_only', 'due', 'pinned', 'hard', 'suspended'].includes(selected)) return [];
 
-    if (selected === 'random_new') {
+    if (selected === 'random_new' && arr.length) {
       const active = arr.filter(c => !session.buriedToday.has(canonicalCardId(c)));
       return active.length ? active : arr;
     }
-    const ordered = splitBuriedToBack(arr.length ? arr : basePlayableCards());
+    const scheduledModes = ['new_first', 'reviewed_first', 'due', 'review_deck'];
+    const ordered = splitBuriedToBack(arr.length || scheduledModes.includes(selected) ? arr : basePlayableCards());
     const active = ordered.filter(c => {
       const id = canonicalCardId(c);
       return !session.buriedToday.has(id) && !getProgress(id).buried;
     });
-    return active.length ? active : ordered;
+    if (active.length) return active;
+    if (ordered.length) return ordered;
+    clearSessionBuried();
+    if (scheduledModes.includes(selected)) {
+      const refreshed = basePlayableCards();
+      if (selected === 'new_first') {
+        return [
+          ...refreshed.filter(isNewCard),
+          ...refreshed.filter(c => isDue(progress(c)) && isReviewedCard(c)),
+          ...refreshed.filter(c => !isDue(progress(c)) && progress(c).stage === 'relearning')
+        ];
+      }
+      if (selected === 'reviewed_first') {
+        return [
+          ...refreshed.filter(c => isReviewedCard(c) && isDue(progress(c))).sort(dueSort),
+          ...refreshed.filter(isNewCard)
+        ];
+      }
+      if (selected === 'due') return refreshed.filter(c => isDue(progress(c)));
+      if (selected === 'review_deck') {
+        return normalizeDeckIdentities().filter(c => !progressForCard(c).suspended).filter(c => {
+          const p = progressForCard(c);
+          return isReviewCandidate(c) && (!hasFutureDue(p) || isDue(p));
+        });
+      }
+    }
+    return shuffleCards(basePlayableCards());
   }
 
   function poolKey(gameType) {
@@ -11620,10 +11692,11 @@ function fixStableOneThingDropdown351() {
   }
 
   function backupPayload() {
+    const progress = deduplicateProgress(exportProgressMap(), appCards());
     return {
       metadata: { type: 'deck_with_progress', deck_fingerprint: deckFingerprint(), exported_at: nowIso(), schema_version: '3.0' },
       cards: cleanDeckPayload().cards,
-      progress: phase3State.progress || {}
+      progress
     };
   }
 
@@ -11644,7 +11717,7 @@ function fixStableOneThingDropdown351() {
     updateKpisPhase3();
     downloadJson('cozy_arcade_progress_' + new Date().toISOString().slice(0, 10) + '.json', progressPayload());
   }
-  function exportDeckWithProgress() { downloadJson('cozy_arcade_deck_with_progress_backup.json', backupPayload()); }
+  function exportDeckWithProgress() { savePhase3State(); updateKpisPhase3(); downloadJson('cozy_arcade_deck_with_progress_backup.json', backupPayload()); }
   function fullGameStatePayload() {
     const settings = {};
     try { settings.questionSeconds = localStorage.getItem('cozyQuestionSeconds351') || '7'; } catch(_) {}
@@ -11828,13 +11901,9 @@ function fixStableOneThingDropdown351() {
     if (q('exportMergeInfo2')) { q('exportMergeInfo2').textContent = 'Export Progress Summary'; q('exportMergeInfo2').onclick = exportSessionSummary; }
     if (q('browseReview351')) q('browseReview351').onclick = () => { showReviewPhase3(); };
     if (q('settingsBtn')) q('settingsBtn').textContent = 'Settings';
-    let progressBtn = document.getElementById('limitlessImportStatus');
+    const progressBtn = document.getElementById('limitlessImportStatus');
     const localDeckStorage = document.getElementById('limitlessLocalDeckStorage');
-    if (!progressBtn && localDeckStorage) {
-      localDeckStorage.id = 'limitlessImportStatus';
-      progressBtn = localDeckStorage;
-    }
-    if (localDeckStorage) {
+    if (localDeckStorage && localDeckStorage !== progressBtn) {
       const n = appCards().length;
       localDeckStorage.textContent = n ? (n + ' cards') : '';
       localDeckStorage.onclick = null;
@@ -11842,12 +11911,30 @@ function fixStableOneThingDropdown351() {
       localDeckStorage.setAttribute('aria-disabled','true');
     }
     if (progressBtn) {
-      const n = appCards().length;
-      progressBtn.textContent = n ? `Progress (${n} cards)` : 'Progress';
+      progressBtn.textContent = 'Progress';
       progressBtn.removeAttribute('aria-disabled');
       progressBtn.style.pointerEvents = 'auto';
       progressBtn.style.cursor = 'pointer';
       progressBtn.onclick = () => {
+        try {
+          const _ac = appCards();
+          if (_ac && _ac.length) {
+            const sysMap = _ac.map(c => {
+              const id = c?.qid_unique || c?.qid || c?.card_id || c?.id;
+              return id ? { qid_unique: id, sys: c?.sys || c?.system || '—' } : null;
+            }).filter(Boolean);
+            const payload = JSON.stringify({
+              metadata: {
+                deck_label: phase3State?.deck_label || 'Cozy Arcade Board Prep Medicine',
+                stored_at: nowIso ? nowIso() : new Date().toISOString(),
+                atlas_cache_mode: 'sys-map only'
+              },
+              cards: sysMap
+            });
+            localStorage.setItem('cozy_arcade_limitless_cards_v1', payload);
+            sessionStorage.setItem('cozy_atlas_pending_refresh', '1');
+          }
+        } catch(_) {}
         window.open('progress_beta.html', '_blank');
       };
     }
@@ -11869,7 +11956,7 @@ function fixStableOneThingDropdown351() {
     const pass = name => results.push({ name, pass: true });
     const fail = (name, err) => results.push({ name, pass: false, err: String(err || '') });
     try { const p = defaultProgress('__smoke'); (p.stage === 'new' && p.interval_days === 0 && p.ease_factor === 2.5) ? pass('default progress') : fail('default progress', JSON.stringify(p)); } catch (err) { fail('default progress', err); }
-    try { isDue(Object.assign(defaultProgress('__due'), { repair_point: true, next_due_at: addDays(new Date(), 1).toISOString() })) ? pass('repair points are due') : fail('repair points are due'); } catch (err) { fail('repair points are due', err); }
+    try { isDue(Object.assign(defaultProgress('__due'), { repair_point: true, next_due_at: new Date(Date.now() - 1000).toISOString() })) ? pass('repair points are due') : fail('repair points are due'); } catch (err) { fail('repair points are due', err); }
     try { previewInterval('__preview', 'good') === '1d' && previewInterval('__preview', 'again') === '10m' ? pass('interval previews') : fail('interval previews'); } catch (err) { fail('interval previews', err); }
     try { const id = '__rate_smoke'; setProgress(id, Object.assign(defaultProgress(id), { stage: 'review', interval_days: 10, ease_factor: 2.5 })); rateCard(id, 'hard'); const p = getProgress(id); (p.interval_days === 12 && Math.abs(p.ease_factor - 2.35) < 0.001 && p.repair_point) ? pass('rateCard hard') : fail('rateCard hard', JSON.stringify(p)); delete phase3State.progress[id]; savePhase3State(); } catch (err) { fail('rateCard hard', err); }
     try { Array.isArray(appCards()) ? pass('deck access') : fail('deck access'); } catch (err) { fail('deck access', err); }
@@ -11881,10 +11968,15 @@ function fixStableOneThingDropdown351() {
 
   function patchFunctions() {
     window.canonicalCardId = canonicalCardId;
-    window.defaultProgress = defaultProgress;
-    window.getProgress = getProgress;
-    window.getCardProgress = getProgress;
-    window.setProgress = setProgress;
+	    window.defaultProgress = defaultProgress;
+	    window.getCardIdentityKeys = getCardIdentityKeys;
+	    window.getProgress = getProgress;
+	    window.getCardProgress = getProgress;
+	    window.stateForCard = progressForCard;
+	    window.isReviewedCard = isReviewedCard;
+	    window.isNewCard = isNewCard;
+	    window.isReviewCandidate = isReviewCandidate;
+	    window.setProgress = setProgress;
     window.updateCardProgress = setProgress;
     window.isDue = isDue;
     window.previewInterval = previewInterval;
@@ -11966,7 +12058,15 @@ function fixStableOneThingDropdown351() {
       nextCard();
     };
     const priorStartSolo = window.startSolo || startSolo;
-    window.startSolo = startSolo = function() { phase3State.settings.solo_order = normalizeMode(q('browseScope351')?.value || phase3State.settings.solo_order); savePhase3State(); return priorStartSolo.apply(this, arguments); };
+	    window.startSolo = startSolo = function() {
+	      try { if (typeof window.__cozyApplyDeckMode351 === 'function') window.__cozyApplyDeckMode351(); } catch (_) {}
+	      const selected = q('browseScope351')?.value || document.documentElement.dataset.cozyLaunchScope || phase3State.settings.solo_order;
+	      document.documentElement.dataset.cozyLaunchScope = selected;
+	      phase3State.settings.solo_order = normalizeMode(selected);
+	      session.poolKey = '';
+	      savePhase3State();
+	      return priorStartSolo.apply(this, arguments);
+	    };
     const priorStartDomain = window.startDomain || startDomain;
     window.startDomain = startDomain = function() { phase3State.settings.expansion_order = normalizeMode(q('expansionOrderPhase3')?.value || phase3State.settings.expansion_order); savePhase3State(); return priorStartDomain.apply(this, arguments); };
     if (q('startSolo')) q('startSolo').onclick = startSolo;

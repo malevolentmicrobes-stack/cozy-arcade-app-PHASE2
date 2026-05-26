@@ -376,10 +376,14 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,sans
    ═══════════════════════════════════════════════════════════ */
 
 const STATE_KEYS = [
+  'cozy_arcade_state_v3',
   'cozy_arcade_progress_v1',
   'soloStudyingState_v1757',
   'cazy_v3'
 ];
+const DECK_STORAGE_KEY = 'cozy_arcade_limitless_cards_v1';
+const PROGRESS_STORAGE_KEY = 'cozy_arcade_progress_v1';
+const MAIN_STATE_KEY = 'cozy_arcade_state_v3';
 
 // In-memory deck card map: card_id → card object (populated by deck upload)
 let deckMap = {};
@@ -436,7 +440,7 @@ function readProgress() {
 
 const atlasLoadDeck = function loadDeckFromLocalStorage() {
   try {
-    const raw = localStorage.getItem('cozy_arcade_limitless_cards_v1');
+    const raw = localStorage.getItem(DECK_STORAGE_KEY);
     if (!raw) { deckMap = {}; return 0; }
     const payload = JSON.parse(raw);
     const cards = Array.isArray(payload) ? payload : (Array.isArray(payload?.['cards']) ? payload['cards'] : []);
@@ -451,6 +455,94 @@ const atlasLoadDeck = function loadDeckFromLocalStorage() {
     return 0;
   }
 };
+
+function payloadCards(obj) {
+  return Array.isArray(obj) ? obj : (Array.isArray(obj?.cards) ? obj.cards : (Array.isArray(obj?.data) ? obj.data : null));
+}
+
+function payloadProgress(obj) {
+  return obj?.progress && typeof obj.progress === 'object' ? obj.progress : (obj?.state && typeof obj.state === 'object' ? obj.state : null);
+}
+
+function hydrateDeckMap(cardsArr) {
+  deckMap = {};
+  (cardsArr || []).forEach(c => {
+    const id = c?.qid_unique || c?.qid || c?.card_id || c?.id;
+    if (id) deckMap[id] = c;
+  });
+}
+
+function atlasCompactCard(c, minimal) {
+  const fields = minimal
+    ? ['qid','qid_unique','card_id','original_qid','legacy_id','sys','diagnosis']
+    : ['qid','qid_unique','card_id','original_qid','legacy_id','sys','diagnosis','presentation','one_thing','board_trigger','educational_objective'];
+  const out = {};
+  fields.forEach(k => {
+    if (c && c[k] !== undefined && c[k] !== null && String(c[k]).length) out[k] = c[k];
+  });
+  return out;
+}
+
+function writeAtlasDeckCache(metadata, cardsArr) {
+  const stamp = { stored_at: new Date().toISOString(), cards_embedded: cardsArr.length };
+  const attempts = [
+    { mode: 'full deck cache', cards: cardsArr },
+    { mode: 'compact deck cache', cards: cardsArr.map(c => atlasCompactCard(c, false)) },
+    { mode: 'atlas-minimal deck cache', cards: cardsArr.map(c => atlasCompactCard(c, true)) },
+    { mode: 'sys-map only', cards: cardsArr.map(c => {
+        const id = c?.qid_unique || c?.qid || c?.card_id || c?.id;
+        return id ? { qid_unique: id, sys: c?.sys || '—' } : null;
+      }).filter(Boolean)
+    }
+  ];
+  let lastErr = null;
+  for (const attempt of attempts) {
+    try {
+      localStorage.setItem(DECK_STORAGE_KEY, JSON.stringify({
+        metadata: Object.assign({}, metadata, stamp, { atlas_cache_mode: attempt.mode }),
+        cards: attempt.cards
+      }));
+      if (attempt.mode !== 'full deck cache') {
+        console.info('Neural Atlas used ' + attempt.mode + ' due to browser storage quota.');
+      }
+      return attempt;
+    } catch(err) {
+      lastErr = err;
+    }
+  }
+  console.warn('Neural Atlas deck cache could not be persisted.', lastErr);
+  return { mode: 'deck cache unavailable', cards: [] };
+}
+
+function storeHydratedPayload(obj, cardsArr, incomingProgress) {
+  const metadata = obj?.metadata || obj?.meta || {};
+  const deckCache = writeAtlasDeckCache(metadata, cardsArr);
+  try {
+    localStorage.setItem(MAIN_STATE_KEY, JSON.stringify({
+      schema_version: metadata.schema_version || '3.0',
+      deck_label: metadata.deck_label || metadata.name || 'Cozy Arcade Board Prep Medicine',
+      imported_at: new Date().toISOString(),
+      metadata: Object.assign({}, metadata, { atlas_cache_mode: deckCache.mode }),
+      cards: deckCache.mode === 'full deck cache' ? undefined : deckCache.cards,
+      progress: incomingProgress
+    }));
+  } catch(_) {
+    try {
+      localStorage.setItem(MAIN_STATE_KEY, JSON.stringify({
+        schema_version: metadata.schema_version || '3.0',
+        deck_label: metadata.deck_label || metadata.name || 'Cozy Arcade Board Prep Medicine',
+        imported_at: new Date().toISOString(),
+        metadata: Object.assign({}, metadata, { atlas_cache_mode: deckCache.mode, cards_stored_in: DECK_STORAGE_KEY }),
+        progress: incomingProgress
+      }));
+    } catch(_) {}
+  }
+  try {
+    localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify({ metadata: Object.assign({}, metadata, { type:'progress' }), progress: incomingProgress }));
+  } catch(_) {}
+  try { localStorage.setItem('soloStudyingState_v1757', JSON.stringify(incomingProgress)); } catch(_) {}
+  return deckCache.mode;
+}
 
 // ── File upload handler (progress JSON or deck JSON) ─────────
 function handleFileUpload(e) {
@@ -475,14 +567,28 @@ function handleDrop(e) {
 function ingestJSON(text, filename) {
   try {
     const obj = JSON.parse(text);
+    const cardsArr = payloadCards(obj);
+    const incomingProgress = payloadProgress(obj);
+    const type = obj?.metadata?.type || obj?.meta?.type || obj?.type;
     // Detect file type
-    if (obj?.metadata?.type === 'progress' && obj.progress) {
+    if (cardsArr && Array.isArray(cardsArr) && cardsArr.length > 0 && incomingProgress && (type === 'deck_with_progress' || type === 'full_gamestate' || obj.progress || obj.state)) {
+      progress = incomingProgress;
+      hydrateDeckMap(cardsArr);
+      const cacheMode = storeHydratedPayload(obj, cardsArr, progress);
+      mergeSysFromDeck();
+      const compactNote = cacheMode && cacheMode !== 'full deck cache' ? ` · ${cacheMode}` : '';
+      showUploadStatus(`✓ Deck + progress: ${cardsArr.length} cards, ${Object.keys(progress).length} signals${compactNote}`, '#22c55e');
+      fullRefreshDisplay();
+      return;
+    }
+
+    if ((type === 'progress' || incomingProgress) && incomingProgress) {
       // === PROGRESS FILE ===
-      progress = obj.progress;
+      progress = incomingProgress;
       // Try to save to localStorage for persistence
       try {
-        const stored = { metadata: obj.metadata, progress };
-        localStorage.setItem('cozy_arcade_progress_v1', JSON.stringify(stored));
+        const stored = { metadata: obj.metadata || { type:'progress' }, progress };
+        localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(stored));
       } catch(_) {}
       // Re-merge sys from deckMap if available
       mergeSysFromDeck();
@@ -492,14 +598,15 @@ function ingestJSON(text, filename) {
     }
 
     // Detect deck format: { meta, cards: [...] } or { cards: [...] }
-    const cardsArr = obj.cards || (Array.isArray(obj) ? obj : null);
     if (cardsArr && Array.isArray(cardsArr) && cardsArr.length > 0 && cardsArr[0].qid_unique) {
       // === DECK FILE ===
-      deckMap = {};
-      cardsArr.forEach(c => {
-        const id = c.qid_unique || c.qid;
-        if (id) deckMap[id] = c;
-      });
+      hydrateDeckMap(cardsArr);
+      try {
+        localStorage.setItem(DECK_STORAGE_KEY, JSON.stringify({
+          metadata: Object.assign({}, obj?.metadata || obj?.meta || {}, { stored_at: new Date().toISOString(), cards_embedded: cardsArr.length }),
+          cards: cardsArr
+        }));
+      } catch(_) {}
       mergeSysFromDeck();
       showUploadStatus(`✓ Deck: ${cardsArr.length} cards`, '#67e8f9');
       fullRefreshDisplay();
@@ -600,6 +707,7 @@ function saveProgress() {
       if (p?.progress) { p.progress = progress; localStorage.setItem(k, JSON.stringify(p)); return; }
     } catch(_) {}
   }
+  try { localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify({ metadata:{ type:'progress' }, progress })); } catch(_) {}
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -1402,6 +1510,12 @@ function init() {
   window.addEventListener('resize',resize);
 
   atlasLoadDeck();
+  if (sessionStorage.getItem('cozy_atlas_pending_refresh')) {
+    sessionStorage.removeItem('cozy_atlas_pending_refresh');
+    atlasLoadDeck();
+    mergeSysFromDeck();
+    fullRefreshDisplay();
+  }
   progress=readProgress();
   mergeSysFromDeck();
   sysMap=buildSysMap(progress);
