@@ -90,6 +90,26 @@ curl -s "https://malevolentmicrobes-stack.github.io/cozy-arcade-app-PHASE2/" | g
 
 ## Completed Log
 
+### This Session — Step-by-Step Build Plan + Premortem (2026-05-26)
+**Status:** ✅ Committed and pushed.
+
+**Key findings this session:**
+- Node.js / npm NOT installed — required before Capacitor/Tauri can proceed
+- XSS surface: card content already wrapped in `escHTML()` in most render paths — lower risk than initially estimated
+- `previewInterval` easy formula fixed: `1.6→1.3` (`9552cb3`)
+- Gear button double-fire fixed: `wireGearButtons()` had duplicate capture listener (`20b166a`)
+- Shadow Dungeon fallback guard hardened with `!start.onclick` (`20b166a`)
+- Full step-by-step plan written: P3 FSRS v5 → P3.5 due-count → LLC → Vercel → PWA → Security → Stripe → iOS Capacitor — each with pre-mortem difficulty flags
+
+**Critical pre-ship sequence:**
+```
+Node.js install → FSRS v5 → due-count widget → LLC ($102) → Vercel deploy →
+PWA + self-host fonts → Security audit → Stripe Payment Link →
+iOS Capacitor (requires Mac + Apple Developer $99) → App Store submission
+```
+
+---
+
 ### This Session — Production Roadmap + Gear/Shadow Dungeon Fixes (2026-05-26)
 **Status:** ✅ Committed and pushed.
 
