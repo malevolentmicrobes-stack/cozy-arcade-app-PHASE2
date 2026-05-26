@@ -1,10 +1,10 @@
 # Cozy Arcade Board Prep Medicine — Project Status
 
-**Date:** May 26, 2026 (updated this session)
+**Date:** 2026-05-26 (updated this session)
 **Repo:** `cozy-arcade-app- PHASE2` · `malevolentmicrobes-stack/cozy-arcade-app`
 **Primary files:** `index.html` (~12,811 lines), `progress_beta.html`
-**Git HEAD (main):** `0a63c2e` — chore: gitignore graphify-out, .agents, .codex, test-fixtures, subdirectory
-**Origin sync:** ✅ Local = origin/main (clean working tree)
+**Git HEAD (main):** `20b166a` — fix(shadow-dungeon): gear double-fire + fallback guard
+**Origin sync:** ✅ Local = origin/main · public branch = `c889df9` (live site updated)
 
 ### Two-Repo Deployment Map
 
@@ -89,6 +89,22 @@ curl -s "https://malevolentmicrobes-stack.github.io/cozy-arcade-app-PHASE2/" | g
 ---
 
 ## Completed Log
+
+### This Session — Production Roadmap + Gear/Shadow Dungeon Fixes (2026-05-26)
+**Status:** ✅ Committed and pushed.
+
+| Commit | Fix |
+|--------|-----|
+| `20b166a` | fix(shadow-dungeon): remove gear double-fire (`wireGearButtons` had `.onclick` + capture `addEventListener` both calling `toggleSettingsGear351`) + harden Shadow Dungeon fallback guard with `!start.onclick` |
+| `8c45291` | docs: session log — runner fix, SRS 17/17, public cleanup, gitignore |
+
+**`previewInterval` easy formula fix** (`1.6→1.3` multiplier): pending commit + public sync.
+
+**Production deployment roadmap added** to this status file: Tier 0 (SRS parity) → Tier 1 (web) → Tier 2 (monetization) → Tier 3 (Tauri desktop) → Tier 4 (iOS Capacitor) → Tier 5 (bug checklist) → Tier 6 (architecture notes).
+
+**Gear bug confirmed:** `wireGearButtons()` was setting both `.onclick` and a capture `addEventListener` on `#gearBtn` — settings toggled open then immediately closed on every click. One-line fix: removed the duplicate `addEventListener`.
+
+---
 
 ### This Session — Gameplay + Deployment + Gitignore (2026-05-26)
 **Status:** ✅ Completed and pushed.
@@ -292,16 +308,186 @@ Post-rebase notes from Claude Code review. Watch during mobile testing:
 
 ## Next Active Task
 
-**P3 — FSRS v5 SRS Upgrade** (or P1 Shadow Dungeon, user's choice)
+**P3 — FSRS v5 SRS Upgrade** (production blocker — highest value)
 
-- P3: Replace SM-2 `rateCard()` with FSRS v5 (~50 lines inline). New fields: `stability`, `difficulty`, `retrievability`. No external library. Prerequisite: `window.runSRSValidation()` 13/13 confirmed in browser first.
-- P1 Shadow Dungeon: No code changes needed — already wired. Browser validate the Shadow Dungeon flow (Settings → Shadow Dungeon tab → filter by system/tag → start session).
+- Replace SM-2 `rateCard()` with FSRS v5 (~50 lines inline)
+- New fields: `stability`, `difficulty`, `retrievability`
+- No external library, backward-compatible with existing progress records
+- Prerequisite: browser confirm `window.runSRSValidation()` → `✅ 17/17` on live site
+
+**Also queued — previewInterval easy formula fix** (`20b166a` pending public sync):
+- `previewInterval` easy was using multiplier `1.6` instead of `1.3` — showed wrong preview vs actual interval scheduled by `rateCard`. Fixed.
+
+---
+
+## Production Deployment Roadmap
+
+> Objective: move from GitHub Pages test deployment → real iOS app + web product (ad-supported + one-time purchase).
+
+### Deployment Targets
+
+| Target | Status | Est. effort |
+|--------|--------|-------------|
+| Web (Vercel/Netlify, custom domain) | 🔜 Next after PWA | 1–2 days |
+| Mac/PC desktop (Tauri wrapper) | 🔜 After web stable | 2–3 days |
+| iOS (Capacitor + App Store) | 🔜 After desktop | 1–2 weeks |
+| Android | Future | After iOS |
+
+### Monetization Model (First Batch)
+
+| Tier | What | Gate |
+|------|------|------|
+| Free web | 50 cards, no SRS history | Ad-supported (Google AdSense) |
+| One-time web purchase | Full deck + full SRS | Stripe Checkout ($9.99–$29.99) |
+| iOS one-time IAP | Full deck + offline | StoreKit 2 non-consumable ($14.99) |
+| Future: subscription | Deck updates + sync | After v1 stable |
+
+---
+
+## Production Readiness — Tier Breakdown
+
+### Tier 0 — SRS Parity (pre-deployment blocker)
+
+Anki gap analysis vs current implementation:
+
+| Feature | Anki | Current | Gap |
+|---------|------|---------|-----|
+| Algorithm | FSRS v5 | SM-2 | ❌ P3 needed |
+| Again timing | configurable learning steps | 10 min hardcoded | ⚠️ acceptable for v1 |
+| Hard/Good/Easy intervals | FSRS formula | SM-2 formula | ❌ P3 |
+| Review count on home | ✅ deck browser | ❌ not shown | ⚠️ P3.5 |
+| Workload forecast | ✅ (reviews/day chart) | ❌ | P4+ |
+| Deck stats (retention %) | ✅ | ❌ | P4+ |
+| `.apkg` import | ✅ | ❌ (JSON only) | Future |
+| Interval modifier | ✅ user setting | ❌ | P3.5 |
+
+**Gate:** P3 FSRS v5 must ship before App Store submission.
+
+- [ ] **P3** — FSRS v5 drop-in for `rateCard()`. Fields: `stability`, `difficulty`, `retrievability`. Preserve all SM-2 fields for backward compatibility.
+- [ ] **P3.5** — Due-count widget on home screen: "5 due · 12 new". Read from `getStudyPool('due')` + `getStudyPool('new_only')`.
+- [ ] **previewInterval fix** — ✅ Fixed `1.6→1.3` multiplier (`20b166a`, pending public sync).
+
+### Tier 1 — Web Production
+
+- [ ] **P7** — PWA / Offline
+  - `sw.js` service worker: cache `index.html`, `progress_beta.html`, fonts, images
+  - `manifest.json`: standalone display, app icons, theme color
+  - Self-host Orbitron + DM Sans (remove Google Fonts CDN dependency — hospital wifi blocks external CDN)
+  - Add to home screen on iOS Safari
+
+- [ ] **P8** — Security Audit
+  - Card content XSS review: `innerHTML` used for card render — must sanitize `diagnosis`, `presentation`, `educational_objective` fields against injected `<script>` tags
+  - Content Security Policy header: `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'`
+  - localStorage scope: no PII stored, deck content stays single-origin — acceptable
+  - Import validation: reject malformed JSON at boundary — currently `parseJsonLoose()` is lenient; add schema check on `importDeck()`
+  - No hardcoded secrets: Supabase keys via localStorage user input only ✅ already enforced
+
+- [ ] **P8.5** — Custom domain + HTTPS
+  - Deploy to Vercel or Netlify (free tier adequate for v1)
+  - Custom domain: `cozyarcade.app` or similar
+  - Redirect GitHub Pages URL to new domain
+  - HTTPS enforced
+
+### Tier 2 — Monetization (Web)
+
+- [ ] **M1** — Ad integration (web free tier)
+  - Google AdSense `async` script — insert after `</body>` in a wrapper, never inside game shell
+  - Ad units: home screen only (not during active study session)
+  - Gate: hide ads for authenticated paid users via localStorage flag `cozy_paid_v1`
+
+- [ ] **M2** — One-time Stripe Checkout
+  - Stripe Checkout (hosted) — no backend required; use Stripe Payment Links
+  - After payment: Stripe redirects back with `?purchased=1`; app sets `localStorage.setItem('cozy_paid_v1', '1')`
+  - Full deck unlock gated on `cozy_paid_v1`
+  - Note: localStorage purchase flag = client-side only. Acceptable for v1 (no real entitlement server). For v2 add Supabase auth.
+
+- [ ] **M3** — Free vs paid card gating
+  - Free: first 50 cards of any imported deck
+  - Paid: full deck + SRS history export
+  - Implementation: `basePlayableCards()` filter — if `!isPaid() && cards.length > 50` → slice to 50 with toast
+
+### Tier 3 — Mac/PC Desktop (Tauri)
+
+Tauri wraps the single-file HTML app in a native shell. Smaller than Electron (~3MB vs ~120MB).
+
+- [ ] **D1** — Tauri project scaffold
+  - `npm create tauri-app@latest` — select existing web assets
+  - Point Tauri at local `index.html`
+  - Build: `cargo tauri build` → `.app` (Mac), `.exe` (Windows)
+
+- [ ] **D2** — File system integration
+  - Tauri `@tauri-apps/api/fs` replaces browser file picker for deck/progress import
+  - Auto-save progress to `~/Library/Application Support/CozyArcade/progress.json` (Mac)
+  - Remove localStorage size constraints — write directly to disk
+
+- [ ] **D3** — Auto-update
+  - Tauri updater plugin — checks GitHub Releases for new `.app`
+  - Notify user in-app, one-click install
+
+- [ ] **D4** — Code signing
+  - Mac: Apple Developer Program ($99/yr) — notarize with `codesign` + `xcrun notarytool`
+  - Windows: EV certificate ($300/yr) or self-signed for beta
+  - Required for: Mac Gatekeeper bypass, Windows SmartScreen
+
+### Tier 4 — iOS (Capacitor)
+
+- [ ] **iOS1** — Capacitor scaffold
+  - `npm init @capacitor/app` — wrap `index.html`
+  - iOS: `npx cap add ios` → opens in Xcode
+  - Replace `localStorage` with `@capacitor/preferences` (maps to iOS Keychain-backed storage)
+
+- [ ] **iOS2** — In-App Purchase (StoreKit 2)
+  - Product: `com.cozyarcade.fullaccess` — non-consumable, one-time
+  - RevenueCat SDK for cross-platform IAP management (iOS + future Android)
+  - Price: $14.99 (matches medical flashcard app market)
+  - Restore purchases button required by App Store guidelines
+
+- [ ] **iOS3** — App Store compliance
+  - Medical content disclaimer (required): "For educational purposes only. Not a substitute for clinical judgment."
+  - Privacy policy URL (required): no PII collected → minimal policy
+  - App category: Education → Medical
+  - Age rating: 4+ (no objectionable content)
+  - Required screenshots: iPhone 6.7", iPad 12.9"
+
+- [ ] **iOS4** — App Store metadata
+  - Title: "Cozy Arcade Board Prep"
+  - Subtitle: "ABIM · Step · Medical SRS"
+  - Keywords: board exam, ABIM, USMLE, flashcard, spaced repetition, medicine
+
+### Tier 5 — Known Bugs / Pre-ship Checklist
+
+| Bug | Status | Severity | Fix |
+|-----|--------|----------|-----|
+| `previewInterval` easy multiplier `1.6` vs `1.3` | ✅ Fixed `20b166a` | Low | Done |
+| Gear button double-fire (`toggleSettingsGear351` twice) | ✅ Fixed `20b166a` | Medium | Done |
+| Shadow Dungeon fallback `addEventListener` without `!onclick` guard | ✅ Fixed `20b166a` | Low | Done |
+| Runner starts at correct answer lane | ✅ Fixed `b572c12` | High | Done |
+| SRS display `17/13` hardcoded total | ✅ Fixed `b572c12` | Low | Done |
+| Card content `innerHTML` render — XSS risk on untrusted decks | ❌ Open | Medium | P8 |
+| `importDeck()` no schema validation | ❌ Open | Low | P8 |
+| `previewInterval` hard: `Math.round(interval * 1.2) \|\| 1` — `\|\| 1` means 0-interval card shows "1d" not "10m" | ❌ Open | Low | P3.5 |
+
+### Tier 6 — Architecture Notes for Production
+
+**Single-file constraint:**
+- All JS in one HTML file is fine for Tauri/Capacitor (they bundle the file locally)
+- For web CDN hosting: consider splitting CSS/JS into separate files at build time using a simple `node build.js` script — reduces TTFB for repeat visitors
+- Do NOT refactor inline — keep editing directly as per iron rules
+
+**localStorage → file system migration path:**
+- Web: keep localStorage (quota: ~5MB, sufficient for 1000-card decks)
+- Desktop (Tauri): migrate to file system using `@tauri-apps/api/fs`
+- iOS (Capacitor): migrate to `@capacitor/preferences`
+- Keep `cozy_arcade_progress_v1` key name as canonical identifier across all platforms
+
+**Backend (when needed — v2):**
+- Supabase (Postgres + auth) — progress sync across devices
+- Schema: `user_id`, `card_id`, `progress_json` — simple upsert
+- No backend needed for v1
 
 ---
 
 ## Future Roadmap (post-mobile, pre-publishing)
-
-> Separate detailed file: `COZY_ARCADE_REFACTOR_PLAN_v1.md`. This is the summary gate order.
 
 ### P3 — SRS Algorithm Upgrade (FSRS v5)
 Replace SM-2 in `rateCard()` with FSRS v5 (~50 lines inline). New fields: `stability`, `difficulty`, `retrievability`. No external library. Do after SRS timing (Task B) is validated.
