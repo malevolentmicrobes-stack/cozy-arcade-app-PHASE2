@@ -6710,7 +6710,6 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       if((txt==='⚙'||txt==='⚙️'||btn.id==='gearBtn')&&!btn.dataset.gear351){
         btn.dataset.gear351='1';
         btn.onclick=toggleSettingsGear351;
-        btn.addEventListener('click',toggleSettingsGear351,true);
       }
     });
   }
@@ -12936,7 +12935,7 @@ function fixStableOneThingDropdown351() {
       cancel.addEventListener('click', () => ov.classList.add('hidden'));
     }
     const start = q('shadowStart351');
-    if (start && !start.dataset.mobileShell371) {
+    if (start && !start.dataset.mobileShell371 && !start.onclick) {
       start.dataset.mobileShell371 = '1';
       start.addEventListener('click', () => {
         const scope = q('shadowScope351')?.value || 'review';
