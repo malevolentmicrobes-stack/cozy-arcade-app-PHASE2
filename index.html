@@ -11357,13 +11357,14 @@ function fixStableOneThingDropdown351() {
   function previewInterval(cardOrId, rating) {
     const cardId = typeof cardOrId === 'string' ? cardOrId : canonicalCardId(cardOrId || current || {});
     const p = getProgress(cardId);
-    const interval = Number(p.interval_days || 0);
-    const ease = Number(p.ease_factor || 2.5);
     if (rating === 'again') return intervalLabel(0, 10);
-    if (rating === 'hard') return intervalLabel(Math.max(1, Math.round(interval * 1.2) || 1));
-    if (rating === 'good') return intervalLabel(interval <= 0 ? 1 : Math.max(1, Math.round(interval * ease)));
-    if (rating === 'easy') return intervalLabel(interval <= 0 ? 4 : Math.max(4, Math.round(interval * Math.min(4.0, ease + 0.15) * 1.3)));
-    return '';
+    const isNew = !p.stability && !Number(p.interval_days || 0);
+    const prevS = Number(p.stability) || Math.max(Number(p.interval_days || 0), 1);
+    const prevD = Number(p.difficulty) || 5.0;
+    const elapsed = p.last_seen_at ? (Date.now() - new Date(p.last_seen_at)) / 86400000 : 0;
+    const Rv = (!isNew && p.last_seen_at) ? fsrsRetrievability(elapsed, prevS) : 1.0;
+    const preS = isNew ? fsrsInitStability(rating) : fsrsRecallStability(prevD, prevS, Rv, rating);
+    return intervalLabel(fsrsNextInterval(preS));
   }
 
   // FSRS v5 — default weights W[0-18] (open-spaced-repetition/fsrs5)
@@ -11447,40 +11448,32 @@ function fixStableOneThingDropdown351() {
     }
 
     const now = new Date();
-    let ease = Number(p.ease_factor || 2.5);
-    let interval = Number(p.interval_days || 0);
+    const isNew = !p.stability && !Number(p.interval_days || 0);
+    const prevS = Number(p.stability) || Math.max(Number(p.interval_days || 0), 1);
+    const prevD = Number(p.difficulty) || 5.0;
+    const elapsedDays = p.last_seen_at ? (now - new Date(p.last_seen_at)) / 86400000 : 0;
+    const Rv = (!isNew && p.last_seen_at) ? fsrsRetrievability(elapsedDays, prevS) : 1.0;
     let stage = p.stage || 'new';
     let lapses = Number(p.lapses || 0);
     let repair = false;
     let buried = false;
-    let nextDue = now;
+    let newS, newD, interval, nextDue;
 
     if (rating === 'again') {
+      newS = isNew ? fsrsInitStability(rating) : fsrsForgetStability(prevD, prevS, Rv);
+      newD = isNew ? fsrsInitDifficulty(rating) : fsrsUpdateDifficulty(prevD, rating);
+      lapses += p.stage === 'review' ? 1 : 0;
       stage = 'relearning';
       interval = 0;
-      ease = Math.max(1.3, ease - 0.2);
-      lapses += p.stage === 'review' ? 1 : 0;
       repair = true;
       buried = false;
       nextDue = addMinutes(now, 10);
-    } else if (rating === 'hard') {
+    } else if (rating === 'hard' || rating === 'good' || rating === 'easy') {
+      newS = isNew ? fsrsInitStability(rating) : fsrsRecallStability(prevD, prevS, Rv, rating);
+      newD = isNew ? fsrsInitDifficulty(rating) : fsrsUpdateDifficulty(prevD, rating);
       stage = 'review';
-      interval = Math.max(1, Math.round(interval * 1.2) || 1);
-      ease = Math.max(1.3, ease - 0.15);
-      repair = true;
-      buried = true;
-      nextDue = addDays(now, interval);
-    } else if (rating === 'good') {
-      stage = 'review';
-      interval = interval <= 0 ? 1 : Math.max(1, Math.round(interval * ease));
-      repair = false;
-      buried = true;
-      nextDue = addDays(now, interval);
-    } else if (rating === 'easy') {
-      stage = 'review';
-      ease = Math.min(4.0, ease + 0.15);
-      interval = interval <= 0 ? 4 : Math.max(4, Math.round(interval * ease * 1.3));
-      repair = false;
+      interval = fsrsNextInterval(newS);
+      repair = rating === 'hard';
       buried = true;
       nextDue = addDays(now, interval);
     } else {
@@ -11499,7 +11492,10 @@ function fixStableOneThingDropdown351() {
       last_seen_at: now.toISOString(),
       next_due_at: nextDue.toISOString(),
       interval_days: interval,
-      ease_factor: ease,
+      ease_factor: 2.5,
+      stability: newS,
+      difficulty: newD,
+      retrievability: Rv,
       lapses,
       repair_point: repair,
       buried: false,

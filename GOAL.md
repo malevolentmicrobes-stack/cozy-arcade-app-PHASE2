@@ -7,8 +7,8 @@
 **Reference:** `FSRS_V5_IMPLEMENTATION_PROMPT.md` — use this as the coding session prompt
 **Status:** IN PROGRESS
 
-**Current phase:** Phase 1–2 — inserting FSRS helpers + `runFSRSValidation()` into index.html
-**Prerequisite gate:** ✅ PASSED 2026-05-26 — `window.runSRSValidation()` → 17/17, `window.runCozySmokeTests()` → 6/6
+**Current phase:** Phase 4 — FSRS v5 math inserted into `rateCard()` — awaiting final validation
+**Prerequisite gate:** ✅ PASSED 2026-05-26 — `window.runFSRSValidation()` → 17/17, `window.runCozySmokeTests()` → 6/6
 
 ---
 
@@ -73,4 +73,5 @@ Report the output here. If output is `✅ FSRS: 17/17 passed` → mark gate PASS
 | 2026-05-26 | Shadow Dungeon dual-event fix | Code review + browser gear test | ✅ PASSED — `20b166a` |
 | 2026-05-26 | previewInterval easy formula | `1.6→1.3` verified against `rateCard()` | ✅ PASSED — `9552cb3` |
 | 2026-05-26 | SM-2 prereq gate | `window.runSRSValidation()` 17/17 + `runCozySmokeTests()` 6/6 | ✅ PASSED — browser confirmed |
-| 2026-05-26 | P3 FSRS Phase 1–2 | helpers + `runFSRSValidation()` inserted into index.html | ⏳ IN PROGRESS |
+| 2026-05-26 | P3 FSRS Phase 1–2 | helpers + `runFSRSValidation()` inserted into index.html | ✅ PASSED — `runFSRSValidation()` 17/17 browser confirmed |
+| 2026-05-26 | P3 FSRS Phase 4 | `rateCard()` SM-2 replaced with FSRS v5 math | ⏳ IN PROGRESS — run `runFSRSValidation()` + `runCozySmokeTests()` to confirm |
