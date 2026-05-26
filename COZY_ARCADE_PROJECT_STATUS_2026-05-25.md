@@ -2,9 +2,30 @@
 
 **Date:** May 26, 2026 (updated this session)
 **Repo:** `cozy-arcade-app- PHASE2` · `malevolentmicrobes-stack/cozy-arcade-app`
-**Primary files:** `index.html` (~11,700+ lines), `progress_beta.html`
-**Git HEAD:** `5f243f5` — fix(srs): schedule-aware fallback — future easy/good/hard cards can never leak into pool
+**Primary files:** `index.html` (~12,811 lines), `progress_beta.html`
+**Git HEAD (main):** `0d1d2f0` — docs: correct SM-2 easy interval spec — e updated before interval calc, test 8 = 14 not 13
 **Origin sync:** ✅ Local = origin/main (clean working tree)
+
+### Two-Repo Deployment Map
+
+| Remote | Repo | Branch | Purpose |
+|--------|------|--------|---------|
+| `origin` | `cozy-arcade-app` | `public` | Git history, SRS fixes, all code |
+| `phase2` | `cozy-arcade-app-PHASE2` | `public` | **Live GitHub Pages site** (`malevolentmicrobes-stack.github.io/cozy-arcade-app-PHASE2/`) |
+
+> ⚠️ **Always push Pages syncs to BOTH remotes:**
+> ```
+> git push origin public      # keeps cozy-arcade-app in sync
+> git push phase2 public      # updates the live site
+> ```
+> The `public` branch was first pushed to `phase2` on 2026-05-26. GitHub Pages source must be set to `public` branch in `cozy-arcade-app-PHASE2` repo settings.
+
+### Pending: GitHub Pages Source Config
+Go to `https://github.com/malevolentmicrobes-stack/cozy-arcade-app-PHASE2/settings/pages` → set Branch = `public` → Save. Then verify:
+```bash
+curl -s "https://malevolentmicrobes-stack.github.io/cozy-arcade-app-PHASE2/" | grep -c "runSRSValidation"
+# Expected: 2
+```
 
 ---
 
@@ -68,11 +89,32 @@
 
 ## Completed Log
 
+### This Session — SRS Validation + Deployment Fix (2026-05-26)
+**Status:** ✅ Completed and pushed.
+
+| Commit | Fix |
+|--------|-----|
+| `79b75e5` | `window.runSRSValidation()` — 13-test SM-2 assertion suite inside Phase 3 IIFE |
+| `0d1d2f0` | docs: correct SM-2 easy interval spec (test 8 = 14, not 13) |
+| `1778e4d` | chore: empty commit to trigger Pages rebuild (pushed to `origin/public`) |
+| (phase2 push) | `public` branch first pushed to `cozy-arcade-app-PHASE2` remote — live site |
+
+**Subdirectory file sync:** `cozy-arcade-app-PHASE2/index.html` (old copy, 11,918 lines, "Full Import Settings" button) overwritten with current main `index.html`. No longer a source of confusion.
+
+**Confirmed function signatures (diagnostic run):**
+- `getProgress(cardId)` — line 11284, 1 arg
+- `setProgress(cardId, patch)` — line 11304, 2 args
+- `rateCard(cardId, rating)` — line 11370, 2 args
+- `session.seenThisSession` (bare `session.`, not `phase3State.session.`)
+
+---
+
 ### Phase 1.1 — Settings Drawer / Import-Export Label Cleanup
 **Status:** ✅ Completed, tested, validated, pushed.
 - `Upload JSON Deck` → `Upload Deck` · `Download JSON` → `Download Deck` · `Progress ↗` → `Progress`
 - Settings drawer: primary `Import ▾`, secondary `Export ▾`
 - Import routes through `importObjectPhase3` · Export: Deck / Progress / Full Deck + Progress
+- **Note:** Old `cozy-arcade-app-PHASE2/index.html` subdirectory copy had "Full Import Settings" single button — this was an OLD file, not a regression. Main file is correct.
 
 ### Phase 1.2 — Progress Link Mutation Fix
 **Status:** ✅ Completed, tested, validated, pushed. Commit `dafabbb` regression-checked.
