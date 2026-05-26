@@ -1503,7 +1503,7 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
     try{deckMode=q('deckMode')?.value || deckMode;}catch(e){}
     try{promptField=q('promptField')?.value || promptField;}catch(e){}
     try{autoSelect=!!q('autoSelect')?.checked;}catch(e){}
-    try{bionicOn=!!q('bionicToggle')?.checked;}catch(e){}
+    try{bionicOn=!!q('bionicToggle')?.checked; localStorage.setItem('bionicOn_v1751523',bionicOn?'1':'0');}catch(e){}
     readSpacedSetting();
     toastSafe('Applied');
   }
@@ -6644,13 +6644,15 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       rerenderVisibleBionic351();
       if(notify){try{toast(on?'Bionic reading on':'Bionic reading off');}catch(err){}}
     };
+    let anyNew=false;
     toggles.forEach(t=>{
       if(t.dataset.cozy351) return;
+      anyNew=true;
       t.dataset.cozy351='1';
       t.checked=initial;
       t.addEventListener('change',()=>sync(t.checked,true));
     });
-    sync(initial,false);
+    if(anyNew) sync(initial,false);
   }
 
   function rerenderVisibleBionic351(){
