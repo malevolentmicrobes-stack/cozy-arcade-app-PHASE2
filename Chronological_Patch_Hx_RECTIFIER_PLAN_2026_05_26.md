@@ -3,6 +3,8 @@
 
 ---
 
+- 2026-05-26 Codex: Browser-validated Steps 1+6-8 plus undo review; `makeChoices`, no double-advance, `loopSolo`, legacy choiceRow classes, FSRS 17/17, and smoke 6/6 all pass.
+
 ## File Inventory
 
 | # | Path | Lines | Bytes | Role |
