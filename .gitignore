@@ -40,6 +40,14 @@ cozy_arcade_progress_*.json
 # Reference copy of gitignore (Git only reads .gitignore)
 gitignore.txt
 
+# Internal tooling — never publish to public branch
+graphify-out/
+.agents/
+.codex/
+AGENTS.md
+test-fixtures/
+cozy-arcade-app-PHASE2/
+
 # macOS metadata (regenerates on folder access)
 .DS_Store
 **/.DS_Store
