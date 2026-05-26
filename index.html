@@ -1296,6 +1296,7 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
     const apply=q('applyBtn'); if(apply) apply.onclick=()=>{deckMode=q('deckMode')?.value||deckMode; promptField='presentation'; autoSelect=!!q('autoSelect')?.checked; bionicOn=!!q('bionicToggle')?.checked; try{localStorage.setItem('bionicOn_v1751523',bionicOn?'1':'0');}catch(e){} saveSpacing(); safeToast('Applied');};
     const cb=q('spacedToggle'); if(cb){cb.onchange=saveSpacing;}
   }
+  window.enhanceSettings = enhanceSettings;
   const gear=q('gearBtn'); if(gear) gear.onclick=openSettings;
   const settingsBtn=q('settingsBtn'); if(settingsBtn) settingsBtn.onclick=openSettings;
   const homeTop=q('homeTopBtn'); if(homeTop) homeTop.onclick=home;
