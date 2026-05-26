@@ -12210,12 +12210,72 @@ function fixStableOneThingDropdown351() {
 :root {
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --hud-h: 112px;
-  --bottom-h: 104px;
-  --game-gap: 12px;
+  --hud-h: 88px;
+  --bottom-h: 88px;
+  --game-gap: 10px;
 }
 
 @media (max-width: 900px), (orientation: landscape) and (max-height: 560px) {
+  #home.screen {
+    padding: calc(14px + var(--safe-top)) 12px calc(18px + var(--safe-bottom)) !important;
+  }
+
+  #home .homeWrap {
+    gap: 12px !important;
+  }
+
+  #home .homeWrap > .hero {
+    display: flex !important;
+    min-height: auto !important;
+    padding: 28px 18px 24px !important;
+    overflow: hidden !important;
+  }
+
+  #home .cozyHeroSigil350 {
+    display: none !important;
+  }
+
+  #home .cozyHeroText350 {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  #home .heroTitle {
+    width: 100% !important;
+    max-width: 100% !important;
+    font-size: clamp(24px, 7.2vw, 34px) !important;
+    letter-spacing: .03em !important;
+    line-height: 1.12 !important;
+    white-space: normal !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+    text-align: center !important;
+  }
+
+  #home .heroSub {
+    font-size: clamp(13px, 4vw, 18px) !important;
+    letter-spacing: .06em !important;
+    line-height: 1.18 !important;
+    margin-top: 10px !important;
+    text-align: center !important;
+  }
+
+  #home .modeGrid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  #home .modeCard {
+    min-height: 118px !important;
+    padding: 18px 16px !important;
+  }
+
+  #home .modeTitle {
+    font-size: clamp(26px, 8vw, 38px) !important;
+    letter-spacing: .12em !important;
+    text-align: center !important;
+  }
+
   #solo.game-shell,
   #domain.game-shell {
     min-height: 100dvh !important;
@@ -12239,40 +12299,55 @@ function fixStableOneThingDropdown351() {
     z-index: 120 !important;
     min-height: var(--hud-h) !important;
     display: grid !important;
-    grid-template-rows: auto auto !important;
-    align-content: center !important;
+    grid-template-rows: 36px 36px !important;
+    align-content: start !important;
     justify-items: center !important;
-    gap: 7px !important;
-    padding: 8px 10px !important;
+    gap: 4px !important;
+    padding: 6px 8px !important;
     background: linear-gradient(180deg, rgba(2,6,17,.95), rgba(2,6,17,.76) 78%, rgba(2,6,17,0)) !important;
+    overflow: hidden !important;
     pointer-events: auto !important;
   }
 
   .hudStats371,
   .hudActions371 {
-    width: min(100%, 720px) !important;
-    display: flex !important;
-    flex-wrap: wrap !important;
+    width: min(100%, 680px) !important;
+    display: grid !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 7px !important;
+    gap: 6px !important;
     min-width: 0 !important;
+  }
+
+  .hudStats371 {
+    grid-template-columns: minmax(118px, 1.35fr) minmax(70px, .75fr) minmax(78px, .85fr) !important;
+  }
+
+  .hudActions371 {
+    grid-template-columns: minmax(70px, 1fr) 36px 36px 36px !important;
+    max-width: 260px !important;
   }
 
   .gameHud .hudGroup:empty {
     display: none !important;
   }
 
+  .gameHud > .energyHud352 {
+    display: none !important;
+  }
+
   .gameHud .hudPill,
   .gameHud .energyHud352 {
     max-width: 100% !important;
-    min-height: 34px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    min-width: 0 !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 6px !important;
-    padding: 7px 10px !important;
-    font-size: 12px !important;
+    gap: 4px !important;
+    padding: 5px 8px !important;
+    font-size: 11px !important;
     line-height: 1 !important;
     white-space: nowrap !important;
     overflow: hidden !important;
@@ -12281,16 +12356,16 @@ function fixStableOneThingDropdown351() {
   }
 
   .gameHud .hpWrap {
-    width: 46px !important;
-    height: 7px !important;
+    width: 34px !important;
+    height: 6px !important;
     margin-left: 0 !important;
-    flex: 0 0 46px !important;
+    flex: 0 0 34px !important;
   }
 
   .hudIconButton371 {
-    width: 42px !important;
-    height: 42px !important;
-    min-width: 42px !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
     padding: 0 !important;
     border-radius: 50% !important;
     font-size: 0 !important;
@@ -12299,8 +12374,13 @@ function fixStableOneThingDropdown351() {
 
   .hudIconButton371::before {
     content: attr(data-hud-icon);
-    font-size: 18px;
+    font-size: 17px;
     line-height: 1;
+  }
+
+  body.cozyGameShellActive371 #gearBtn,
+  body.cozyGameShellActive371 #homeTopBtn {
+    display: none !important;
   }
 
   .game-main,
@@ -12330,6 +12410,11 @@ function fixStableOneThingDropdown351() {
     overflow: auto !important;
     padding: 16px 18px 17px !important;
     border-radius: 18px !important;
+  }
+
+  #domain .gameMain371 > .promptBox {
+    min-height: 112px !important;
+    max-height: 24dvh !important;
   }
 
   .gameMain371 .promptText {
@@ -12378,6 +12463,34 @@ function fixStableOneThingDropdown351() {
     min-height: 330px !important;
     max-width: 760px !important;
     margin: 0 auto !important;
+  }
+
+  #domain .gameMain371 > #orbArena.orbArena {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    flex: 1 1 auto !important;
+    min-height: 330px !important;
+    max-width: 760px !important;
+    margin: 10px auto 0 !important;
+    overflow: hidden !important;
+    pointer-events: auto !important;
+  }
+
+  .gameMain371 > .orbArena .orb {
+    min-width: 96px !important;
+    max-width: 132px !important;
+    min-height: 48px !important;
+    padding: 9px 10px !important;
+    font-size: clamp(10px, 2.9vw, 12px) !important;
+    line-height: 1.08 !important;
+    border-radius: 18px !important;
+    overflow: hidden !important;
+    pointer-events: auto !important;
+  }
+
+  .gameMain371 > .orbArena .orb::before {
+    display: none !important;
   }
 
   .gameMain371 > .reveal {
@@ -12451,35 +12564,84 @@ function fixStableOneThingDropdown351() {
   .gateBanner {
     top: 48% !important;
   }
+
+  body.cozyGameShellActive371 .toast,
+  body.cozyGameShellActive371 .pulseToast351 {
+    bottom: calc(var(--bottom-h) + var(--safe-bottom) + 10px) !important;
+    max-width: calc(100vw - 24px) !important;
+    padding: 10px 12px !important;
+    font-size: 12px !important;
+    line-height: 1.25 !important;
+    pointer-events: none !important;
+  }
+
+  .gameMain371 #soloWarn {
+    display: none !important;
+  }
+
+  .gameMain371 > #soloDropWarn175151 {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+    z-index: 36 !important;
+    align-self: center !important;
+    min-height: 18px !important;
+    margin: -4px auto 0 !important;
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+    letter-spacing: .12em !important;
+    text-align: center !important;
+    pointer-events: none !important;
+  }
+
+  .gameMain371 > #soloDropWarn175151:not(.on) {
+    opacity: 0 !important;
+  }
 }
 
 @media (max-width: 480px) {
   :root {
-    --hud-h: 96px;
-    --bottom-h: 88px;
-    --game-gap: 10px;
+    --hud-h: 82px;
+    --bottom-h: 86px;
+    --game-gap: 8px;
   }
 
   .gameHud {
-    padding: 7px 8px !important;
-    gap: 6px !important;
+    grid-template-rows: 34px 34px !important;
+    padding: 5px 7px !important;
+    gap: 4px !important;
   }
 
   .gameHud .hudPill,
   .gameHud .energyHud352 {
-    font-size: 11px !important;
-    padding: 6px 8px !important;
+    height: 31px !important;
+    min-height: 31px !important;
+    font-size: 10px !important;
+    padding: 5px 7px !important;
   }
 
   .hudIconButton371 {
-    width: 40px !important;
-    height: 40px !important;
-    min-width: 40px !important;
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
   }
 
   .gameMain371 > .promptBox {
     max-height: 31dvh !important;
     padding: 15px 14px 16px !important;
+  }
+
+  #domain .gameMain371 > .promptBox {
+    max-height: 22dvh !important;
+  }
+
+  .gameMain371 > .orbArena {
+    min-height: 300px !important;
+  }
+
+  #domain .gameMain371 > #orbArena.orbArena {
+    min-height: 300px !important;
   }
 
   #choiceRow.v17515-css-drop,
@@ -12511,7 +12673,11 @@ function fixStableOneThingDropdown351() {
 
   .hudStats371,
   .hudActions371 {
-    width: auto !important;
+    width: 100% !important;
+  }
+
+  .hudActions371 {
+    max-width: 240px !important;
   }
 
   .gameMain371 {
@@ -12714,7 +12880,7 @@ function fixStableOneThingDropdown351() {
       hud.insertAdjacentElement('afterend', main);
     }
     const ids = gameId === 'solo'
-      ? ['.promptBox', '.soloTrack', '#soloReveal']
+      ? ['.promptBox', '#soloDropWarn175151', '.soloTrack', '#soloReveal']
       : ['.domainTitle', '.promptBox', '#orbArena', '#domainReveal'];
     ids.forEach(selector => {
       const el = game.querySelector(selector);
@@ -12732,14 +12898,18 @@ function fixStableOneThingDropdown351() {
       if (!mobileQuery() || !arena || !arena.closest('.gameMain371')) return priorPosition.apply(this, arguments);
       const rect = arena.getBoundingClientRect();
       const cx = rect.width / 2;
-      const cy = rect.height * .46;
-      const maxR = Math.min(rect.width, rect.height) * .34;
+      const cy = rect.height / 2;
+      const maxR = Math.max(34, Math.min((rect.width - 190) / 2, (rect.height - 170) / 2, 88));
       try {
         orbData.forEach((o, i) => {
-          const r = 58 + p * maxR;
+          const r = 36 + p * maxR;
           const wob = Math.sin(Date.now() / 650 + i) * 7;
-          o.x = cx + (r + wob) * Math.cos(o.ang);
-          o.y = cy + (r + wob) * Math.sin(o.ang);
+          const rawX = cx + (r + wob) * Math.cos(o.ang);
+          const rawY = cy + (r + wob) * Math.sin(o.ang);
+          const halfW = Math.max(54, o.el.offsetWidth / 2 || 64);
+          const halfH = Math.max(28, o.el.offsetHeight / 2 || 32);
+          o.x = Math.max(halfW + 8, Math.min(rect.width - halfW - 8, rawX));
+          o.y = Math.max(halfH + 8, Math.min(rect.height - halfH - 8, rawY));
           o.el.style.left = o.x + 'px';
           o.el.style.top = o.y + 'px';
           o.el.style.transform = 'translate(-50%,-50%) scale(' + (1 + p * .05) + ')';
@@ -12784,11 +12954,15 @@ function fixStableOneThingDropdown351() {
   }
 
   function run() {
-    try { if (typeof updateEnergyHud === 'function') updateEnergyHud(); } catch (_) {}
     normalizeHud('solo');
     normalizeHud('domain');
     wrapGameMain('solo');
     wrapGameMain('domain');
+    const gameActive = ['solo', 'domain'].some(id => {
+      const game = q(id);
+      return game && !game.classList.contains('hidden');
+    });
+    document.body.classList.toggle('cozyGameShellActive371', gameActive);
     patchDomainGeometry();
   }
 
