@@ -1,16 +1,16 @@
-# Graph Report - cozy-arcade-app- PHASE2  (2026-05-25)
+# Graph Report - cozy-arcade-app- PHASE2  (2026-05-26)
 
 ## Corpus Check
-- 22 files · ~2,518,633 words
+- 28 files · ~2,621,666 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1057 nodes · 1041 edges · 51 communities (45 shown, 6 thin omitted)
+- 1713 nodes · 1703 edges · 87 communities (81 shown, 6 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `ab9d206e`
+- Built from commit: `d162708c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -65,6 +65,42 @@
 - [[_COMMUNITY_Community 48|Community 48]]
 - [[_COMMUNITY_Community 49|Community 49]]
 - [[_COMMUNITY_Community 50|Community 50]]
+- [[_COMMUNITY_Community 51|Community 51]]
+- [[_COMMUNITY_Community 52|Community 52]]
+- [[_COMMUNITY_Community 53|Community 53]]
+- [[_COMMUNITY_Community 54|Community 54]]
+- [[_COMMUNITY_Community 55|Community 55]]
+- [[_COMMUNITY_Community 56|Community 56]]
+- [[_COMMUNITY_Community 57|Community 57]]
+- [[_COMMUNITY_Community 58|Community 58]]
+- [[_COMMUNITY_Community 59|Community 59]]
+- [[_COMMUNITY_Community 60|Community 60]]
+- [[_COMMUNITY_Community 61|Community 61]]
+- [[_COMMUNITY_Community 62|Community 62]]
+- [[_COMMUNITY_Community 63|Community 63]]
+- [[_COMMUNITY_Community 64|Community 64]]
+- [[_COMMUNITY_Community 65|Community 65]]
+- [[_COMMUNITY_Community 66|Community 66]]
+- [[_COMMUNITY_Community 67|Community 67]]
+- [[_COMMUNITY_Community 68|Community 68]]
+- [[_COMMUNITY_Community 69|Community 69]]
+- [[_COMMUNITY_Community 70|Community 70]]
+- [[_COMMUNITY_Community 71|Community 71]]
+- [[_COMMUNITY_Community 72|Community 72]]
+- [[_COMMUNITY_Community 73|Community 73]]
+- [[_COMMUNITY_Community 74|Community 74]]
+- [[_COMMUNITY_Community 75|Community 75]]
+- [[_COMMUNITY_Community 76|Community 76]]
+- [[_COMMUNITY_Community 77|Community 77]]
+- [[_COMMUNITY_Community 78|Community 78]]
+- [[_COMMUNITY_Community 79|Community 79]]
+- [[_COMMUNITY_Community 80|Community 80]]
+- [[_COMMUNITY_Community 81|Community 81]]
+- [[_COMMUNITY_Community 82|Community 82]]
+- [[_COMMUNITY_Community 83|Community 83]]
+- [[_COMMUNITY_Community 84|Community 84]]
+- [[_COMMUNITY_Community 85|Community 85]]
+- [[_COMMUNITY_Community 86|Community 86]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `11 - 13303` - 24 edges
@@ -81,15 +117,15 @@
 ## Surprising Connections (you probably didn't know these)
 - None detected - all connections are within the same source files.
 
-## Communities (51 total, 6 thin omitted)
+## Communities (87 total, 6 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.04
 Nodes (46): Accepted Field Aliases, Architecture, Card Schema, code:bash (# No install required), code:js (const CACHE = 'cozy-arcade-v4';), code:json ({), code:javascript (// Enable debug panel), code:block2 (diagnosis → educational_objective → board_trigger → one_thin) (+38 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.06
-Nodes (37): Accepted Aliases, Accepted Aliases (app normalizes automatically), Adding Multiple Cards, AI Conversion, code:json ({), code:block7 (Anki Front  →  presentation), code:block8 (Slide title / bold heading  →  diagnosis), code:block9 (Section heading    →  diagnosis) (+29 more)
+Cohesion: 0.05
+Nodes (45): Accepted Aliases, Accepted Aliases (app normalizes automatically), Adding Multiple Cards, AI Conversion, code:json ({), code:block2 ([paste the AI prompt from the app]), code:json ({), code:block4 (presentation  ← also: prompt, front, question, clinical_vign) (+37 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.22
@@ -132,12 +168,12 @@ Cohesion: 0.06
 Nodes (34): code:block1 (/graphify                                             # full), code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -c "), code:bash (if [ ! -f graphify-out/.graphify_extract.json ]; then), code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -c ") (+26 more)
 
 ### Community 12 - "Community 12"
-Cohesion: 0.07
-Nodes (28): Active: Task A — Atlas / Deck Hydration Fix, Active: Task B — SRS Timing / Again Queue Validation, code:block1 (graphify update .), code:block2 (Use Graphify first if helpful. Run: graphify update .), code:block3 (isDue() returns true immediately because repair_point or sta), code:js (function isDue(progress) {), code:block5 (Use Graphify first if helpful. Run: graphify update .), Completed Log (+20 more)
+Cohesion: 0.20
+Nodes (11): Active: Task A — Atlas / Deck Hydration Fix, code:block1 (1. Confirm .gitignore exists (not just gitignore.txt) and pr), code:block2 (graphify update .), Cozy Arcade Board Prep Medicine — Project Status, Graphify Status, Graphify — When to Use Where, Iron Rules — DO NOT TOUCH (from MASTER_CONTINUITY_PROMPT v3), Phase 2 Mobile Shell — Risk Monitoring (no action needed now) (+3 more)
 
 ### Community 13 - "Community 13"
-Cohesion: 0.07
-Nodes (28): Based on direct analysis of: `index.html` (10,604 lines, 654KB), `ABIM_DATABASE_first_10_cards_in_order.json`, `ABIM_DATABASE_random_20_cards_seed_20260521_PRETTY.json`, CANONICAL SCHEMA, code:json ({), code:js (function signalStrength(p) {), code:block12 (You are implementing Phase 1 of a refactor of a single-file ), code:block13 (TEST 1: Import first_10_cards_in_order.json), code:json ({), CODEX HANDOFF PROMPT (+20 more)
+Cohesion: 0.20
+Nodes (9): Based on direct analysis of: `index.html` (10,604 lines, 654KB), `ABIM_DATABASE_first_10_cards_in_order.json`, `ABIM_DATABASE_random_20_cards_seed_20260521_PRETTY.json`, code:block12 (You are implementing Phase 1 of a refactor of a single-file ), code:block13 (TEST 1: Import first_10_cards_in_order.json), CODEX HANDOFF PROMPT, COZY ARCADE BOARD PREP MEDICINE, NON-NEGOTIABLES, Senior Developer Refactor Plan — v1.0, Smoke Tests (run after every phase) (+1 more)
 
 ### Community 16 - "Community 16"
 Cohesion: 0.08
@@ -156,8 +192,8 @@ Cohesion: 0.08
 Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
 
 ### Community 20 - "Community 20"
-Cohesion: 0.08
-Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
+Cohesion: 0.04
+Nodes (44): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+36 more)
 
 ### Community 21 - "Community 21"
 Cohesion: 0.08
@@ -220,12 +256,12 @@ Cohesion: 0.08
 Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
 
 ### Community 36 - "Community 36"
-Cohesion: 0.09
-Nodes (22): 1A. CSS Consolidation, 1B. JS Consolidation, 2A. `one_thing` in Live Reveal (Priority: HIGH), 2B. `sys` Normalization, 2C. `makeChoices()` Minimum Guard, 2D. LocalStorage Migration, 2E. Remove three.js, code:css (/* === 1. CSS VARIABLES / ROOT === */) (+14 more)
+Cohesion: 0.18
+Nodes (11): 2A. `one_thing` in Live Reveal (Priority: HIGH), 2B. `sys` Normalization, 2C. `makeChoices()` Minimum Guard, 2D. LocalStorage Migration, 2E. Remove three.js, code:block3 (1. Diagnosis title (large)         → diagnosis), code:js (// In reveal():), code:js (function normalizeSys(val) {) (+3 more)
 
 ### Community 37 - "Community 37"
-Cohesion: 0.10
-Nodes (20): buried, card_id, correct_count, last_rating, last_seen_at, next_due_at, pinned, repair_point (+12 more)
+Cohesion: 0.05
+Nodes (37): Active: Task A — Atlas / Deck Hydration Fix, Active: Task B — SRS Timing / Again Queue Validation, code:block1 (1. Confirm .gitignore exists (not just gitignore.txt) and pr), code:block2 (graphify update .), code:block3 (Premortem check first:), code:block4 (isDue() returns true immediately because repair_point or sta), code:js (function isDue(progress) {), code:block6 (Use Graphify first if helpful. Run: graphify update .) (+29 more)
 
 ### Community 38 - "Community 38"
 Cohesion: 0.15
@@ -259,25 +295,169 @@ Nodes (7): code:javascript (window.isDue = isDue;), Issue 1: `isDue` not exposed
 Cohesion: 0.67
 Nodes (3): code:javascript ((async function runSRSValidation() {), code:block18 (✅ SRS VALIDATION: 27 passed, 0 failed), PART 7 — MASTER SMOKE TEST (Run All)
 
+### Community 51 - "Community 51"
+Cohesion: 0.22
+Nodes (8): Confirmed Findings, Cozy Arcade Board Prep Medicine — Progress Atlas Handoff Status, Current Bug, Most Likely Root Cause, Relevant Files, Safest Minimal Patch Next, Strategic Decision, Validation After Patch
+
+### Community 52 - "Community 52"
+Cohesion: 0.25
+Nodes (7): cards, meta, row_end, row_start, schema, source, total
+
+### Community 53 - "Community 53"
+Cohesion: 0.25
+Nodes (7): cards, meta, row_end, row_start, schema, source, total
+
+### Community 54 - "Community 54"
+Cohesion: 0.08
+Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
+
+### Community 55 - "Community 55"
+Cohesion: 0.08
+Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
+
+### Community 56 - "Community 56"
+Cohesion: 0.08
+Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
+
+### Community 57 - "Community 57"
+Cohesion: 0.08
+Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
+
+### Community 58 - "Community 58"
+Cohesion: 0.08
+Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
+
+### Community 59 - "Community 59"
+Cohesion: 0.08
+Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
+
+### Community 60 - "Community 60"
+Cohesion: 0.08
+Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
+
+### Community 61 - "Community 61"
+Cohesion: 0.08
+Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
+
+### Community 62 - "Community 62"
+Cohesion: 0.08
+Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
+
+### Community 63 - "Community 63"
+Cohesion: 0.08
+Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
+
+### Community 64 - "Community 64"
+Cohesion: 0.08
+Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
+
+### Community 65 - "Community 65"
+Cohesion: 0.08
+Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
+
+### Community 66 - "Community 66"
+Cohesion: 0.04
+Nodes (44): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+36 more)
+
+### Community 67 - "Community 67"
+Cohesion: 0.08
+Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
+
+### Community 68 - "Community 68"
+Cohesion: 0.08
+Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
+
+### Community 69 - "Community 69"
+Cohesion: 0.08
+Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
+
+### Community 70 - "Community 70"
+Cohesion: 0.08
+Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
+
+### Community 71 - "Community 71"
+Cohesion: 0.08
+Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
+
+### Community 72 - "Community 72"
+Cohesion: 0.08
+Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
+
+### Community 73 - "Community 73"
+Cohesion: 0.08
+Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
+
+### Community 74 - "Community 74"
+Cohesion: 0.17
+Nodes (13): 1. Smoke test (console), 2. Pool composition check (console — paste after import), 3. General Study Mode — live gameplay, 4. Review Deck mode, 5. Progress → Atlas handoff, code:block10 (Use Graphify first. Run: graphify update .), code:js (window.runCozySmokeTests()   // must be 6/6), code:js (// Should show only: new cards + due/legacy reviewed + relea) (+5 more)
+
+### Community 75 - "Community 75"
+Cohesion: 0.24
+Nodes (10): Active: Task B — SRS Timing / Again Queue Validation, Browser validation (run after next open), code:block3 (1. New (unseen)), code:js (function isDue(progress) {), code:block5 (window.runCozySmokeTests()   → expect 6/6), Commits this session, Completed: Task B — SRS Timing / Study Pool, Final `getStudyPool` — new_first bucket order (Anki-aligned) (+2 more)
+
+### Community 76 - "Community 76"
+Cohesion: 0.20
+Nodes (10): Future Roadmap (post-mobile, pre-publishing), P10 — Capacitor iOS / Android, P11 — Payments / Publishing, P3 — SRS Algorithm Upgrade (FSRS v5), P4 — End Screen Per-System Breakdown, P5 — CSV Import, P6 — Energy Rank Display (optional backport), P7 — PWA / Offline (+2 more)
+
+### Community 77 - "Community 77"
+Cohesion: 0.29
+Nodes (7): IMPLEMENTATION ROADMAP, Phase 1: Stabilize Import + Schema, Phase 2: Stabilize Gameplay, Phase 3: Progress / Review Object, Phase 4: PWA / Offline, Phase 5: Supabase Sync, Phase 6: Capacitor iOS / Android
+
+### Community 78 - "Community 78"
+Cohesion: 0.33
+Nodes (6): Completed Log, localStorage Contract (finalized), Phase 1.1 — Settings Drawer / Import-Export Label Cleanup, Phase 1.2.2 — Review Deck Filtering / New-Card Launch Scope, Phase 1.2 — Progress Link Mutation Fix, Phase 2 — Mobile Top-Bar / Game Shell (cozy-mobile-shell-371)
+
+### Community 79 - "Community 79"
+Cohesion: 0.33
+Nodes (6): CANONICAL SCHEMA, code:json ({), code:js (function signalStrength(p) {), code:json ({), v1 Card Schema (source-of-truth, never mutated), v1 User Progress Schema (separate object, never in card data)
+
+### Community 80 - "Community 80"
+Cohesion: 0.33
+Nodes (6): code:js (function getProgress(cardId) {), Phase 3 — Add Separated Progress Object (1 session), Phase 4 — PWA / Offline (1 session), Phase 5 — Supabase Sync (future), Phase 6 — Capacitor iOS / Android (future), REFACTOR PLAN
+
+### Community 81 - "Community 81"
+Cohesion: 0.33
+Nodes (6): Hard Numbers First, PROJECT DIAGNOSIS, What Is Duplicated, What Is Fragile, What Is Working, What Likely Causes Future Bugs
+
+### Community 82 - "Community 82"
+Cohesion: 0.40
+Nodes (5): 1A. CSS Consolidation, 1B. JS Consolidation, code:css (/* === 1. CSS VARIABLES / ROOT === */), code:js (// === SECTION 1: APP DATA (DATA object, cards, state) ===), Phase 1 — Consolidate Without Breaking (1–2 sessions)
+
+### Community 83 - "Community 83"
+Cohesion: 0.06
+Nodes (35): #1 — `selectSolo` is overridden 13 times; stale timer handles cause double-advance, #2 — `bindRatings` accumulates duplicate click handlers across the 12-deep reveal chain, #3 — Timer setting in Settings has no effect (Apply never writes `cozyQuestionSeconds351`), #4 — `bionicOn` default regression + 3-key split-brain persistence, #5 — `makeChoices()` return value used as array assignment in `startCard()`, A. Bionic Reading Initialization, A. File 2 vs File 3 (Old Prior vs Earlier Prior), B. File 3 vs File 4 (Earlier Prior vs Blank Import) (+27 more)
+
+### Community 84 - "Community 84"
+Cohesion: 0.22
+Nodes (8): Behavior rules, code:block1 (/goal                        # show current goal + condition), code:markdown (## Active Goal), Gate condition enforcement, /goal, GOAL.md format, Usage, What /goal does
+
+### Community 85 - "Community 85"
+Cohesion: 0.25
+Nodes (7): Active Goal, Advancement Rules, Blocked Goals Queue (next after P3), code:block1 (condition: browser:console validation suite after Steps 1–8), Gate Condition, Gate Log, Project Goal Tracker
+
+### Community 86 - "Community 86"
+Cohesion: 0.29
+Nodes (6): code:block1 (W = [0.4072,1.1829,3.1262,15.4722,7.2102,0.5316,1.0651,0.058), code:block2 (READ FIRST before any edits:), Error Catalog, Exact Test Vectors (computed from reference weights), FSRS v5 Implementation — Safe Validation Prompt, Session Prompt (paste into Claude Code terminal)
+
 ## Knowledge Gaps
-- **811 isolated node(s):** `schema`, `version`, `description`, `total`, `required_fields` (+806 more)
+- **1385 isolated node(s):** `schema`, `version`, `description`, `total`, `required_fields` (+1380 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **6 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `progress` connect `Community 37` to `Community 16`, `Community 17`, `Community 18`, `Community 19`, `Community 20`, `Community 21`, `Community 22`, `Community 23`, `Community 24`, `Community 25`, `Community 26`, `Community 27`, `Community 28`, `Community 29`, `Community 30`, `Community 31`, `Community 32`, `Community 33`, `Community 34`, `Community 35`?**
-  _High betweenness centrality (0.235) - this node is a cross-community bridge._
-- **Why does `card-0006` connect `Community 33` to `Community 37`?**
-  _High betweenness centrality (0.034) - this node is a cross-community bridge._
-- **Why does `4 - 13423` connect `Community 23` to `Community 37`?**
-  _High betweenness centrality (0.029) - this node is a cross-community bridge._
+- **Why does `progress` connect `Community 66` to `Community 54`, `Community 55`, `Community 56`, `Community 57`, `Community 58`, `Community 59`, `Community 60`, `Community 61`, `Community 62`, `Community 63`, `Community 64`, `Community 65`, `Community 67`, `Community 68`, `Community 69`, `Community 70`, `Community 71`, `Community 72`, `Community 73`?**
+  _High betweenness centrality (0.095) - this node is a cross-community bridge._
+- **Why does `progress` connect `Community 20` to `Community 16`, `Community 17`, `Community 18`, `Community 19`, `Community 21`, `Community 22`, `Community 23`, `Community 24`, `Community 25`, `Community 26`, `Community 27`, `Community 28`, `Community 29`, `Community 30`, `Community 31`, `Community 32`, `Community 33`, `Community 34`, `Community 35`?**
+  _High betweenness centrality (0.064) - this node is a cross-community bridge._
+- **Why does `card-0001` connect `Community 67` to `Community 66`?**
+  _High betweenness centrality (0.016) - this node is a cross-community bridge._
 - **What connects `schema`, `version`, `description` to the rest of the system?**
-  _811 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1385 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.0425531914893617 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.05832147937411095 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.05272895467160037 - nodes in this community are weakly interconnected._
 - **Should `Community 4` be split into smaller, more focused modules?**
   _Cohesion score 0.04081632653061224 - nodes in this community are weakly interconnected._

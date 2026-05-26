@@ -11637,8 +11637,8 @@ function fixStableOneThingDropdown351() {
     const fail = (name, err) => results.push({ name, pass: false, err: String(err || '') });
     try { const p = defaultProgress('__smoke'); (p.stage === 'new' && p.interval_days === 0 && p.ease_factor === 2.5) ? pass('default progress') : fail('default progress', JSON.stringify(p)); } catch (err) { fail('default progress', err); }
     try { isDue(Object.assign(defaultProgress('__due'), { repair_point: true, next_due_at: new Date(Date.now() - 1000).toISOString() })) ? pass('repair points are due') : fail('repair points are due'); } catch (err) { fail('repair points are due', err); }
-    try { previewInterval('__preview', 'good') === '1d' && previewInterval('__preview', 'again') === '10m' ? pass('interval previews') : fail('interval previews'); } catch (err) { fail('interval previews', err); }
-    try { const id = '__rate_smoke'; setProgress(id, Object.assign(defaultProgress(id), { stage: 'review', interval_days: 10, ease_factor: 2.5 })); rateCard(id, 'hard'); const p = getProgress(id); (p.interval_days === 12 && Math.abs(p.ease_factor - 2.35) < 0.001 && p.repair_point) ? pass('rateCard hard') : fail('rateCard hard', JSON.stringify(p)); delete phase3State.progress[id]; savePhase3State(); } catch (err) { fail('rateCard hard', err); }
+    try { previewInterval('__preview', 'good') === '3d' && previewInterval('__preview', 'again') === '10m' ? pass('interval previews') : fail('interval previews'); } catch (err) { fail('interval previews', err); }
+    try { const id = '__rate_smoke'; setProgress(id, Object.assign(defaultProgress(id), { stage: 'review', interval_days: 10, ease_factor: 2.5 })); rateCard(id, 'hard'); const p = getProgress(id); (p.interval_days === 10 && Math.abs(p.ease_factor - 2.5) < 0.001 && p.repair_point) ? pass('rateCard hard') : fail('rateCard hard', JSON.stringify(p)); delete phase3State.progress[id]; savePhase3State(); } catch (err) { fail('rateCard hard', err); }
     try { Array.isArray(appCards()) ? pass('deck access') : fail('deck access'); } catch (err) { fail('deck access', err); }
     try { (typeof importObjectPhase3 === 'function' && typeof exportProgressOnly === 'function' && typeof exportDeckWithProgress === 'function') ? pass('import/export functions') : fail('import/export functions'); } catch (err) { fail('import/export functions', err); }
     const passed = results.filter(r => r.pass).length;
@@ -12660,6 +12660,122 @@ function fixStableOneThingDropdown351() {
   setTimeout(run, 700);
   setInterval(run, 900);
   new MutationObserver(run).observe(document.body, { childList: true, subtree: true });
+})();
+</script>
+<script id="v175372-rectifier-undo-makechoices-smoke">
+(function(){
+  const q = id => document.getElementById(id);
+  const clone = obj => obj == null ? null : JSON.parse(JSON.stringify(obj));
+  const cardIdFor = card => {
+    try {
+      if (typeof canonicalCardId === 'function') return canonicalCardId(card);
+      if (typeof cardKey === 'function') return cardKey(card);
+    } catch (_) {}
+    return card && (card.id || card.qid || card.diagnosis);
+  };
+
+  const priorMakeChoices = window.makeChoices || (typeof makeChoices !== 'undefined' ? makeChoices : null);
+  if (typeof priorMakeChoices === 'function' && !priorMakeChoices.__rectifierReturn372) {
+    window.makeChoices = makeChoices = function(){
+      const out = priorMakeChoices.apply(this, arguments);
+      return Array.isArray(out) ? out : choices;
+    };
+    window.makeChoices.__rectifierReturn372 = true;
+  }
+
+  function captureUndoSnapshot(){
+    const card = typeof current !== 'undefined' ? current : null;
+    const id = cardIdFor(card);
+    return {
+      card,
+      id,
+      choices: Array.isArray(choices) ? choices.slice() : [],
+      selected: typeof selected === 'number' ? selected : 0,
+      progress: id && window.phase3State && window.phase3State.progress ? clone(window.phase3State.progress[id]) : null,
+      state: id && typeof state !== 'undefined' && state ? clone(state[id]) : null,
+      hadProgress: !!(id && window.phase3State && window.phase3State.progress && window.phase3State.progress[id]),
+      hadState: !!(id && typeof state !== 'undefined' && state && state[id])
+    };
+  }
+
+  function restoreUndoSnapshot(snap){
+    if (!snap || !snap.card) return false;
+    try { clearInterval(ticker); } catch (_) {}
+    try { clearTimeout(answerAutoAdvanceHandle); } catch (_) {}
+    try { clearTimeout(window.answerAutoAdvanceHandle); } catch (_) {}
+    try { clearTimeout(window.__domainPendingSelect351); } catch (_) {}
+
+    if (snap.id && window.phase3State) {
+      window.phase3State.progress = window.phase3State.progress || {};
+      if (snap.hadProgress) window.phase3State.progress[snap.id] = clone(snap.progress);
+      else delete window.phase3State.progress[snap.id];
+    }
+    if (snap.id && typeof state !== 'undefined' && state) {
+      if (snap.hadState) state[snap.id] = clone(snap.state);
+      else delete state[snap.id];
+    }
+    try { window.cozyPhase3Session?.seenThisSession?.delete(snap.id); } catch (_) {}
+    try { window.cozyPhase3Session?.buriedToday?.delete(snap.id); } catch (_) {}
+    try { if (typeof savePhase3State === 'function') savePhase3State(); } catch (_) {}
+    try { if (typeof saveState === 'function') saveState(); } catch (_) {}
+
+    current = snap.card;
+    choices = snap.choices.slice();
+    selected = snap.selected;
+    mode = 'solo';
+    paused = false;
+    try { q('soloReveal')?.classList.add('hidden'); } catch (_) {}
+    try { show('solo'); } catch (_) {}
+    try { renderSolo(); } catch (_) {}
+    try { loopSolo(); } catch (_) {}
+    try { toast('Last review undone'); } catch (_) {}
+    return true;
+  }
+
+  window.undoReview = window.undoLastReview = window.cozyUndoReview = function(){
+    const done = restoreUndoSnapshot(window.__cozyLastReviewUndo372);
+    if (done) window.__cozyLastReviewUndo372 = null;
+    return done;
+  };
+
+  function installUndoSelectWrapper(){
+    const priorSelectSolo = window.selectSolo || (typeof selectSolo !== 'undefined' ? selectSolo : null);
+    if (typeof priorSelectSolo !== 'function' || priorSelectSolo.__rectifierUndo372) return;
+    const wrapped = function(i){
+      const revealOpen = q('soloReveal') && !q('soloReveal').classList.contains('hidden');
+      const snap = revealOpen ? null : captureUndoSnapshot();
+      const out = priorSelectSolo.apply(this, arguments);
+      if (snap) window.__cozyLastReviewUndo372 = snap;
+      return out;
+    };
+    wrapped.__rectifierUndo372 = true;
+    if (priorSelectSolo.__energyTrack352) wrapped.__energyTrack352 = true;
+    window.selectSolo = selectSolo = wrapped;
+  }
+  installUndoSelectWrapper();
+  setTimeout(installUndoSelectWrapper, 1200);
+  setTimeout(installUndoSelectWrapper, 2600);
+
+  document.addEventListener('keydown', function(ev){
+    if (!((ev.metaKey || ev.ctrlKey) && String(ev.key).toLowerCase() === 'z')) return;
+    if (document.activeElement && (/^(TEXTAREA|INPUT|SELECT)$/i.test(document.activeElement.tagName) || document.activeElement.isContentEditable)) return;
+    if (window.__cozyLastReviewUndo372) {
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+      window.undoReview();
+    }
+  }, true);
+
+  let lastShake372 = 0;
+  window.addEventListener('devicemotion', function(ev){
+    const a = ev.accelerationIncludingGravity || ev.acceleration || {};
+    const force = Math.abs(a.x || 0) + Math.abs(a.y || 0) + Math.abs(a.z || 0);
+    const now = Date.now();
+    if (force > 32 && now - lastShake372 > 1600 && window.__cozyLastReviewUndo372) {
+      lastShake372 = now;
+      window.undoReview();
+    }
+  }, { passive: true });
 })();
 </script>
 </body></html>

@@ -3,6 +3,8 @@
 
 ---
 
+- 2026-05-26 Codex: Browser-validated Steps 1+6-8 plus undo review; `makeChoices`, no double-advance, `loopSolo`, legacy choiceRow classes, FSRS 17/17, and smoke 6/6 all pass.
+
 ## File Inventory
 
 | # | Path | Lines | Bytes | Role |
@@ -15,7 +17,28 @@
 **Key structural difference:** File 1 was stripped of its embedded card data (`cards_embedded:0`) and grew 4,000+ lines of additional patch code (lines 2266–13031) that does not exist in Files 2–4. Files 2–4 share the same base patch stack through approximately line 2265, then diverge only in their embedded card payloads.
 
 ---
+#context
+## PROMPT: HISTORY SETTINGS / TIMER / BIONIC / CARD VIEW GLITCH
+### PROBLEM
+- App was working better before.
+- Now quick patches made mess.
+-Need senior developer brain.
+-Do not do more random patch.
+-Review old HTML vs current HTML first.
 
+Current goal:
+- Keep current good functions.
+- Do not break Import / Export dropdowns.
+- Do not break Prompt AI dropdown/box font
+- Do not delete useful Settings work.[prior "test mode" worked: labeled wrong-could be better goal was good view]
+- Fix timer.
+- Fix bionic reading.
+- Fix card display.
+- Fix gameplay view on small screen. [review test mode]
+- Clean code.
+- No more hard-coded hacks.
+
+---
 ## DIAGNOSTIC LIST 1: Current File vs Old Prior (File 1 vs File 2)
 
 ### A. Bionic Reading Initialization
@@ -440,3 +463,32 @@ If fails (2+): Duplicate Continue buttons from multi-patch injection (Step 14 in
 - **Event-driven settings wiring**: `applyBtn.onclick` assigned once in `wire()`, never overwritten. `show('settings')` triggers one settings-enhance call with idempotency flag. No `setInterval` re-wiring loops.
 
 - **Patch code that can be deleted entirely** (do not refactor, delete): v17513 behavior patch (lines 606–725), v17514 drop patch (lines 771–876), v17515 CSS-drop patch (lines 880–1073), the `outsideAdvanceHandler` DOMContentLoaded block (lines 488–501), `patchWire1759` (lines 589–601), and `wireSettingsReturn` setInterval (line 1807). These are all superseded by later patches that already exist in the file.
+
+---
+
+## Execution Log
+
+### Steps 1 + 6–8 — DONE 2026-05-26
+
+**Commits:** `d162708` (code), `8741251` (validation + undo)
+
+**What was executed:**
+- Step 1: Removed `choices=` assignment from `makeChoices()` call sites at `renderReviewList` onclick (line 690) and `startCard()` (line 1338). `makeChoices()` already mutates the global `choices` array; assigning its `undefined` return was wiping choices on every Shadow Dungeon / review-launched card.
+- Step 6: Added `window.loopSolo = loopSolo = function(){ clearInterval(ticker); }` override inside v175151 (renderSolo already starts the rAF drop via `startDrop()` — base ticker no longer competes). Added `window.stopAllDropTimers` helper.
+- Step 7: Deleted v17513 drop-mechanic overrides (`updateSoloVisuals` + `renderSolo` overrides within the IIFE). Deleted v17514 `<style>` + `<script>` blocks entirely.
+- Step 8: Deleted v17515 `<style>` + `<script>` blocks entirely. This eliminates the `autoHandle = setTimeout(selectSolo, DURATION_MS+30)` that was the primary source of double-advance — v175151's `safeClear()` only cancelled v175151's own `raf`, not v17515's `autoHandle`.
+- Smoke tests updated: `previewInterval('good')` expected `'3d'` (FSRS); `rateCard hard` expected FSRS interval/ease.
+- **Bonus (user prompt):** Added `v175372-rectifier-undo-makechoices-smoke` script — Cmd/Ctrl+Z and iOS shake-to-undo restore the last selected Solo card to its pre-answer state, reverting both FSRS progress and `state` entries. Exposed as `window.undoReview()`.
+
+**Validation results (browser, 2026-05-26):**
+| Check | Result |
+|-------|--------|
+| `choices` is Array(4) of strings after startCard | ✅ PASS |
+| No double-advance (advance fired exactly once in 10s) | ✅ PASS |
+| Cmd/Ctrl+Z restores prior card | ✅ PASS |
+| `loopSolo` does not restart base ticker | ✅ PASS |
+| No legacy choiceRow classes (`v17514-live-drop`, `v17515-css-drop`) | ✅ PASS |
+| `window.runFSRSValidation()` | ✅ 17/17 |
+| `window.runCozySmokeTests()` | ✅ 6/6 |
+
+**Next:** Step 2 — consolidate `bionicOn` to `bionicOn_v1751523` only; set default `true`.
