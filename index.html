@@ -11931,10 +11931,10 @@ function fixStableOneThingDropdown351() {
               },
               cards: sysMap
             });
+            try{ localStorage.removeItem('cozy_arcade_limitless_cards_v1'); }catch(_){}
             localStorage.setItem('cozy_arcade_limitless_cards_v1', payload);
-            sessionStorage.setItem('cozy_atlas_pending_refresh', '1');
           }
-        } catch(_) {}
+        }catch(qe){ console.warn('[Atlas] localStorage quota or write error:', qe); }
         window.open('progress_beta.html', '_blank');
       };
     }
