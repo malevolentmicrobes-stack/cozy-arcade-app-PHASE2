@@ -369,8 +369,12 @@ These functions/elements must never be rewritten or renamed. Any Codex output th
 | again | −0.20 | 0 days (relearn in 10 min) | relearning | true |
 | hard | −0.15 | max(1, round(i × 1.2)) | review | true |
 | good | ±0 | i≤0 → 1d else max(1, round(i×e)) | review | false |
-| easy | +0.15 | i≤0 → 4d else max(4, round(i×e×1.3)) | review | false |
+| easy | +0.15 | i≤0 → 4d else max(4, round(i×**e′**×1.3)) | review | false |
 | pin | none | unchanged | unchanged | unchanged |
+
+> **easy interval note:** ease is updated first (`e′ = min(4.0, e+0.15)`), then used in the interval formula.
+> Example: interval=4, ease=2.5 → e′=2.65 → `max(4, round(4×2.65×1.3))` = **14**, not 13.
+> Confirmed by `window.runSRSValidation()` test 8 (`79b75e5`).
 
 ease_factor: floor 1.3 · default 2.5 · ceiling 4.0
 
