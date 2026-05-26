@@ -306,6 +306,171 @@ Post-rebase notes from Claude Code review. Watch during mobile testing:
 
 ---
 
+## Premortem Analysis — 6 / 12 / 18 Months
+
+> Finance-constrained. All costs are real numbers. This is a realistic pessimist's read so nothing blindsides you.
+
+---
+
+### Cost Structure — Every Service You Will Touch
+
+| Service | Cost | Pay model | Notes |
+|---------|------|-----------|-------|
+| Vercel / Netlify | **$0** | Free tier | 100 GB/month bandwidth — sufficient for v1 |
+| Custom domain | **$12/yr** | Annual | Namecheap or Porkbun |
+| Apple Developer Program | **$99/yr** | Annual | Required for App Store. No Mac = blocked. |
+| Google Play Console | **$25 once** | One-time | Only if Android |
+| Stripe | **2.9% + $0.30** | Per transaction | No monthly fee. $20 sale = $19.12 net. |
+| RevenueCat (iOS IAP) | **$0** until $2,500 MRR | % of revenue | Handles StoreKit receipt hell. Use it. |
+| Tauri (desktop) | **$0** | Open source | Binary ~3 MB. No Electron bloat. |
+| Capacitor (iOS) | **$0** | Open source | Wraps your HTML in WKWebView |
+| Google AdSense | **$0 to join** | CPM ~$2–6 | Medical vertical pays better than average |
+| Supabase | **$0** (free tier) | Per project | 500 MB DB, 50K MAU free. Paid = $25/month |
+| LLC filing (Wyoming) | **$102 one-time** | State fee | Cheapest + no state income tax + privacy |
+| Registered agent | **$0–$50/yr** | Annual | Wyoming lets you be your own if resident; else use Northwest ($39/yr) |
+| EIN | **$0** | IRS.gov | Same-day online. Required before Stripe/bank. |
+| Business bank (Mercury) | **$0** | Free | Best free business checking. Apply with EIN. |
+| Wave accounting | **$0** | Free | Handles invoices, P&L, tax prep exports |
+| Privacy policy + TOS | **$0** | Generator | TermsFeed free tier is sufficient for v1 |
+| Windows EV code-signing cert | **$200–300/yr** | Annual | Skip for v1 — self-signed for beta is fine |
+| Apple notarization | **$0** (included in $99) | — | Required to ship Mac .app via Gatekeeper |
+
+**Hard floor to ship iOS + web + LLC: ~$213 first year** (`$99 Apple + $102 Wyoming + $12 domain`)
+
+---
+
+### Revenue Model — Realistic Projections
+
+Market: ABIM internal medicine board prep. ~24,000 candidates/year. Adjacent: USMLE Step, IM shelf, hospitalist recertification.
+
+Competing price points: Amboss $300+/yr · Boards & Beyond $149/yr · UWorld $380/yr · Anki free (but medical decks sell $20–50 each).
+
+**Your price point: $19.99 one-time** (lowest barrier, avoids subscription fatigue, matches Anki deck market)
+
+| Milestone | Est. MAU | Conversion | Monthly revenue | Running total |
+|-----------|----------|------------|-----------------|---------------|
+| 6 months | 150 | 3% | **~$90** | ~$300 |
+| 12 months | 600 | 4% | **~$480** | ~$2,700 |
+| 18 months | 1,800 | 5% | **~$1,800** | ~$9,000 |
+
+> These are conservative. A single Reddit r/medicalschool or r/Step1 post that hits front page can spike 10x in a week. One attendings-at-large Twitter/X thread can too. The deck quality is the product.
+
+**Ad revenue (web free tier):**
+- 150 MAU × 5 sessions/week × 4 weeks × $4 CPM / 1000 = ~$12/month at 6 months
+- Not meaningful until 5,000+ MAU. Treat ads as a nuisance tax on free users, not a revenue line.
+
+---
+
+### 6-Month Premortem (By Nov 2026)
+
+**Target state:** Web app live on custom domain, LLC formed, iOS in review or shipped.
+
+**What kills it:**
+1. **FSRS v5 not shipped** → experienced Anki users dismiss the app immediately. SM-2 is visibly inferior for high-volume review decks. This is the #1 feature gate.
+2. **iOS App Store rejection** → Medical category has strict review. If the app is rejected for "limited functionality" (common for single-purpose apps) you need to add: a study statistics screen, a settings screen, and a help/about screen. Plan for 2–3 rejection cycles (~2–3 weeks each).
+3. **No discovery** → GitHub Pages URL shared with 10 classmates ≠ product launch. Need at least one of: Reddit post, Discord server (medstudents), Product Hunt launch, or a single X/Twitter post from a med influencer.
+4. **Mac not available for iOS build** → Capacitor + Xcode requires macOS. If you don't own a Mac: MacStadium cloud Mac starts at $59/month (2 months = $118 to get through App Store submission). Or use a friend's Mac for the final Xcode build.
+5. **Stripe purchase flag bypassable** → `localStorage.setItem('cozy_paid_v1','1')` is client-side. Any user who opens DevTools can unlock. For v1 with <1,000 users this is acceptable (honor system). By 12 months, gate via Supabase JWT instead.
+
+**What works in your favor:**
+- The app already works and is polished. Most indie medical apps don't get this far.
+- JSON deck format is a real differentiator (Anki uses SQLite .apkg, which requires a desktop export step).
+- You own the content pipeline (ABIM JSON schema already documented).
+
+---
+
+### 12-Month Premortem (By May 2027)
+
+**Target state:** $300–600/month revenue, 500+ MAU, iOS stable, Mac/PC desktop shipped.
+
+**What kills it:**
+1. **App Store 30% cut** → IAP through App Store costs 30% (15% if under $1M/year under Small Business Program). $19.99 → Apple takes $6 → you get $13.99. Plan for this in pricing. Web Stripe is 2.9% → you get $19.40. Encourage web purchase over iOS purchase.
+2. **Content staleness** → Medicine changes. If your ABIM deck has outdated guidelines (e.g., HTN targets, statin thresholds), users will post corrections publicly and it damages credibility. Schedule quarterly content review.
+3. **Single-file architecture debt** → 13,000-line HTML files become painful to debug. Not blocking at 12 months but plan a structured build step (separate CSS/JS files compiled to single HTML) for v2.
+4. **No multi-device sync** → Users want to study on phone AND laptop. Without Supabase sync, they have to manually export/import JSON. This is the #1 churn driver at 12 months. Supabase free tier handles this.
+5. **LLC taxes** → First year with revenue means quarterly estimated taxes (IRS Form 1040-ES). Wyoming LLC taxed as sole proprietorship by default (pass-through). Set aside 25–30% of net revenue for federal + state taxes immediately.
+
+**Survival threshold:** $300/month (~15 paid users/month) covers Apple Developer + domain + covers a few hours of your time. This is very achievable with 500 MAU.
+
+---
+
+### 18-Month Premortem (By Nov 2027)
+
+**Target state:** $1,500–3,000/month, multi-device sync, v2 architecture underway, possibly a second deck (Step 2/3 or subspecialty).
+
+**What kills it:**
+1. **Burnout on solo maintenance** → At 1,500 MAU you will get support emails, bug reports, and deck correction requests weekly. This is a real job. Either hire a VA ($5–10/hour for support triage) or set expectations clearly (async support, no SLA).
+2. **RevenueCat fee kicks in** → At $2,500 MRR, RevenueCat charges 1% of tracked revenue. At $3,000 MRR that's $30/month — trivial. Not a kill factor.
+3. **Supabase paid tier** → At >50,000 MAU (well past 18 months at this pace) you'd hit the paid tier ($25/month). Not a concern until then.
+4. **Competitor clones your JSON format** → Your deck schema is public. A competitor could clone the format and offer a similar app with better marketing. Differentiation: your SRS implementation quality, the ABIM-specific content depth, and the game mechanic (runner/dungeon) are hard to clone quickly.
+5. **LLC → S-Corp election** → At $40K+ annual profit, electing S-Corp status (Form 2553) saves meaningful self-employment tax (15.3% SE tax on pass-through income). At $50K profit: S-Corp saves ~$5,000–7,000/year. File the election before March 15 of the tax year you want it to apply.
+
+---
+
+### LLC — Exact Timeline (Wyoming, DIY, ~$100 total)
+
+| Day | Action | Cost | Where |
+|-----|--------|------|-------|
+| Day 1 | Choose LLC name (check `wyomingbusiness.gov` availability) | $0 | wyomingbusiness.gov |
+| Day 1 | File Articles of Organization online | **$102** | wyomingbusiness.gov/LLC |
+| Day 2 | Get EIN (Employer ID) | **$0** | irs.gov → "Apply for EIN Online" |
+| Day 3 | Open Mercury business checking | **$0** | mercury.com — requires EIN |
+| Day 5 | Write single-page Operating Agreement | **$0** | Template: northwestregisteredagent.com |
+| Day 7 | Set up Stripe with business info | **$0** | stripe.com — needs EIN + bank |
+| Day 30 | Connect Stripe to app (Payment Link, no backend needed) | $0 | |
+| Month 3 | File FinCEN Beneficial Ownership Report (required 2024+) | **$0** | fincen.gov — 90 days from formation |
+| Jan 2027 | File Wyoming Annual Report | **$60** | wyomingbusiness.gov |
+
+**Why Wyoming over Delaware:**
+- Wyoming: $102 formation, $60/year renewal, no state income tax, no public member disclosure, no minimum franchise tax
+- Delaware: $90 formation + $50 registered agent + **$400 minimum franchise tax** → $540/year. Only worth it if you're raising VC (you're not yet).
+
+**Bank: Mercury** (not a traditional bank)
+- No minimum balance, no monthly fee
+- ACH, wires, Stripe payouts all work
+- Gives you a real routing/account number same week
+
+**Tax obligations (Wyoming LLC, pass-through):**
+- Federal: self-employment tax 15.3% on net profit + income tax bracket
+- Wyoming: **$0 state income tax** ← this is why Wyoming
+- IRS quarterly estimated payments: April 15, June 15, Sept 15, Jan 15
+- Track all software costs, Apple Developer fee, domain, any equipment as business expenses
+
+---
+
+### Decision Tree — What to Build When
+
+```
+NOW (today – month 2):
+  ├── P3 FSRS v5                    ← code, ~1 week
+  ├── P3.5 due-count widget          ← code, ~2 hours
+  ├── LLC formation (Wyoming)        ← $102, 1 day
+  └── Vercel deploy + custom domain  ← $12, 2 hours
+
+MONTH 2–4:
+  ├── PWA service worker (offline)   ← code, ~1 day
+  ├── Security: XSS + CSP            ← code, ~2 days
+  ├── Stripe Payment Link            ← no code, 30 min
+  └── iOS Capacitor build            ← code + Mac, ~1 week
+
+MONTH 4–6:
+  ├── App Store submission            ← 1–3 weeks review
+  ├── Reddit / Discord launch post   ← $0 marketing
+  └── Tauri Mac/PC build             ← code, ~3 days
+
+MONTH 6–12:
+  ├── Supabase sync (if churn from no sync)  ← code, ~1 week
+  ├── Second deck (Step 2 or subspecialty)   ← content, ~2 weeks
+  └── S-Corp election if profit >$40K/yr    ← $0, IRS Form 2553
+
+SKIP UNTIL REVENUE PROVES IT:
+  ├── Windows EV cert ($300)         ← skip until desktop demand proven
+  ├── Android                        ← skip until iOS stable
+  └── Subscription model             ← skip until v1 retention data
+```
+
+---
+
 ## Next Active Task
 
 **P3 — FSRS v5 SRS Upgrade** (production blocker — highest value)
