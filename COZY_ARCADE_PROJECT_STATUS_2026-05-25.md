@@ -3,7 +3,7 @@
 **Date:** May 26, 2026 (updated this session)
 **Repo:** `cozy-arcade-app- PHASE2` · `malevolentmicrobes-stack/cozy-arcade-app`
 **Primary files:** `index.html` (~12,811 lines), `progress_beta.html`
-**Git HEAD (main):** `0d1d2f0` — docs: correct SM-2 easy interval spec — e updated before interval calc, test 8 = 14 not 13
+**Git HEAD (main):** `fb5f98f` — fix(atlas): quota guard + remove dead sessionStorage retry
 **Origin sync:** ✅ Local = origin/main (clean working tree)
 
 ### Two-Repo Deployment Map
@@ -34,12 +34,13 @@ curl -s "https://malevolentmicrobes-stack.github.io/cozy-arcade-app-PHASE2/" | g
 | # | Correction |
 |---|---|
 | 1 | Phase 2 mobile shell is **already done** — commit `5b2154e` on origin/main, pulled via rebase. Do not treat as pending. |
-| 2 | Git is **clean and synced** at `ab9d206`. Nothing to push. |
-| 3 | **Active Task A** = Atlas/deck hydration persistence. Run this first. |
-| 4 | **Active Task B** = SRS Again timing. Run this second, browser-first. |
-| 5 | Task B must NOT start until Task A is diagnosed and patched. |
+| 2 | Git is **clean and synced** at `fb5f98f`. Nothing to push. |
+| 3 | ~~**Active Task A** = Atlas/deck hydration persistence.~~ ✅ **DONE** — `fb5f98f` |
+| 4 | ~~**Active Task B** = SRS Again timing.~~ ✅ **DONE** — commits `b8dc61b`–`5f243f5` |
+| 5 | ~~Task B must NOT start until Task A is diagnosed and patched.~~ ✅ Both complete. |
 | 6 | SRS math (`rate()`, `rateCard()`) is protected and verified 13/13. Do not rewrite. |
 | 7 | Task B always starts with `window.runSRSValidation()` in browser — not a Codex grep task. |
+| 8 | **Two-repo deploy:** push Pages syncs to BOTH `origin public` AND `phase2 public`. |
 
 **Immediate next terminal session order:**
 ```
@@ -147,26 +148,16 @@ curl -s "https://malevolentmicrobes-stack.github.io/cozy-arcade-app-PHASE2/" | g
 
 ---
 
-## Active: Task A — Atlas / Deck Hydration Fix
+## ✅ Completed: Task A — Atlas / Deck Hydration Fix
 
-**Status:** 🔶 Partially patched. One final polish patch remaining (low urgency — core path works).
-**Priority:** MEDIUM — sys-map write path confirmed working; remaining issue is error surfacing.
-
-**Patches applied (committed and pushed):**
+**Status:** ✅ All patches applied, committed `fb5f98f`, pushed to both remotes. Browser retest recommended.
 
 | Commit | File | Fix |
 |--------|------|-----|
 | `318f1ce` | `progress_beta.html` | `writeAtlasDeckCache`: 4th `sys-map only` fallback attempt |
 | `bae4f2e` | `index.html` | Progress button: flush compact sys-map before `window.open` |
 | `4af9aed` | both | Payload serialization; confirmed sessionStorage retry is dead (tab-scoped) |
-
-**One remaining patch (index.html Progress button onclick):**
-1. `localStorage.removeItem('cozy_arcade_limitless_cards_v1')` before `setItem` — prevents quota collision from stale prior value
-2. Remove `sessionStorage.setItem('cozy_atlas_pending_refresh', '1')` — dead code (tab-isolated)
-3. Replace `catch(_){}` with `console.warn` + `alert` so quota failures surface
-4. Remove dead sessionStorage retry block from `progress_beta.html` `init()` lines ~1513–1518
-
-**Do NOT touch:** `setAppCards()`, `rateCard()`, import/export schema, card content.
+| `fb5f98f` | both | **Final polish:** quota guard (removeItem before setItem), removed dead sessionStorage line, surfaced quota errors via `console.warn('[Atlas] localStorage quota or write error:', qe)`, removed dead retry block from `progress_beta.html` init() |
 
 ---
 
@@ -217,11 +208,12 @@ function isDue(progress) {
 | `3-7988`, `4-8508`, `5-8377` | again/relearning | 12:22 AM | Bucket 2 (past timer) or 3 (within 10 min) ✓ |
 | `card-0001` to `card-0010` | legacy (no `next_due_at`) | — | Bucket 2 — treated as overdue ✓ |
 
-### Browser validation (run after next open)
+### Browser validation
 ```
 window.runCozySmokeTests()   → expect 6/6
-window.runSRSValidation()    → expect 13/13 (if defined)
+window.runSRSValidation()    → expect 13/13
 ```
+**Retest status:** ⏳ Pending browser confirmation (2026-05-26).
 
 ---
 
@@ -288,6 +280,15 @@ Post-rebase notes from Claude Code review. Watch during mobile testing:
 | `wrapGameMain()` reparents `.promptBox` — any code using `#solo > .promptBox` (direct child selector) silently fails | `cozy-mobile-shell-371-js` | Medium — grep needed if display issues arise |
 | `patchDomainGeometry()` monkey-patches `window.positionOrbs` — any later reassignment of `positionOrbs` silently loses geometry correction | `cozy-mobile-shell-371-js` | Medium — graceful fallback exists |
 | `:has(.reveal:not(.hidden)) > .promptBox { display:none !important }` — race condition could blank game screen | `cozy-mobile-shell-371-css` | Low-medium |
+
+---
+
+## Next Active Task
+
+**P3 — FSRS v5 SRS Upgrade** (or P1 Shadow Dungeon, user's choice)
+
+- P3: Replace SM-2 `rateCard()` with FSRS v5 (~50 lines inline). New fields: `stability`, `difficulty`, `retrievability`. No external library. Prerequisite: `window.runSRSValidation()` 13/13 confirmed in browser first.
+- P1 Shadow Dungeon: No code changes needed — already wired. Browser validate the Shadow Dungeon flow (Settings → Shadow Dungeon tab → filter by system/tag → start session).
 
 ---
 
