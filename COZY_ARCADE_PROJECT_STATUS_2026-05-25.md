@@ -3,7 +3,7 @@
 **Date:** May 26, 2026 (updated this session)
 **Repo:** `cozy-arcade-app- PHASE2` · `malevolentmicrobes-stack/cozy-arcade-app`
 **Primary files:** `index.html` (~11,700+ lines), `progress_beta.html`
-**Git HEAD:** `6f2bcf3` — fix(srs): enforce strict SM-2 intervals — only due/new/relearning cards in session
+**Git HEAD:** `5f243f5` — fix(srs): schedule-aware fallback — future easy/good/hard cards can never leak into pool
 **Origin sync:** ✅ Local = origin/main (clean working tree)
 
 ---
@@ -139,6 +139,7 @@
 | `b8dc61b` | `isDue()`: check `next_due_at` before `repair_point/relearning`; `getStudyPool` due mode removes redundant `\|\| stage=relearning`; smoke test corrected |
 | `68d3b36` | `new_first`: repair_point bucket added between due and not-due; `review_deck` reads all non-suspended cards (including buried hard cards); session truncation prevention: `random_new` falls through on empty; nuclear fallback auto-calls `clearSessionBuried()` + reshuffles when pool exhausts |
 | `6f2bcf3` | Strict SM-2 interval enforcement: `isDue()` treats unscheduled `stage:review` cards (null `next_due_at`) as overdue; `new_first` bucket 4 (reviewed-not-due) removed — easy/good/hard cards with future intervals hidden until due; bucket 3 restricted to `stage:'relearning'` only (10-min again cards) |
+| `5f243f5` | **Codex:** Added `hasFutureDue()` guard; `review_deck` and `hard` modes now block future-dated repair/candidate cards; `reviewed_first` restricted to `isDue` only; nuclear fallback made schedule-aware so `clearSessionBuried()` never reintroduces future easy/good/hard cards — each scheduled mode rebuilds its own filtered pool after reset; `shuffleCards(basePlayableCards())` fallback now only fires for unscheduled modes. Validated against `cozy_arcade_progress_2026-05-26 copy.json`: future easy/good/hard = `[]` in all modes; again/relearning due cards included correctly; smoke 6/6. |
 
 ### Final `getStudyPool` — new_first bucket order (Anki-aligned)
 
@@ -223,8 +224,9 @@ console.table(pool.slice(0,20).map(c => {
 
 ### 4. Review Deck mode
 1. Set dropdown to **Review deck: pinned / missed / hard**
-2. Cards with `last_rating: "hard"` and `repair_point: true` (e.g. `1-8118`, `2-13381`) should appear
-3. Cards with `last_rating: "easy"` or `"good"` should NOT appear
+2. `again`-rated cards (e.g. `3-7988`, `4-8508`, `5-8377`) — past their 10-min timer → should appear
+3. `hard`-rated cards (`1-8118`, `2-13381`) — `next_due_at = May 27` → should NOT appear (future-due gate via `hasFutureDue()`)
+4. `easy`/`good` cards — should never appear in this mode
 
 ### 5. Progress → Atlas handoff
 1. Import deck + progress
