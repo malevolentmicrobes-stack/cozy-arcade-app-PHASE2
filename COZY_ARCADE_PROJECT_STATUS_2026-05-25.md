@@ -256,7 +256,7 @@ function isDue(progress) {
 window.runCozySmokeTests()   → expect 6/6
 window.runSRSValidation()    → expect 13/13
 ```
-**Retest status:** ⏳ Pending browser confirmation (2026-05-26).
+**Retest status:** ✅ Browser confirmed 2026-05-26 — `window.runSRSValidation()` → 17/17, `window.runCozySmokeTests()` → 6/6.
 
 ---
 
