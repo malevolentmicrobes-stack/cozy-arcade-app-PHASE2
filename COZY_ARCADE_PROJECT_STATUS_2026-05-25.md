@@ -3,7 +3,7 @@
 **Date:** May 26, 2026 (updated this session)
 **Repo:** `cozy-arcade-app- PHASE2` · `malevolentmicrobes-stack/cozy-arcade-app`
 **Primary files:** `index.html` (~12,811 lines), `progress_beta.html`
-**Git HEAD (main):** `fb5f98f` — fix(atlas): quota guard + remove dead sessionStorage retry
+**Git HEAD (main):** `0a63c2e` — chore: gitignore graphify-out, .agents, .codex, test-fixtures, subdirectory
 **Origin sync:** ✅ Local = origin/main (clean working tree)
 
 ### Two-Repo Deployment Map
@@ -90,23 +90,30 @@ curl -s "https://malevolentmicrobes-stack.github.io/cozy-arcade-app-PHASE2/" | g
 
 ## Completed Log
 
-### This Session — SRS Validation + Deployment Fix (2026-05-26)
+### This Session — Gameplay + Deployment + Gitignore (2026-05-26)
 **Status:** ✅ Completed and pushed.
 
 | Commit | Fix |
 |--------|-----|
-| `79b75e5` | `window.runSRSValidation()` — 13-test SM-2 assertion suite inside Phase 3 IIFE |
+| `79b75e5` | `window.runSRSValidation()` — SM-2 assertion suite inside Phase 3 IIFE |
 | `0d1d2f0` | docs: correct SM-2 easy interval spec (test 8 = 14, not 13) |
-| `1778e4d` | chore: empty commit to trigger Pages rebuild (pushed to `origin/public`) |
-| (phase2 push) | `public` branch first pushed to `cozy-arcade-app-PHASE2` remote — live site |
+| `fb5f98f` | fix(atlas): quota guard + remove dead sessionStorage retry (Task A final) |
+| `bba1559` | **Codex:** Fix mobile board prep layout — orbArena buried selector override |
+| `b572c12` | fix(gameplay): runner starts at random lane (not correct answer); SRS display uses `results.length` (17/17); `Study Mode Selectable.png` tracked |
+| `0a63c2e` | chore: `.gitignore` now excludes `graphify-out/`, `.agents/`, `.codex/`, `test-fixtures/`, `cozy-arcade-app-PHASE2/` |
 
-**Subdirectory file sync:** `cozy-arcade-app-PHASE2/index.html` (old copy, 11,918 lines, "Full Import Settings" button) overwritten with current main `index.html`. No longer a source of confusion.
+**Runner bug root cause:** All 4 `makeChoices()` variants set `selected = choices.indexOf(dx)` — the correct answer's index. Replaced with `Math.floor(Math.random()*4)` across all instances.
 
-**Confirmed function signatures (diagnostic run):**
-- `getProgress(cardId)` — line 11284, 1 arg
-- `setProgress(cardId, patch)` — line 11304, 2 args
-- `rateCard(cardId, rating)` — line 11370, 2 args
-- `session.seenThisSession` (bare `session.`, not `phase3State.session.`)
+**SRS validation:** `window.runSRSValidation()` → `✅ SRS: 17/17 passed`. `window.runCozySmokeTests()` → `6/6`. All assertions passing. Total was hardcoded as 13; corrected to `results.length`.
+
+**Public branch cleanup:** `git add -A` accidentally swept graphify cache, private progress JSON, .agents, .codex, submodule ref into public. Removed with `63d8306`. Public now contains only: `index.html`, `progress_beta.html`, 5 PNGs, `README.md`, `example_deck_template.json`, `.gitignore`.
+
+**Game end confirmed:** No card count cap. Game only ends when HP=0 (wrong answer drain). `index % pool.length` wraps indefinitely. Nuclear fallback prevents empty pool.
+
+**Two-remote sync rule (updated):** Never use `git add -A` on public branch. Always use explicit file checkout:
+```bash
+git checkout main -- index.html progress_beta.html
+```
 
 ---
 
