@@ -2,44 +2,38 @@
 
 ## Active Goal
 
-**Goal:** Implement FSRS v5 scheduling — replace SM-2 math in `rateCard()` with FSRS v5 algorithm
-**Phase:** P3
-**Reference:** `FSRS_V5_IMPLEMENTATION_PROMPT.md` — use this as the coding session prompt
+**Goal:** P-RC Rectifier — execute 20-step patch cleanup plan to eliminate accumulated quick-fix debt
+**Phase:** P-RC (Rectifier)
+**Reference:** `Chronological_Patch_Hx_RECTIFIER_PLAN_2026_05_26.md` — authoritative step list
 **Status:** IN PROGRESS
 
-**Current phase:** Phase 4 — FSRS v5 math inserted into `rateCard()` — awaiting final validation
+**Priority order (Steps 1–8 first — highest impact, unblock rest):**
+- Step 1: Fix `makeChoices` return value → choices never undefined
+- Step 2: Consolidate `bionicOn` initialization (single key, correct default)  
+- Step 3–5: Consolidate bionic/timer persistence, normalize timerMax
+- Step 6–8: Remove superseded drop-mechanic patches (v17513, v17514, v17515)
+
+**P3.5 due-count widget:** deferred until after P-RC Step 8 — display code must be stable first
+
+**Current phase:** DONE — FSRS v5 fully live; advancing to P3.5
 **Prerequisite gate:** ✅ PASSED 2026-05-26 — `window.runFSRSValidation()` → 17/17, `window.runCozySmokeTests()` → 6/6
 
 ---
 
-## Gate Condition (must pass before Phase 4 proceeds)
+## Gate Condition
 
 ```
-condition: browser:window.runFSRSValidation()
-expected:  { passed: 17, total: 17, failed: [] }
-output:    ✅ FSRS: 17/17 passed
+condition: browser:console validation suite after Steps 1–8
+expected:
+  1. advances.length === 1  (no double-advance)
+  2. bindRatings called once per reveal
+  3. choices is valid Array(4) of strings
+  4. bionicOn === false on fresh load (localStorage cleared)
+  5. window.runFSRSValidation() → 17/17 still passing
+  6. window.runCozySmokeTests() → 6/6 still passing
 ```
 
-**To unblock:** Open the live app in browser, open DevTools console, run:
-```js
-window.runFSRSValidation()
-```
-Report the output here. If output is `✅ FSRS: 17/17 passed` → mark gate PASSED → proceed to Phase 4.
-
-**Phase 4 is locked until this gate passes. Do not modify `rateCard()` before then.**
-
----
-
-## What Phase 4 will do (once gate passes)
-
-- Replace SM-2 math inside `rateCard()` with FSRS v5 internals
-- Add `stability`, `difficulty`, `retrievability` fields to `setProgress()` call
-- Handle SM-2 migration: cards without `stability` default to `stability = max(interval_days, 1)`, `difficulty = 5.0`
-- Update `previewInterval()` to match FSRS formula
-- Run `window.runFSRSValidation()` → ✅ 17/17
-- Run `window.runCozySmokeTests()` → ✅ 6/6
-- Commit: `feat(fsrs): replace rateCard SM-2 math with FSRS v5`
-- Push to both `origin public` and `phase2 public`
+**To unblock:** Run the 8 Codex console prompts in `Chronological_Patch_Hx_RECTIFIER_PLAN_2026_05_26.md` → all pass → mark DONE → advance to P3.5.
 
 ---
 
@@ -74,4 +68,5 @@ Report the output here. If output is `✅ FSRS: 17/17 passed` → mark gate PASS
 | 2026-05-26 | previewInterval easy formula | `1.6→1.3` verified against `rateCard()` | ✅ PASSED — `9552cb3` |
 | 2026-05-26 | SM-2 prereq gate | `window.runSRSValidation()` 17/17 + `runCozySmokeTests()` 6/6 | ✅ PASSED — browser confirmed |
 | 2026-05-26 | P3 FSRS Phase 1–2 | helpers + `runFSRSValidation()` inserted into index.html | ✅ PASSED — `runFSRSValidation()` 17/17 browser confirmed |
-| 2026-05-26 | P3 FSRS Phase 4 | `rateCard()` SM-2 replaced with FSRS v5 math | ⏳ IN PROGRESS — run `runFSRSValidation()` + `runCozySmokeTests()` to confirm |
+| 2026-05-26 | P3 FSRS Phase 4 | `rateCard()` SM-2 replaced with FSRS v5 math | ✅ PASSED — `0a4f9d3`, runFSRSValidation() 17/17 + runCozySmokeTests() 6/6 |
+| 2026-05-26 | P-RC Audit | 4-file diagnostic comparison, 20-step rectifier plan written | ✅ DONE — `Chronological_Patch_Hx_RECTIFIER_PLAN_2026_05_26.md` |
