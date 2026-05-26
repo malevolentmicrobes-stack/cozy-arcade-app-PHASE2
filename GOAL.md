@@ -2,38 +2,44 @@
 
 ## Active Goal
 
-**Goal:** P-RC Rectifier — execute 20-step patch cleanup plan to eliminate accumulated quick-fix debt
+**Goal:** P-RC Rectifier — Step 2: consolidate `bionicOn` to single key + correct default
 **Phase:** P-RC (Rectifier)
 **Reference:** `Chronological_Patch_Hx_RECTIFIER_PLAN_2026_05_26.md` — authoritative step list
 **Status:** IN PROGRESS
 
-**Priority order (Steps 1–8 first — highest impact, unblock rest):**
-- Step 1: Fix `makeChoices` return value → choices never undefined
-- Step 2: Consolidate `bionicOn` initialization (single key, correct default)  
-- Step 3–5: Consolidate bionic/timer persistence, normalize timerMax
-- Step 6–8: Remove superseded drop-mechanic patches (v17513, v17514, v17515)
+**Completed (Steps 1 + 6–8):** ✅ DONE 2026-05-26
+- ✅ Step 1: `makeChoices` return value fixed — choices always Array(4), never undefined
+- ✅ Step 6: `stopAllDropTimers()` + `loopSolo` override added to v175151
+- ✅ Step 7: v17513 drop overrides + v17514 style+script deleted
+- ✅ Step 8: v17515 style+script deleted (primary double-advance source eliminated)
+- ✅ Bonus: Undo review (Cmd/Ctrl+Z + iOS shake) added via `v175372-rectifier-undo-makechoices-smoke`
 
-**P3.5 due-count widget:** deferred until after P-RC Step 8 — display code must be stable first
+**Next priority (Steps 2–5):**
+- **Step 2 ← ACTIVE:** Consolidate `bionicOn` to `bionicOn_v1751523` only; set default `true`
+- Step 3: Fix `patchSettingsText()` 1200ms setInterval to read single key
+- Step 4: Fix Apply button to write `cozyQuestionSeconds351`
+- Step 5: Normalize remaining `timerMax` hardcoded literals
 
-**Current phase:** DONE — FSRS v5 fully live; advancing to P3.5
-**Prerequisite gate:** ✅ PASSED 2026-05-26 — `window.runFSRSValidation()` → 17/17, `window.runCozySmokeTests()` → 6/6
+**P3.5 due-count widget:** unblocked — Step 8 complete, display code is now stable
+
+**Prerequisite gate:** ✅ PASSED 2026-05-26 — `window.runFSRSValidation()` → 17/17, `window.runCozySmokeTests()` → 6/6, no double-advance, choices valid
 
 ---
 
-## Gate Condition
+## Gate Condition (Step 2)
 
 ```
-condition: browser:console validation suite after Steps 1–8
+condition: browser:console validation after Step 2
 expected:
-  1. advances.length === 1  (no double-advance)
-  2. bindRatings called once per reveal
-  3. choices is valid Array(4) of strings
-  4. bionicOn === false on fresh load (localStorage cleared)
+  1. localStorage.clear(); location.reload() → bionicOn === true on fresh load
+  2. localStorage.setItem('bionicOn_v1751523','1'); location.reload() → bionicOn === true, drawer checkbox checked
+  3. localStorage.setItem('bionicOn_v1751523','0'); location.reload() → bionicOn === false, drawer checkbox unchecked
+  4. cozyBionic351 key no longer read or written (grep localStorage.setItem in console → only bionicOn_v1751523)
   5. window.runFSRSValidation() → 17/17 still passing
   6. window.runCozySmokeTests() → 6/6 still passing
 ```
 
-**To unblock:** Run the 8 Codex console prompts in `Chronological_Patch_Hx_RECTIFIER_PLAN_2026_05_26.md` → all pass → mark DONE → advance to P3.5.
+**To unblock:** Run Step 2 Codex console prompts → all pass → add gate log entry → advance to Step 3.
 
 ---
 
@@ -70,3 +76,4 @@ expected:
 | 2026-05-26 | P3 FSRS Phase 1–2 | helpers + `runFSRSValidation()` inserted into index.html | ✅ PASSED — `runFSRSValidation()` 17/17 browser confirmed |
 | 2026-05-26 | P3 FSRS Phase 4 | `rateCard()` SM-2 replaced with FSRS v5 math | ✅ PASSED — `0a4f9d3`, runFSRSValidation() 17/17 + runCozySmokeTests() 6/6 |
 | 2026-05-26 | P-RC Audit | 4-file diagnostic comparison, 20-step rectifier plan written | ✅ DONE — `Chronological_Patch_Hx_RECTIFIER_PLAN_2026_05_26.md` |
+| 2026-05-26 | P-RC Steps 1+6–8 | makeChoices fix + v17513/14/15 deleted + undo + validated | ✅ PASSED — `d162708`+`8741251`, FSRS 17/17, smoke 6/6, no double-advance |
