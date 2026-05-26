@@ -1,9 +1,9 @@
 # Cozy Arcade Board Prep Medicine — Project Status
 
-**Date:** May 25, 2026 (updated ~2pm)
+**Date:** May 26, 2026 (updated this session)
 **Repo:** `cozy-arcade-app- PHASE2` · `malevolentmicrobes-stack/cozy-arcade-app`
-**Primary files:** `index.html` (10,604+ lines), `progress_beta.html`
-**Git HEAD:** `4af9aed` — fix(atlas): sessionStorage refresh flag for Safari file:// localStorage isolation
+**Primary files:** `index.html` (~11,700+ lines), `progress_beta.html`
+**Git HEAD:** `6f2bcf3` — fix(srs): enforce strict SM-2 intervals — only due/new/relearning cards in session
 **Origin sync:** ✅ Local = origin/main (clean working tree)
 
 ---
@@ -107,122 +107,130 @@
 
 ## Active: Task A — Atlas / Deck Hydration Fix
 
-**Status:** 🔶 Partially patched. One final patch remaining. Credits exhausted — resume next session.
-**Priority:** HIGH — blocks full Atlas reload persistence.
+**Status:** 🔶 Partially patched. One final polish patch remaining (low urgency — core path works).
+**Priority:** MEDIUM — sys-map write path confirmed working; remaining issue is error surfacing.
 
-**Symptom:** Atlas shows progress-only state ("No deck loaded") instead of full system nodes after reload or Progress button click.
-
-**Confirmed root cause:** `QuotaExceededError` silently swallowed in all three deck-write paths. Full deck (~10MB, 1249 cards) exceeds 5MB localStorage quota.
-
-**Patches already applied (committed and pushed):**
+**Patches applied (committed and pushed):**
 
 | Commit | File | Fix |
 |--------|------|-----|
-| `318f1ce` | `progress_beta.html` | `writeAtlasDeckCache`: added 4th `sys-map only` attempt when full/compact/minimal all fail quota |
-| `bae4f2e` | `index.html` | Progress button onclick: flush compact sys-map to `cozy_arcade_limitless_cards_v1` before `window.open` |
-| `4af9aed` | both | Serialize to `payload` var; add (now-confirmed-broken) `sessionStorage` retry flag |
+| `318f1ce` | `progress_beta.html` | `writeAtlasDeckCache`: 4th `sys-map only` fallback attempt |
+| `bae4f2e` | `index.html` | Progress button: flush compact sys-map before `window.open` |
+| `4af9aed` | both | Payload serialization; confirmed sessionStorage retry is dead (tab-scoped) |
 
-**Confirmed still broken:**
-- `sessionStorage` is tab-scoped — flag written in index.html tab A is invisible to progress_beta.html tab B. The retry block in `init()` (lines 1513–1518) **never executes**.
-- Silent `catch(_){}` at line 11913 of index.html hides any `localStorage.setItem` failure for the compact sys-map write.
-- If localStorage quota is full at click time, nothing is written and Atlas opens with empty deckMap.
+**One remaining patch (index.html Progress button onclick):**
+1. `localStorage.removeItem('cozy_arcade_limitless_cards_v1')` before `setItem` — prevents quota collision from stale prior value
+2. Remove `sessionStorage.setItem('cozy_atlas_pending_refresh', '1')` — dead code (tab-isolated)
+3. Replace `catch(_){}` with `console.warn` + `alert` so quota failures surface
+4. Remove dead sessionStorage retry block from `progress_beta.html` `init()` lines ~1513–1518
 
-**Next patch (one in-place edit, index.html only):**
-
-In the Progress button onclick handler (around line 11894), make these three changes:
-1. Add `localStorage.removeItem('cozy_arcade_limitless_cards_v1');` before the `localStorage.setItem` — clears stale/oversized prior value to free quota before writing the compact sys-map.
-2. Remove `sessionStorage.setItem('cozy_atlas_pending_refresh', '1');` — dead code.
-3. Replace `catch(_){}` with named catch + `console.warn` + `alert` so quota failures surface to the user.
-
-Also remove the dead sessionStorage retry block from `progress_beta.html` init() (lines 1513–1518).
-
-**Commit gate:**
-- [ ] `git diff --check -- index.html progress_beta.html` passes
-- [ ] Import `deck_with_progress` → click Progress → `Object.keys(deckMap).length > 0` in Atlas console
-- [ ] "No deck loaded" hint is hidden
-- [ ] System nodes render
-- [ ] `localStorage.getItem('cozy_arcade_limitless_cards_v1')` is compact sys-map, not full 10MB deck
-- [ ] No `QuotaExceededError` in console
-- [ ] Suggested message: `fix(atlas): removeItem before sys-map write + surface quota errors`
-
-**Do NOT touch:**
-- `setAppCards()` (line 11061) — leave full-deck write attempt as-is, it already fails silently and that's acceptable
-- `rating/rateCard()/rate()` — SRS math verified 13/13, protected
-- import/export schema, progress schema, medical card content
+**Do NOT touch:** `setAppCards()`, `rateCard()`, import/export schema, card content.
 
 ---
 
-## Active: Task B — SRS Timing / Again Queue Validation
+## Completed: Task B — SRS Timing / Study Pool
 
-**Status:** 🔶 Diagnosed. Validation prompt ready. Not yet run in terminal.
-**Priority:** HIGH — Again cards may repeat immediately or get lost.
+**Status:** ✅ All fixes applied, committed, pushed. Browser retest recommended.
 
-**Expected Anki-style behavior:**
-- `Again` → `stage=relearning`, `repair_point=true`, `next_due_at = now + 10min`, excluded from Random-new
-- After 10min: card is due, re-enters Review/due flow, NOT lost, NOT immediate repeat
-- `Random - new cards` never includes relearning/reviewed cards
+### Commits this session
 
-**Suspected primary bug:**
+| Commit | Fix |
+|--------|-----|
+| `b8dc61b` | `isDue()`: check `next_due_at` before `repair_point/relearning`; `getStudyPool` due mode removes redundant `\|\| stage=relearning`; smoke test corrected |
+| `68d3b36` | `new_first`: repair_point bucket added between due and not-due; `review_deck` reads all non-suspended cards (including buried hard cards); session truncation prevention: `random_new` falls through on empty; nuclear fallback auto-calls `clearSessionBuried()` + reshuffles when pool exhausts |
+| `6f2bcf3` | Strict SM-2 interval enforcement: `isDue()` treats unscheduled `stage:review` cards (null `next_due_at`) as overdue; `new_first` bucket 4 (reviewed-not-due) removed — easy/good/hard cards with future intervals hidden until due; bucket 3 restricted to `stage:'relearning'` only (10-min again cards) |
+
+### Final `getStudyPool` — new_first bucket order (Anki-aligned)
+
 ```
-isDue() returns true immediately because repair_point or stage='relearning'
-overrides the next_due_at check — so Again is scheduled for 10min
-but the pool treats it as due NOW.
+1. New (unseen)
+2. Due reviewed (past next_due_at — including legacy null-next_due_at review-stage cards)
+3. Relearning in 10-min cooldown (stage=relearning, not yet due — rated again this session)
+[removed] reviewed-but-not-due — easy/good/hard cards hidden until their due date
+Nuclear fallback: clearSessionBuried() + reshuffle when all three exhaust
 ```
 
-**Theoretical smallest fix (do not apply yet — confirm first):**
+### `isDue()` — current implementation
+
 ```js
 function isDue(progress) {
   if (!progress) return false;
   if (progress.next_due_at) {
-    const dueTime = Date.parse(progress.next_due_at);
-    if (!Number.isNaN(dueTime)) return dueTime <= Date.now();
+    const t = Date.parse(progress.next_due_at);
+    if (!isNaN(t)) return t <= Date.now();
   }
-  return !!(progress.repair_point || progress.stage === 'relearning');
+  if ((progress.stage === 'review' || progress.stage === 'relearning') && !progress.next_due_at) return true;
+  return !!(progress.repair_point);
 }
 ```
 
-**Terminal prompt — Task B (validation only, no edits):**
+### Test data verification (`cozy_arcade_progress_2026-05-26 copy.json`)
+
+| Card | Rating | Due | Session behavior |
+|---|---|---|---|
+| `7-7735`, `8-8088`, `9-7898` | easy | May 30 | Hidden ✓ |
+| `10-8121`, `11-8398`, `12-8462` | good | June 6 | Hidden ✓ |
+| `1-8118`, `2-13381` | hard | May 27 | Hidden until tomorrow ✓ |
+| `3-7988`, `4-8508`, `5-8377` | again/relearning | 12:22 AM | Bucket 2 (past timer) or 3 (within 10 min) ✓ |
+| `card-0001` to `card-0010` | legacy (no `next_due_at`) | — | Bucket 2 — treated as overdue ✓ |
+
+### Browser validation (run after next open)
 ```
-Use Graphify first if helpful. Run: graphify update .
-
-Read:
-1. CLAUDE.md
-2. COZY_ARCADE_PROJECT_STATUS_2026-05-25.md
-3. graphify-out/GRAPH_REPORT.md
-
-Task: SRS timing validation — Again queue behavior. Do not edit files.
-
-Inspect only index.html (and progress_beta.html only if needed for export/Atlas SRS display).
-Clinical/card content must not be changed.
-
-Validate these SRS functions:
-- rateCard() — confirm Again sets: stage='relearning', interval_days=0, ease_factor-=0.2,
-  repair_point=true, next_due_at=now+10min, last_rating='again'
-- isDue() — does it check next_due_at FIRST, or does repair_point override timing?
-- getStudyPool() — does 'due-weighted review' mode include repair_point cards
-  regardless of next_due_at?
-- session.seenThisSession — does it block a due Again card from re-entering after 10min?
-- advance()/next-card — is the session pool static (built once) or does it rehydrate
-  delayed relearning cards?
-- basePlayableCards() / isReviewCandidate() — confirm Again cards excluded from Random-new
-
-Output for each function:
-- PASS/FAIL
-- exact current behavior for Again
-- whether bug is: rating math / due timing / pool selection / session queue / identity / export-import
-- minimal patch recommendation if needed (no edits unless I approve)
-- regression checklist
-
-Most likely bug: isDue() makes repair_point/relearning immediately due,
-overriding next_due_at. Confirm or rule out before any other fix.
+window.runCozySmokeTests()   → expect 6/6
+window.runSRSValidation()    → expect 13/13 (if defined)
 ```
 
-**Commit gate (when patch confirmed):**
-- [ ] Again card does NOT reappear in Random-new
-- [ ] Again card does NOT immediately reappear in due queue
-- [ ] After simulated 10min, Again card is retrievable in review/due mode
-- [ ] Export/reimport preserves `stage`, `next_due_at`, `repair_point` fields
-- [ ] Suggested message: `Fix SRS isDue: respect next_due_at for relearning/repair cards`
+---
+
+## Next Step — Full Validation Checklist
+
+Import `cozy_arcade_progress_2026-05-26 copy.json` into the app (Settings → Import Progress), then run each check in order.
+
+### 1. Smoke test (console)
+```js
+window.runCozySmokeTests()   // must be 6/6
+```
+
+### 2. Pool composition check (console — paste after import)
+```js
+// Should show only: new cards + due/legacy reviewed + relearning in cooldown
+const pool = window.cozyPhase3.getStudyPool('new_first', 'solo');
+const p = id => window.cozyPhase3 && phase3State.progress[id];
+console.table(pool.slice(0,20).map(c => {
+  const id = c.qid_unique || c.card_id || c.id;
+  const pr = phase3State.progress[id] || {};
+  return { id, last_rating: pr.last_rating, stage: pr.stage, next_due_at: pr.next_due_at, isDue: window.isDue ? window.isDue(pr) : '?' };
+}));
+```
+
+**Expected — cards that must NOT appear in pool:**
+- `7-7735`, `8-8088`, `9-7898` (easy, due May 30)
+- `10-8121`, `11-8398`, `12-8462` (good, due June 6)
+- `1-8118`, `2-13381` (hard, due May 27 — tomorrow)
+
+**Expected — cards that MUST appear:**
+- All `stage: "new"` cards → bucket 1
+- `card-0001` through `card-0010` (legacy, `next_due_at: null`, `stage: "review"`) → bucket 2
+- `3-7988`, `4-8508`, `5-8377` (relearning, past 12:22 AM timer) → bucket 2
+
+### 3. General Study Mode — live gameplay
+1. Set dropdown to **All cards** (→ `new_first`)
+2. Click **Review deck** → start session
+3. Rate a card **Easy** → it should NOT reappear in this session
+4. Rate a card **Again** → it should reappear within ~10 cards (bucket 3 within 10-min window)
+5. After 10+ minutes, the **Again** card should move to bucket 2 (due)
+6. Session should never show "No cards available" — nuclear fallback reshuffles if all exhausted
+
+### 4. Review Deck mode
+1. Set dropdown to **Review deck: pinned / missed / hard**
+2. Cards with `last_rating: "hard"` and `repair_point: true` (e.g. `1-8118`, `2-13381`) should appear
+3. Cards with `last_rating: "easy"` or `"good"` should NOT appear
+
+### 5. Progress → Atlas handoff
+1. Import deck + progress
+2. Click **Progress** button
+3. In Atlas console: `Object.keys(deckMap).length` → should be > 0
+4. System nodes should render (not "No deck loaded")
 
 ---
 
