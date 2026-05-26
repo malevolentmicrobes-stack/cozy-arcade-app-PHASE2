@@ -11366,6 +11366,75 @@ function fixStableOneThingDropdown351() {
     return '';
   }
 
+  // FSRS v5 — default weights W[0-18] (open-spaced-repetition/fsrs5)
+  const FSRS_W=[0.4072,1.1829,3.1262,15.4722,7.2102,0.5316,1.0651,0.0589,
+                1.5330,0.1544,0.9956,1.9783,0.1542,0.4683,0.5825,0.0000,
+                2.7869,0.4527,0.6632];
+  const FSRS_RETENTION=0.9;
+  function fsrsRating(r){return {again:1,hard:2,good:3,easy:4}[r]||3;}
+  function fsrsClamp(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
+  function fsrsInitStability(r){return Math.max(0.1,FSRS_W[fsrsRating(r)-1]);}
+  function fsrsInitDifficulty(r){
+    const ri=fsrsRating(r);
+    return fsrsClamp(FSRS_W[4]-Math.exp(FSRS_W[5]*(ri-1))+1,1,10);
+  }
+  function fsrsRetrievability(elapsedDays,S){
+    return Math.exp(Math.log(FSRS_RETENTION)*Math.max(0.001,elapsedDays)/Math.max(0.1,S));
+  }
+  function fsrsNextInterval(S){return Math.max(1,Math.round(S));}
+  function fsrsRecallStability(D,S,Rv,r){
+    const ri=fsrsRating(r);
+    const hard_p=ri===2?FSRS_W[15]:1, easy_b=ri===4?FSRS_W[16]:1;
+    const val=S*Math.exp(FSRS_W[8])*(11-D)*Math.pow(S,-FSRS_W[9])
+             *(Math.exp(FSRS_W[10]*(1-Rv))-1)*hard_p*easy_b;
+    return Math.max(S,val);
+  }
+  function fsrsForgetStability(D,S,Rv){
+    const val=FSRS_W[11]*Math.pow(D,-FSRS_W[12])
+             *(Math.pow(S+1,FSRS_W[13])-1)*Math.exp(FSRS_W[14]*(1-Rv));
+    return fsrsClamp(val,0.1,S-0.1);
+  }
+  function fsrsUpdateDifficulty(D,r){
+    const ri=fsrsRating(r);
+    const D0e=fsrsClamp(FSRS_W[4]-Math.exp(FSRS_W[5]*3)+1,1,10);
+    return fsrsClamp(FSRS_W[7]*D0e+(1-FSRS_W[7])*(D-FSRS_W[6]*(ri-3)),1,10);
+  }
+
+  window.runFSRSValidation=function(){
+    const pass=[],fail=[];
+    function check(label,got,exp,tol){
+      tol=tol===undefined?0.05:tol;
+      const ok=Math.abs(Number(got)-Number(exp))<=tol;
+      (ok?pass:fail).push({label,got:Number(got).toFixed(4),exp:Number(exp).toFixed(4)});
+    }
+    check('S0 again', fsrsInitStability('again'),  0.4072,0.001);
+    check('S0 hard',  fsrsInitStability('hard'),   1.1829,0.001);
+    check('S0 good',  fsrsInitStability('good'),   3.1262,0.001);
+    check('S0 easy',  fsrsInitStability('easy'),  15.4722,0.001);
+    check('D0 again', fsrsInitDifficulty('again'), 7.2102,0.01);
+    check('D0 hard',  fsrsInitDifficulty('hard'),  6.5085,0.01);
+    check('D0 good',  fsrsInitDifficulty('good'),  5.3146,0.01);
+    check('D0 easy',  fsrsInitDifficulty('easy'),  3.2829,0.01);
+    check('int good', fsrsNextInterval(fsrsInitStability('good')),  3);
+    check('int easy', fsrsNextInterval(fsrsInitStability('easy')), 15);
+    const Rv=fsrsRetrievability(3,3.1262);
+    check('R on schedule',Rv,0.9038,0.005);
+    const S2=fsrsRecallStability(5.3146,3.1262,Rv,'good');
+    check('S good->good',S2,6.9371,0.05);
+    check('int good->good',fsrsNextInterval(S2),7);
+    const Rv2=fsrsRetrievability(1,3.1262);
+    const Sf=fsrsForgetStability(5.315,3.1262,Rv2);
+    check('S early again',Sf,1.4685,0.05);
+    const Se=fsrsRecallStability(5.315,3.1262,Rv2,'easy');
+    check('easy bonus',Se>3.1262*2?1:0,1);
+    check('D update good', fsrsUpdateDifficulty(5.315,'good'),5.195,0.05);
+    check('D update again',fsrsUpdateDifficulty(5.315,'again'),7.20,0.05);
+    const passed=pass.length,total=pass.length+fail.length;
+    console.log((passed===total?'✅':'❌')+' FSRS: '+passed+'/'+total+' passed');
+    if(fail.length) console.table(fail);
+    return {passed,total,failed:fail};
+  };
+
   function rateCard(cardId, rating) {
     const p = getProgress(cardId);
     if (rating === 'pin') {
