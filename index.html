@@ -199,12 +199,6 @@
 .soloWarn.on{opacity:1;}
 </style>
 
-<style id="v17513-true-drop-css">
-/* final drop mechanics emphasis without changing visual proportions */
-.choiceRow{top:0;bottom:auto!important;transition:none!important;will-change:top!important;}
-.choiceRow.warning .choice,.choiceRow.danger .choice{border-color:#fb5876!important;box-shadow:0 0 0 3px rgba(251,88,118,.22),0 0 36px rgba(251,88,118,.28)!important;}
-.choiceRow.warning .letter,.choiceRow.danger .letter{background:rgba(251,88,118,.18)!important;color:#ffd6dd!important;}
-</style>
 
 <style id="v175162-naruto-sprite-css">
 
@@ -604,30 +598,6 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
 
 /* v17.5.13 behavior patch — falling answer lanes, warning countdown, keyboard/click flow, review filters */
 (function(){
-  const oldUpdateSolo = updateSoloVisuals;
-  window.updateSoloVisuals = updateSoloVisuals = function(){
-    const row=$('choiceRow');
-    const p=1-Math.max(0,Math.min(1,timer/timerMax));
-    const maxDrop=Math.max(170,Math.min(innerHeight*.34,310));
-    if(row){
-      row.style.transform='translateY('+(p*maxDrop).toFixed(1)+'px)';
-      row.classList.toggle('danger', timer<=3 && $('soloReveal').classList.contains('hidden'));
-    }
-    let warn=$('soloWarn');
-    if(warn){ warn.textContent = timer<=3 ? 'AUTO SELECT IN '+Math.ceil(Math.max(0,timer)) : ''; warn.classList.toggle('on', timer<=3); }
-    [...document.querySelectorAll('#choiceRow .choice')].forEach((d,i)=>d.classList.toggle('selected',i===selected));
-    moveHunter();
-    $('soloTimerFill').style.width=Math.max(0,timer/timerMax*100)+'%';
-  };
-
-  const oldRenderSolo = renderSolo;
-  window.renderSolo = renderSolo = function(){
-    oldRenderSolo();
-    const row=$('choiceRow'); if(row){row.style.transform='translateY(0px)';row.classList.remove('danger');}
-    if(!$('soloWarn')){ const w=document.createElement('div'); w.id='soloWarn'; w.className='soloWarn'; $('soloTrack').appendChild(w); }
-    updateSoloVisuals();
-  };
-
   window.positionOrbs = positionOrbs = function(p){
     const cx=innerWidth/2;
     const cy=Math.min(innerHeight*.58, innerHeight-220);
@@ -687,7 +657,7 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
       return !!s.pinned || s.rating==='again' || !!s.seen;
     }).slice(0,120);
     list.innerHTML=entries.length?'':'<div class="empty">No cards match this filter.</div>';
-    entries.forEach(c=>{let s=state[c.id||c.qid]||{};let div=document.createElement('div');div.className='reviewItem '+(s.pinned?'pinned ':'')+(s.rating==='again'?'missed':'');div.innerHTML=`<b>${escHTML(c.diagnosis)}</b><span>${escHTML(c.system||'')} • ${s.pinned?'Pinned':s.rating==='again'?'No Idea':s.seen?'Reviewed':'New'} • ${escHTML(clean(c.quick_recall||c.educational_objective||c.presentation).slice(0,180))}</span>`;div.onclick=()=>{current=c;choices=makeChoices(c);mode='solo';show('solo');renderSolo();loopSolo();};list.appendChild(div)});
+    entries.forEach(c=>{let s=state[c.id||c.qid]||{};let div=document.createElement('div');div.className='reviewItem '+(s.pinned?'pinned ':'')+(s.rating==='again'?'missed':'');div.innerHTML=`<b>${escHTML(c.diagnosis)}</b><span>${escHTML(c.system||'')} • ${s.pinned?'Pinned':s.rating==='again'?'No Idea':s.seen?'Reviewed':'New'} • ${escHTML(clean(c.quick_recall||c.educational_objective||c.presentation).slice(0,180))}</span>`;div.onclick=()=>{current=c;makeChoices();mode='solo';show('solo');renderSolo();loopSolo();};list.appendChild(div)});
   };
 
   function install17510(){
@@ -727,351 +697,10 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
 </script>
 
 
-<style id="v17514-drop-mechanics-css">
-/* v17.5.15.2 — preserve v17.5.12/13 visual proportions; repair actual falling MCQ mechanics */
-#choiceRow.v17514-live-drop{
-  position:absolute!important;
-  left:3vw!important;
-  right:3vw!important;
-  bottom:auto!important;
-  display:grid!important;
-  grid-template-columns:repeat(4,minmax(0,1fr))!important;
-  gap:18px!important;
-  z-index:31!important;
-  will-change:top!important;
-  transition:none!important;
-}
-#choiceRow.v17514-live-drop .choice{
-  min-height:82px!important;
-  font-size:clamp(14px,1.18vw,18px)!important;
-  line-height:1.16!important;
-}
-#choiceRow.v17514-live-drop.warning .choice:not(.correct):not(.wrong){
-  border-color:#fb5876!important;
-  box-shadow:0 0 0 3px rgba(251,88,118,.24),0 0 38px rgba(251,88,118,.30)!important;
-  color:#fff3f5!important;
-  font-weight:950!important;
-}
-#choiceRow.v17514-live-drop.warning .choice .letter{
-  color:#fff!important;
-  background:rgba(251,88,118,.24)!important;
-  border-color:rgba(251,88,118,.58)!important;
-}
-#soloWarn.v17514-warn{
-  position:absolute;left:50%;transform:translateX(-50%);top:calc(100% - 46px);z-index:42;
-  font-family:Orbitron,monospace;letter-spacing:.16em;font-size:13px;font-weight:950;
-  color:#fb7185;text-shadow:0 0 18px rgba(251,88,118,.55);opacity:0;pointer-events:none;
-}
-#soloWarn.v17514-warn.on{opacity:1;}
-@media(max-width:760px){
-  #choiceRow.v17514-live-drop{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;}
-  #choiceRow.v17514-live-drop .choice{min-height:66px!important;font-size:13px!important;}
-}
-</style>
-<script id="v17514-drop-mechanics-final">
-/* v17.5.15.2: hard repair for Game 1 MCQ boxes.
-   The answer row starts immediately under the prompt/playfield top and moves steadily downward for 7 seconds.
-   This patch intentionally does NOT alter the menu, notification transition, prompt card, reveal card, or Game 2 aesthetics. */
-(function(){
-  const DURATION_MS = 7000;
-  let dropTimer = null;
-  let dropStart = 0;
-  let locked = false;
-  let lastProgress = 0;
-  function q(id){ return document.getElementById(id); }
-  function clamp(n,a,b){ return Math.max(a, Math.min(b,n)); }
-  function row(){ return q('choiceRow'); }
-  function revealVisible(){ const r=q('soloReveal'); return r && !r.classList.contains('hidden'); }
-  function rowHeight(){ const r=row(); return r ? Math.max(82, r.getBoundingClientRect().height || 82) : 82; }
-  function trackHeight(){ const t=document.querySelector('.soloTrack'); return Math.max(360, t ? t.clientHeight : (window.innerHeight-290)); }
-  function endY(){ return Math.max(230, trackHeight() - rowHeight() - 78); }
-  function setWarn(on, remaining){
-    let w=q('soloWarn');
-    if(!w){ w=document.createElement('div'); w.id='soloWarn'; document.querySelector('.soloTrack')?.appendChild(w); }
-    w.className='v17514-warn'+(on?' on':'');
-    w.textContent=on ? ('AUTO SELECT IN '+Math.max(1,Math.ceil(remaining/1000))) : '';
-  }
-  function position(p){
-    const r=row(); if(!r) return;
-    p=clamp(p,0,1); lastProgress=p;
-    r.classList.add('v17514-live-drop');
-    r.style.top = (p * endY()).toFixed(1) + 'px';
-    r.style.transform = 'none';
-    r.style.bottom = 'auto';
-    const remaining = Math.max(0, DURATION_MS * (1-p));
-    const warn = remaining <= 3000 && !revealVisible();
-    r.classList.toggle('warning', warn);
-    setWarn(warn, remaining);
-    const fill=q('soloTimerFill'); if(fill) fill.style.width = ((1-p)*100).toFixed(2)+'%';
-  }
-  function selectedIdx(){
-    try { return clamp(Number(selected)||0,0,3); } catch(e){ return 0; }
-  }
-  function updateSelectionOnly(){
-    try { [...document.querySelectorAll('#choiceRow .choice')].forEach((d,i)=>d.classList.toggle('selected',i===selected)); } catch(e){}
-    try { moveHunter(); } catch(e){}
-    const fill=q('soloTimerFill'); if(fill) fill.style.width=Math.max(0,timer/timerMax*100)+'%';
-  }
-  function stopDrop(){
-    if(dropTimer) cancelAnimationFrame(dropTimer);
-    dropTimer=null;
-    setWarn(false,0);
-  }
-  function tick(now){
-    if(mode!=='solo' || revealVisible()){ stopDrop(); return; }
-    if(paused){ dropTimer=requestAnimationFrame(tick); return; }
-    if(!dropStart) dropStart=now;
-    const elapsed=now-dropStart;
-    const p=clamp(elapsed/DURATION_MS,0,1);
-    timerMax = DURATION_MS/1000;
-    timer = Math.max(0,(DURATION_MS-elapsed)/1000);
-    updateSelectionOnly();
-    position(p);
-    if(p>=1){
-      if(!locked){
-        locked=true;
-        if(typeof autoSelect==='undefined' || autoSelect) selectSolo(selectedIdx());
-      }
-      return;
-    }
-    dropTimer=requestAnimationFrame(tick);
-  }
-  const baseRender = renderSolo;
-  const baseSelect = selectSolo;
-  window.updateSoloVisuals = updateSoloVisuals = function(){
-    updateSelectionOnly();
-    if(row() && mode==='solo' && !revealVisible()) position(lastProgress);
-  };
-  window.renderSolo = renderSolo = function(){
-    stopDrop(); locked=false; lastProgress=0; dropStart=0;
-    baseRender();
-    timerMax = DURATION_MS/1000; timer = DURATION_MS/1000;
-    const r=row();
-    if(r){
-      r.dataset.locked='0';
-      r.classList.remove('warning','danger');
-      r.style.transition='none';
-      r.style.bottom='auto';
-      r.style.transform='none';
-    }
-    position(0);
-  };
-  window.loopSolo = loopSolo = function(){
-    clearInterval(ticker);
-    stopDrop(); locked=false; lastProgress=0; dropStart=0;
-    position(0);
-    dropTimer=requestAnimationFrame(tick);
-  };
-  window.selectSolo = selectSolo = function(i){
-    if(revealVisible()) return;
-    const r=row();
-    if(r && r.dataset.locked==='1') return;
-    if(r) r.dataset.locked='1';
-    stopDrop();
-    return baseSelect(i);
-  };
-  window.addEventListener('resize',()=>{
-    if(mode==='solo' && !revealVisible()) position(lastProgress || (1-(timer/(DURATION_MS/1000))));
-  });
-})();
-</script>
 
 
-<!-- v17.5.15.2 final mechanic repair: CSS-driven 7-second answer drop + Knowledge Expansion sigils -->
-<style id="v17515-css-drop-final">
-/* Keep the v17.5.14 picture, but make the MC boxes physically drop from the red-outlined/top playfield space to the lower selection zone. */
-#choiceRow.v17515-css-drop {
-  position:absolute!important;
-  left:3vw!important;
-  right:3vw!important;
-  top:0!important;
-  bottom:auto!important;
-  display:grid!important;
-  grid-template-columns:repeat(4,minmax(0,1fr))!important;
-  gap:18px!important;
-  z-index:31!important;
-  transform:translate3d(0,0,0)!important;
-  animation:choiceDrop17515 7s linear forwards!important;
-  will-change:transform!important;
-}
-#choiceRow.v17515-css-drop .choice {
-  min-height:82px!important;
-  font-size:clamp(14px,1.15vw,18px)!important;
-  line-height:1.16!important;
-  animation:none!important;
-}
-#choiceRow.v17515-css-drop.v17515-warning .choice:not(.correct):not(.wrong) {
-  border-color:#fb5876!important;
-  box-shadow:0 0 0 3px rgba(251,88,118,.28),0 0 42px rgba(251,88,118,.34)!important;
-  color:#fff3f6!important;
-}
-#choiceRow.v17515-css-drop.v17515-warning .choice .letter {
-  background:rgba(251,88,118,.25)!important;
-  color:#fff!important;
-  border-color:rgba(251,88,118,.60)!important;
-}
-@keyframes choiceDrop17515 {
-  from { transform:translate3d(0,0,0); }
-  to { transform:translate3d(0,var(--choiceDropDistance, 54vh),0); }
-}
-#soloWarn.v17515-warn {
-  position:absolute!important;
-  left:50%!important;
-  top:calc(var(--choiceDropDistance, 54vh) + 105px)!important;
-  transform:translateX(-50%)!important;
-  z-index:42!important;
-  font-family:Orbitron,monospace!important;
-  letter-spacing:.15em!important;
-  font-size:13px!important;
-  font-weight:950!important;
-  color:#fb7185!important;
-  text-shadow:0 0 18px rgba(251,88,118,.55)!important;
-  opacity:0!important;
-  pointer-events:none!important;
-}
-#soloWarn.v17515-warn.on { opacity:1!important; }
-/* Add the user-provided purple/cyan expansion sigil on both sides of the Knowledge Expansion title. */
-.domainTitle {
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  gap:22px!important;
-  text-align:center!important;
-}
-.domainTitle::before,.domainTitle::after {
-  content:'';
-  width:86px;
-  height:86px;
-  flex:0 0 86px;
-  background-image:url('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==');
-  background-size:contain;
-  background-repeat:no-repeat;
-  background-position:center;
-  filter:drop-shadow(0 0 18px rgba(124,58,237,.65)) drop-shadow(0 0 22px rgba(34,211,238,.25));
-  opacity:.88;
-}
-.domainTitle::after { transform:scaleX(-1); }
-@media(max-width:760px){
-  #choiceRow.v17515-css-drop{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;}
-  #choiceRow.v17515-css-drop .choice{min-height:66px!important;font-size:13px!important;}
-  .domainTitle::before,.domainTitle::after{width:46px;height:46px;flex-basis:46px;}
-}
-</style>
-<script id="v17515-css-drop-final">
-/* CSS animation is used instead of repeatedly writing top/transform in requestAnimationFrame.
-   This avoids the prior freeze caused by competing legacy top/transform patches. */
-(function(){
-  const DURATION_MS = 7000;
-  let autoHandle=null, warnHandle=null, tickHandle=null;
-  function q(id){return document.getElementById(id);}
-  function revealVisible(){const r=q('soloReveal'); return r && !r.classList.contains('hidden');}
-  function clearDropTimers(){
-    clearTimeout(autoHandle); clearTimeout(warnHandle); clearInterval(tickHandle);
-    autoHandle=warnHandle=tickHandle=null;
-  }
-  function selectedIdx(){ try{return Math.max(0,Math.min(3,Number(selected)||0));}catch(e){return 0;} }
-  function computeDropDistance(){
-    const track=document.querySelector('.soloTrack');
-    const row=q('choiceRow');
-    const trackH = track ? track.clientHeight : Math.max(420, window.innerHeight-290);
-    const rowH = row ? Math.max(82, row.getBoundingClientRect().height||82) : 82;
-    /* Start just under the prompt; finish in the lower open corridor above the hunter/hint. */
-    return Math.max(230, Math.min(trackH - rowH - 118, window.innerHeight * 0.58));
-  }
-  function ensureWarn(){
-    let w=q('soloWarn');
-    if(!w){ w=document.createElement('div'); w.id='soloWarn'; document.querySelector('.soloTrack')?.appendChild(w); }
-    w.className='v17515-warn';
-    return w;
-  }
-  function updateWarnText(seconds){
-    const w=ensureWarn();
-    if(seconds>0){ w.textContent='AUTO SELECT IN '+seconds; w.classList.add('on'); }
-    else { w.textContent=''; w.classList.remove('on'); }
-  }
-  function updateChoiceSelectionOnly(){
-    try{[...document.querySelectorAll('#choiceRow .choice')].forEach((d,i)=>d.classList.toggle('selected',i===selected));}catch(e){}
-    try{moveHunter();}catch(e){}
-  }
-  function beginChoiceDrop(){
-    clearDropTimers();
-    const row=q('choiceRow'); if(!row) return;
-    const dist=computeDropDistance();
-    row.style.setProperty('--choiceDropDistance', dist.toFixed(0)+'px');
-    row.style.top='0px'; row.style.bottom='auto'; row.style.transform='translate3d(0,0,0)';
-    row.classList.remove('v17514-live-drop','warning','danger','v17515-css-drop','v17515-warning');
-    /* force style flush so restarting on next card actually restarts the animation */
-    void row.offsetWidth;
-    row.classList.add('v17515-css-drop');
-    updateWarnText(0);
-    tickHandle=setInterval(()=>{
-      if(mode!=='solo' || revealVisible() || paused) return;
-      updateChoiceSelectionOnly();
-      const fill=q('soloTimerFill');
-      if(fill){
-        const elapsed = Math.min(DURATION_MS, Math.max(0, performance.now() - (window.__v17515DropStartedAt||performance.now())));
-        fill.style.width = Math.max(0,100 - elapsed/DURATION_MS*100).toFixed(2)+'%';
-      }
-    },80);
-    window.__v17515DropStartedAt = performance.now();
-    warnHandle=setTimeout(()=>{
-      if(mode==='solo' && !revealVisible()){
-        row.classList.add('v17515-warning');
-        let n=3; updateWarnText(n);
-        const countdown=setInterval(()=>{
-          if(mode!=='solo' || revealVisible()){clearInterval(countdown); updateWarnText(0); return;}
-          n-=1; if(n>0) updateWarnText(n); else {clearInterval(countdown); updateWarnText(0);}
-        },1000);
-      }
-    }, DURATION_MS-3000);
-    autoHandle=setTimeout(()=>{
-      if(mode==='solo' && !revealVisible()){
-        const fill=q('soloTimerFill'); if(fill) fill.style.width='0%';
-        /* Always auto-lock the currently highlighted answer at the bottom of the drop. */
-        selectSolo(selectedIdx());
-      }
-    }, DURATION_MS+30);
-  }
-  const prevRender = renderSolo;
-  const prevSelect = selectSolo;
-  window.renderSolo = renderSolo = function(){
-    clearDropTimers();
-    prevRender();
-    timerMax = DURATION_MS/1000; timer = DURATION_MS/1000;
-    const row=q('choiceRow');
-    if(row){
-      row.dataset.locked='0';
-      row.classList.remove('v17514-live-drop','warning','danger','v17515-css-drop','v17515-warning');
-      row.style.bottom='auto'; row.style.top='0px'; row.style.transform='translate3d(0,0,0)';
-    }
-    const fill=q('soloTimerFill'); if(fill) fill.style.width='100%';
-    ensureWarn();
-  };
-  window.loopSolo = loopSolo = function(){
-    clearInterval(ticker);
-    clearDropTimers();
-    beginChoiceDrop();
-  };
-  window.updateSoloVisuals = updateSoloVisuals = function(){
-    updateChoiceSelectionOnly();
-  };
-  window.selectSolo = selectSolo = function(i){
-    if(revealVisible()) return;
-    const row=q('choiceRow');
-    if(row){
-      row.style.animationPlayState='paused';
-      row.dataset.locked='1';
-      row.classList.remove('v17515-warning');
-    }
-    clearDropTimers(); updateWarnText(0);
-    return prevSelect(i);
-  };
-  window.addEventListener('resize',()=>{
-    const row=q('choiceRow');
-    if(mode==='solo' && row && !revealVisible()) row.style.setProperty('--choiceDropDistance', computeDropDistance().toFixed(0)+'px');
-  });
-})();
-</script>
+
+
 
 
 
@@ -1243,6 +872,11 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
     setTimeout(()=>reveal('solo',ok),650);
   };
 
+  // loopSolo is called by advance/startCard after renderSolo — renderSolo already starts the RAF drop, so just clear any base ticker.
+  window.loopSolo = loopSolo = function(){ clearInterval(ticker); };
+
+  window.stopAllDropTimers = function(){ clearInterval(ticker); safeClear(); };
+
   // Keep keyboard / click navigation simple after answer.
   const oldAdvance = advance;
   window.advance = advance = function(which){
@@ -1335,7 +969,7 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
       return true;
     });
   }
-  function startCard(c){ if(!c)return; current=c; choices=makeChoices(c); mode='solo'; show('solo'); renderSolo(); loopSolo(); }
+  function startCard(c){ if(!c)return; current=c; makeChoices(); mode='solo'; show('solo'); renderSolo(); loopSolo(); }
   window.showShadowDungeon = function(){ showReview(); setTimeout(()=>{const tab=q('shadowTabDungeon'); if(tab) tab.click();},0); };
   window.renderShadowDungeonList=function(){
     const list=q('reviewList'); if(!list)return;
