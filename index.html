@@ -4744,11 +4744,12 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     }
     const promptLabel=q('promptField')?.closest('.field')?.querySelector('label'); if(promptLabel) promptLabel.textContent='Prompt source';
     const bionic=q('bionicToggle');
-    if(bionic){
+    if(bionic && !bionic.dataset.v1751523Init){
       const saved=localStorage.getItem('bionicOn_v1751523');
-      if(saved===null && !bionic.dataset.v1751523Default){ bionic.checked=true; try{bionicOn=true;}catch(e){} }
+      if(saved===null){ bionic.checked=true; try{bionicOn=true;}catch(e){} }
       else { bionic.checked=saved==='1'; try{bionicOn=bionic.checked;}catch(e){} }
       bionic.dataset.v1751523Default='1';
+      bionic.dataset.v1751523Init='1';
       const lab=bionic.closest('label'); if(lab){ lab.childNodes.forEach(n=>{ if(n.nodeType===3) n.textContent=' Bionic emphasis'; }); }
     }
     // Remove the old optional hide-continue-hint setting entirely.
@@ -11401,7 +11402,7 @@ function fixStableOneThingDropdown351() {
   function fullGameStatePayload() {
     const settings = {};
     try { settings.questionSeconds = localStorage.getItem('cozyQuestionSeconds351') || '7'; } catch(_) {}
-    try { settings.bionicOn = localStorage.getItem('cozyBionicReading351') || 'false'; } catch(_) {}
+    try { settings.bionicOn = localStorage.getItem('bionicOn_v1751523') || 'false'; } catch(_) {}
     try { settings.spacedOn = localStorage.getItem('soloStudying_spacedOn_v175153') || '0'; } catch(_) {}
     try { settings.answerField = localStorage.getItem('cozyAnswerChoiceField_v1751517') || 'diagnosis'; } catch(_) {}
     try { settings.revealField = localStorage.getItem('cozyRevealField_v1751517') || 'educational_objective'; } catch(_) {}
