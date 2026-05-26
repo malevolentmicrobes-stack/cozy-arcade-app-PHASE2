@@ -11327,10 +11327,16 @@ function fixStableOneThingDropdown351() {
 	    return !p.buried && !p.suspended && !isReviewedCard(card);
 	  }
 
-	  function isReviewCandidate(card) {
-	    const p = progressForCard(card);
-	    return !!(p.pinned || p.repair_point || p.buried || p.suspended || p.rating === 'again' || p.rating === 'hard' || p.last_rating === 'again' || p.last_rating === 'hard' || p.wrong || p.missed || p.flagged || p.lastCorrect === false);
-	  }
+  function isReviewCandidate(card) {
+    const p = progressForCard(card);
+    return !!(p.pinned || p.repair_point || p.buried || p.suspended || p.rating === 'again' || p.rating === 'hard' || p.last_rating === 'again' || p.last_rating === 'hard' || p.wrong || p.missed || p.flagged || p.lastCorrect === false);
+  }
+
+  function hasFutureDue(progress) {
+    if (!progress || !progress.next_due_at) return false;
+    const t = Date.parse(progress.next_due_at);
+    return !isNaN(t) && t > Date.now();
+  }
 
   function isDue(progress) {
     if (!progress) return false;
@@ -11537,13 +11543,16 @@ function fixStableOneThingDropdown351() {
 	      arr = shuffleCards(arr.filter(isNewCard));
 	    } else if (selected === 'reviewed_first') {
 	      arr = [
-	        ...arr.filter(isReviewedCard).sort(dueSort),
+	        ...arr.filter(c => isReviewedCard(c) && isDue(progress(c))).sort(dueSort),
 	        ...arr.filter(isNewCard)
 	      ];
     } else if (selected === 'due') {
       arr = arr.filter(c => isDue(progress(c)));
 	    } else if (selected === 'review_deck') {
-	      arr = normalizeDeckIdentities().filter(c => !progressForCard(c).suspended).filter(isReviewCandidate).sort((a, b) => {
+	      arr = normalizeDeckIdentities().filter(c => !progressForCard(c).suspended).filter(c => {
+	        const p = progressForCard(c);
+	        return isReviewCandidate(c) && (!hasFutureDue(p) || isDue(p));
+	      }).sort((a, b) => {
 	        const pa = progress(a), pb = progress(b);
 	        const score = p => (p.pinned ? 0 : p.repair_point ? 1 : 2);
         if (score(pa) !== score(pb)) return score(pa) - score(pb);
@@ -11553,7 +11562,10 @@ function fixStableOneThingDropdown351() {
     } else if (selected === 'pinned') {
       arr = arr.filter(c => progress(c).pinned);
 	    } else if (selected === 'hard') {
-	      arr = arr.filter(c => progress(c).repair_point || progress(c).last_rating === 'hard' || progress(c).last_rating === 'again' || progress(c).rating === 'hard' || progress(c).rating === 'again');
+	      arr = arr.filter(c => {
+	        const p = progress(c);
+	        return (p.repair_point || p.last_rating === 'hard' || p.last_rating === 'again' || p.rating === 'hard' || p.rating === 'again') && !hasFutureDue(p);
+	      });
     } else if (selected === 'suspended') {
       arr = normalizeDeckIdentities().filter(c => progressForCard(c).suspended);
     }
@@ -11564,7 +11576,8 @@ function fixStableOneThingDropdown351() {
       const active = arr.filter(c => !session.buriedToday.has(canonicalCardId(c)));
       return active.length ? active : arr;
     }
-    const ordered = splitBuriedToBack(arr.length ? arr : basePlayableCards());
+    const scheduledModes = ['new_first', 'reviewed_first', 'due', 'review_deck'];
+    const ordered = splitBuriedToBack(arr.length || scheduledModes.includes(selected) ? arr : basePlayableCards());
     const active = ordered.filter(c => {
       const id = canonicalCardId(c);
       return !session.buriedToday.has(id) && !getProgress(id).buried;
@@ -11572,6 +11585,29 @@ function fixStableOneThingDropdown351() {
     if (active.length) return active;
     if (ordered.length) return ordered;
     clearSessionBuried();
+    if (scheduledModes.includes(selected)) {
+      const refreshed = basePlayableCards();
+      if (selected === 'new_first') {
+        return [
+          ...refreshed.filter(isNewCard),
+          ...refreshed.filter(c => isDue(progress(c)) && isReviewedCard(c)),
+          ...refreshed.filter(c => !isDue(progress(c)) && progress(c).stage === 'relearning')
+        ];
+      }
+      if (selected === 'reviewed_first') {
+        return [
+          ...refreshed.filter(c => isReviewedCard(c) && isDue(progress(c))).sort(dueSort),
+          ...refreshed.filter(isNewCard)
+        ];
+      }
+      if (selected === 'due') return refreshed.filter(c => isDue(progress(c)));
+      if (selected === 'review_deck') {
+        return normalizeDeckIdentities().filter(c => !progressForCard(c).suspended).filter(c => {
+          const p = progressForCard(c);
+          return isReviewCandidate(c) && (!hasFutureDue(p) || isDue(p));
+        });
+      }
+    }
     return shuffleCards(basePlayableCards());
   }
 
