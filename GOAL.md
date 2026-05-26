@@ -2,22 +2,23 @@
 
 ## Active Goal
 
-**Goal:** P-RC Rectifier — Step 3: fix `patchSettingsText()` 1200ms interval
+**Goal:** P-RC Rectifier — Steps 4–5 active
 **Phase:** P-RC (Rectifier)
 **Reference:** `Chronological_Patch_Hx_RECTIFIER_PLAN_2026_05_26.md` — authoritative step list
 **Status:** IN PROGRESS
 
-**Completed (Steps 1, 2, 6–8):** ✅ DONE 2026-05-26
+**Completed (Steps 1–3, 6–8):** ✅ DONE 2026-05-26
 - ✅ Step 1: `makeChoices` return value fixed — choices always Array(4), never undefined
 - ✅ Step 6: `stopAllDropTimers()` + `loopSolo` override added to v175151
 - ✅ Step 7: v17513 drop overrides + v17514 style+script deleted
 - ✅ Step 8: v17515 style+script deleted (primary double-advance source eliminated)
 - ✅ Bonus: Undo review (Cmd/Ctrl+Z + iOS shake) added via `v175372-rectifier-undo-makechoices-smoke`
 - ✅ Step 2: `bionicOn` consolidated to `bionicOn_v1751523` only; fresh-load default is `true`
+- ✅ Step 3: `patchSettingsText()` bionic block guarded to run once; stale key fixed
+- ✅ Step 3b (bionic revert): `applySettings175157()` now writes `bionicOn_v1751523`; `ensureBionic351()` only force-syncs on first toggle init — `3bbefde`
 
-**Next priority (Steps 3–5):**
-- **Step 3 ← ACTIVE:** Fix `patchSettingsText()` 1200ms setInterval to read single key
-- Step 4: Fix Apply button to write `cozyQuestionSeconds351`
+**Next priority (Steps 4–5):**
+- **Step 4 ← ACTIVE:** Fix Apply button to write `cozyQuestionSeconds351`
 - Step 5: Normalize remaining `timerMax` hardcoded literals
 
 **P3.5 due-count widget:** unblocked — Step 8 complete, display code is now stable
@@ -26,19 +27,19 @@
 
 ---
 
-## Gate Condition (Step 3)
+## Gate Condition (Step 3b — bionic revert fix)
 
 ```
-condition: browser:console validation after Step 3
+condition: browser:console validation after 3bbefde
 expected:
-  1. patchSettingsText does not force bionic state from stale/null storage during its 1200ms loop
-  2. drawer/base bionic toggles stay synchronized after repeated interval ticks
-  3. localStorage still contains only bionicOn_v1751523 for bionic state
+  1. Uncheck bionic toggle → click Apply → close settings → reopen settings → checkbox is UNCHECKED
+  2. localStorage.getItem('bionicOn_v1751523') === '0' after unchecking and applying
+  3. Opening gameplay hub does NOT re-check the bionic toggle
   4. window.runFSRSValidation() → 17/17 still passing
   5. window.runCozySmokeTests() → 6/6 still passing
 ```
 
-**To unblock:** Run Step 3 Codex console prompts → all pass → add gate log entry → advance to Step 4.
+**To unblock:** Validate in browser → add gate log entry → advance to Step 5.
 
 ---
 
@@ -77,3 +78,5 @@ expected:
 | 2026-05-26 | P-RC Audit | 4-file diagnostic comparison, 20-step rectifier plan written | ✅ DONE — `Chronological_Patch_Hx_RECTIFIER_PLAN_2026_05_26.md` |
 | 2026-05-26 | P-RC Steps 1+6–8 | makeChoices fix + v17513/14/15 deleted + undo + validated | ✅ PASSED — `d162708`+`8741251`, FSRS 17/17, smoke 6/6, no double-advance |
 | 2026-05-26 | P-RC Step 2 | bionic default + single-key round-trip + stale-key audit | ✅ PASSED — bionicOn true fresh-load, ON/OFF round-trip, only `bionicOn_v1751523`, FSRS 17/17, smoke 6/6 |
+| 2026-05-26 | P-RC Step 3 | patchSettingsText bionic guard + stale key fix | ✅ PASSED — `f0f4d6b` |
+| 2026-05-26 | P-RC Step 3b | bionic toggle revert root cause fixed — applySettings175157 writes localStorage, ensureBionic351 guarded | ✅ CODE — `3bbefde` — browser validation pending |
