@@ -11338,7 +11338,8 @@ function fixStableOneThingDropdown351() {
       const t = Date.parse(progress.next_due_at);
       if (!isNaN(t)) return t <= Date.now();
     }
-    return !!(progress.repair_point || progress.stage === 'relearning');
+    if ((progress.stage === 'review' || progress.stage === 'relearning') && !progress.next_due_at) return true;
+    return !!(progress.repair_point);
   }
 
   function intervalLabel(days, minutes) {
@@ -11528,8 +11529,7 @@ function fixStableOneThingDropdown351() {
 	      arr = [
 	        ...arr.filter(isNewCard),
 	        ...arr.filter(c => isDue(progress(c)) && isReviewedCard(c)),
-	        ...arr.filter(c => !isDue(progress(c)) && progress(c).repair_point),
-	        ...arr.filter(c => isReviewedCard(c) && !isDue(progress(c)) && !progress(c).repair_point)
+	        ...arr.filter(c => !isDue(progress(c)) && progress(c).stage === 'relearning')
 	      ];
 	    } else if (selected === 'random_all') {
 	      arr = shuffleCards(arr);
