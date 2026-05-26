@@ -1280,6 +1280,8 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
   function openSettings(){settingsReturnMode=(mode==='solo'||mode==='domain')?mode:'home'; paused=true; show('settings'); enhanceSettings();}
   function enhanceSettings(){
     const box=q('settings')?.querySelector('.box'); if(!box) return;
+    // Hydrate bionicToggle from localStorage on every open so checkbox always reflects saved state
+    const _bt=q('bionicToggle'); if(_bt){const _sv=localStorage.getItem('bionicOn_v1751523'); _bt.checked=_sv===null?true:_sv==='1'; try{bionicOn=_bt.checked;}catch(e){}}
     loadSpacing();
     const file=q('deckFile'); if(file){file.setAttribute('accept','.json,.csv,application/json,text/csv'); file.onchange=e=>importAny(e.target.files&&e.target.files[0],false);}
     if(!q('dropZone175154')){
