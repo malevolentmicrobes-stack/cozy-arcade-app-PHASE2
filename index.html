@@ -12018,6 +12018,81 @@ function fixStableOneThingDropdown351() {
       return Object.keys(migrated).length;
     };
     window.cozyParseJson351 = parseJsonLoose;
+    function runSRSValidation() {
+      const results = [];
+      const pass = (name, val, expected) => {
+        const ok = val === expected;
+        results.push({ name, ok, val, expected });
+      };
+      const SRS_TEST_ID = '__srs_v__';
+      function sim(overrides, rating) {
+        setProgress(SRS_TEST_ID, Object.assign(defaultProgress(SRS_TEST_ID), {
+          seen_count: 0, reviewed_count: 0, correct_count: 0, wrong_count: 0,
+          interval_days: 0, ease_factor: 2.5, lapses: 0,
+          repair_point: false, pinned: false, buried: false,
+          next_due_at: null, last_rating: null
+        }, overrides));
+        rateCard(SRS_TEST_ID, rating);
+        const r = getProgress(SRS_TEST_ID);
+        delete phase3State.progress[SRS_TEST_ID];
+        session.seenThisSession.delete(SRS_TEST_ID);
+        session.buriedToday.delete(SRS_TEST_ID);
+        return r;
+      }
+      // 1. Again on new card → relearning, interval 0
+      let r = sim({}, 'again');
+      pass('again/new → stage relearning', r.stage, 'relearning');
+      pass('again/new → interval 0', r.interval_days, 0);
+      // 2. Again → ease drops by 0.20 (rounded to avoid float inequality)
+      r = sim({ ease_factor: 2.5 }, 'again');
+      pass('again → ease_factor 2.30', Math.round(r.ease_factor * 100) / 100, 2.3);
+      // 3. Hard on new card → review, interval 1
+      r = sim({}, 'hard');
+      pass('hard/new → stage review', r.stage, 'review');
+      pass('hard/new → interval 1', r.interval_days, 1);
+      // 4. Hard on review card (interval 5) → max(1, round(5×1.2)) = 6
+      r = sim({ stage: 'review', interval_days: 5, ease_factor: 2.5 }, 'hard');
+      pass('hard/review/5d → interval 6', r.interval_days, 6);
+      // 5. Good on new card → review, interval 1
+      r = sim({}, 'good');
+      pass('good/new → stage review', r.stage, 'review');
+      pass('good/new → interval 1', r.interval_days, 1);
+      // 6. Good on review (interval 3, ease 2.5) → max(1, round(3×2.5)) = 8
+      r = sim({ stage: 'review', interval_days: 3, ease_factor: 2.5 }, 'good');
+      pass('good/review/3d → interval 8', r.interval_days, 8);
+      // 7. Easy on new card → review, interval 4
+      r = sim({}, 'easy');
+      pass('easy/new → stage review', r.stage, 'review');
+      pass('easy/new → interval 4', r.interval_days, 4);
+      // 8. Easy on review (interval 4, ease 2.5): ease updated first to 2.65,
+      //    then interval = max(4, round(4×2.65×1.3)) = max(4, 14) = 14
+      r = sim({ stage: 'review', interval_days: 4, ease_factor: 2.5 }, 'easy');
+      pass('easy/review/4d → interval 14', r.interval_days, 14);
+      // 9. ease_factor floor at 1.3
+      r = sim({ stage: 'review', interval_days: 1, ease_factor: 1.4, lapses: 4 }, 'again');
+      pass('ease floor 1.3', Math.round(r.ease_factor * 100) / 100 >= 1.3, true);
+      // 10. ease_factor ceiling at 4.0
+      r = sim({ stage: 'review', interval_days: 1, ease_factor: 3.95 }, 'easy');
+      pass('ease ceiling 4.0', r.ease_factor <= 4.0, true);
+      // 11. isDue() with future next_due_at → false
+      const future = new Date(Date.now() + 86400000 * 3).toISOString();
+      pass('isDue future → false', isDue({ next_due_at: future, stage: 'review' }), false);
+      // 12. isDue() with past next_due_at → true
+      const past = new Date(Date.now() - 86400000).toISOString();
+      pass('isDue past → true', isDue({ next_due_at: past, stage: 'review' }), true);
+      // 13. isDue() null next_due_at + stage review → true
+      pass('isDue null/review → true', isDue({ next_due_at: null, stage: 'review' }), true);
+      const passed = results.filter(r => r.ok).length;
+      const failed = results.filter(r => !r.ok);
+      if (failed.length) {
+        console.group('❌ SRS failures:');
+        failed.forEach(f => console.warn(`${f.name}: got ${f.val}, expected ${f.expected}`));
+        console.groupEnd();
+      }
+      console.log(`${passed === 13 ? '✅' : '❌'} SRS: ${passed}/13 passed`);
+      return { passed, total: 13, failed };
+    }
+    window.runSRSValidation = runSRSValidation;
     window.runCozySmokeTests = runCozySmokeTestsPhase3;
     window.appCards = appCards;
     window.importLimitlessDeck = importObjectPhase3;
