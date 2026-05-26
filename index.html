@@ -11528,7 +11528,8 @@ function fixStableOneThingDropdown351() {
 	      arr = [
 	        ...arr.filter(isNewCard),
 	        ...arr.filter(c => isDue(progress(c)) && isReviewedCard(c)),
-	        ...arr.filter(c => isReviewedCard(c) && !isDue(progress(c)))
+	        ...arr.filter(c => !isDue(progress(c)) && progress(c).repair_point),
+	        ...arr.filter(c => isReviewedCard(c) && !isDue(progress(c)) && !progress(c).repair_point)
 	      ];
 	    } else if (selected === 'random_all') {
 	      arr = shuffleCards(arr);
@@ -11542,12 +11543,13 @@ function fixStableOneThingDropdown351() {
     } else if (selected === 'due') {
       arr = arr.filter(c => isDue(progress(c)));
 	    } else if (selected === 'review_deck') {
-	      arr = arr.filter(isReviewCandidate).sort((a, b) => {
+	      arr = normalizeDeckIdentities().filter(c => !progressForCard(c).suspended).filter(isReviewCandidate).sort((a, b) => {
 	        const pa = progress(a), pb = progress(b);
 	        const score = p => (p.pinned ? 0 : p.repair_point ? 1 : 2);
         if (score(pa) !== score(pb)) return score(pa) - score(pb);
         return String(pa.last_seen_at || '').localeCompare(String(pb.last_seen_at || ''));
       });
+      return arr;
     } else if (selected === 'pinned') {
       arr = arr.filter(c => progress(c).pinned);
 	    } else if (selected === 'hard') {
@@ -11556,9 +11558,9 @@ function fixStableOneThingDropdown351() {
       arr = normalizeDeckIdentities().filter(c => progressForCard(c).suspended);
     }
 
-	    if (!arr.length && ['new_only', 'random_new', 'due', 'review_deck', 'pinned', 'hard', 'suspended'].includes(selected)) return [];
+	    if (!arr.length && ['new_only', 'due', 'pinned', 'hard', 'suspended'].includes(selected)) return [];
 
-    if (selected === 'random_new') {
+    if (selected === 'random_new' && arr.length) {
       const active = arr.filter(c => !session.buriedToday.has(canonicalCardId(c)));
       return active.length ? active : arr;
     }
@@ -11567,7 +11569,10 @@ function fixStableOneThingDropdown351() {
       const id = canonicalCardId(c);
       return !session.buriedToday.has(id) && !getProgress(id).buried;
     });
-    return active.length ? active : ordered;
+    if (active.length) return active;
+    if (ordered.length) return ordered;
+    clearSessionBuried();
+    return shuffleCards(basePlayableCards());
   }
 
   function poolKey(gameType) {
