@@ -11372,7 +11372,8 @@ function fixStableOneThingDropdown351() {
 
   function cleanDeckCard(card) {
     const out = Object.assign({}, card, { card_id: canonicalCardId(card) });
-    ['seen_count','correct_count','wrong_count','reviewed_count','pinned','buried','suspended','repair_point','stage','last_rating','last_seen_at','next_due_at','interval_days','ease_factor','lapses','created_at','updated_at'].forEach(key => { delete out[key]; });
+    ['seen_count','correct_count','wrong_count','reviewed_count','pinned','buried','suspended','repair_point','stage','last_rating','last_seen_at','next_due_at','interval_days','ease_factor','lapses','created_at','updated_at',
+     'level_1_presentation','level_2_three_second_exposure','prompt','clinical_vignette_summary','answer','subject','qid_unique','treatment','next_step'].forEach(key => { delete out[key]; });
     return out;
   }
 

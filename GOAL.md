@@ -61,6 +61,20 @@ expected:
 
 ---
 
+## Active Goals — Export / Undo (E-series)
+
+| # | Goal | Status |
+|---|------|--------|
+| E1 | Undo review (Cmd/Ctrl+Z + iOS shake) | ✅ CODE — browser verify needed |
+| E2 | Export strips legacy alias fields from all deck exports | ✅ FIXED — `cleanDeckCard()` extended |
+| E3–E5 | Settings exports (deck-only, progress-only, deck+progress) | ⚡ VERIFY in browser |
+
+**Root cause (E2):** `cleanDeckCard()` did `Object.assign({}, card)` which carried every alias added by import normalization. Fixed: added `level_1_presentation`, `level_2_three_second_exposure`, `prompt`, `clinical_vignette_summary`, `answer`, `subject`, `qid_unique`, `treatment`, `next_step` to deletion list.
+
+**Undo implementation note (E1):** `v175372-rectifier-undo-makechoices-smoke` wraps `selectSolo`, captures snapshot before answer fires, restores on Cmd+Z or shake (force>32, 1600ms debounce). Domain mode not covered — solo only.
+
+---
+
 ## Blocked Goals Queue (next after P3)
 
 | Priority | Goal | Gate condition |

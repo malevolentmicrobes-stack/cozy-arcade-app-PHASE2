@@ -37,6 +37,24 @@
 
 ---
 
+## Priority 2b — Export / Undo (Active)
+
+| # | Goal | Status | Validation |
+|---|------|--------|------------|
+| E1 | Undo review (Cmd/Ctrl+Z + iOS shake) returns prior card as if not answered | ✅ CODE (v175372) — browser verify | Play card → answer → Cmd+Z → prior card reappears, FSRS state reverted |
+| E2 | "Download Deck" (home) no longer includes legacy alias fields (`level_1_presentation`, `level_2_three_second_exposure`, `prompt`, `clinical_vignette_summary`, `answer`, `subject`, `qid_unique`, `treatment`, `next_step`) | ✅ FIXED `cleanDeckCard()` | Export clean deck → JSON contains only canonical source fields |
+| E3 | Settings Export → Deck Only clean | ⚡ VERIFY | `cozy_arcade_clean_deck.json` fields match source schema |
+| E4 | Settings Export → Progress Only | ⚡ VERIFY | `cozy_arcade_progress_*.json` contains only FSRS state, no card data |
+| E5 | Settings Export → Deck + Progress | ⚡ VERIFY | `cozy_arcade_deck_with_progress_backup.json` cards clean + progress accurate |
+
+**Export field schema (canonical — what should appear in any card export):**
+`qid · sys · diagnosis · presentation · one_thing · educational_objective · board_trigger · explanation · why_not_others · test · quick_recall · cloze_source_text · cloze_enabled · tags · card_id`
+
+**Fields stripped by `cleanDeckCard()` (derived aliases — must NOT appear in export):**
+`level_1_presentation · level_2_three_second_exposure · prompt · clinical_vignette_summary · answer · subject · qid_unique · treatment · next_step`
+
+---
+
 ## Priority 3 — Feature Goals
 
 | # | Goal | Status | Gate |
