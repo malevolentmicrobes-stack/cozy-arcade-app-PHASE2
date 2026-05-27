@@ -1296,6 +1296,11 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
     const apply=q('applyBtn'); if(apply) apply.onclick=()=>{deckMode=q('deckMode')?.value||deckMode; promptField='presentation'; autoSelect=!!q('autoSelect')?.checked; bionicOn=!!q('bionicToggle')?.checked; try{localStorage.setItem('bionicOn_v1751523',bionicOn?'1':'0');}catch(e){} try{document.documentElement.dataset.cozyBionic=bionicOn?'1':'0';}catch(e){} try{if(typeof installBionicQuestionPatch352==='function') installBionicQuestionPatch352();}catch(e){} try{if(typeof rerenderVisibleBionic351==='function') rerenderVisibleBionic351();}catch(e){} saveSpacing(); safeToast('Applied');};
     const cb=q('spacedToggle'); if(cb){cb.onchange=saveSpacing;}
     box.querySelectorAll('details.v175152-panel').forEach(p=>{if(/Advanced.*Merge|Merge.*Import/i.test(p.querySelector('summary')?.textContent||'')) p.style.display='none';});
+    if(!q('cozyControlsHint175374')){const hint=document.createElement('div'); hint.id='cozyControlsHint175374'; hint.style.cssText='margin:18px 0 0;border:1px solid rgba(103,232,249,.18);border-radius:14px;background:rgba(103,232,249,.04);padding:14px 18px;color:#b6c8e8;font-size:13px;line-height:1.55;'; hint.innerHTML='<b style="color:#dffbff;letter-spacing:.08em">CONTROLS</b><br>'+
+      '<b>Enter</b> / <b>→</b> Good &amp; continue &nbsp;·&nbsp; <b>1</b> Again &nbsp;·&nbsp; <b>2</b> Hard &nbsp;·&nbsp; <b>3</b> Good &nbsp;·&nbsp; <b>4</b> Easy<br>'+
+      '<b>↓</b> Full Card &nbsp;·&nbsp; <b>↑</b> Close Full Card &nbsp;·&nbsp; <b>Cmd/Ctrl+Z</b> or shake Undo last answer<br>'+
+      '<span style="color:#8ea8cc">Timing controls review pace across games. Knowledge Expansion: arrows = top/right/bottom/left; Enter, /, or click selects after prompt lock.</span>';
+    (box.querySelector('.controls')||box).before(hint);}
   }
   window.enhanceSettings = enhanceSettings;
   const gear=q('gearBtn'); if(gear) gear.onclick=openSettings;
@@ -12669,20 +12674,10 @@ function fixStableOneThingDropdown351() {
 })();
 </script>
 <style id="v175374-rectifier-font-bionic-fix">
-/* Fit-to-screen prompt sizing — keeps text small enough that promptBox
-   stays within soloTrack inset so timer never overlaps choices */
-.solo .promptText,.game.solo .promptText{font-size:clamp(15px,1.75vw,22px)!important;line-height:1.28!important;letter-spacing:.025em!important;}
-.domain .promptText,.game.domain .promptText{font-size:clamp(15px,1.75vw,22px)!important;line-height:1.28!important;letter-spacing:.025em!important;}
-/* soloTrack pushed down 10px more so promptBox+timer clear the track boundary */
+/* soloTrack nudged 10px for clearance — prevents promptBox+timer overlapping choiceRow */
 .soloTrack{inset:240px 0 0!important;}
-.choice{font-size:clamp(13px,1.15vw,17px)!important;min-height:72px!important;line-height:1.16!important;}
-@media(max-width:760px){
-  .solo .promptText,.game.solo .promptText{font-size:clamp(14px,4.2vw,20px)!important;}
-  .domain .promptText,.game.domain .promptText{font-size:clamp(14px,4.0vw,20px)!important;}
-  .soloTrack{inset:220px 0 0!important;}
-  .choice{font-size:clamp(12px,3.5vw,16px)!important;min-height:60px!important;}
-}
-/* Bionic contrast — bold first-letters bright white, base text dimmed */
+@media(max-width:760px){.soloTrack{inset:220px 0 0!important;}}
+/* Bionic contrast — bold first-letters bright white, base text dimmed blue-gray */
 [data-cozybionic="1"] .promptText,[data-cozyBionic="1"] .promptText{color:rgba(160,200,255,0.62)!important;font-weight:500!important;}
 [data-cozybionic="1"] .promptText b,[data-cozyBionic="1"] .promptText b{color:#ffffff!important;font-weight:950!important;}
 </style>
