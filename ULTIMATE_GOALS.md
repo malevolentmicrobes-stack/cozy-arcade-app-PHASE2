@@ -59,7 +59,7 @@
 
 | # | Goal | Status | Gate |
 |---|------|--------|------|
-| F1 | Due-count widget on home ("5 due · 12 new") | ⏳ P3.5 | Visual confirm in browser |
+| F1 | Due-count widget on home ("X due · Y new") | ✅ CODE (`d830094`) — browser verify | Home KPI row shows Cards\|Reviewed\|Due\|New\|Pinned; Due = FSRS-accurate, New = unseen |
 | F2 | PWA service worker + self-host fonts | ⏳ P7 | Chrome DevTools → Application → Service Workers registered |
 | F3 | XSS audit + CSP headers (vercel.json) | ⏳ P8 | `curl -I` shows `Content-Security-Policy` header |
 | F4 | Stripe Payment Link | ⏳ M2 | Test purchase + `localStorage.getItem('cozy_paid_v1') === '1'` |

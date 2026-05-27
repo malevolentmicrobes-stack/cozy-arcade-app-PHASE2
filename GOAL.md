@@ -36,7 +36,7 @@
 5. Export clean deck → no `level_1_presentation` in JSON
 6. Cmd+Z after answering → prior card returns
 
-**Next code task:** P3.5 — due-count widget ("5 due · 12 new") on home screen
+**Next code task:** E3–E5 browser verify (export clean deck, progress-only, deck+progress) → then F2 PWA / P8 CSP
 
 ---
 
