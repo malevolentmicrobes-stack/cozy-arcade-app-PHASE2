@@ -12669,16 +12669,20 @@ function fixStableOneThingDropdown351() {
 })();
 </script>
 <style id="v175374-rectifier-font-bionic-fix">
-/* Restore readable prompt sizes — overrides accumulated patch shrinkage */
-.solo .promptText,.game.solo .promptText{font-size:clamp(22px,2.6vw,36px)!important;line-height:1.30!important;letter-spacing:.03em!important;}
-.domain .promptText,.game.domain .promptText{font-size:clamp(20px,2.4vw,32px)!important;line-height:1.32!important;letter-spacing:.03em!important;}
-.choice{font-size:clamp(14px,1.3vw,19px)!important;min-height:80px!important;line-height:1.18!important;}
+/* Fit-to-screen prompt sizing — keeps text small enough that promptBox
+   stays within soloTrack inset so timer never overlaps choices */
+.solo .promptText,.game.solo .promptText{font-size:clamp(15px,1.75vw,22px)!important;line-height:1.28!important;letter-spacing:.025em!important;}
+.domain .promptText,.game.domain .promptText{font-size:clamp(15px,1.75vw,22px)!important;line-height:1.28!important;letter-spacing:.025em!important;}
+/* soloTrack pushed down 10px more so promptBox+timer clear the track boundary */
+.soloTrack{inset:240px 0 0!important;}
+.choice{font-size:clamp(13px,1.15vw,17px)!important;min-height:72px!important;line-height:1.16!important;}
 @media(max-width:760px){
-  .solo .promptText,.game.solo .promptText{font-size:clamp(18px,4.8vw,26px)!important;}
-  .domain .promptText,.game.domain .promptText{font-size:clamp(16px,4.4vw,24px)!important;}
-  .choice{font-size:clamp(13px,3.8vw,17px)!important;min-height:66px!important;}
+  .solo .promptText,.game.solo .promptText{font-size:clamp(14px,4.2vw,20px)!important;}
+  .domain .promptText,.game.domain .promptText{font-size:clamp(14px,4.0vw,20px)!important;}
+  .soloTrack{inset:220px 0 0!important;}
+  .choice{font-size:clamp(12px,3.5vw,16px)!important;min-height:60px!important;}
 }
-/* Bionic contrast — makes first-letter bold visible against base text */
+/* Bionic contrast — bold first-letters bright white, base text dimmed */
 [data-cozybionic="1"] .promptText,[data-cozyBionic="1"] .promptText{color:rgba(160,200,255,0.62)!important;font-weight:500!important;}
 [data-cozybionic="1"] .promptText b,[data-cozyBionic="1"] .promptText b{color:#ffffff!important;font-weight:950!important;}
 </style>

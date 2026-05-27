@@ -11,7 +11,8 @@
 | `26153a4` | 8200–8202 | Remove `setTimeout(returnFromSettings352, 0)` from Apply listener — settings no longer auto-closes on Apply | ✅ LIVE |
 | `26153a4` | 1296 | Apply onclick now calls `installBionicQuestionPatch352()` + `rerenderVisibleBionic351()` — bionic re-renders in gameplay after Apply | ✅ LIVE |
 | `26153a4` | 1299 | `box.querySelectorAll('details.v175152-panel')` loop hides "Advanced: Merge / Progress Import" panel on every settings open | ✅ LIVE |
-| pending | 12670–12671 | `<style id="v175374-rectifier-font-bionic-fix">` — font size restore + bionic contrast CSS | ✅ INSERTED (uncommitted) |
+| `8e18663` | 12670–12671 | `<style id="v175374-rectifier-font-bionic-fix">` — font + bionic contrast CSS (v1, too large) | ⚠️ REVISED |
+| pending | 12671–12684 | `v175374` revised — font fit-to-screen `clamp(15px,1.75vw,22px)`, soloTrack inset 240px, bionic contrast kept | ✅ INSERTED |
 
 ---
 
@@ -32,7 +33,7 @@
 **Fix:** `[data-cozyBionic="1"] .promptText` → `font-weight:500; color:rgba(160,200,255,0.62)` base. `b` inside → `font-weight:950; color:#fff`. Now bold half is white/heavy, rest is dimmed blue.  
 **Note:** `document.documentElement.dataset.cozyBionic` is set by `applyVisibleSettings352()` (line 8107) and `installBionicQuestionPatch352()` (line 7402).
 
-### C — Font Size Accumulated Shrinkage (FIXED `v175374-...` style)
+### C — Font Size / Timer Overlap (REVISED `v175374` — fit-to-screen, not larger)
 
 Twelve overlapping `!important` rules for `.solo .promptText` each progressively smaller:
 
@@ -45,7 +46,13 @@ Twelve overlapping `!important` rules for `.solo .promptText` each progressively
 | 3209 | `clamp(16px,1.72vw,27px)!important` | 27px |
 
 Last `!important` at same specificity wins → text shrinks with each patch.  
-**Fix:** New rule at bottom of file: `clamp(22px,2.6vw,36px)!important` — higher position in cascade, restores legible size. Mobile breakpoint also corrected.
+
+**Key geometry constraint (confirmed from browser + images):**  
+`promptBox` is `position:absolute; top:48–54px`. `soloTrack` is `position:absolute; inset:230px 0 0`.  
+If `promptBox` height > 230–54 = 176px, it overlaps `soloTrack` → timer bar appears over choiceRow.  
+At `clamp(22px,2.6vw,36px)`, a 5-line question + margin-top:32px + timer = ~250px → 74px of overlap. **This was the timer-covers-text bug introduced by v1 of v175374.**  
+
+**Fix (v2):** `clamp(15px,1.75vw,22px)` — 5 lines at 15px ≈ 97px + 32px margin + 28px timer + 34px padding = ~191px. Plus soloTrack nudged to `inset:240px 0 0` → no overlap, timer stays below text, choices remain visible.
 
 ### D — Settings Auto-Close on Apply (FIXED `26153a4`)
 
