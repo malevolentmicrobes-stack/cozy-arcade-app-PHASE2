@@ -11373,7 +11373,9 @@ function fixStableOneThingDropdown351() {
   function cleanDeckCard(card) {
     const out = Object.assign({}, card, { card_id: canonicalCardId(card) });
     ['seen_count','correct_count','wrong_count','reviewed_count','pinned','buried','suspended','repair_point','stage','last_rating','last_seen_at','next_due_at','interval_days','ease_factor','lapses','created_at','updated_at',
-     'level_1_presentation','level_2_three_second_exposure','prompt','clinical_vignette_summary','answer','subject','qid_unique','treatment','next_step'].forEach(key => { delete out[key]; });
+     'level_1_presentation','level_2_three_second_exposure','prompt','clinical_vignette_summary','answer','subject','qid_unique','treatment','next_step',
+     'system','id','json_id','original_qid','legacy_id','card_type','type','source','input','output','clinical_vignette',
+     'level_1','level_2','level_2_three_second','level_3_recall','level_3_quick_recall','level_4_full','level_4_full_card','educational_obj'].forEach(key => { delete out[key]; });
     return out;
   }
 
@@ -12680,8 +12682,8 @@ function fixStableOneThingDropdown351() {
 .soloTrack{inset:240px 0 0!important;}
 @media(max-width:760px){.soloTrack{inset:220px 0 0!important;}}
 /* Bionic contrast — bold first-letters bright white, base text dimmed blue-gray */
-[data-cozy-bionic="1"] .promptText{color:rgba(160,200,255,0.62)!important;font-weight:500!important;}
-[data-cozy-bionic="1"] .promptText b{color:#ffffff!important;font-weight:950!important;}
+:root[data-cozy-bionic="1"] .promptText,:root[data-cozy-bionic="1"] .promptText *:not(b){color:rgba(160,200,255,0.62)!important;font-weight:500!important;}
+:root[data-cozy-bionic="1"] .promptText b{color:#ffffff!important;font-weight:950!important;}
 </style>
 <script id="v175375-new-count-kpi">
 (function(){
