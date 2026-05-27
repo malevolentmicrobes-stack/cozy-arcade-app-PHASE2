@@ -11369,10 +11369,9 @@ function fixStableOneThingDropdown351() {
   }
 
   function progressPayload() {
-    const progress = deduplicateProgress(exportProgressMap(), appCards());
     return {
       metadata: { type: 'progress', deck_fingerprint: deckFingerprint(), exported_at: nowIso(), schema_version: '3.0' },
-      progress
+      progress: exportProgressMap()
     };
   }
 
@@ -11434,11 +11433,10 @@ function fixStableOneThingDropdown351() {
   }
 
   function backupPayload() {
-    const progress = deduplicateProgress(exportProgressMap(), appCards());
     return {
       metadata: { type: 'deck_with_progress', deck_fingerprint: deckFingerprint(), exported_at: nowIso(), schema_version: '3.0' },
       cards: cleanDeckPayload().cards,
-      progress
+      progress: exportProgressMap()
     };
   }
 
@@ -11483,7 +11481,7 @@ function fixStableOneThingDropdown351() {
         progress_count: Object.keys(phase3State.progress || {}).length
       },
       cards: _cards,
-      progress: phase3State.progress || {},
+      progress: exportProgressMap(),
       settings,
       persona
     };
