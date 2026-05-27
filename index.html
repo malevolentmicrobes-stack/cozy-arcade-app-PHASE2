@@ -12539,7 +12539,6 @@ function fixStableOneThingDropdown351() {
     const phase = pillFor(gameId === 'solo' ? 'soloGate' : 'domainRound');
     const pause = q(gameId === 'solo' ? 'soloPause' : 'domainPause');
     const exit = hud.querySelector('button[data-home]');
-    const settings = ensureSettingsButton(hud);
 
     let energy = gameId === 'solo' ? pillFor('hpFill') : (energyClones[0] || ensureEnergyPill(hud));
     if (gameId === 'solo') {
@@ -12561,7 +12560,6 @@ function fixStableOneThingDropdown351() {
     appendIf(actions, phase);
     appendIf(actions, pause);
     appendIf(actions, exit);
-    appendIf(actions, settings);
 
     iconize(pause, 'Pause', '⏸');
     iconize(exit, 'Close', '×');
