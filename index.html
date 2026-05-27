@@ -1293,8 +1293,9 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
     }
     let old=q('settingsContinue175153'); if(old) old.onclick=returnToPrior;
     if(!q('settingsContinue175154')){const b=document.createElement('button'); b.id='settingsContinue175154'; b.className='btn primary'; b.textContent='Continue'; b.onclick=returnToPrior; (box.querySelector('.controls')||box).appendChild(b);}
-    const apply=q('applyBtn'); if(apply) apply.onclick=()=>{deckMode=q('deckMode')?.value||deckMode; promptField='presentation'; autoSelect=!!q('autoSelect')?.checked; bionicOn=!!q('bionicToggle')?.checked; try{localStorage.setItem('bionicOn_v1751523',bionicOn?'1':'0');}catch(e){} saveSpacing(); safeToast('Applied');};
+    const apply=q('applyBtn'); if(apply) apply.onclick=()=>{deckMode=q('deckMode')?.value||deckMode; promptField='presentation'; autoSelect=!!q('autoSelect')?.checked; bionicOn=!!q('bionicToggle')?.checked; try{localStorage.setItem('bionicOn_v1751523',bionicOn?'1':'0');}catch(e){} try{document.documentElement.dataset.cozyBionic=bionicOn?'1':'0';}catch(e){} try{if(typeof installBionicQuestionPatch352==='function') installBionicQuestionPatch352();}catch(e){} try{if(typeof rerenderVisibleBionic351==='function') rerenderVisibleBionic351();}catch(e){} saveSpacing(); safeToast('Applied');};
     const cb=q('spacedToggle'); if(cb){cb.onchange=saveSpacing;}
+    box.querySelectorAll('details.v175152-panel').forEach(p=>{if(/Advanced.*Merge|Merge.*Import/i.test(p.querySelector('summary')?.textContent||'')) p.style.display='none';});
   }
   window.enhanceSettings = enhanceSettings;
   const gear=q('gearBtn'); if(gear) gear.onclick=openSettings;
@@ -8199,7 +8200,6 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
         btn.dataset.applyReturn352 = '1';
         btn.addEventListener('click', () => {
           applyVisibleSettings352();
-          setTimeout(returnFromSettings352, 0);
         }, false);
       }
     });
