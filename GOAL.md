@@ -17,13 +17,20 @@
 - ✅ Step 3: `patchSettingsText()` bionic block guarded to run once; stale key fixed
 - ✅ Step 3b (bionic revert): `applySettings175157()` now writes `bionicOn_v1751523`; `ensureBionic351()` only force-syncs on first toggle init — `3bbefde`
 
+**Also completed this session (bionic/settings rectifier):**
+- ✅ `window.enhanceSettings` export — gear-click path now calls hydrating version (`45a26b6`)
+- ✅ Settings Apply no longer auto-closes; Advanced panel hidden; bionic rerenders on Apply (`26153a4`)
+- ✅ `v175374-rectifier-font-bionic-fix` style — font sizes restored, bionic contrast CSS added
+
 **Next priority (Steps 4–5):**
-- **Step 4 ← ACTIVE:** Fix Apply button to write `cozyQuestionSeconds351`
+- **Step 4 ← ACTIVE:** Verify Apply writes `cozyQuestionSeconds351` (handled by `applyVisibleSettings352()` line 8111 — confirm in browser)
 - Step 5: Normalize remaining `timerMax` hardcoded literals
 
 **P3.5 due-count widget:** unblocked — Step 8 complete, display code is now stable
 
 **Prerequisite gate:** ✅ PASSED 2026-05-26 — `window.runFSRSValidation()` → 17/17, `window.runCozySmokeTests()` → 6/6, no double-advance, choices valid
+
+**Pending visual gate:** `v175374` font + bionic contrast — visual confirm in browser required
 
 ---
 
