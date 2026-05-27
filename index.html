@@ -8787,7 +8787,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     let progress=document.getElementById('limitlessImportStatus');
     if(!progress){ progress=document.createElement('span'); progress.id='limitlessImportStatus'; progress.className='btn'; }
     if(progress.parentElement!==panel) panel.appendChild(progress);
-    const ex=document.getElementById('limitlessExampleDeck'); if(ex) ex.onclick=()=>{ if(window.cozyPhase3&&typeof window.cozyPhase3.exportDeckWithProgress==='function') window.cozyPhase3.exportDeckWithProgress(); else if(typeof window.exportProgress351==='function') window.exportProgress351(); else downloadJson(); };
+    const ex=document.getElementById('limitlessExampleDeck'); if(ex) ex.onclick=()=>{ if(window.cozyPhase3&&typeof window.cozyPhase3.exportCleanDeck==='function') window.cozyPhase3.exportCleanDeck(); else if(typeof exportCleanDeck==='function') exportCleanDeck(); else downloadJson(); };
     updateImportButtons();
   }
   function renderReviewDeck(){
@@ -11375,7 +11375,8 @@ function fixStableOneThingDropdown351() {
     ['seen_count','correct_count','wrong_count','reviewed_count','pinned','buried','suspended','repair_point','stage','last_rating','last_seen_at','next_due_at','interval_days','ease_factor','lapses','created_at','updated_at',
      'level_1_presentation','level_2_three_second_exposure','prompt','clinical_vignette_summary','answer','subject','qid_unique','treatment','next_step',
      'system','id','json_id','original_qid','legacy_id','card_type','type','source','input','output','clinical_vignette',
-     'level_1','level_2','level_2_three_second','level_3_recall','level_3_quick_recall','level_4_full','level_4_full_card','educational_obj'].forEach(key => { delete out[key]; });
+     'level_1','level_2','level_2_three_second','level_3_recall','level_3_quick_recall','level_4_full','level_4_full_card','educational_obj',
+     'subject'].forEach(key => { delete out[key]; });
     return out;
   }
 
@@ -11590,7 +11591,7 @@ function fixStableOneThingDropdown351() {
     if (q('pauseExport')) { q('pauseExport').textContent = 'Export Progress'; q('pauseExport').onclick = exportProgressOnly; }
     if (q('drawerExport351')) q('drawerExport351').remove();
     if (q('exportJson351')) { q('exportJson351').textContent = 'Download Deck'; q('exportJson351').onclick = exportCleanDeck; }
-    if (q('limitlessExampleDeck')) q('limitlessExampleDeck').onclick = exportDeckWithProgress;
+    if (q('limitlessExampleDeck')) q('limitlessExampleDeck').onclick = exportCleanDeck;
     if (q('settingsExportProgress351')) q('settingsExportProgress351').onclick = exportProgressOnly;
     if (q('exportProgress2')) { q('exportProgress2').textContent = 'Export Progress Only'; q('exportProgress2').onclick = exportProgressOnly; }
     if (q('exportMergeInfo2')) { q('exportMergeInfo2').textContent = 'Export Progress Summary'; q('exportMergeInfo2').onclick = exportSessionSummary; }
