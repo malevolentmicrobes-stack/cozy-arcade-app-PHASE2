@@ -11376,14 +11376,54 @@ function fixStableOneThingDropdown351() {
     };
   }
 
+  // canonicalizeCard — single source of truth for field normalization and export filtering.
+  // mode:'export'  → allowlist only canonical source fields (strips all aliases, progress state, synthesized views)
+  // mode:'display' → normalize aliases in-place, keep computed level_* views for gameplay
+  function canonicalizeCard(raw, opts) {
+    const mode = (opts && opts.mode) || 'display';
+    const c = Object.assign({}, raw || {});
+    const presentation = c.presentation || c.prompt || c.clinical_vignette_summary || c.level_1_presentation || c.front || c.question || '';
+    const educational_objective = c.educational_objective || c.answer || c.level_2_three_second_exposure || c.quick_recall || c.back || '';
+    const sys = c.sys || c.system || c.subject || '';
+    const diagnosis = c.diagnosis || c.dx || c.title || String(educational_objective || presentation || '').slice(0, 80) || '';
+    const tags = Array.isArray(c.tags) ? c.tags : (c.tags ? String(c.tags).split(/[|;,]/).map(x => x.trim()).filter(Boolean) : []);
+
+    if (mode === 'export') {
+      const out = { card_id: canonicalCardId(raw) };
+      if (c.qid != null && c.qid !== '')  out.qid = c.qid;
+      if (sys)                             out.sys = sys;
+      if (diagnosis)                       out.diagnosis = diagnosis;
+      if (presentation)                    out.presentation = presentation;
+      if (c.one_thing)                     out.one_thing = c.one_thing;
+      if (educational_objective)           out.educational_objective = educational_objective;
+      if (c.board_trigger)                 out.board_trigger = c.board_trigger;
+      if (c.explanation)                   out.explanation = c.explanation;
+      if (c.why_not_others)                out.why_not_others = c.why_not_others;
+      if (c.test)                          out.test = c.test;
+      if (c.quick_recall)                  out.quick_recall = c.quick_recall;
+      if (c.cloze_source_text)             out.cloze_source_text = c.cloze_source_text;
+      if (c.cloze_enabled)                 out.cloze_enabled = c.cloze_enabled;
+      if (tags.length)                     out.tags = tags;
+      return out;
+    }
+
+    // mode:'display' — normalize aliases, keep computed views for gameplay rendering
+    c.presentation = presentation;
+    c.educational_objective = educational_objective;
+    c.sys = sys;
+    c.system = c.system || sys;
+    c.diagnosis = diagnosis;
+    c.level_1_presentation = presentation;
+    c.level_2_three_second_exposure = educational_objective;
+    c.prompt = presentation;
+    c.answer = educational_objective;
+    c.quick_recall = c.quick_recall || educational_objective;
+    c.tags = tags;
+    return c;
+  }
+
   function cleanDeckCard(card) {
-    const out = Object.assign({}, card, { card_id: canonicalCardId(card) });
-    ['seen_count','correct_count','wrong_count','reviewed_count','pinned','buried','suspended','repair_point','stage','last_rating','last_seen_at','next_due_at','interval_days','ease_factor','lapses','created_at','updated_at',
-     'level_1_presentation','level_2_three_second_exposure','prompt','clinical_vignette_summary','answer','subject','qid_unique','treatment','next_step',
-     'system','id','json_id','original_qid','legacy_id','card_type','type','source','input','output','clinical_vignette',
-     'level_1','level_2','level_2_three_second','level_3_recall','level_3_quick_recall','level_4_full','level_4_full_card','educational_obj',
-     'subject'].forEach(key => { delete out[key]; });
-    return out;
+    return canonicalizeCard(card, { mode: 'export' });
   }
 
   function cleanDeckPayload() {
@@ -11685,6 +11725,7 @@ function fixStableOneThingDropdown351() {
     window.rateCard = rateCard;
     window.getStudyPool = getStudyPool;
     window.migrateLegacyProgress = migrateLegacyProgress;
+    window.canonicalizeCard = canonicalizeCard;
     window.cozyPhase3 = { exportCleanDeck, exportProgressOnly, exportDeckWithProgress, exportFullGameState, importObjectPhase3, cleanDeckPayload, progressPayload, backupPayload, fullGameStatePayload, getStudyPool, clearSessionBuried, wireUi };
     try {
       const _fgsHooks = {};
