@@ -110,3 +110,4 @@ Run in order — do not proceed to P7 until all pass:
 | 2026-05-27 | canonicalizeCard + export de-alias | ✅ `698ebe9`, `35cd2b4`, `2dd12a1` |
 | 2026-05-27 | Undo 5-deep + one_thing persist | ✅ `92b9be8` |
 | 2026-05-27 | Neural Atlas inline embed | ✅ `74ce963`, `c7e5c01`, `20df845` |
+| 2026-05-27 | Prompt AI v3 schema update | ✅ `65f1074` — all three locations |

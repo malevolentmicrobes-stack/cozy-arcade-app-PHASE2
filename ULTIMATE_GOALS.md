@@ -71,6 +71,7 @@
 | A5 | Atlas reads live progress from `window.phase3State.progress` | ✅ DONE | `c7e5c01` |
 | A6 | Orphan progress pruning — no `'—'` node when deck loaded | ✅ DONE | `20df845` |
 | A7 | All IDs `na-` prefixed; CSS scoped to `#atlas` | ✅ DONE | `74ce963` |
+| A8 | Prompt AI — all 3 locations updated to v3 full schema | ✅ DONE | `65f1074` |
 
 **Atlas architecture (embedded):**
 - Screen div: `id="atlas" class="screen hidden"` — participates in existing `show()` system
