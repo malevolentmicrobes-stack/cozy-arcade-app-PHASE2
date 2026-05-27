@@ -2,51 +2,41 @@
 
 ## Active Goal
 
-**Goal:** P-RC Rectifier — Steps 4–5 active
-**Phase:** P-RC (Rectifier)
+**Goal:** P-RC Rectifier — ALL STEPS COMPLETE (browser validation pending)
+**Phase:** P-RC (Rectifier) → advancing to E-series (Export/Undo) + P3.5 (due-count)
 **Reference:** `Chronological_Patch_Hx_RECTIFIER_PLAN_2026_05_26.md` — authoritative step list
-**Status:** IN PROGRESS
+**Status:** CODE COMPLETE — awaiting browser validation
 
-**Completed (Steps 1–3, 6–8):** ✅ DONE 2026-05-26
-- ✅ Step 1: `makeChoices` return value fixed — choices always Array(4), never undefined
-- ✅ Step 6: `stopAllDropTimers()` + `loopSolo` override added to v175151
-- ✅ Step 7: v17513 drop overrides + v17514 style+script deleted
-- ✅ Step 8: v17515 style+script deleted (primary double-advance source eliminated)
-- ✅ Bonus: Undo review (Cmd/Ctrl+Z + iOS shake) added via `v175372-rectifier-undo-makechoices-smoke`
-- ✅ Step 2: `bionicOn` consolidated to `bionicOn_v1751523` only; fresh-load default is `true`
-- ✅ Step 3: `patchSettingsText()` bionic block guarded to run once; stale key fixed
-- ✅ Step 3b (bionic revert): `applySettings175157()` now writes `bionicOn_v1751523`; `ensureBionic351()` only force-syncs on first toggle init — `3bbefde`
+**All Rectifier Steps Done:**
+- ✅ Step 1: `makeChoices` return value fixed — choices always Array(4)
+- ✅ Step 2: `bionicOn` consolidated to `bionicOn_v1751523`; fresh-load reads localStorage (`7156bd1`)
+- ✅ Step 3/3b: bionic settings hydration + Apply guard + stale key fixed
+- ✅ Step 4: `applyVisibleSettings352()` writes `cozyQuestionSeconds351` at line 8118 — code confirmed
+- ✅ Step 5: All `timerMax` assignments read localStorage (lines 402, 408, 446, 793, 824)
+- ✅ Step 6: `stopAllDropTimers()` + `loopSolo` override in v175151
+- ✅ Step 7/8: v17513/14/15 deleted (double-advance eliminated)
+- ✅ F3: `dataset.cozyBionic` set at script init (line 383, `7156bd1`)
+- ✅ F7: Home controls `display:none` → `order:3` (`7156bd1`)
 
-**Also completed this session (bionic/settings rectifier):**
-- ✅ `window.enhanceSettings` export — gear-click path now calls hydrating version (`45a26b6`)
-- ✅ Settings Apply no longer auto-closes; Advanced panel hidden; bionic rerenders on Apply (`26153a4`)
-- ✅ `v175374-rectifier-font-bionic-fix` style — font sizes restored, bionic contrast CSS added
+**Bionic/Settings also done:**
+- ✅ `window.enhanceSettings` export (`45a26b6`)
+- ✅ Apply no longer auto-closes; Advanced panel hidden; bionic rerenders on Apply (`26153a4`)
+- ✅ `v175374` font reverted to pre-my-changes; bionic contrast CSS; soloTrack inset:240px (`bc333a9`)
+- ✅ Keyboard controls hint in settings (`bc333a9`)
 
-**Next priority (Steps 4–5):**
-- **Step 4 ← ACTIVE:** Verify Apply writes `cozyQuestionSeconds351` (handled by `applyVisibleSettings352()` line 8111 — confirm in browser)
-- Step 5: Normalize remaining `timerMax` hardcoded literals
+**Export/Undo done:**
+- ✅ E1: Undo (Cmd/Ctrl+Z + shake) implemented in `v175372` — browser verify pending
+- ✅ E2: `cleanDeckCard()` strips legacy alias fields — `b0ab820`
 
-**P3.5 due-count widget:** unblocked — Step 8 complete, display code is now stable
+**Pending browser validation (do in order):**
+1. `window.runFSRSValidation()` → 17/17
+2. `window.runCozySmokeTests()` → 6/6
+3. Bionic checkbox ON/OFF round-trip after Apply
+4. Timer: set 5s → Apply → start game → drains in 5s
+5. Export clean deck → no `level_1_presentation` in JSON
+6. Cmd+Z after answering → prior card returns
 
-**Prerequisite gate:** ✅ PASSED 2026-05-26 — `window.runFSRSValidation()` → 17/17, `window.runCozySmokeTests()` → 6/6, no double-advance, choices valid
-
-**Pending visual gate:** `v175374` font + bionic contrast — visual confirm in browser required
-
----
-
-## Gate Condition (Step 3b — bionic revert fix)
-
-```
-condition: browser:console validation after 3bbefde
-expected:
-  1. Uncheck bionic toggle → click Apply → close settings → reopen settings → checkbox is UNCHECKED
-  2. localStorage.getItem('bionicOn_v1751523') === '0' after unchecking and applying
-  3. Opening gameplay hub does NOT re-check the bionic toggle
-  4. window.runFSRSValidation() → 17/17 still passing
-  5. window.runCozySmokeTests() → 6/6 still passing
-```
-
-**To unblock:** Validate in browser → add gate log entry → advance to Step 5.
+**Next code task:** P3.5 — due-count widget ("5 due · 12 new") on home screen
 
 ---
 

@@ -1,5 +1,5 @@
 # Cozy Arcade Board Prep — Ultimate Goals
-*Single source of truth. Updated 2026-05-26.*
+*Single source of truth. Updated 2026-05-26 (session 2).*
 
 ---
 
@@ -21,8 +21,8 @@
 | R3 | Bionic contrast visible in gameplay | ✅ DONE (CSS) | Bold first-letters white, rest dim blue — needs re-render on new card |
 | R4 | Timer bar does not overlap question text | ✅ DONE | soloTrack inset:240px clears promptBox |
 | R5 | Settings shows keyboard controls, not "Advanced Merge" panel | ✅ DONE | Controls hint visible in settings |
-| R6 | Apply writes `cozyQuestionSeconds351` | ⚡ VERIFY | `localStorage.getItem('cozyQuestionSeconds351')` after changing timer + Apply |
-| R7 | `timerMax` reads from localStorage everywhere | ⏳ TODO | Set 5s → start game → timer drains in 5s not 7s |
+| R6 | Apply writes `cozyQuestionSeconds351` | ✅ CODE (line 8118) | `localStorage.getItem('cozyQuestionSeconds351')` after changing timer + Apply |
+| R7 | `timerMax` reads from localStorage everywhere | ✅ CODE (lines 402,408,446,793,824) | All render functions already read localStorage; initial `timerMax=9` overridden at every render |
 
 ---
 
@@ -31,8 +31,8 @@
 | # | Goal | Status | Notes |
 |---|------|--------|-------|
 | D1 | Card/prompt box proportional to screen (fit-to-screen, not overflow) | ✅ DONE | soloTrack nudge; font stays at accumulated patch values |
-| D2 | Bionic re-renders on new card load (not just on Apply) | ⏳ TODO | `renderSolo()` calls `bionic()` which checks `bionicOn` — verify dataset.cozyBionic is set at load |
-| D3 | Home screen controls visible (not hidden by `display:none!important`) | ⏳ TODO | `cozy_v350_rescue_css` line 5685 hides `.homeWrap>.controls` |
+| D2 | Bionic re-renders on new card load (not just on Apply) | ✅ DONE (`7156bd1`) | `bionicOn` now reads localStorage at line 382; `dataset.cozyBionic` set immediately at script init |
+| D3 | Home screen controls visible (not hidden by `display:none!important`) | ✅ DONE (`7156bd1`) | `order:3!important` replaces `display:none!important` at line 5692 |
 | D4 | Settings bar shows prior clean layout (no side-drawer overrides) | ✅ PARTIAL | Advanced panel hidden; controls hint added |
 
 ---

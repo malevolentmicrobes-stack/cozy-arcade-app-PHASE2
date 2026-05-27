@@ -95,11 +95,11 @@ At `clamp(22px,2.6vw,36px)`, a 5-line question + margin-top:32px + timer = ~250p
 |------|--------|---------|-----|------|
 | F1 | Font sizes | 12670 (new style) | ✅ DONE — `v175374` style block inserted | Visual confirm |
 | F2 | Bionic contrast | 12670 (new style) | ✅ DONE — `[data-cozyBionic]` CSS | Visual confirm bionic on/off |
-| F3 | `dataset.cozyBionic` on init | 382 area | Add `document.documentElement.dataset.cozyBionic` write to initial `bionicOn=true` declaration | `runFSRSValidation()` 17/17 |
-| F4 | Timer key (Step 4 Rectifier) | 1296 | Apply onclick already calls `applyVisibleSettings352()` which writes `cozyQuestionSeconds351` (line 8111). Verify no gap. | `localStorage.getItem('cozyQuestionSeconds351')` after Apply |
-| F5 | `timerMax` literals (Step 5) | ~402, ~408, ~7 hardcoded | Replace `7` with `parseInt(localStorage.getItem('cozyQuestionSeconds351')\|\|7)` | Timer uses selected value |
-| F6 | `setInterval(install,900)` guard | 8310 | Add `document.documentElement.dataset` guard to expensive inner functions so 900ms loop is a no-op after first run | No visible regression |
-| F7 | `cozy_v350_rescue_css` home controls | 5685 | Remove `display:none!important` on `.homeWrap>.controls` | Home buttons visible |
+| F3 | `dataset.cozyBionic` on init | 382–383 | ✅ DONE `7156bd1` — `bionicOn` reads localStorage; `dataset.cozyBionic` set at line 383 | `runFSRSValidation()` 17/17 |
+| F4 | Timer key (Step 4 Rectifier) | 8118 | ✅ DONE (code-confirmed) — `applyVisibleSettings352()` writes `cozyQuestionSeconds351` at line 8118 | `localStorage.getItem('cozyQuestionSeconds351')` after Apply |
+| F5 | `timerMax` literals (Step 5) | 402,408,446,793,824 | ✅ DONE (code-confirmed) — all render functions already read `localStorage.getItem('cozyQuestionSeconds351')\|\|7` | Timer uses selected value |
+| F6 | `setInterval(install,900)` guard | 8310 | ⏳ LOW PRIORITY — deferring; no visible regression currently | No visible regression |
+| F7 | `cozy_v350_rescue_css` home controls | 5692 | ✅ DONE `7156bd1` — `display:none!important` → `order:3!important;margin-top:12px!important` | Home buttons visible |
 | F8 | `v343_minimal_revert_patch` MutationObserver | 5665 | Narrow observer target from `documentElement` to `#soloCard,#fullCard` | No performance hit |
 | F9 | Due-count widget (P3.5) | TBD | "5 due · 12 new" on home screen | Visual confirm |
 | F10 | `patchHome()` gear rewrite cleanup | 2114 | Add `if(gear.dataset.v175374Wired) return` guard so gear.onclick is assigned once | Gear always opens settings |
