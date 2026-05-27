@@ -13159,8 +13159,8 @@ var deckMap={};
 var SYS_COLORS={'CV':'#ef4444','CARDIOLOGY':'#ef4444','CARD':'#ef4444','GI':'#f97316','GASTROENTEROLOGY':'#f97316','ID':'#84cc16','INFECTIOUS DISEASE':'#84cc16','INFECTIOUS':'#84cc16','ENDO':'#a855f7','ENDOCRINE':'#a855f7','ENDOCRINOLOGY':'#a855f7','PULM':'#3b82f6','PULMONOLOGY':'#3b82f6','PULM/CCM':'#3b82f6','NEPHRO':'#06b6d4','NEPHROLOGY':'#06b6d4','RENAL':'#06b6d4','NEURO':'#f59e0b','NEUROLOGY':'#f59e0b','ONC':'#ec4899','ONCOLOGY':'#ec4899','HEM/ONC':'#ec4899','RHEUM':'#10b981','RHEUMATOLOGY':'#10b981','HEM':'#6366f1','HEMATOLOGY':'#6366f1','DERM':'#fbbf24','DERMATOLOGY':'#fbbf24','PSYCH':'#8b5cf6','PSYCHIATRY':'#8b5cf6','MSK':'#78716c','MUSCULOSKELETAL':'#78716c','GYN':'#f43f5e','OB/GYN':'#f43f5e','GYNECOLOGY':'#f43f5e','GERIATRICS':'#94a3b8','PALLIATIVE':'#94a3b8','ETHICS':'#d97706','STATS':'#0891b2','ENT':'#7c3aed','OPHTHO':'#2563eb','ALLERGY':'#16a34a','—':'#4163ff','UNKNOWN':'#4163ff'};
 function normSys(s){if(!s)return'—';return String(s).trim().toUpperCase();}
 function sysColor(sys){var n=normSys(sys);return SYS_COLORS[n]||SYS_COLORS[sys]||'#4163ff';}
-function readProgress(){for(var i=0;i<STATE_KEYS.length;i++){try{var r=localStorage.getItem(STATE_KEYS[i]);if(!r)continue;var p=JSON.parse(r);if(p&&p.progress&&typeof p.progress==='object')return p.progress;if(typeof p==='object'&&!Array.isArray(p)&&p!==null){var v=Object.values(p);if(v.length>0&&(v[0].stage||v[0].seen_count!==undefined))return p;}}catch(_){}}return{};}
-var atlasLoadDeck=function(){try{var raw=localStorage.getItem(DECK_STORAGE_KEY);if(!raw){deckMap={};return 0;}var payload=JSON.parse(raw);var cards=Array.isArray(payload)?payload:(Array.isArray(payload&&payload.cards)?payload.cards:[]);deckMap={};cards.forEach(function(c){var id=c&&(c.qid_unique||c.qid||c.card_id||c.id);if(id)deckMap[id]=c;});return Object.keys(deckMap).length;}catch(_){deckMap={};return 0;}};
+function readProgress(){try{if(window.phase3State&&window.phase3State.progress&&Object.keys(window.phase3State.progress).length>0)return window.phase3State.progress;}catch(_){}for(var i=0;i<STATE_KEYS.length;i++){try{var r=localStorage.getItem(STATE_KEYS[i]);if(!r)continue;var p=JSON.parse(r);if(p&&p.progress&&typeof p.progress==='object')return p.progress;if(typeof p==='object'&&!Array.isArray(p)&&p!==null){var v=Object.values(p);if(v.length>0&&(v[0].stage||v[0].seen_count!==undefined))return p;}}catch(_){}}return{};}
+var atlasLoadDeck=function(){try{if(typeof window.appCards==='function'){var ac=window.appCards();if(ac&&ac.length){deckMap={};ac.forEach(function(c){var id=c&&(c.qid_unique||c.qid||c.card_id||c.id);if(id)deckMap[id]=c;});return Object.keys(deckMap).length;}}}catch(_){}try{var raw=localStorage.getItem(DECK_STORAGE_KEY);if(!raw){deckMap={};return 0;}var payload=JSON.parse(raw);var cards=Array.isArray(payload)?payload:(Array.isArray(payload&&payload.cards)?payload.cards:[]);deckMap={};cards.forEach(function(c){var id=c&&(c.qid_unique||c.qid||c.card_id||c.id);if(id)deckMap[id]=c;});return Object.keys(deckMap).length;}catch(_){deckMap={};return 0;}};
 function payloadCards(obj){return Array.isArray(obj)?obj:(Array.isArray(obj&&obj.cards)?obj.cards:(Array.isArray(obj&&obj.data)?obj.data:null));}
 function payloadProgress(obj){return(obj&&obj.progress&&typeof obj.progress==='object')?obj.progress:((obj&&obj.state&&typeof obj.state==='object')?obj.state:null);}
 function hydrateDeckMap(arr){deckMap={};(arr||[]).forEach(function(c){var id=c&&(c.qid_unique||c.qid||c.card_id||c.id);if(id)deckMap[id]=c;});}
@@ -13290,8 +13290,10 @@ window.showAtlasScreen=function(){
 };
 window.hideAtlasScreen=function(){
   if(naRafId){cancelAnimationFrame(naRafId);naRafId=null;}
-  if(typeof home==='function')home();
-  else{var el=document.getElementById('atlas');if(el)el.classList.add('hidden');var h=document.getElementById('home');if(h)h.classList.remove('hidden');}
+  var atlasEl=document.getElementById('atlas');
+  if(atlasEl)atlasEl.classList.add('hidden');
+  if(typeof window.home==='function')window.home();
+  else{var h=document.getElementById('home');if(h)h.classList.remove('hidden');}
 };
 
 // ── GLOBAL BRIDGES for HTML onclick attrs ─────────────────────────────────
