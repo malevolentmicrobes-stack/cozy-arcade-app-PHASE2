@@ -1,8 +1,9 @@
 # How to Create Your Own Cards
+### Cozy Arcade Board Prep · v3 Schema
 
-Cozy Arcade uses a simple v3 JSON schema. The goal is: question first, answer after testing, then deeper explanation only when you ask for the full card.
+---
 
-## Simplest Card
+## The Simplest Card (3 fields)
 
 ```json
 {
@@ -12,51 +13,50 @@ Cozy Arcade uses a simple v3 JSON schema. The goal is: question first, answer af
       "sys": "CV",
       "diagnosis": "STEMI",
       "presentation": "Crushing chest pain, diaphoresis, ST elevation in II/III/aVF.",
-      "one_thing": "Inferior STEMI -> right coronary artery -> PCI within 90 minutes."
+      "one_thing": "Inferior STEMI → right coronary artery → PCI within 90 minutes."
     }
   ]
 }
 ```
 
-Save the file as `.json`, then drag it into the app.
+Save as `.json`, drag into the app. Done.
 
-## Field Map
+---
 
-| Field | Use |
-| --- | --- |
-| `qid` | Unique ID. This is how progress is remembered. |
-| `sys` | Organ system. Examples: `CV`, `ID`, `GI`, `PULM`, `RENAL`. |
-| `test` | Optional deck/test group. Examples: `TEST 1`, `MY CARDIOLOGY`. |
-| `diagnosis` | Correct answer choice. |
-| `presentation` | Question, clinical stem, or front of card. |
-| `one_thing` | The main reveal in your own words. |
-| `educational_objective` | Full teaching point in the Full Card dropdown. |
-| `board_trigger` | Pattern: IF finding -> diagnosis -> action. |
-| `why_not_others` | Distractor explanations. |
-| `explanation` | Long explanation. |
-| `quick_recall` | One-sentence recall fallback. |
-| `tags` | Comma-separated keywords. |
+## Method 1 — AI Conversion (fastest)
 
-## AI Conversion
+### Step 1
+Open the app → click **🤖 AI Cards** in the header → copy the prompt.
 
-Open the app and click **AI Cards**. Copy the prompt and paste it into Claude, ChatGPT, Gemini, or another AI with your notes below it.
+### Step 2
+Open Claude, ChatGPT, or any AI. Paste the prompt, then add your notes below it:
 
-Use this structure when giving notes:
-
-```text
-[paste the AI Cards prompt from the app]
+```
+[paste the AI prompt from the app]
 
 --- MY NOTES ---
-Aortic stenosis
+Aortic stenosis:
 - Classic triad: angina, syncope, heart failure
-- Severe: AVA <1.0 cm2, mean gradient >40 mmHg
-- Symptomatic severe AS: TAVR or surgical AVR
-- No effective medical therapy for severe symptomatic disease
+- Severe: AVA < 1.0 cm², mean gradient > 40 mmHg
+- Treatment: symptomatic severe AS → TAVR or surgical AVR
+- No effective medical therapy
 ```
 
-The AI should return valid JSON only. Drag that JSON into the app.
+### Step 3
+The AI returns valid JSON. Drag it into the app.
 
-## Manual Template
+### Rules the AI follows (and you should too)
+- `presentation` = the question shown during testing
+- `diagnosis` = the correct answer
+- `one_thing` = **your own words** — the single most important takeaway
+- Medical facts (doses, cutoffs, criteria) are not copyrightable — use exactly
+- Explanatory prose → rephrase in your own words
+
+---
+
+## Method 2 — Manual (full control)
+
+Copy this template, fill it in, save as `my_cards.json`:
 
 ```json
 {
@@ -68,65 +68,160 @@ The AI should return valid JSON only. Drag that JSON into the app.
     {
       "qid": "MY-001",
       "sys": "CV",
-      "test": "MY NOTES - CARDIOLOGY",
+      "test": "MY NOTES — CARDIOLOGY",
       "diagnosis": "Aortic stenosis",
-      "presentation": "70-year-old with exertional syncope and harsh systolic murmur at the right upper sternal border radiating to the carotids.",
-      "one_thing": "Symptomatic severe aortic stenosis needs valve replacement.",
-      "educational_objective": "Severe symptomatic aortic stenosis requires valve replacement. TAVR is often preferred for older or higher-risk patients; surgical AVR remains appropriate for selected lower-risk patients.",
-      "board_trigger": "IF exertional syncope + crescendo-decrescendo RUSB murmur -> aortic stenosis -> echo -> valve replacement if severe and symptomatic",
-      "why_not_others": "Hypertrophic cardiomyopathy worsens with Valsalva and is often seen in younger patients. Mitral regurgitation causes a holosystolic murmur at the apex.",
-      "explanation": "Aortic stenosis causes fixed outflow obstruction. Symptoms mark worse prognosis and should prompt echocardiography and definitive valve intervention.",
-      "quick_recall": "AS: angina/syncope/dyspnea + RUSB murmur -> echo -> TAVR/AVR if severe and symptomatic.",
+
+      "presentation": "70-year-old with exertional syncope, harsh systolic murmur at RUSB radiating to carotids.",
+      "one_thing": "Aortic stenosis triad: angina + syncope + dyspnea (HF). Severe + symptomatic → valve replacement.",
+
+      "educational_objective": "Severe symptomatic AS requires valve replacement. TAVR preferred for high surgical risk; surgical AVR otherwise. No effective medical therapy for severe AS.",
+      "board_trigger": "IF exertional syncope + crescendo-decrescendo murmur RUSB → AS → Echo → if severe + symptomatic → AVR/TAVR",
+      "why_not_others": "HCM: dynamic obstruction, worsens with Valsalva. MR: holosystolic murmur at apex. HOCM: young patient, family history sudden death.",
+      "explanation": "AS triad develops in order: angina → syncope → HF. Each symptom = worse prognosis. AVA <1.0 cm² = severe. Mean gradient >40 mmHg = severe. TAVR now preferred for most patients over surgical AVR.",
+      "quick_recall": "AS: angina/syncope/dyspnea + RUSB murmur → Echo → severe + symptomatic → TAVR or AVR",
+
       "tags": "CV, aortic stenosis, valvular, murmur"
     }
   ]
 }
 ```
 
-## Accepted Aliases
+---
 
-The app normalizes common field names:
+## Field Reference
 
-```text
-prompt, front, question, clinical_vignette_summary -> presentation
-answer, back -> diagnosis
-takeaway, quick_recall, level_2_three_second -> one_thing
-system, subject -> sys
-source_sheet -> test
+### Required
+| Field | What it is |
+|-------|-----------|
+| `qid` | Unique ID — any string, no spaces (e.g. "MY-001") |
+| `sys` | Organ system — see list below |
+| `diagnosis` | The correct answer choice |
+| `presentation` | The clinical question / stem |
+| `one_thing` | Key takeaway — shown immediately on reveal |
+
+### Strongly Recommended
+| Field | What it is |
+|-------|-----------|
+| `test` | Group name for filtering (e.g. "TEST 1", "MY CARDIOLOGY") |
+| `educational_objective` | Full teaching point — shown in expanded full card |
+| `board_trigger` | IF [finding] → [diagnosis] → [action] |
+
+### Full Card (shown on demand)
+| Field | What it is |
+|-------|-----------|
+| `why_not_others` | Why the distractors are wrong |
+| `explanation` | Verbose full explanation |
+| `quick_recall` | One-sentence fallback if `one_thing` is blank |
+
+### Accepted Aliases (app normalizes automatically)
 ```
+presentation  ← also: prompt, front, question, clinical_vignette_summary
+diagnosis     ← also: answer, back
+one_thing     ← also: takeaway, quick_recall, level_2_three_second
+sys           ← also: system, subject
+```
+
+---
 
 ## System Values
 
-Use one of these where possible:
+Use any of these for `sys`:
 
-```text
-CV, ID, GI, ENDO, NEURO, RHEUM, RENAL, PSYCH, DERM, PULM,
-HEME, OB/GYN, ENT, ETHICS, STATS, OPHTHO, ALLERGY, UROLOGY,
-EMERGENCY, TOX
+```
+CV        Cardiology
+ID        Infectious Disease
+GI        Gastroenterology
+ENDO      Endocrinology
+NEURO     Neurology
+RHEUM     Rheumatology
+RENAL     Nephrology
+PSYCH     Psychiatry
+DERM      Dermatology
+PULM      Pulmonology / Critical Care
+HEME      Hematology / Oncology
+OB/GYN    Obstetrics / Gynecology
+ENT       Ear, Nose, Throat
+ETHICS    Ethics / Professionalism
+STATS     Biostatistics / Epidemiology
+OPHTHO    Ophthalmology
+ALLERGY   Allergy / Immunology
 ```
 
-The app normalizes common variants. For example: `Pulm`, `PULM`, `pulm/cc`, and `puml/cc` all become `PULM`.
+The app normalizes case variants automatically (Pulm, PULM, pulm/cc → all become PULM).
+
+---
+
+## Adding Multiple Cards
+
+```json
+{
+  "meta": { "schema": "cozy-arcade-v3", "total": 3 },
+  "cards": [
+    { "qid": "MY-001", "sys": "CV", ... },
+    { "qid": "MY-002", "sys": "GI", ... },
+    { "qid": "MY-003", "sys": "NEURO", ... }
+  ]
+}
+```
+
+Rules:
+- Comma between cards, no comma after the last one
+- Every `qid` must be unique
+- Validate at [jsonlint.com](https://jsonlint.com) if unsure
+
+---
+
+## Converting Existing Notes
+
+### From Anki
+```
+Anki Front  →  presentation
+Anki Back   →  one_thing + educational_objective
+Anki Tags   →  tags + sys
+```
+
+### From lecture slides / textbook
+```
+Slide title / bold heading  →  diagnosis
+Clinical scenario           →  presentation
+"Key point" / bottom line   →  one_thing (in your words)
+Management section          →  educational_objective + board_trigger
+```
+
+### From UpToDate highlights
+```
+Section heading    →  diagnosis
+Opening summary    →  one_thing (paraphrase)
+Key paragraph      →  educational_objective (paraphrase)
+Management table   →  board_trigger
+```
+
+---
 
 ## Validation Checklist
 
-- File ends in `.json`.
-- JSON has a top-level `cards` array.
-- Every `qid` is unique.
-- No trailing comma after the last card.
-- Strings use double quotes.
-- Empty optional values can be omitted or set to `null`.
-- `presentation` is the question, not the answer.
-- `diagnosis` is the answer.
-- `one_thing` is your own wording.
+Before importing:
 
-## Copyright Note
+- [ ] File saved as `.json` (not `.json.txt`)
+- [ ] Every `qid` is unique
+- [ ] No trailing comma after the last card
+- [ ] All strings in double quotes
+- [ ] Use `null` (not `""`) for empty optional fields
+- [ ] Validate at jsonlint.com if you get an import error
 
-Medical facts, criteria, cutoffs, doses, and timelines can be used exactly.
+---
 
-Rephrase:
+## Copyright
 
-- Commercial question stems
-- Original explanatory prose
-- Distinctive narrative examples from books, question banks, or paid courses
+Medical facts — doses, diagnostic criteria, cutoff values, lab ranges — are not copyrightable and can be used exactly.
 
-The safest workflow is to make `one_thing` your own wording and keep deeper explanation in your own study voice.
+What requires paraphrasing:
+- Explanatory prose from question banks
+- Specific vignette wording from commercial sources
+- Original narrative explanations
+
+Your `one_thing` field is always your own words. Everything else can be close to source for the `educational_objective`.
+
+---
+
+*v3 · May 2026 · cozy-arcade-app*

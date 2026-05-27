@@ -6195,7 +6195,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     hub=document.createElement('div');
     hub.id='gameplayHub351';
     hub.className='screen settings hidden';
-    hub.innerHTML='<div class="box gameplayPanel351"><div class="controls"><button class="btn" id="gameplayHome351">Home</button><button class="btn primary" id="openImport351">Advanced: Merge / Progress Import</button><button class="btn primary" id="applyGameplay351">Apply</button><button class="btn" id="closeGameplay351">Close Settings</button></div><div class="gameplayCard351"><h2>Settings</h2><label>Gameplay</label><select id="gameplayMode351"><option>Solo Studying controls</option><option>Knowledge Expansion controls</option><option>Shadow Dungeon</option><option>Answer card controls</option><option>Import / export workflow</option></select><div class="inlineSettings351"><label class="toggleLine351"><input id="gameplayBionic351" type="checkbox"> Toggle Bionic Reading</label><div><label>Game timing</label><select id="questionTime351"><option value="3">3 seconds</option><option value="4">4 seconds</option><option value="5">5 seconds</option><option value="6">6 seconds</option><option value="7">7 seconds</option><option value="8">8 seconds</option><option value="9">9 seconds</option><option value="10">10 seconds</option></select></div></div><p><span class="kbd351">Enter</span><span class="kbd351">Right</span> choose Good and continue. <span class="kbd351">1</span> Again, <span class="kbd351">2</span> Hard, <span class="kbd351">3</span> Good, <span class="kbd351">4</span> Easy. <span class="kbd351">Down</span> opens Full Card. <span class="kbd351">Up</span> closes Full Card.</p><p>Timing controls the review pace across games. Knowledge Expansion arrows map to top, right, bottom, left; Enter, slash, or click selects after the brief prompt lock.</p></div><div class="gameplayGrid351"><div class="gameplayCard351"><h3>Prompt AI</h3><p>Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade card schema.</p><textarea class="promptBox351" readonly>Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade\ncard schema. \nReturn valid JSON only:\n{\n  "meta": { "schema": "cozy-arcade-v3" },\n  "cards": [\n    {\n      "qid": "unique-id",\n      "sys": "CV",\n      "diagnosis": "correct answer/topic",\n      "presentation": "question, prompt, or vignette",\n      "one_thing": "single highest-yield takeaway",\n      "educational_objective": "full teaching point if available",\n      "board_trigger": "IF finding → THINK diagnosis → ACTION",\n      "explanation": "long explanation if available",\n      "tags": []\n    }\n  ]\n}\nDo not rewrite medical content. Map sys/system fields to card.sys.</textarea></div></div></div>';
+    hub.innerHTML='<div class="box gameplayPanel351"><div class="controls"><button class="btn" id="gameplayHome351">Home</button><button class="btn primary" id="openImport351">Advanced: Merge / Progress Import</button><button class="btn primary" id="applyGameplay351">Apply</button><button class="btn" id="closeGameplay351">Close Settings</button></div><div class="gameplayCard351"><h2>Settings</h2><label>Gameplay</label><select id="gameplayMode351"><option>Solo Studying controls</option><option>Knowledge Expansion controls</option><option>Shadow Dungeon</option><option>Answer card controls</option><option>Import / export workflow</option></select><div class="inlineSettings351"><label class="toggleLine351"><input id="gameplayBionic351" type="checkbox"> Toggle Bionic Reading</label><div><label>Game timing</label><select id="questionTime351"><option value="3">3 seconds</option><option value="4">4 seconds</option><option value="5">5 seconds</option><option value="6">6 seconds</option><option value="7">7 seconds</option><option value="8">8 seconds</option><option value="9">9 seconds</option><option value="10">10 seconds</option></select></div></div><p><span class="kbd351">Enter</span><span class="kbd351">Right</span> choose Good and continue. <span class="kbd351">1</span> Again, <span class="kbd351">2</span> Hard, <span class="kbd351">3</span> Good, <span class="kbd351">4</span> Easy. <span class="kbd351">Down</span> opens Full Card. <span class="kbd351">Up</span> closes Full Card.</p><p>Timing controls the review pace across games. Knowledge Expansion arrows map to top, right, bottom, left; Enter, slash, or click selects after the brief prompt lock.</p></div><div class="gameplayGrid351"><div class="gameplayCard351"><h3>Prompt AI</h3><p>Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade card schema.</p><textarea class="promptBox351" readonly>You are converting medical notes or flashcards into Cozy Arcade Board Prep (ABIM-style) cards.\nReturn ONLY valid JSON — no markdown fences, no explanation.\n\n{\n  "meta": { "schema": "cozy-arcade-v3", "total": 1 },\n  "cards": [\n    {\n      "qid": "unique-id-001",\n      "sys": "CV",\n      "diagnosis": "correct answer or topic",\n      "presentation": "clinical question or vignette stem",\n      "one_thing": "single highest-yield pearl — your own words",\n      "test": "optional group label e.g. MY CARDIOLOGY",\n      "educational_objective": "full teaching point",\n      "board_trigger": "IF [finding] → THINK [dx] → ACTION [next step]",\n      "why_not_others": "why the distractor answers are wrong",\n      "explanation": "full explanation if available",\n      "quick_recall": "one-sentence fallback recall cue",\n      "tags": "CV, topic, keyword"\n    }\n  ]\n}\n\nsys values: CV · ID · GI · ENDO · NEURO · RHEUM · RENAL · PSYCH · DERM · PULM · HEME · OB/GYN · ENT · ETHICS · STATS · OPHTHO · ALLERGY\n\nRules:\n- Preserve all medical facts exactly: doses, criteria, cutoffs, lab values\n- Rephrase explanatory prose in your own words\n- Map sys/system/subject → sys; question/prompt/front → presentation; answer/back → diagnosis\n- Every qid unique (e.g. CV-001). Omit fields with no source — do not hallucinate.\n\n[PASTE YOUR NOTES BELOW THIS LINE]</textarea></div></div></div>';
     document.body.appendChild(hub);
     $('gameplayHome351').onclick=()=>{hub.classList.add('hidden'); try{show('home');}catch(e){} try{paused=false;}catch(e){}};
     $('closeGameplay351').onclick=()=>closeGameplayHub351();
@@ -8560,8 +8560,41 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   const STORAGE_KEY='cozy_arcade_limitless_cards_v1';
   const META_KEY='cozy_arcade_limitless_meta_v1';
   const USER_ONE_THING_KEY='cozy_user_one_thing_v1';
-  const AI_SHORT='Convert my CSV/JSON/APKG/flashcard text into Cozy Arcade v3 cards. Return valid JSON only with meta.schema = "cozy-arcade-v3" and a cards array. Preserve the medical content; do not rewrite facts. Map sys or system to card.sys, use unique qids, put the question in presentation, answer/topic in diagnosis, key takeaway in one_thing, and include optional fields like educational_objective, board_trigger, explanation, and tags when available. See schema/template guidance in the uploaded files.';
-  const AI_LONG=`Convert my CSV/JSON/APKG/flashcard text into Cozy Arcade v3 cards. Return valid JSON only with meta.schema = "cozy-arcade-v3" and a cards array. Preserve the medical content; do not rewrite facts. Map sys or system to card.sys, use unique qids, put the question in presentation, answer/topic in diagnosis, key takeaway in one_thing, and include optional fields like educational_objective, board_trigger, explanation, and tags when available. See schema/template guidance in the uploaded files.`;
+  const AI_SHORT='Paste your notes below this prompt — AI converts them to valid JSON you can drag straight into the app.';
+  const AI_LONG=`You are converting medical notes or flashcards into Cozy Arcade Board Prep (ABIM-style) cards.
+Return ONLY valid JSON — no markdown fences, no explanation, no extra text.
+
+{
+  "meta": { "schema": "cozy-arcade-v3", "total": 1 },
+  "cards": [
+    {
+      "qid": "unique-id-001",
+      "sys": "CV",
+      "diagnosis": "correct answer or topic",
+      "presentation": "clinical question or vignette stem",
+      "one_thing": "single highest-yield pearl — your own words",
+      "test": "optional group label e.g. MY CARDIOLOGY",
+      "educational_objective": "full teaching point",
+      "board_trigger": "IF [finding] → THINK [dx] → ACTION [next step]",
+      "why_not_others": "why the distractor answers are wrong",
+      "explanation": "full explanation if available",
+      "quick_recall": "one-sentence fallback recall cue",
+      "tags": "CV, topic, keyword"
+    }
+  ]
+}
+
+sys values: CV · ID · GI · ENDO · NEURO · RHEUM · RENAL · PSYCH · DERM · PULM · HEME · OB/GYN · ENT · ETHICS · STATS · OPHTHO · ALLERGY
+
+Rules:
+- Preserve all medical facts exactly: doses, criteria, cutoffs, lab values
+- Rephrase explanatory prose (not facts) in your own words
+- Map sys/system/subject → sys; question/prompt/front → presentation; answer/back → diagnosis
+- Every qid must be unique (e.g. CV-001, ID-002)
+- one_thing is always plain language — the single thing to remember
+- Omit fields with no source content — do not hallucinate
+
+[PASTE YOUR NOTES BELOW THIS LINE]`;
   const clean=v=>String(v==null?'':v).replace(/NOT SPECIFIED IN SOURCE/g,'').replace(/\s+/g,' ').trim();
 	  const first=(...xs)=>xs.find(x=>clean(x))||'';
 	  const esc=s=>String(s==null?'':s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
@@ -9448,26 +9481,40 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 
   const XP_KEY = 'cozyCorrect351';
   const RANKS = ['rank-e','rank-d','rank-b','rank-a','rank-s','rank-apex','rank-monarch'];
-  const PROMPT_TEXT = `Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade
-card schema. 
-Return valid JSON only:
+  const PROMPT_TEXT = `You are converting medical notes or flashcards into Cozy Arcade Board Prep (ABIM-style) cards.
+Return ONLY valid JSON — no markdown fences, no explanation, no extra text.
+
 {
-  "meta": { "schema": "cozy-arcade-v3" },
+  "meta": { "schema": "cozy-arcade-v3", "total": 1 },
   "cards": [
     {
-      "qid": "unique-id",
+      "qid": "unique-id-001",
       "sys": "CV",
-      "diagnosis": "correct answer/topic",
-      "presentation": "question, prompt, or vignette",
-      "one_thing": "single highest-yield takeaway",
-      "educational_objective": "full teaching point if available",
-      "board_trigger": "IF finding → THINK diagnosis → ACTION",
-      "explanation": "long explanation if available",
-      "tags": []
+      "diagnosis": "correct answer or topic",
+      "presentation": "clinical question or vignette stem",
+      "one_thing": "single highest-yield pearl — your own words",
+      "test": "optional group label e.g. MY CARDIOLOGY",
+      "educational_objective": "full teaching point",
+      "board_trigger": "IF [finding] → THINK [dx] → ACTION [next step]",
+      "why_not_others": "why the distractor answers are wrong",
+      "explanation": "full explanation if available",
+      "quick_recall": "one-sentence fallback recall cue",
+      "tags": "CV, topic, keyword"
     }
   ]
 }
-Do not rewrite medical content. Map sys/system fields to card.sys.`;
+
+sys values: CV · ID · GI · ENDO · NEURO · RHEUM · RENAL · PSYCH · DERM · PULM · HEME · OB/GYN · ENT · ETHICS · STATS · OPHTHO · ALLERGY
+
+Rules:
+- Preserve all medical facts exactly: doses, criteria, cutoffs, lab values
+- Rephrase explanatory prose (not facts) in your own words
+- Map sys/system/subject → sys; question/prompt/front → presentation; answer/back → diagnosis
+- Every qid must be unique (e.g. CV-001, ID-002)
+- one_thing is always plain language — the single thing to remember
+- Omit fields with no source content — do not hallucinate
+
+[PASTE YOUR NOTES BELOW THIS LINE]`;
   const RUNNER_ANIMATION = 'runnerSprint 420ms steps(4) infinite, narutoSpriteBob .34s ease-in-out infinite alternate';
 
   function activateV24Style() {
