@@ -8105,7 +8105,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       const deckModeEl = $('deckMode');
       const promptFieldEl = $('promptField');
       const autoEl = $('autoSelect');
-      const bionicEl = $('bionicToggle') || $('gameplayBionic351');
+      const bionicEl = $('bionicToggle');
       if(deckModeEl) deckMode = deckModeEl.value;
       if(promptFieldEl) promptField = promptFieldEl.value;
       if(autoEl) autoSelect = !!autoEl.checked;
@@ -9122,6 +9122,9 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     if(bionic){
       try{ bionicOn = !!bionic.checked; }catch(_){}
       try{ localStorage.setItem('bionicOn_v1751523', bionic.checked ? '1' : '0'); }catch(_){}
+      try{ document.documentElement.dataset.cozyBionic = bionic.checked ? '1' : '0'; }catch(_){}
+      try{ if(typeof installBionicQuestionPatch352==='function') installBionicQuestionPatch352(); }catch(_){}
+      try{ if(typeof rerenderVisibleBionic351==='function') rerenderVisibleBionic351(); }catch(_){}
       const legacy = q('bionicToggle');
       if(legacy) legacy.checked = bionic.checked;
     }
@@ -9217,7 +9220,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       const saved = localStorage.getItem('cozyQuestionSeconds351') || q('soloTimerInput')?.value || '7';
       q('drawerQuestionTime351').value = q('drawerQuestionTime351').querySelector('option[value="' + saved + '"]') ? saved : '7';
     }
-    if(q('drawerBionic351')){
+    if(q('drawerBionic351') && !q('cozySettingsDrawer351')?.classList.contains('open')){
       const saved = localStorage.getItem('bionicOn_v1751523');
       q('drawerBionic351').checked = saved === null ? true : saved === '1';
     }
