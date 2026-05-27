@@ -10834,6 +10834,8 @@ function fixStableOneThingDropdown351() {
     appCards().forEach(c => { const id = canonicalCardId(c); if (c.one_thing) cardOneThingMap[id] = c.one_thing; });
     Object.keys(deduped || {}).forEach(cardId => {
       const p = syncProgressAliases(Object.assign(defaultProgress(cardId), deduped[cardId] || {}, { card_id: cardId }));
+      const oneThingVal = p.one_thing || cardOneThingMap[cardId];
+      if (oneThingVal) p.one_thing = oneThingVal;
       phase3State.progress[cardId] = p;
       const entry = {
         card_id: p.card_id,
@@ -10855,7 +10857,6 @@ function fixStableOneThingDropdown351() {
         created_at: p.created_at || nowIso(),
         updated_at: p.updated_at || nowIso()
       };
-      const oneThingVal = p.one_thing || cardOneThingMap[cardId];
       if (oneThingVal) entry.one_thing = oneThingVal;
       out[cardId] = entry;
     });
@@ -12763,6 +12764,7 @@ function fixStableOneThingDropdown351() {
 (function(){
   const q = id => document.getElementById(id);
   const clone = obj => obj == null ? null : JSON.parse(JSON.stringify(obj));
+  const UNDO_LIMIT = 5;
   const cardIdFor = card => {
     try {
       if (typeof canonicalCardId === 'function') return canonicalCardId(card);
@@ -12779,6 +12781,8 @@ function fixStableOneThingDropdown351() {
     };
     window.makeChoices.__rectifierReturn372 = true;
   }
+
+  window.__cozyUndoStack372 = window.__cozyUndoStack372 || [];
 
   function captureUndoSnapshot(){
     const card = typeof current !== 'undefined' ? current : null;
@@ -12825,14 +12829,13 @@ function fixStableOneThingDropdown351() {
     try { show('solo'); } catch (_) {}
     try { renderSolo(); } catch (_) {}
     try { loopSolo(); } catch (_) {}
-    try { toast('Last review undone'); } catch (_) {}
+    const remaining = window.__cozyUndoStack372.length;
+    try { toast(remaining > 0 ? 'Undone (' + remaining + ' more)' : 'Undone'); } catch (_) {}
     return true;
   }
 
   window.undoReview = window.undoLastReview = window.cozyUndoReview = function(){
-    const done = restoreUndoSnapshot(window.__cozyLastReviewUndo372);
-    if (done) window.__cozyLastReviewUndo372 = null;
-    return done;
+    return restoreUndoSnapshot(window.__cozyUndoStack372.pop());
   };
 
   function installUndoSelectWrapper(){
@@ -12842,7 +12845,10 @@ function fixStableOneThingDropdown351() {
       const revealOpen = q('soloReveal') && !q('soloReveal').classList.contains('hidden');
       const snap = revealOpen ? null : captureUndoSnapshot();
       const out = priorSelectSolo.apply(this, arguments);
-      if (snap) window.__cozyLastReviewUndo372 = snap;
+      if (snap) {
+        window.__cozyUndoStack372.push(snap);
+        if (window.__cozyUndoStack372.length > UNDO_LIMIT) window.__cozyUndoStack372.shift();
+      }
       return out;
     };
     wrapped.__rectifierUndo372 = true;
@@ -12856,7 +12862,7 @@ function fixStableOneThingDropdown351() {
   document.addEventListener('keydown', function(ev){
     if (!((ev.metaKey || ev.ctrlKey) && String(ev.key).toLowerCase() === 'z')) return;
     if (document.activeElement && (/^(TEXTAREA|INPUT|SELECT)$/i.test(document.activeElement.tagName) || document.activeElement.isContentEditable)) return;
-    if (window.__cozyLastReviewUndo372) {
+    if (window.__cozyUndoStack372 && window.__cozyUndoStack372.length) {
       ev.preventDefault();
       ev.stopImmediatePropagation();
       window.undoReview();
@@ -12868,7 +12874,7 @@ function fixStableOneThingDropdown351() {
     const a = ev.accelerationIncludingGravity || ev.acceleration || {};
     const force = Math.abs(a.x || 0) + Math.abs(a.y || 0) + Math.abs(a.z || 0);
     const now = Date.now();
-    if (force > 32 && now - lastShake372 > 1600 && window.__cozyLastReviewUndo372) {
+    if (force > 32 && now - lastShake372 > 1600 && window.__cozyUndoStack372 && window.__cozyUndoStack372.length) {
       lastShake372 = now;
       window.undoReview();
     }
