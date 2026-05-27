@@ -6681,8 +6681,8 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   }
 
   function questionSeconds351(){
-    let n=5;
-    try{n=Number(localStorage.getItem('cozyQuestionSeconds351')||5)||5;}catch(e){}
+    let n=7;
+    try{n=Number(localStorage.getItem('cozyQuestionSeconds351')||7)||7;}catch(e){}
     return Math.max(3,Math.min(10,n));
   }
 
@@ -9130,6 +9130,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     }
     if(timing){
       try{ localStorage.setItem('cozyQuestionSeconds351', timing.value); }catch(_){}
+      try{ if(typeof applyQuestionSeconds351==='function') applyQuestionSeconds351(); }catch(_){}
       const legacyTimer = q('soloTimerInput');
       if(legacyTimer) legacyTimer.value = timing.value;
     }
@@ -9216,7 +9217,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   function updateDrawer351(){
     const cardsNow = appCards351();
     if(q('drawerDataStatus351')) q('drawerDataStatus351').innerHTML = '<div>Loaded: <b>' + cardsNow.length + '</b> cards</div><div>Source: <b>' + (cardsNow.length ? 'uploaded/local' : 'blank public app') + '</b></div>';
-    if(q('drawerQuestionTime351')){
+    if(q('drawerQuestionTime351') && !q('cozySettingsDrawer351')?.classList.contains('open')){
       const saved = localStorage.getItem('cozyQuestionSeconds351') || q('soloTimerInput')?.value || '7';
       q('drawerQuestionTime351').value = q('drawerQuestionTime351').querySelector('option[value="' + saved + '"]') ? saved : '7';
     }
