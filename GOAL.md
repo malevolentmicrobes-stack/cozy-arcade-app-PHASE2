@@ -59,7 +59,19 @@
 - ✅ `7d809ef`: ArrowDown full-screen modal glitch fixed — `patchFullCardButtons` 1200ms interval guarded with `!b.dataset.v350`; redundant `btn.click()` removed from v343 handler so `handleRevealKey` is sole toggle authority
 - ✅ `e7e6ccf`: Advanced Merge `<details>` dropdown removed — replaced with flat `.drawerStatusBar351` chip bar (card count + source); same change applied to cozy-arcade and cozy-arcade-app repos
 - ✅ SYS upload verified: `systems()` builds list dynamically from loaded cards (`c.sys`); no hardcoded validation — custom sys values flow through filters, atlas, shadow dungeon automatically
-- ⏳ Prompt AI text update pending — user paste content `[Pasted text #1 +33 lines]` not received
+- ✅ `37f5896`/`316db65`: Prompt AI text updated — "Flashcard app" branding, "Rephrase" rule removed; PHASE2 + cozy-arcade-app (cozy-arcade already had different text)
+
+### Atlas Tag Feature (2026-05-28) — all ✅
+- ✅ `003957c`: Tag filter + sortable columns + tag/sys constellation toggle (PHASE2 only)
+  - `parseTags(card)` helper handles string or array `tags` field
+  - `buildTagMap(prog)` — builds constellation grouped by card tags (same structure as `buildSysMap`)
+  - "Tag View" toggle button in sidebar header → switches constellation + sys-list between sys and tag nodes
+  - Tag filter list in sidebar (below sys-list) — all unique tags with counts, click to filter card browser; active tag highlighted
+  - `naSelectedTag` state + tag filter in `renderTable()` — stackable with sys filter and pill filters
+  - Tags included in search scope (`parseTags(card).join(' ')`)
+  - Sortable column headers: click Diagnosis/Sys/Stage/Due → ▲▼ indicators, click again to reverse
+  - Tags shown as clickable pills in card detail panel — click a tag pill to filter the browser by that tag
+  - `clearSelection()` also clears `naSelectedTag`; `fullRefreshDisplay()` uses `naViewMode`
 
 ---
 
@@ -86,10 +98,20 @@ Run in order — do not proceed to P7 until all pass:
 
 | Priority | Goal | Gate |
 |----------|------|------|
+| A9 | Atlas: "▶ Review Tag" button in card detail → triggers home `browseTag351` + review session | Opens solo study filtered to selected tag |
+| A10 | Atlas: pin/bury toggle from card detail panel (write to `phase3State.progress`) | `p.pinned`/`p.buried` toggles persist after atlas close |
+| A11 | Atlas: one_thing inline edit from card detail (write to `window.phase3State.progress[id].user_one_thing`) | Card detail shows updated text immediately |
 | P7 | PWA service worker (`sw.js` + register before `</body>`) | Chrome DevTools → Application → Service Workers registered |
 | P8 | CSP headers via `vercel.json` | `curl -I` shows `Content-Security-Policy` header |
 | M2 | Stripe Payment Link | Test purchase + `localStorage.getItem('cozy_paid_v1') === '1'` |
 | iOS1 | Capacitor scaffold | `npx cap sync` exits 0 |
+
+### Atlas Browse — Non-Negotiables (do not regress)
+- Constellation continues to work when atlas opens (naInit → naSelectedSys=null, naSelectedTag=null)
+- `phase3State.progress` and `appCards()` are the live data sources — no localStorage round-trips
+- All atlas element IDs remain `na-` prefixed; CSS scoped to `#atlas`
+- RAF render loop must stop when `#atlas.hidden`
+- Anki import field mapping: `Anki Front → presentation`, `Anki Back → one_thing + educational_objective`, `Anki Tags → tags + sys` (handled by `canonicalizeCard` allowlist — tags field preserved)
 
 ---
 
