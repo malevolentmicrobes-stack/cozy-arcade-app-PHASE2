@@ -65,7 +65,7 @@
 - ✅ PHASE2 local folder `origin` → `cozy-arcade-app-PHASE2.git` (correct; was displaying wrong in GitHub Desktop PR panel — confirmed UI cache bug, not a push error)
 - ✅ `app` cross-remote removed from PHASE2 folder — PHASE2 can only push to PHASE2.git; cozy-arcade-app folder pushes to cozy-arcade-app.git independently
 - ✅ PHASE2 `public` branch merged from `main` (48 commits) — live site at `malevolentmicrobes-stack.github.io/cozy-arcade-app-PHASE2/` now serves v175160
-- ✅ Both repos at same commit (`0c6ba70`); `*.SAFE_COPY.md` gitignored on both
+- ✅ Both deployed app HTML files match (`index.html` SHA-256 `bf8b187...`); `cozy-arcade-app` remains at `0c6ba70`, PHASE2 `main` is `fca5396` with docs-only infrastructure note, and `*.SAFE_COPY.md` is gitignored on both
 - **GitHub Desktop PR panel still shows "cozy-arcade-app"** — this is a stale UI cache. Push goes to correct repo. Fix: remove + re-add PHASE2 repo entry in GitHub Desktop (right-click → Remove → File → Add Local Repository → same folder)
 
 ### Gameplay + Atlas UX Polish (2026-05-28) — all ✅
