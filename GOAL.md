@@ -1,5 +1,5 @@
 # Project Goal Tracker
-*Updated 2026-05-27 — reflects both session compactions + current session*
+*Updated 2026-05-28 — reflects session compactions + 2026-05-28 session*
 
 ---
 
@@ -53,6 +53,13 @@
   - After deck+progress load, drops entries with no matching card in `deckMap`
   - Eliminates `'—'` constellation node caused by prior-session/prior-deck orphan records
   - Guard: only prunes when deck IS loaded; if no deck, shows all progress
+
+### UI Polish (2026-05-28) — all ✅
+- ✅ `a4712f1`: How to Play collapsible added to settings drawer — Solo, Knowledge Expansion, Mobile sections; `.kbd351` pill styling; `drawerBionic351`/`drawerQuestionTime351` untouched
+- ✅ `7d809ef`: ArrowDown full-screen modal glitch fixed — `patchFullCardButtons` 1200ms interval guarded with `!b.dataset.v350`; redundant `btn.click()` removed from v343 handler so `handleRevealKey` is sole toggle authority
+- ✅ `e7e6ccf`: Advanced Merge `<details>` dropdown removed — replaced with flat `.drawerStatusBar351` chip bar (card count + source); same change applied to cozy-arcade and cozy-arcade-app repos
+- ✅ SYS upload verified: `systems()` builds list dynamically from loaded cards (`c.sys`); no hardcoded validation — custom sys values flow through filters, atlas, shadow dungeon automatically
+- ⏳ Prompt AI text update pending — user paste content `[Pasted text #1 +33 lines]` not received
 
 ---
 
@@ -111,3 +118,5 @@ Run in order — do not proceed to P7 until all pass:
 | 2026-05-27 | Undo 5-deep + one_thing persist | ✅ `92b9be8` |
 | 2026-05-27 | Neural Atlas inline embed | ✅ `74ce963`, `c7e5c01`, `20df845` |
 | 2026-05-27 | Prompt AI v3 schema update | ✅ `65f1074` — all three locations |
+| 2026-05-28 | How to Play drawer + ArrowDown glitch fix | ✅ `a4712f1`, `7d809ef` |
+| 2026-05-28 | Advanced Merge dropdown → status chips (3 repos) | ✅ `e7e6ccf` |
