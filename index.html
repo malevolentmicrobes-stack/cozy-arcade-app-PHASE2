@@ -9204,6 +9204,27 @@ Rules:
           <div class="drawerActions351"><button class="btn primary" id="drawerApply351" type="button">Apply</button><div class="exportMenuWrap351"><button class="btn primary" id="importMenuBtn351" type="button">Import ▾</button><div class="exportMenu351" id="importMenu351"><div class="exportMenuHint351">Import from .json file</div><button class="exportMenuItem351" id="importMenuDeck351">📂 Deck Only</button><button class="exportMenuItem351" id="importMenuProgress351">📂 Progress Only</button><button class="exportMenuItem351" id="importMenuFull351">📂 Full Deck + Progress</button><div class="exportMenuHint351" style="opacity:.35;font-size:9px">.csv support coming soon</div></div></div><div class="exportMenuWrap351"><button class="btn" id="drawerFullSettings351" type="button">Export ▾</button><div class="exportMenu351" id="exportMenu351">
             <button class="exportMenuItem351" id="exportMenuDeck351">📄 Deck Only</button><button class="exportMenuItem351" id="exportMenuProgress351">📊 Progress Only</button><button class="exportMenuItem351" id="exportMenuFull351">💾 Full Deck + Progress</button></div></div><input type="file" id="importFile351" accept=".json,application/json" style="display:none"></div>
         </section>
+        <details class="drawerPanel351" id="howToPlay351">
+          <summary>How to Play</summary>
+          <div class="htpBody351">
+            <div class="htpSection351">
+              <span class="htpLabel351">Solo Study</span>
+              <div class="htpRow351"><span class="kbd351">↓</span> Open full card &nbsp;·&nbsp; <span class="kbd351">↑</span> Close</div>
+              <div class="htpRow351"><span class="kbd351">Enter</span> / <span class="kbd351">→</span> Rate Good &amp; continue</div>
+              <div class="htpRow351"><span class="kbd351">1</span> Again &nbsp;·&nbsp; <span class="kbd351">2</span> Hard &nbsp;·&nbsp; <span class="kbd351">3</span> Good &nbsp;·&nbsp; <span class="kbd351">4</span> Easy</div>
+              <div class="htpRow351"><span class="kbd351">Cmd/Ctrl Z</span> Undo last answer</div>
+            </div>
+            <div class="htpSection351">
+              <span class="htpLabel351">Knowledge Expansion</span>
+              <div class="htpRow351"><span class="kbd351">↑</span><span class="kbd351">→</span><span class="kbd351">↓</span><span class="kbd351">←</span> Select orb direction</div>
+              <div class="htpRow351"><span class="kbd351">Enter</span> / <span class="kbd351">/</span> Confirm after lock-in</div>
+            </div>
+            <div class="htpSection351">
+              <span class="htpLabel351">Mobile</span>
+              <div class="htpRow351">Shake phone = Undo last answer</div>
+            </div>
+          </div>
+        </details>
       </div>
       <div class="drawerFooter351">Cozy Arcade Board Prep - LIMITLESS - Public Blank - v18</div>`;
     document.body.appendChild(drawer);
@@ -12780,6 +12801,13 @@ function fixStableOneThingDropdown351() {
 /* Bionic contrast — bold first-letters bright white, base text dimmed blue-gray */
 :root[data-cozy-bionic="1"] .promptText,:root[data-cozy-bionic="1"] .promptText *:not(b){color:rgba(160,200,255,0.62)!important;font-weight:500!important;}
 :root[data-cozy-bionic="1"] .promptText b{color:#ffffff!important;font-weight:950!important;}
+</style>
+<style id="htp-drawer-351">
+#howToPlay351 summary{cursor:pointer;user-select:none;}
+.htpBody351{padding:6px 2px 4px;display:flex;flex-direction:column;gap:10px;}
+.htpSection351{display:flex;flex-direction:column;gap:3px;}
+.htpLabel351{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:rgba(103,232,249,.55);font-family:Orbitron,monospace;margin-bottom:2px;}
+.htpRow351{font-size:12px;color:rgba(220,240,255,.75);line-height:1.6;display:flex;align-items:center;flex-wrap:wrap;gap:2px;}
 </style>
 <script id="v175375-new-count-kpi">
 (function(){
