@@ -5,10 +5,10 @@
 
 ## Active Goal
 
-**Goal:** Neural Atlas inline + export/schema hardening — COMPLETE
-**Phase:** P7 PWA service worker → P8 CSP headers
+**Goal:** v175160 gameplay + atlas polish — COMPLETE
+**Phase:** Next → A9 (Review Tag button) or P7 (PWA service worker)
 **Reference:** `RECTIFIER_PLAN_2026_05_26.md`, `ULTIMATE_GOALS.md`
-**Status:** All rectifier + atlas + export work CODE COMPLETE. Browser-validate before P7.
+**Status:** v175160 live on both GitHub Pages sites. Infrastructure stabilized. Ready for next feature.
 
 ---
 
@@ -60,6 +60,13 @@
 - ✅ `e7e6ccf`: Advanced Merge `<details>` dropdown removed — replaced with flat `.drawerStatusBar351` chip bar (card count + source); same change applied to cozy-arcade and cozy-arcade-app repos
 - ✅ SYS upload verified: `systems()` builds list dynamically from loaded cards (`c.sys`); no hardcoded validation — custom sys values flow through filters, atlas, shadow dungeon automatically
 - ✅ `37f5896`/`316db65`: Prompt AI text updated — "Flashcard app" branding, "Rephrase" rule removed; PHASE2 + cozy-arcade-app (cozy-arcade already had different text)
+
+### Infrastructure / Deployment (2026-05-28) — all ✅
+- ✅ PHASE2 local folder `origin` → `cozy-arcade-app-PHASE2.git` (correct; was displaying wrong in GitHub Desktop PR panel — confirmed UI cache bug, not a push error)
+- ✅ `app` cross-remote removed from PHASE2 folder — PHASE2 can only push to PHASE2.git; cozy-arcade-app folder pushes to cozy-arcade-app.git independently
+- ✅ PHASE2 `public` branch merged from `main` (48 commits) — live site at `malevolentmicrobes-stack.github.io/cozy-arcade-app-PHASE2/` now serves v175160
+- ✅ Both repos at same commit (`0c6ba70`); `*.SAFE_COPY.md` gitignored on both
+- **GitHub Desktop PR panel still shows "cozy-arcade-app"** — this is a stale UI cache. Push goes to correct repo. Fix: remove + re-add PHASE2 repo entry in GitHub Desktop (right-click → Remove → File → Add Local Repository → same folder)
 
 ### Gameplay + Atlas UX Polish (2026-05-28) — all ✅
 - ✅ `v175160`: Double-advance lock — lock resets on `renderSolo`/`renderDomain` instead of 650ms timer; 12s fallback; stale auto-advance timers no longer skip the next card
