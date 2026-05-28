@@ -13433,4 +13433,133 @@ window.naOpenCardDetail=function(id){openCardDetail(id);};
 
 })();
 </script>
+<script id="v175159-end-atlas-ux">
+// === v175159: Fix endHome + Continue button + Atlas tab navigation ===
+;(function(){
+'use strict';
+
+// ── FIX 1: endHome bypass exit-prompt + add Continue button ─────────────
+function fixEndScreen(){
+  var endEl=document.getElementById('end');
+  if(!endEl) return;
+
+  // Fix endHome: call home(true) so shouldPromptExit() is bypassed
+  var homeBtn=document.getElementById('endHome');
+  if(homeBtn) homeBtn.onclick=function(){
+    endEl.classList.add('hidden');
+    try{ if(typeof home==='function') home(true); }catch(e){}
+  };
+
+  // Add Continue button if not already present
+  if(document.getElementById('endContinue')) return;
+  var controls=endEl.querySelector('.controls');
+  if(!controls) return;
+  var btn=document.createElement('button');
+  btn.id='endContinue'; btn.className='btn primary'; btn.textContent='Continue';
+  btn.onclick=function(){
+    endEl.classList.add('hidden');
+    try{ hp=100; }catch(e){}
+    try{
+      if(typeof mode!=='undefined'){
+        if(mode==='solo'){
+          try{ if(typeof nextCard==='function') nextCard(); }catch(e){}
+          try{ gate=(typeof gate!=='undefined'?gate:1)+1; }catch(e){}
+          try{ if(typeof renderSolo==='function') renderSolo(); }catch(e){}
+          try{ if(typeof loopSolo==='function') loopSolo(); }catch(e){}
+        } else {
+          try{ if(typeof nextCard==='function') nextCard(); }catch(e){}
+          try{ domainRound=(typeof domainRound!=='undefined'?domainRound:1)+1; }catch(e){}
+          try{ if(typeof renderDomain==='function') renderDomain(); }catch(e){}
+          try{ if(typeof loopDomain==='function') loopDomain(); }catch(e){}
+        }
+      }
+    }catch(e){}
+  };
+  var restart=document.getElementById('endRestart');
+  if(restart) controls.insertBefore(btn, restart);
+  else controls.appendChild(btn);
+}
+
+// ── FIX 2: Atlas tab navigation ─────────────────────────────────────────
+var naCurrentView='atlas';
+
+// CSS
+var naUxStyle=document.createElement('style');
+naUxStyle.id='na-ux-159-style';
+naUxStyle.textContent=
+  '#na-app.browse-mode #na-canvas-wrap{display:none!important}'+
+  '#na-app.browse-mode #na-sidebar{width:100%!important;max-width:100%!important;border-left:none!important}'+
+  '#na-atlas-tab-group{display:flex;gap:4px;align-items:center;padding-right:8px;margin-right:4px;border-right:1px solid rgba(103,232,249,.15)}'+
+  '#atlas .na-btn.tab-active{background:rgba(103,232,249,.22)!important;border-color:var(--na-cyan)!important;color:var(--na-cyan)!important}'+
+  '#na-card-detail .cd-atlas-btn{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:999px;border:1px solid rgba(103,232,249,.3);background:rgba(103,232,249,.08);color:var(--na-cyan);font-size:10px;font-weight:900;cursor:pointer;font-family:inherit;letter-spacing:.05em}';
+document.head.appendChild(naUxStyle);
+
+function naUxUpdateTabs(){
+  var a=document.getElementById('na-atlas-tab-btn'),b=document.getElementById('na-browse-tab-btn');
+  if(a) a.classList.toggle('tab-active',naCurrentView==='atlas');
+  if(b) b.classList.toggle('tab-active',naCurrentView==='browse');
+}
+
+function naUxShowAtlas(){
+  naCurrentView='atlas';
+  var app=document.getElementById('na-app');
+  if(app) app.classList.remove('browse-mode');
+  try{ if(typeof window.naCloseCardDetail==='function') window.naCloseCardDetail(); }catch(e){}
+  naUxUpdateTabs();
+}
+
+function naUxShowBrowse(){
+  naCurrentView='browse';
+  var app=document.getElementById('na-app');
+  if(app) app.classList.add('browse-mode');
+  try{ if(typeof window.naCloseCardDetail==='function') window.naCloseCardDetail(); }catch(e){}
+  var scroll=document.getElementById('na-sb-scroll');
+  if(scroll) setTimeout(function(){scroll.scrollTop=0;},50);
+  naUxUpdateTabs();
+}
+
+window.naUxShowAtlas=naUxShowAtlas;
+window.naUxShowBrowse=naUxShowBrowse;
+
+// Reset to atlas view whenever atlas opens
+(function(){
+  var orig=window.showAtlasScreen;
+  if(orig) window.showAtlasScreen=function(){
+    naCurrentView='atlas';
+    var app=document.getElementById('na-app');
+    if(app) app.classList.remove('browse-mode');
+    return orig.apply(this,arguments);
+  };
+})();
+
+function injectAtlasTabs(){
+  var btns=document.getElementById('na-topbar-btns');
+  if(!btns||document.getElementById('na-atlas-tab-group')) return;
+  var wrap=document.createElement('div');
+  wrap.id='na-atlas-tab-group';
+  wrap.innerHTML=
+    '<button id="na-atlas-tab-btn" class="na-btn sm tab-active" onclick="window.naUxShowAtlas()">⬡ Atlas</button>'+
+    '<button id="na-browse-tab-btn" class="na-btn sm" onclick="window.naUxShowBrowse()">≡ Review Cards</button>';
+  btns.insertBefore(wrap, btns.firstChild);
+}
+
+function patchCardDetailCloseBtn(){
+  var btn=document.querySelector('#na-card-detail .cd-close-btn');
+  if(btn && !btn.dataset.patched159){
+    btn.textContent='← Atlas';
+    btn.dataset.patched159='1';
+  }
+}
+
+function boot(){
+  fixEndScreen();
+  injectAtlasTabs();
+  patchCardDetailCloseBtn();
+}
+
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot);
+else boot();
+setTimeout(boot,600);
+})();
+</script>
 </body></html>

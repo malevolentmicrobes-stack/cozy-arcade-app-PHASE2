@@ -61,6 +61,12 @@
 - ✅ SYS upload verified: `systems()` builds list dynamically from loaded cards (`c.sys`); no hardcoded validation — custom sys values flow through filters, atlas, shadow dungeon automatically
 - ✅ `37f5896`/`316db65`: Prompt AI text updated — "Flashcard app" branding, "Rephrase" rule removed; PHASE2 + cozy-arcade-app (cozy-arcade already had different text)
 
+### Game Completed + Atlas UX (2026-05-28) — planned
+- ✅ **Game Completed Home button fixed** — root cause was `patchedHome(force=undefined)` → `shouldPromptExit()` true (mode still `'solo'`). Fix: `endHome.onclick` now calls `home(true)`. Commit `v175159`.
+- ✅ **Continue button added** — `#end` modal now has Continue (primary) / Restart / Home. Continue resets HP=100, calls `nextCard()`, increments gate/round, rerenders.
+- ✅ **Atlas tabs injected in topbar** — `⬡ Atlas | ≡ Review Cards`. "Review Cards" adds `browse-mode` class: canvas hidden, sidebar fills 100% width. Active tab cyan highlight. Resets to Atlas view on each `showAtlasScreen()` call.
+- ✅ **Card detail close button** — relabeled `✕ Close` → `← Atlas`.
+
 ### Atlas Tag Feature (2026-05-28) — all ✅
 - ✅ `003957c`: Tag filter + sortable columns + tag/sys constellation toggle (PHASE2 only)
   - `parseTags(card)` helper handles string or array `tags` field
