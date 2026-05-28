@@ -4807,7 +4807,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   }
   function patchFullCardButtons(){
     ['soloFull','domainFull'].forEach(id=>{
-      const b=q(id); if(b){ b.style.display='inline-flex'; b.style.visibility='visible'; b.onclick=(e)=>{e.preventDefault(); if(typeof fullCard==='function') fullCard();}; }
+      const b=q(id); if(b){ b.style.display='inline-flex'; b.style.visibility='visible'; if(!b.dataset.v350) b.onclick=(e)=>{e.preventDefault(); if(typeof fullCard==='function') fullCard();}; }
     });
   }
   function patchRevealNoHints(){
@@ -5663,10 +5663,10 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       const box = $(which+'FullDropdown343');
       const btn = which==='domain' ? $('domainFull') : $('soloFull');
       if(e.key==='ArrowDown' && box && box.classList.contains('hidden')){
-        e.preventDefault(); e.stopImmediatePropagation(); btn && btn.click(); return;
+        e.preventDefault(); e.stopImmediatePropagation(); return;
       }
       if((e.key==='ArrowUp' || e.key==='Escape') && box && !box.classList.contains('hidden')){
-        e.preventDefault(); e.stopImmediatePropagation(); btn && btn.click(); return;
+        e.preventDefault(); e.stopImmediatePropagation(); return;
       }
     }
   }, true);
