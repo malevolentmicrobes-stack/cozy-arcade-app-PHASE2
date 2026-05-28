@@ -13558,4 +13558,132 @@ else boot();
 setTimeout(boot,600);
 })();
 </script>
+
+<!-- v175160 — double-advance lock, selectSolo guard, auto-export on exit, card detail sidebar scope -->
+<script>
+;(function(){
+'use strict';
+
+// ── 1. CARD DETAIL: SCOPE TO SIDEBAR + BACK BUTTON + SCROLL SAVE/RESTORE ──
+var _naScrollSave160=0;
+
+var s160=document.createElement('style');
+s160.id='v175160-style';
+s160.textContent=
+  // Scope card detail to sidebar (not full atlas)
+  '#na-sidebar{position:relative!important}'+
+  // Styled ← Back pill
+  '#atlas .cd-back-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:999px;background:transparent;border:1px solid rgba(103,232,249,.35);color:var(--na-cyan);font-size:10px;cursor:pointer;letter-spacing:.07em;font-family:inherit;transition:border-color .15s,background .15s;}'+
+  '#atlas .cd-back-btn:hover{border-color:var(--na-cyan);background:rgba(103,232,249,.09);}'+
+  // Ensure topbar stays above card detail (z-index guard)
+  '#na-topbar{z-index:300!important}';
+document.head.appendChild(s160);
+
+// Save scroll when opening card detail, restore on close
+var _origOpen160=window.naOpenCardDetail;
+window.naOpenCardDetail=function(id){
+  var sc=document.getElementById('na-sb-scroll');
+  if(sc) _naScrollSave160=sc.scrollTop;
+  if(typeof _origOpen160==='function') _origOpen160(id);
+};
+
+var _origClose160=window.naCloseCardDetail;
+window.naCloseCardDetail=function(){
+  if(typeof _origClose160==='function') _origClose160();
+  requestAnimationFrame(function(){
+    var sc=document.getElementById('na-sb-scroll');
+    if(sc) sc.scrollTop=_naScrollSave160;
+  });
+};
+
+// Replace close button with ← Back pill
+function patchBackBtn(){
+  var btn=document.querySelector('#na-card-detail .cd-close-btn, #na-card-detail .cd-back-btn');
+  if(btn && !btn.dataset.v160){
+    btn.textContent='← Back';
+    btn.className='cd-back-btn';
+    btn.dataset.v160='1';
+  }
+}
+
+// ── 2. DOUBLE-ADVANCE LOCK: RESET ON RENDER, FALLBACK 12s ─────────────────
+var _adv160=false, _adv160t=null;
+
+var _prevAdv160=window.advance;
+if(typeof _prevAdv160==='function'){
+  window.advance=advance=function(which){
+    if(_adv160) return;
+    _adv160=true;
+    clearTimeout(_adv160t);
+    clearTimeout(window.answerAutoAdvanceHandle);
+    _adv160t=setTimeout(function(){_adv160=false;},12000);
+    return _prevAdv160.call(this,which);
+  };
+  // Release lock when new card renders
+  var _prevRS160=window.renderSolo;
+  if(typeof _prevRS160==='function'){
+    window.renderSolo=renderSolo=function(){
+      _adv160=false; clearTimeout(_adv160t);
+      return _prevRS160.apply(this,arguments);
+    };
+  }
+  var _prevRD160=window.renderDomain;
+  if(typeof _prevRD160==='function'){
+    window.renderDomain=renderDomain=function(){
+      _adv160=false; clearTimeout(_adv160t);
+      return _prevRD160.apply(this,arguments);
+    };
+  }
+}
+
+// ── 3. SELECTSOLO DEBOUNCE: 700ms GUARD ───────────────────────────────────
+var _selT160=0;
+var _prevSel160=window.selectSolo;
+if(typeof _prevSel160==='function'){
+  window.selectSolo=selectSolo=function(ok){
+    var n=Date.now();
+    if(n-_selT160<700) return;
+    _selT160=n;
+    return _prevSel160.call(this,ok);
+  };
+}
+
+// ── 4. AUTO-EXPORT PROGRESS ON GAME EXIT ──────────────────────────────────
+function autoExportOnExit(){
+  try{
+    if(typeof window.exportProgress351==='function') window.exportProgress351();
+  }catch(e){}
+}
+
+function patchExitBtns160(){
+  var ph=document.getElementById('pauseHome');
+  if(ph && !ph.dataset.v160){
+    var prevPH=ph.onclick;
+    ph.onclick=function(e){
+      autoExportOnExit();
+      if(typeof prevPH==='function') prevPH.call(this,e);
+    };
+    ph.dataset.v160='1';
+  }
+  var eh=document.getElementById('endHome');
+  if(eh && !eh.dataset.v160){
+    var prevEH=eh.onclick;
+    eh.onclick=function(e){
+      autoExportOnExit();
+      if(typeof prevEH==='function') prevEH.call(this,e);
+    };
+    eh.dataset.v160='1';
+  }
+}
+
+function boot160(){
+  patchBackBtn();
+  patchExitBtns160();
+}
+
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot160);
+else boot160();
+setTimeout(boot160,900);
+})();
+</script>
 </body></html>
