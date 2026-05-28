@@ -9192,6 +9192,14 @@ Rules:
     drawer.innerHTML = `
       <div class="drawerHead351"><h2>Settings &amp; Gameplay</h2><button id="closeDrawer351" type="button" aria-label="Close settings">x</button></div>
       <div class="drawerBody351">
+        <section class="drawerPanel351">
+          <label class="drawerToggle351"><input type="checkbox" id="testModeToggle351"> TEST MODE - Live Side Screen</label>
+          <div id="testModeInfo351" class="drawerStats351 isHidden351">
+            <div>Cards loaded: <b id="liveCardCount351">0</b></div>
+            <div>Schema: <b>public_blank_limitless</b></div>
+            <div>One Thing storage: <b id="storageStatus351">none</b></div>
+          </div>
+        </section>
         <div class="drawerStatusBar351">
           <div id="drawerDataStatus351"></div>
         </div>
@@ -9269,7 +9277,13 @@ Rules:
 
   function updateDrawer351(){
     const cardsNow = appCards351();
+    const info = q('testModeInfo351');
+    const checked = !!q('testModeToggle351')?.checked;
+    if(info) info.classList.toggle('isHidden351', !checked);
+    if(q('liveCardCount351')) q('liveCardCount351').textContent = String(cardsNow.length);
+    if(q('storageStatus351')) q('storageStatus351').textContent = localStorage.getItem(ONE_THING_KEY) ? 'saved' : 'none';
     if(q('drawerDataStatus351')) q('drawerDataStatus351').innerHTML = '<span class="dsChip351"><b>' + cardsNow.length + '</b> cards</span><span class="dsChip351 dsChipSrc351">' + (cardsNow.length ? '&#10003; deck loaded' : 'no deck') + '</span>';
+    if(q('drawerJsonPreview351')) q('drawerJsonPreview351').value = preview351();
     if(q('drawerQuestionTime351') && !q('cozySettingsDrawer351')?.classList.contains('open')){
       const saved = localStorage.getItem('cozyQuestionSeconds351') || q('soloTimerInput')?.value || '7';
       q('drawerQuestionTime351').value = q('drawerQuestionTime351').querySelector('option[value="' + saved + '"]') ? saved : '7';
@@ -12560,6 +12574,10 @@ function fixStableOneThingDropdown351() {
     min-width: 0 !important;
   }
 }
+.drawerStatusBar351{display:flex;align-items:center;gap:8px;padding:4px 2px 12px;flex-wrap:wrap;}
+.dsChip351{font-size:12px;font-family:Orbitron,monospace;letter-spacing:.06em;background:rgba(103,232,249,.07);border:1px solid rgba(103,232,249,.20);border-radius:999px;padding:4px 12px;color:rgba(200,225,255,.65);}
+.dsChip351 b{color:#67e8f9;font-weight:950;}
+.dsChipSrc351{color:rgba(160,200,220,.45);border-color:rgba(103,232,249,.12);}
 </style>
 <script id="cozy-mobile-shell-371-js">
 (function(){
