@@ -51,3 +51,15 @@ cozy-arcade-app-PHASE2/
 # macOS metadata (regenerates on folder access)
 .DS_Store
 **/.DS_Store
+
+# Local Claude/Codex session state
+.claude/settings.local.json
+
+# Safe-copy backups and local planning snapshots
+*.SAFE_COPY.md
+*SAFE_COPY*
+
+# Old duplicate repo folders if accidentally dragged back inside this repo
+OLD-cozy-arcade-app-PHASE2/
+OLDcozy-arcade-app-PHASE2/
+cozy-arcade-app-PHASE2-old/

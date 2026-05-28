@@ -377,9 +377,10 @@
 }
 </style>
 
-</head><body><button id="homeTopBtn" class="homeTopBtn" title="Home">⌂</button><button id="gearBtn" class="settingsGear" title="Settings">⚙</button><div id="home" class="screen"><div class="homeWrap"><section class="hero"><div class="heroIcon">⚔️</div><div class="heroTitle">COZY ARCADE BOARD PREP-MEDICINE</div><div class="heroSub">BOARD PREP-MEDICINE</div></section><section class="modeGrid"><button id="startSolo" class="modeCard"><span class="modeIcon">⚔️</span><h2 class="modeTitle">Solo Studying</h2><p class="modeCaption">Game 1 · runner lanes</p></button><button id="startDomain" class="modeCard"><span class="modeIcon">🌀</span><h2 class="modeTitle">Knowledge Expansion</h2><p class="modeCaption">Game 2 · swipe/orb select</p></button></section><div class="controls"><button id="settingsBtn" class="btn">Settings</button></div><div id="limitlessHomeImport" class="limitlessHomeControls" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;align-items:center"><label class="btn primary" for="limitlessHomeDeckFile">Upload Deck</label><input id="limitlessHomeDeckFile" type="file" accept=".json,.csv,application/json,text/csv" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0"><button id="limitlessExampleDeck" class="btn" type="button">Download Deck</button><span class="btn" id="limitlessImportStatus"></span></div><div class="kpis"><div class="kpi"><b id="cardCount">0</b><span>Cards</span></div><div class="kpi"><b id="reviewedCount">0</b><span>Reviewed</span></div><div class="kpi"><b id="dueCount">0</b><span>Due</span></div><div class="kpi"><b id="pinCount">0</b><span>Pinned</span></div></div></div></div><div id="solo" class="game solo hidden"><div class="hud"><div class="hudGroup"><div class="hudPill">HP <div class="hpWrap"><div id="hpFill" class="hpFill"></div></div></div><div class="hudPill">Score <span id="soloScore">0</span></div><div class="hudPill">Streak <span id="soloStreak">0</span></div><div class="hudPill">Gate <span id="soloGate">1</span></div></div><div class="hudGroup"><button id="soloPause" class="hudPill">Pause</button><button class="hudPill" data-home>Exit</button></div></div><div class="promptBox"><span id="soloSystem" class="systemBadge"></span><div id="soloQuestion" class="promptText"></div><div class="timer"><div id="soloTimerFill" class="timerFill"></div></div></div><div class="soloTrack"><div id="choiceRow" class="choiceRow"></div><div id="runner" class="hunter lane0"><i class="hair"></i><i class="head"></i><i class="coat"></i><i class="arm l"></i><i class="arm r"></i><i class="leg l"></i><i class="leg r"></i><i class="blade"></i></div><div id="groundGlow"></div><div id="gateComplete" class="gateBanner hidden">GATE COMPLETED</div><div class="soloHint">← / → move • 1–4 select • timer auto-locks selected answer</div></div><div id="soloReveal" class="reveal hidden"><h2 id="soloRevealTitle"></h2><div id="soloRevealDx" class="dx"></div><div id="soloTrigger" class="trigger"></div><div id="soloRevealRatings"></div><div class="controls" style="justify-content:center"><button id="soloFull" class="btn primary">Full Card</button></div></div><div class="mobileControls"><button id="leftBtn" class="btn">←</button><button id="selectBtn" class="btn primary">Select</button><button id="rightBtn" class="btn">→</button></div></div><div id="domain" class="game domain hidden"><div id="cursorGlow" class="cursorGlow"></div><div class="domainTitle">Knowledge Expansion</div><div class="hud"><div class="hudGroup"><div class="hudPill">Round <span id="domainRound">1</span></div><div class="hudPill">Score <span id="domainScore">0</span></div><div class="hudPill">Streak <span id="domainStreak">0</span></div></div><div class="hudGroup"><button id="domainPause" class="hudPill">Pause</button><button class="hudPill" data-home>Exit</button></div></div><div class="promptBox"><span id="domainSystem" class="systemBadge"></span><div id="domainQuestion" class="promptText"></div><div class="timer"><div class="timerFill" id="domainTimerFill"></div></div></div><div id="orbArena" class="orbArena"></div><div id="domainReveal" class="reveal hidden"><h2 id="domainRevealTitle"></h2><div id="domainDx" class="dx"></div><div id="domainObj" class="trigger"></div><div id="domainRevealRatings"></div><div class="controls" style="justify-content:center"><button id="domainFull" class="btn primary">Full Card</button></div></div></div><div id="review" class="screen settings hidden"><div class="box"><h1>Spaced Repetition</h1><div class="controls"><button class="btn" data-home>Home</button><button id="clearBtn" class="btn red">Clear Local State</button></div><div id="reviewList"></div></div></div><div id="settings" class="screen settings hidden"><div class="box"><h1>Settings</h1><div class="grid2"><div class="field"><label>Deck mode</label><select id="deckMode"><option value="sequential">Sequential</option><option value="random">Random</option><option value="due">Due + pinned first</option><option value="pinned">Pinned only</option></select></div><div class="field"><label>Prompt field</label><select id="promptField"><option value="quick">Quick recall</option><option value="presentation" selected>Presentation</option><option value="objective">Educational objective</option></select></div><div class="field"><label>Solo timer seconds</label><input id="soloTimerInput" type="number" min="4" max="40" value="7"></div><div class="field"><label>Import JSON deck</label><input id="deckFile" type="file" accept=".json,application/json"></div><div class="field"><label><input id="autoSelect" type="checkbox" checked> Timer auto-selects</label></div><div class="field"><label><input id="bionicToggle" type="checkbox"> Bionic emphasis</label></div><div class="field"><label><input id="spacedToggle" type="checkbox"> Spaced Repetition after answers</label></div></div><div class="controls"><button id="applyBtn" class="btn primary">Apply</button><button class="btn" data-home>Home</button></div></div></div><div id="notify" class="notification hidden"><div class="notifyBox"><div class="notifyLabel">NOTIFICATION</div><div id="notifyBody" class="notifyBody"></div><div class="controls" style="justify-content:center"><button id="notifyContinue" class="btn primary">Continue</button><span id="notifyTimer" class="btn">5s</span></div></div></div><div id="pause" class="pause hidden"><div class="pauseBox"><div class="notifyLabel">PAUSED</div><div id="pauseBody" class="notifyBody"></div><div class="controls" style="justify-content:center"><button id="pauseResume" class="btn primary">Resume</button><button id="pauseExport" class="btn">Export Progress</button><button id="pauseHome" class="btn">Exit to Home</button></div></div></div><div id="end" class="end hidden"><div class="endBox"><h1 id="endTitle"></h1><p id="endBody"></p><div class="controls" style="justify-content:center"><button id="endRestart" class="btn primary">Restart</button><button id="endHome" class="btn">Home</button></div></div></div><div id="modal" class="modal hidden"><div class="modalBox"><h2 id="modalTitle"></h2><pre id="modalText"></pre><button id="modalClose" class="btn primary">Close</button></div></div><div id="fx" class="fx"></div><div id="toast" class="toast hidden"></div><script>
+</head><body><button id="homeTopBtn" class="homeTopBtn" title="Home">⌂</button><button id="gearBtn" class="settingsGear" title="Settings">⚙</button><div id="home" class="screen"><div class="homeWrap"><section class="hero"><div class="heroIcon">⚔️</div><div class="heroTitle">COZY ARCADE BOARD PREP-MEDICINE</div><div class="heroSub">BOARD PREP-MEDICINE</div></section><section class="modeGrid"><button id="startSolo" class="modeCard"><span class="modeIcon">⚔️</span><h2 class="modeTitle">Solo Studying</h2><p class="modeCaption">Game 1 · runner lanes</p></button><button id="startDomain" class="modeCard"><span class="modeIcon">🌀</span><h2 class="modeTitle">Knowledge Expansion</h2><p class="modeCaption">Game 2 · swipe/orb select</p></button></section><div class="controls"><button id="settingsBtn" class="btn">Settings</button></div><div id="limitlessHomeImport" class="limitlessHomeControls" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;align-items:center"><label class="btn primary" for="limitlessHomeDeckFile">Upload</label><input id="limitlessHomeDeckFile" type="file" accept=".json,.csv,application/json,text/csv" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0"><button id="limitlessExampleDeck" class="btn" type="button">Download</button><span class="btn" id="limitlessImportStatus"></span></div><div class="kpis"><div class="kpi"><b id="cardCount">0</b><span>Cards</span></div><div class="kpi"><b id="reviewedCount">0</b><span>Reviewed</span></div><div class="kpi"><b id="dueCount">0</b><span>Due</span></div><div class="kpi"><b id="newCount">0</b><span>New</span></div><div class="kpi"><b id="pinCount">0</b><span>Pinned</span></div></div></div></div><div id="solo" class="game solo hidden"><div class="hud"><div class="hudGroup"><div class="hudPill">HP <div class="hpWrap"><div id="hpFill" class="hpFill"></div></div></div><div class="hudPill">Score <span id="soloScore">0</span></div><div class="hudPill">Streak <span id="soloStreak">0</span></div><div class="hudPill">Gate <span id="soloGate">1</span></div></div><div class="hudGroup"><button id="soloPause" class="hudPill">Pause</button></div></div><div class="promptBox"><span id="soloSystem" class="systemBadge"></span><div id="soloQuestion" class="promptText"></div><div class="timer"><div id="soloTimerFill" class="timerFill"></div></div></div><div class="soloTrack"><div id="choiceRow" class="choiceRow"></div><div id="runner" class="hunter lane0"><i class="hair"></i><i class="head"></i><i class="coat"></i><i class="arm l"></i><i class="arm r"></i><i class="leg l"></i><i class="leg r"></i><i class="blade"></i></div><div id="groundGlow"></div><div id="gateComplete" class="gateBanner hidden">GATE COMPLETED</div><div class="soloHint">← / → move • 1–4 select • timer auto-locks selected answer</div></div><div id="soloReveal" class="reveal hidden"><h2 id="soloRevealTitle"></h2><div id="soloRevealDx" class="dx"></div><div id="soloTrigger" class="trigger"></div><div id="soloRevealRatings"></div><div class="controls" style="justify-content:center"><button id="soloFull" class="btn primary">Full Card</button></div></div><div class="mobileControls"><button id="leftBtn" class="btn">←</button><button id="selectBtn" class="btn primary">Select</button><button id="rightBtn" class="btn">→</button></div></div><div id="domain" class="game domain hidden"><div id="cursorGlow" class="cursorGlow"></div><div class="domainTitle">Knowledge Expansion</div><div class="hud"><div class="hudGroup"><div class="hudPill">Round <span id="domainRound">1</span></div><div class="hudPill">Score <span id="domainScore">0</span></div><div class="hudPill">Streak <span id="domainStreak">0</span></div></div><div class="hudGroup"><button id="domainPause" class="hudPill">Pause</button></div></div><div class="promptBox"><span id="domainSystem" class="systemBadge"></span><div id="domainQuestion" class="promptText"></div><div class="timer"><div class="timerFill" id="domainTimerFill"></div></div></div><div id="orbArena" class="orbArena"></div><div id="domainReveal" class="reveal hidden"><h2 id="domainRevealTitle"></h2><div id="domainDx" class="dx"></div><div id="domainObj" class="trigger"></div><div id="domainRevealRatings"></div><div class="controls" style="justify-content:center"><button id="domainFull" class="btn primary">Full Card</button></div></div></div><div id="review" class="screen settings hidden"><div class="box"><h1>Spaced Repetition</h1><div class="controls"><button class="btn" data-home>Home</button><button id="clearBtn" class="btn red">Clear Local State</button></div><div id="reviewList"></div></div></div><div id="settings" class="screen settings hidden"><div class="box"><h1>Settings</h1><div class="grid2"><div class="field"><label>Deck mode</label><select id="deckMode"><option value="sequential">Sequential</option><option value="random">Random</option><option value="due">Due + pinned first</option><option value="pinned">Pinned only</option></select></div><div class="field"><label>Prompt field</label><select id="promptField"><option value="quick">Quick recall</option><option value="presentation" selected>Presentation</option><option value="objective">Educational objective</option></select></div><div class="field"><label>Solo timer seconds</label><input id="soloTimerInput" type="number" min="4" max="40" value="7"></div><div class="field"><label>Import JSON deck</label><input id="deckFile" type="file" accept=".json,application/json"></div><div class="field"><label><input id="autoSelect" type="checkbox" checked> Timer auto-selects</label></div><div class="field"><label><input id="bionicToggle" type="checkbox"> Bionic emphasis</label></div><div class="field"><label><input id="spacedToggle" type="checkbox"> Spaced Repetition after answers</label></div></div><div class="controls"><button id="applyBtn" class="btn primary">Apply</button><button class="btn" data-home>Home</button></div></div></div><div id="notify" class="notification hidden"><div class="notifyBox"><div class="notifyLabel">NOTIFICATION</div><div id="notifyBody" class="notifyBody"></div><div class="controls" style="justify-content:center"><button id="notifyContinue" class="btn primary">Continue</button><span id="notifyTimer" class="btn">5s</span></div></div></div><div id="pause" class="pause hidden"><div class="pauseBox"><div class="notifyLabel">PAUSED</div><div id="pauseBody" class="notifyBody"></div><div class="controls" style="justify-content:center"><button id="pauseResume" class="btn primary">Resume</button><button id="pauseExport" class="btn">Export Progress</button><button id="pauseHome" class="btn">Exit to Home</button></div></div></div><div id="end" class="end hidden"><div class="endBox"><h1 id="endTitle"></h1><p id="endBody"></p><div class="controls" style="justify-content:center"><button id="endRestart" class="btn primary">Restart</button><button id="endHome" class="btn">Home</button></div></div></div><div id="modal" class="modal hidden"><div class="modalBox"><h2 id="modalTitle"></h2><pre id="modalText"></pre><button id="modalClose" class="btn primary">Close</button></div></div><div id="fx" class="fx"></div><div id="toast" class="toast hidden"></div><script>
 const DATA={"metadata":{"app":"Cozy Arcade Board Prep Medicine","title":"COZY ARCADE BOARD PREP-MEDICINE LIMITLESS","version":"v3.5.3 LIMITLESS card-id-repaired","rescue_base":"v3.5.3 public import shell","deck_label":"BLANK HTML LIMITLESS","limitless_text":"BLANK HTML LIMITLESS","created_at":"2026-05-17T00:36:59.356Z","mapping":"LIMITLESS: Card ID*, Card ID, card_id, cardId, json_id, id, qid_unique, qid, original_qid, legacy_id preserved; card_type/source/input/output retained.","cards_embedded":0,"import_ready":true},"cards":[]};
-let cards=(DATA.cards||[]), state=loadState(), deckMode='sequential', promptField='quick', autoSelect=true, bionicOn=true;
+let cards=(DATA.cards||[]), state=loadState(), deckMode='sequential', promptField='quick', autoSelect=true, bionicOn=(localStorage.getItem('bionicOn_v1751523')==='1');
+document.documentElement.dataset.cozyBionic=bionicOn?'1':'0';
 let mode=null, current=null, choices=[], selected=0, timer=0, timerMax=9, ticker=null, index=0, score=0, streak=0, hp=100, gate=1, paused=false, domainRound=1, orbData=[], cursor={x:innerWidth/2,y:innerHeight/2};
 const $=id=>document.getElementById(id), screens=['home','solo','domain','review','settings'];
 function loadState(){try{return JSON.parse(localStorage.getItem('soloStudyingState_v1757')||'{}')}catch(e){return {}}}
@@ -1123,7 +1124,7 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
     const apply=q('applyBtn'); if(apply && !apply.dataset.v175153){
       apply.dataset.v175153='1';
       apply.onclick=()=>{
-        try{deckMode=q('deckMode')?.value||deckMode; promptField=q('promptField')?.value||promptField; autoSelect=!!q('autoSelect')?.checked; bionicOn=!!q('bionicToggle')?.checked;}catch(e){}
+        try{deckMode=q('deckMode')?.value||deckMode; promptField=q('promptField')?.value||promptField; autoSelect=!!q('autoSelect')?.checked; bionicOn=!!q('bionicToggle')?.checked; localStorage.setItem('bionicOn_v1751523',bionicOn?'1':'0');}catch(e){}
         saveSpacedToggle(); toastSafe('Applied');
       };
     }
@@ -1280,6 +1281,8 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
   function openSettings(){settingsReturnMode=(mode==='solo'||mode==='domain')?mode:'home'; paused=true; show('settings'); enhanceSettings();}
   function enhanceSettings(){
     const box=q('settings')?.querySelector('.box'); if(!box) return;
+    // Hydrate bionicToggle from localStorage on every open so checkbox always reflects saved state
+    const _bt=q('bionicToggle'); if(_bt){const _sv=localStorage.getItem('bionicOn_v1751523'); _bt.checked=_sv===null?false:_sv==='1'; try{bionicOn=_bt.checked;}catch(e){}}
     loadSpacing();
     const file=q('deckFile'); if(file){file.setAttribute('accept','.json,.csv,application/json,text/csv'); file.onchange=e=>importAny(e.target.files&&e.target.files[0],false);}
     if(!q('dropZone175154')){
@@ -1291,9 +1294,16 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
     }
     let old=q('settingsContinue175153'); if(old) old.onclick=returnToPrior;
     if(!q('settingsContinue175154')){const b=document.createElement('button'); b.id='settingsContinue175154'; b.className='btn primary'; b.textContent='Continue'; b.onclick=returnToPrior; (box.querySelector('.controls')||box).appendChild(b);}
-    const apply=q('applyBtn'); if(apply) apply.onclick=()=>{deckMode=q('deckMode')?.value||deckMode; promptField='presentation'; autoSelect=!!q('autoSelect')?.checked; bionicOn=!!q('bionicToggle')?.checked; saveSpacing(); safeToast('Applied');};
+    const apply=q('applyBtn'); if(apply) apply.onclick=()=>{deckMode=q('deckMode')?.value||deckMode; promptField='presentation'; autoSelect=!!q('autoSelect')?.checked; bionicOn=!!q('bionicToggle')?.checked; try{localStorage.setItem('bionicOn_v1751523',bionicOn?'1':'0');}catch(e){} try{document.documentElement.dataset.cozyBionic=bionicOn?'1':'0';}catch(e){} try{if(typeof installBionicQuestionPatch352==='function') installBionicQuestionPatch352();}catch(e){} try{if(typeof rerenderVisibleBionic351==='function') rerenderVisibleBionic351();}catch(e){} saveSpacing(); safeToast('Applied');};
     const cb=q('spacedToggle'); if(cb){cb.onchange=saveSpacing;}
+    box.querySelectorAll('details.v175152-panel').forEach(p=>{if(/Advanced.*Merge|Merge.*Import/i.test(p.querySelector('summary')?.textContent||'')) p.style.display='none';});
+    if(!q('cozyControlsHint175374')){const hint=document.createElement('div'); hint.id='cozyControlsHint175374'; hint.style.cssText='margin:18px 0 0;border:1px solid rgba(103,232,249,.18);border-radius:14px;background:rgba(103,232,249,.04);padding:14px 18px;color:#b6c8e8;font-size:13px;line-height:1.55;'; hint.innerHTML='<b style="color:#dffbff;letter-spacing:.08em">CONTROLS</b><br>'+
+      '<b>Enter</b> / <b>→</b> Good &amp; continue &nbsp;·&nbsp; <b>1</b> Again &nbsp;·&nbsp; <b>2</b> Hard &nbsp;·&nbsp; <b>3</b> Good &nbsp;·&nbsp; <b>4</b> Easy<br>'+
+      '<b>↓</b> Full Card &nbsp;·&nbsp; <b>↑</b> Close Full Card &nbsp;·&nbsp; <b>Cmd/Ctrl+Z</b> or shake Undo last answer<br>'+
+      '<span style="color:#8ea8cc">Timing controls review pace across games. Knowledge Expansion: arrows = top/right/bottom/left; Enter, /, or click selects after prompt lock.</span>';
+    (box.querySelector('.controls')||box).before(hint);}
   }
+  window.enhanceSettings = enhanceSettings;
   const gear=q('gearBtn'); if(gear) gear.onclick=openSettings;
   const settingsBtn=q('settingsBtn'); if(settingsBtn) settingsBtn.onclick=openSettings;
   const homeTop=q('homeTopBtn'); if(homeTop) homeTop.onclick=home;
@@ -1503,7 +1513,7 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
     try{deckMode=q('deckMode')?.value || deckMode;}catch(e){}
     try{promptField=q('promptField')?.value || promptField;}catch(e){}
     try{autoSelect=!!q('autoSelect')?.checked;}catch(e){}
-    try{bionicOn=!!q('bionicToggle')?.checked;}catch(e){}
+    try{bionicOn=!!q('bionicToggle')?.checked; localStorage.setItem('bionicOn_v1751523',bionicOn?'1':'0');}catch(e){}
     readSpacedSetting();
     toastSafe('Applied');
   }
@@ -3928,7 +3938,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   }
 
   window.renderSolo = renderSolo = function(){
-    document.body.className='';
+    var _savedBodyClasses=document.body.className.split(' ').filter(function(c){return c&&/^cozy|^na-|Drawer/.test(c);});document.body.className='';_savedBodyClasses.forEach(function(c){document.body.classList.add(c);});
     q('soloScore').textContent=score; q('soloStreak').textContent=streak; q('soloGate').textContent=gate;
     try{q('hpFill').style.width=hp+'%';}catch(e){}
     q('soloSystem').textContent=current.system||current.sys||'';
@@ -4746,7 +4756,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     const bionic=q('bionicToggle');
     if(bionic && !bionic.dataset.v1751523Init){
       const saved=localStorage.getItem('bionicOn_v1751523');
-      if(saved===null){ bionic.checked=true; try{bionicOn=true;}catch(e){} }
+      if(saved===null){ bionic.checked=false; try{bionicOn=false;}catch(e){} }
       else { bionic.checked=saved==='1'; try{bionicOn=bionic.checked;}catch(e){} }
       bionic.dataset.v1751523Default='1';
       bionic.dataset.v1751523Init='1';
@@ -4797,7 +4807,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   }
   function patchFullCardButtons(){
     ['soloFull','domainFull'].forEach(id=>{
-      const b=q(id); if(b){ b.style.display='inline-flex'; b.style.visibility='visible'; b.onclick=(e)=>{e.preventDefault(); if(typeof fullCard==='function') fullCard();}; }
+      const b=q(id); if(b){ b.style.display='inline-flex'; b.style.visibility='visible'; if(!b.dataset.v350) b.onclick=(e)=>{e.preventDefault(); if(typeof fullCard==='function') fullCard();}; }
     });
   }
   function patchRevealNoHints(){
@@ -4814,7 +4824,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     try{ window.csvRowsToCards175158=csvRowsToCardsFinal1751523; csvRowsToCards175158=csvRowsToCardsFinal1751523; }catch(e){}
     try{ window.normalizeJSONCard175158=normalizeJSONFinal1751523; normalizeJSONCard175158=normalizeJSONFinal1751523; }catch(e){}
     try{ window.importAny175158=importAnyFinal1751523; importAny175158=importAnyFinal1751523; window.importFileAny=importAnyFinal1751523; window.importDeck=importAnyFinal1751523; }catch(e){}
-    try{ const saved=localStorage.getItem('bionicOn_v1751523'); bionicOn=saved===null?true:saved==='1'; }catch(e){}
+    try{ const saved=localStorage.getItem('bionicOn_v1751523'); bionicOn=saved===null?false:saved==='1'; }catch(e){}
     patchSettingsText(); bindImportControls(); patchBionicApply(); patchFullCardButtons(); patchRevealNoHints(); patchOpenButtons();
     if(typeof updateKpis==='function') updateKpis();
   }
@@ -5653,10 +5663,10 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       const box = $(which+'FullDropdown343');
       const btn = which==='domain' ? $('domainFull') : $('soloFull');
       if(e.key==='ArrowDown' && box && box.classList.contains('hidden')){
-        e.preventDefault(); e.stopImmediatePropagation(); btn && btn.click(); return;
+        e.preventDefault(); e.stopImmediatePropagation(); return;
       }
       if((e.key==='ArrowUp' || e.key==='Escape') && box && !box.classList.contains('hidden')){
-        e.preventDefault(); e.stopImmediatePropagation(); btn && btn.click(); return;
+        e.preventDefault(); e.stopImmediatePropagation(); return;
       }
     }
   }, true);
@@ -5680,7 +5690,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 #home .hero>img:not(.cozyHeroSigil350){display:none!important}
 #home .modeGrid{order:2!important;margin-top:18px!important}
 #homePlayPanel175155{display:none!important}
-#home .homeWrap>.controls{display:none!important}
+#home .homeWrap>.controls{order:3!important;margin-top:12px!important}
 #home .homeWrap>.kpis{order:4!important;margin-top:18px!important}
 #home .modeIcon img{width:44px;height:44px;object-fit:contain;filter:drop-shadow(0 0 14px rgba(103,232,249,.40))}
 .dirToast,.directionToast,.arrowHint,.domainHint,.soloHint,#domainReady17528,#domainReady1751516,#domainReady17515161,#domainReady1751519{display:none!important;opacity:0!important;visibility:hidden!important}
@@ -5689,7 +5699,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 #soloRevealTitle{font-size:clamp(22px,2.55vw,34px)!important;line-height:1!important;margin-bottom:12px!important}
 .domainTitle{max-width:calc(100vw - 260px)!important;text-align:center!important;letter-spacing:.18em!important;z-index:42!important;pointer-events:none!important}
 .solo .promptBox,.domain .promptBox{width:min(1320px,92vw)!important;max-height:38vh!important;overflow:auto!important}
-.game.solo .promptBox,#solo .promptBox{top:58px!important;width:min(1680px,94vw)!important;max-width:94vw!important;min-height:250px!important;max-height:42vh!important;padding:26px clamp(28px,4vw,64px) 24px!important;overflow:auto!important;border-radius:0 0 28px 28px!important}
+.game.solo .promptBox,#solo .promptBox{top:58px!important;width:min(1680px,94vw)!important;max-width:94vw!important;min-height:clamp(280px,38vh,42vh)!important;max-height:42vh!important;padding:26px clamp(28px,4vw,64px) 24px!important;overflow:auto!important;border-radius:0 0 28px 28px!important}
 .game.solo .promptText,#solo .promptText{max-width:none!important;margin:34px auto 0!important;text-wrap:balance}
 .solo .promptText,.domain .promptText{font-size:clamp(24px,2.05vw,30px)!important;line-height:1.36!important;letter-spacing:0!important;font-weight:900!important}
 .game.solo .promptText,.game.domain .promptText,#solo .promptText,#domain .promptText{font-size:clamp(24px,2.05vw,30px)!important;line-height:1.36!important;letter-spacing:0!important;font-weight:900!important}
@@ -6185,7 +6195,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     hub=document.createElement('div');
     hub.id='gameplayHub351';
     hub.className='screen settings hidden';
-    hub.innerHTML='<div class="box gameplayPanel351"><div class="controls"><button class="btn" id="gameplayHome351">Home</button><button class="btn primary" id="openImport351">Advanced: Merge / Progress Import</button><button class="btn primary" id="applyGameplay351">Apply</button><button class="btn" id="closeGameplay351">Close Settings</button></div><div class="gameplayCard351"><h2>Settings</h2><label>Gameplay</label><select id="gameplayMode351"><option>Solo Studying controls</option><option>Knowledge Expansion controls</option><option>Shadow Dungeon</option><option>Answer card controls</option><option>Import / export workflow</option></select><div class="inlineSettings351"><label class="toggleLine351"><input id="gameplayBionic351" type="checkbox"> Toggle Bionic Reading</label><div><label>Game timing</label><select id="questionTime351"><option value="3">3 seconds</option><option value="4">4 seconds</option><option value="5">5 seconds</option><option value="6">6 seconds</option><option value="7">7 seconds</option><option value="8">8 seconds</option><option value="9">9 seconds</option><option value="10">10 seconds</option></select></div></div><p><span class="kbd351">Enter</span><span class="kbd351">Right</span> choose Good and continue. <span class="kbd351">1</span> Again, <span class="kbd351">2</span> Hard, <span class="kbd351">3</span> Good, <span class="kbd351">4</span> Easy. <span class="kbd351">Down</span> opens Full Card. <span class="kbd351">Up</span> closes Full Card.</p><p>Timing controls the review pace across games. Knowledge Expansion arrows map to top, right, bottom, left; Enter, slash, or click selects after the brief prompt lock.</p></div><div class="gameplayGrid351"><div class="gameplayCard351"><h3>Prompt AI</h3><p>Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade card schema.</p><textarea class="promptBox351" readonly>Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade\ncard schema. \nReturn valid JSON only:\n{\n  "meta": { "schema": "cozy-arcade-v3" },\n  "cards": [\n    {\n      "qid": "unique-id",\n      "sys": "CV",\n      "diagnosis": "correct answer/topic",\n      "presentation": "question, prompt, or vignette",\n      "one_thing": "single highest-yield takeaway",\n      "educational_objective": "full teaching point if available",\n      "board_trigger": "IF finding → THINK diagnosis → ACTION",\n      "explanation": "long explanation if available",\n      "tags": []\n    }\n  ]\n}\nDo not rewrite medical content. Map sys/system fields to card.sys.</textarea></div></div></div>';
+    hub.innerHTML='<div class="box gameplayPanel351"><div class="controls"><button class="btn" id="gameplayHome351">Home</button><button class="btn primary" id="openImport351">Advanced: Merge / Progress Import</button><button class="btn primary" id="applyGameplay351">Apply</button><button class="btn" id="closeGameplay351">Close Settings</button></div><div class="gameplayCard351"><h2>Settings</h2><label>Gameplay</label><select id="gameplayMode351"><option>Solo Studying controls</option><option>Knowledge Expansion controls</option><option>Shadow Dungeon</option><option>Answer card controls</option><option>Import / export workflow</option></select><div class="inlineSettings351"><label class="toggleLine351"><input id="gameplayBionic351" type="checkbox"> Toggle Bionic Reading</label><div><label>Game timing</label><select id="questionTime351"><option value="3">3 seconds</option><option value="4">4 seconds</option><option value="5">5 seconds</option><option value="6">6 seconds</option><option value="7">7 seconds</option><option value="8">8 seconds</option><option value="9">9 seconds</option><option value="10">10 seconds</option></select></div></div><p><span class="kbd351">Enter</span><span class="kbd351">Right</span> choose Good and continue. <span class="kbd351">1</span> Again, <span class="kbd351">2</span> Hard, <span class="kbd351">3</span> Good, <span class="kbd351">4</span> Easy. <span class="kbd351">Down</span> opens Full Card. <span class="kbd351">Up</span> closes Full Card.</p><p>Timing controls the review pace across games. Knowledge Expansion arrows map to top, right, bottom, left; Enter, slash, or click selects after the brief prompt lock.</p></div><div class="gameplayGrid351"><div class="gameplayCard351"><h3>Prompt AI</h3><p>Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade card schema.</p><textarea class="promptBox351" readonly>You are converting medical notes or flashcards into Cozy Arcade Flashcard app cards.\nReturn ONLY valid JSON — no markdown fences, no explanation.\n\n{\n  "meta": { "schema": "cozy-arcade-v3", "total": 1 },\n  "cards": [\n    {\n      "qid": "unique-id-001",\n      "sys": "CV",\n      "diagnosis": "correct answer or topic",\n      "presentation": "clinical question or vignette stem",\n      "one_thing": "single highest-yield pearl — your own words",\n      "test": "optional group label e.g. MY CARDIOLOGY",\n      "educational_objective": "full teaching point",\n      "board_trigger": "IF [finding] → THINK [dx] → ACTION [next step]",\n      "why_not_others": "why the distractor answers are wrong",\n      "explanation": "full explanation if available",\n      "quick_recall": "one-sentence fallback recall cue",\n      "tags": "CV, topic, keyword"\n    }\n  ]\n}\n\nsys values: CV · ID · GI · ENDO · NEURO · RHEUM · RENAL · PSYCH · DERM · PULM · HEME · OB/GYN · ENT · ETHICS · STATS · OPHTHO · ALLERGY\n\nRules:\n- Preserve all medical facts exactly: doses, criteria, cutoffs, lab values\n- Map sys/system/subject → sys; question/prompt/front → presentation; answer/back → diagnosis\n- Every qid unique (e.g. CV-001). Omit fields with no source — do not hallucinate.\n\n[PASTE YOUR NOTES BELOW THIS LINE]</textarea></div></div></div>';
     document.body.appendChild(hub);
     $('gameplayHome351').onclick=()=>{hub.classList.add('hidden'); try{show('home');}catch(e){} try{paused=false;}catch(e){}};
     $('closeGameplay351').onclick=()=>closeGameplayHub351();
@@ -6628,7 +6638,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   function ensureBionic351(){
     let saved=null;
     try{saved=localStorage.getItem('bionicOn_v1751523');}catch(e){}
-    const initial=saved===null ? true : saved==='1';
+    const initial=saved===null ? false : saved==='1';
     const toggles=[$('bionicToggle'),$('gameplayBionic351')].filter(Boolean);
     if(!toggles.length){
       try{bionicOn=initial;}catch(e){}
@@ -6644,13 +6654,15 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       rerenderVisibleBionic351();
       if(notify){try{toast(on?'Bionic reading on':'Bionic reading off');}catch(err){}}
     };
+    let anyNew=false;
     toggles.forEach(t=>{
       if(t.dataset.cozy351) return;
+      anyNew=true;
       t.dataset.cozy351='1';
       t.checked=initial;
       t.addEventListener('change',()=>sync(t.checked,true));
     });
-    sync(initial,false);
+    if(anyNew) sync(initial,false);
   }
 
   function rerenderVisibleBionic351(){
@@ -6669,8 +6681,8 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   }
 
   function questionSeconds351(){
-    let n=5;
-    try{n=Number(localStorage.getItem('cozyQuestionSeconds351')||5)||5;}catch(e){}
+    let n=7;
+    try{n=Number(localStorage.getItem('cozyQuestionSeconds351')||7)||7;}catch(e){}
     return Math.max(3,Math.min(10,n));
   }
 
@@ -7394,7 +7406,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     try{
       try{
         const _saved=localStorage.getItem('bionicOn_v1751523');
-        const _b=_saved===null ? true : _saved==='1';
+        const _b=_saved===null ? false : _saved==='1';
         document.documentElement.dataset.cozyBionic=_b?'1':'0';
       }catch(_){}
       if(!window.__originalBionicQuestion352 && typeof bionic === 'function') window.__originalBionicQuestion352 = bionic;
@@ -8093,7 +8105,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       const deckModeEl = $('deckMode');
       const promptFieldEl = $('promptField');
       const autoEl = $('autoSelect');
-      const bionicEl = $('bionicToggle') || $('gameplayBionic351');
+      const bionicEl = $('bionicToggle');
       if(deckModeEl) deckMode = deckModeEl.value;
       if(promptFieldEl) promptField = promptFieldEl.value;
       if(autoEl) autoSelect = !!autoEl.checked;
@@ -8194,7 +8206,6 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
         btn.dataset.applyReturn352 = '1';
         btn.addEventListener('click', () => {
           applyVisibleSettings352();
-          setTimeout(returnFromSettings352, 0);
         }, false);
       }
     });
@@ -8492,7 +8503,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     panel.id="limitlessHomeImport";
     panel.className="limitlessHomeControls";
     panel.style.cssText="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;align-items:center";
-    panel.innerHTML='<label class="btn primary" for="limitlessHomeDeckFile">Upload Deck</label><input id="limitlessHomeDeckFile" type="file" accept=".json,.csv,application/json,text/csv" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0"><button id="limitlessExampleDeck" class="btn" type="button">Download Deck</button><span class="btn" id="limitlessImportStatus" aria-disabled="true"></span>';
+    panel.innerHTML='<label class="btn primary" for="limitlessHomeDeckFile">Upload</label><input id="limitlessHomeDeckFile" type="file" accept=".json,.csv,application/json,text/csv" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0"><button id="limitlessExampleDeck" class="btn" type="button">Download</button><span class="btn" id="limitlessImportStatus" aria-disabled="true"></span>';
     const anchor=home.querySelector(".kpis")||home.lastElementChild;
     if(anchor) home.insertBefore(panel,anchor);
     else home.appendChild(panel);
@@ -8549,8 +8560,40 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   const STORAGE_KEY='cozy_arcade_limitless_cards_v1';
   const META_KEY='cozy_arcade_limitless_meta_v1';
   const USER_ONE_THING_KEY='cozy_user_one_thing_v1';
-  const AI_SHORT='Convert my CSV/JSON/APKG/flashcard text into Cozy Arcade v3 cards. Return valid JSON only with meta.schema = "cozy-arcade-v3" and a cards array. Preserve the medical content; do not rewrite facts. Map sys or system to card.sys, use unique qids, put the question in presentation, answer/topic in diagnosis, key takeaway in one_thing, and include optional fields like educational_objective, board_trigger, explanation, and tags when available. See schema/template guidance in the uploaded files.';
-  const AI_LONG=`Convert my CSV/JSON/APKG/flashcard text into Cozy Arcade v3 cards. Return valid JSON only with meta.schema = "cozy-arcade-v3" and a cards array. Preserve the medical content; do not rewrite facts. Map sys or system to card.sys, use unique qids, put the question in presentation, answer/topic in diagnosis, key takeaway in one_thing, and include optional fields like educational_objective, board_trigger, explanation, and tags when available. See schema/template guidance in the uploaded files.`;
+  const AI_SHORT='Paste your notes below this prompt — AI converts them to valid JSON you can drag straight into the app.';
+  const AI_LONG=`You are converting medical notes or flashcards into Cozy Arcade Flashcard app cards.
+Return ONLY valid JSON — no markdown fences, no explanation, no extra text.
+
+{
+  "meta": { "schema": "cozy-arcade-v3", "total": 1 },
+  "cards": [
+    {
+      "qid": "unique-id-001",
+      "sys": "CV",
+      "diagnosis": "correct answer or topic",
+      "presentation": "clinical question or vignette stem",
+      "one_thing": "single highest-yield pearl — your own words",
+      "test": "optional group label e.g. MY CARDIOLOGY",
+      "educational_objective": "full teaching point",
+      "board_trigger": "IF [finding] → THINK [dx] → ACTION [next step]",
+      "why_not_others": "why the distractor answers are wrong",
+      "explanation": "full explanation if available",
+      "quick_recall": "one-sentence fallback recall cue",
+      "tags": "CV, topic, keyword"
+    }
+  ]
+}
+
+sys values: CV · ID · GI · ENDO · NEURO · RHEUM · RENAL · PSYCH · DERM · PULM · HEME · OB/GYN · ENT · ETHICS · STATS · OPHTHO · ALLERGY
+
+Rules:
+- Preserve all medical facts exactly: doses, criteria, cutoffs, lab values
+- Map sys/system/subject → sys; question/prompt/front → presentation; answer/back → diagnosis
+- Every qid must be unique (e.g. CV-001, ID-002)
+- one_thing is always plain language — the single thing to remember
+- Omit fields with no source content — do not hallucinate
+
+[PASTE YOUR NOTES BELOW THIS LINE]`;
   const clean=v=>String(v==null?'':v).replace(/NOT SPECIFIED IN SOURCE/g,'').replace(/\s+/g,' ').trim();
 	  const first=(...xs)=>xs.find(x=>clean(x))||'';
 	  const esc=s=>String(s==null?'':s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
@@ -8755,7 +8798,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   }
   function updateImportButtons(){
     const n=appCards().length;
-    document.querySelectorAll('#limitlessExampleDeck,#exportJson351').forEach(btn=>{if(btn&&btn.id==='limitlessExampleDeck') btn.textContent='Download Deck';});
+    document.querySelectorAll('#limitlessExampleDeck,#exportJson351').forEach(btn=>{if(btn&&btn.id==='limitlessExampleDeck') btn.textContent='Download';});
     const local=document.getElementById('limitlessLocalDeckStorage');
     const progress=document.getElementById('limitlessImportStatus');
     if(local && local!==progress){
@@ -8770,13 +8813,13 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     if(!home) return;
     let panel=document.getElementById('limitlessHomeImport');
     if(!panel){panel=document.createElement('div'); panel.id='limitlessHomeImport'; panel.className='limitlessHomeControls'; home.insertBefore(panel,home.querySelector('.modeGrid')||home.firstChild);}
-    if(!panel.querySelector('label[for="limitlessHomeDeckFile"]')) panel.insertAdjacentHTML('beforeend','<label class="btn primary" for="limitlessHomeDeckFile">Upload Deck</label>');
+    if(!panel.querySelector('label[for="limitlessHomeDeckFile"]')) panel.insertAdjacentHTML('beforeend','<label class="btn primary" for="limitlessHomeDeckFile">Upload</label>');
     if(!document.getElementById('limitlessHomeDeckFile')) panel.insertAdjacentHTML('beforeend','<input id="limitlessHomeDeckFile" type="file" accept=".json,.csv,application/json,text/csv" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">');
-    if(!document.getElementById('limitlessExampleDeck')) panel.insertAdjacentHTML('beforeend','<button id="limitlessExampleDeck" class="btn" type="button">Download Deck</button>');
+    if(!document.getElementById('limitlessExampleDeck')) panel.insertAdjacentHTML('beforeend','<button id="limitlessExampleDeck" class="btn" type="button">Download</button>');
     let progress=document.getElementById('limitlessImportStatus');
     if(!progress){ progress=document.createElement('span'); progress.id='limitlessImportStatus'; progress.className='btn'; }
     if(progress.parentElement!==panel) panel.appendChild(progress);
-    const ex=document.getElementById('limitlessExampleDeck'); if(ex) ex.onclick=()=>{ if(window.cozyPhase3&&typeof window.cozyPhase3.exportDeckWithProgress==='function') window.cozyPhase3.exportDeckWithProgress(); else if(typeof window.exportProgress351==='function') window.exportProgress351(); else downloadJson(); };
+    const ex=document.getElementById('limitlessExampleDeck'); if(ex) ex.onclick=()=>{ if(window.cozyPhase3&&typeof window.cozyPhase3.exportCleanDeck==='function') window.cozyPhase3.exportCleanDeck(); else if(typeof exportCleanDeck==='function') exportCleanDeck(); else downloadJson(); };
     updateImportButtons();
   }
   function renderReviewDeck(){
@@ -9111,11 +9154,15 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     if(bionic){
       try{ bionicOn = !!bionic.checked; }catch(_){}
       try{ localStorage.setItem('bionicOn_v1751523', bionic.checked ? '1' : '0'); }catch(_){}
+      try{ document.documentElement.dataset.cozyBionic = bionic.checked ? '1' : '0'; }catch(_){}
+      try{ if(typeof installBionicQuestionPatch352==='function') installBionicQuestionPatch352(); }catch(_){}
+      try{ if(typeof rerenderVisibleBionic351==='function') rerenderVisibleBionic351(); }catch(_){}
       const legacy = q('bionicToggle');
       if(legacy) legacy.checked = bionic.checked;
     }
     if(timing){
       try{ localStorage.setItem('cozyQuestionSeconds351', timing.value); }catch(_){}
+      try{ if(typeof applyQuestionSeconds351==='function') applyQuestionSeconds351(); }catch(_){}
       const legacyTimer = q('soloTimerInput');
       if(legacyTimer) legacyTimer.value = timing.value;
     }
@@ -9144,10 +9191,9 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     drawer.innerHTML = `
       <div class="drawerHead351"><h2>Settings &amp; Gameplay</h2><button id="closeDrawer351" type="button" aria-label="Close settings">x</button></div>
       <div class="drawerBody351">
-        <details class="drawerPanel351" open>
-          <summary>Advanced: Merge / Progress Import</summary>
-          <div id="drawerDataStatus351" class="drawerStats351"></div>
-        </details>
+        <div class="drawerStatusBar351">
+          <div id="drawerDataStatus351"></div>
+        </div>
         <section class="drawerPanel351">
           <h3>Gameplay Controls</h3>
           <label>Game timing</label>
@@ -9156,6 +9202,27 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
           <div class="drawerActions351"><button class="btn primary" id="drawerApply351" type="button">Apply</button><div class="exportMenuWrap351"><button class="btn primary" id="importMenuBtn351" type="button">Import ▾</button><div class="exportMenu351" id="importMenu351"><div class="exportMenuHint351">Import from .json file</div><button class="exportMenuItem351" id="importMenuDeck351">📂 Deck Only</button><button class="exportMenuItem351" id="importMenuProgress351">📂 Progress Only</button><button class="exportMenuItem351" id="importMenuFull351">📂 Full Deck + Progress</button><div class="exportMenuHint351" style="opacity:.35;font-size:9px">.csv support coming soon</div></div></div><div class="exportMenuWrap351"><button class="btn" id="drawerFullSettings351" type="button">Export ▾</button><div class="exportMenu351" id="exportMenu351">
             <button class="exportMenuItem351" id="exportMenuDeck351">📄 Deck Only</button><button class="exportMenuItem351" id="exportMenuProgress351">📊 Progress Only</button><button class="exportMenuItem351" id="exportMenuFull351">💾 Full Deck + Progress</button></div></div><input type="file" id="importFile351" accept=".json,application/json" style="display:none"></div>
         </section>
+        <details class="drawerPanel351" id="howToPlay351">
+          <summary>How to Play</summary>
+          <div class="htpBody351">
+            <div class="htpSection351">
+              <span class="htpLabel351">Solo Study</span>
+              <div class="htpRow351"><span class="kbd351">↓</span> Open full card &nbsp;·&nbsp; <span class="kbd351">↑</span> Close</div>
+              <div class="htpRow351"><span class="kbd351">Enter</span> / <span class="kbd351">→</span> Rate Good &amp; continue</div>
+              <div class="htpRow351"><span class="kbd351">1</span> Again &nbsp;·&nbsp; <span class="kbd351">2</span> Hard &nbsp;·&nbsp; <span class="kbd351">3</span> Good &nbsp;·&nbsp; <span class="kbd351">4</span> Easy</div>
+              <div class="htpRow351"><span class="kbd351">Cmd/Ctrl Z</span> Undo last answer</div>
+            </div>
+            <div class="htpSection351">
+              <span class="htpLabel351">Knowledge Expansion</span>
+              <div class="htpRow351"><span class="kbd351">↑</span><span class="kbd351">→</span><span class="kbd351">↓</span><span class="kbd351">←</span> Select orb direction</div>
+              <div class="htpRow351"><span class="kbd351">Enter</span> / <span class="kbd351">/</span> Confirm after lock-in</div>
+            </div>
+            <div class="htpSection351">
+              <span class="htpLabel351">Mobile</span>
+              <div class="htpRow351">Shake phone = Undo last answer</div>
+            </div>
+          </div>
+        </details>
       </div>
       <div class="drawerFooter351">Cozy Arcade Board Prep - LIMITLESS - Public Blank - v18</div>`;
     document.body.appendChild(drawer);
@@ -9201,14 +9268,20 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 
   function updateDrawer351(){
     const cardsNow = appCards351();
-    if(q('drawerDataStatus351')) q('drawerDataStatus351').innerHTML = '<div>Loaded: <b>' + cardsNow.length + '</b> cards</div><div>Source: <b>' + (cardsNow.length ? 'uploaded/local' : 'blank public app') + '</b></div>';
-    if(q('drawerQuestionTime351')){
+    const info = q('testModeInfo351');
+    const checked = !!q('testModeToggle351')?.checked;
+    if(info) info.classList.toggle('isHidden351', !checked);
+    if(q('liveCardCount351')) q('liveCardCount351').textContent = String(cardsNow.length);
+    if(q('storageStatus351')) q('storageStatus351').textContent = localStorage.getItem(ONE_THING_KEY) ? 'saved' : 'none';
+    if(q('drawerDataStatus351')) q('drawerDataStatus351').innerHTML = '<span class="dsChip351"><b>' + cardsNow.length + '</b> cards</span><span class="dsChip351 dsChipSrc351">' + (cardsNow.length ? '&#10003; deck loaded' : 'no deck') + '</span>';
+    if(q('drawerJsonPreview351')) q('drawerJsonPreview351').value = preview351();
+    if(q('drawerQuestionTime351') && !q('cozySettingsDrawer351')?.classList.contains('open')){
       const saved = localStorage.getItem('cozyQuestionSeconds351') || q('soloTimerInput')?.value || '7';
       q('drawerQuestionTime351').value = q('drawerQuestionTime351').querySelector('option[value="' + saved + '"]') ? saved : '7';
     }
-    if(q('drawerBionic351')){
+    if(q('drawerBionic351') && !q('cozySettingsDrawer351')?.classList.contains('open')){
       const saved = localStorage.getItem('bionicOn_v1751523');
-      q('drawerBionic351').checked = saved === null ? true : saved === '1';
+      q('drawerBionic351').checked = saved === null ? false : saved === '1';
     }
   }
 
@@ -9218,6 +9291,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     ev?.stopImmediatePropagation?.();
     q('settings')?.classList.add('hidden');
     q('gameplayHub351')?.classList.add('hidden');
+    try{ window.__drawerPriorPaused351 = (typeof paused !== 'undefined') ? !!paused : false; paused = true; }catch(_){}
     const drawer = createDrawer351();
     updateDrawer351();
     requestAnimationFrame(() => {
@@ -9234,6 +9308,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   function closeDrawer351(ev){
     ev?.preventDefault?.();
     ev?.stopPropagation?.();
+    try{ if(typeof window.__drawerPriorPaused351 !== 'undefined') paused = window.__drawerPriorPaused351; }catch(_){}
     const drawer = q('cozySettingsDrawer351');
     if(drawer){
       drawer.classList.remove('open');
@@ -9431,26 +9506,39 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 
   const XP_KEY = 'cozyCorrect351';
   const RANKS = ['rank-e','rank-d','rank-b','rank-a','rank-s','rank-apex','rank-monarch'];
-  const PROMPT_TEXT = `Convert CSV, JSON, APKG, or flashcard text into the current Cozy Arcade
-card schema. 
-Return valid JSON only:
+  const PROMPT_TEXT = `You are converting medical notes or flashcards into Cozy Arcade Flashcard app cards.
+Return ONLY valid JSON — no markdown fences, no explanation, no extra text.
+
 {
-  "meta": { "schema": "cozy-arcade-v3" },
+  "meta": { "schema": "cozy-arcade-v3", "total": 1 },
   "cards": [
     {
-      "qid": "unique-id",
+      "qid": "unique-id-001",
       "sys": "CV",
-      "diagnosis": "correct answer/topic",
-      "presentation": "question, prompt, or vignette",
-      "one_thing": "single highest-yield takeaway",
-      "educational_objective": "full teaching point if available",
-      "board_trigger": "IF finding → THINK diagnosis → ACTION",
-      "explanation": "long explanation if available",
-      "tags": []
+      "diagnosis": "correct answer or topic",
+      "presentation": "clinical question or vignette stem",
+      "one_thing": "single highest-yield pearl — your own words",
+      "test": "optional group label e.g. MY CARDIOLOGY",
+      "educational_objective": "full teaching point",
+      "board_trigger": "IF [finding] → THINK [dx] → ACTION [next step]",
+      "why_not_others": "why the distractor answers are wrong",
+      "explanation": "full explanation if available",
+      "quick_recall": "one-sentence fallback recall cue",
+      "tags": "CV, topic, keyword"
     }
   ]
 }
-Do not rewrite medical content. Map sys/system fields to card.sys.`;
+
+sys values: CV · ID · GI · ENDO · NEURO · RHEUM · RENAL · PSYCH · DERM · PULM · HEME · OB/GYN · ENT · ETHICS · STATS · OPHTHO · ALLERGY
+
+Rules:
+- Preserve all medical facts exactly: doses, criteria, cutoffs, lab values
+- Map sys/system/subject → sys; question/prompt/front → presentation; answer/back → diagnosis
+- Every qid must be unique (e.g. CV-001, ID-002)
+- one_thing is always plain language — the single thing to remember
+- Omit fields with no source content — do not hallucinate
+
+[PASTE YOUR NOTES BELOW THIS LINE]`;
   const RUNNER_ANIMATION = 'runnerSprint 420ms steps(4) infinite, narutoSpriteBob .34s ease-in-out infinite alternate';
 
   function activateV24Style() {
@@ -10813,10 +10901,14 @@ function fixStableOneThingDropdown351() {
   function exportProgressMap() {
     const out = {};
     const deduped = deduplicateProgress(phase3State.progress || {}, appCards());
+    const cardOneThingMap = {};
+    appCards().forEach(c => { const id = canonicalCardId(c); if (c.one_thing) cardOneThingMap[id] = c.one_thing; });
     Object.keys(deduped || {}).forEach(cardId => {
       const p = syncProgressAliases(Object.assign(defaultProgress(cardId), deduped[cardId] || {}, { card_id: cardId }));
+      const oneThingVal = p.one_thing || cardOneThingMap[cardId];
+      if (oneThingVal) p.one_thing = oneThingVal;
       phase3State.progress[cardId] = p;
-      out[cardId] = {
+      const entry = {
         card_id: p.card_id,
         seen_count: Number(p.seen_count || 0),
         correct_count: Number(p.correct_count || 0),
@@ -10836,6 +10928,8 @@ function fixStableOneThingDropdown351() {
         created_at: p.created_at || nowIso(),
         updated_at: p.updated_at || nowIso()
       };
+      if (oneThingVal) entry.one_thing = oneThingVal;
+      out[cardId] = entry;
     });
     return out;
   }
@@ -11352,17 +11446,60 @@ function fixStableOneThingDropdown351() {
   }
 
   function progressPayload() {
-    const progress = deduplicateProgress(exportProgressMap(), appCards());
     return {
       metadata: { type: 'progress', deck_fingerprint: deckFingerprint(), exported_at: nowIso(), schema_version: '3.0' },
-      progress
+      progress: exportProgressMap()
     };
   }
 
+  // canonicalizeCard — single source of truth for field normalization and export filtering.
+  // mode:'export'  → allowlist only canonical source fields (strips all aliases, progress state, synthesized views)
+  // mode:'display' → normalize aliases in-place, keep computed level_* views for gameplay
+  function canonicalizeCard(raw, opts) {
+    const mode = (opts && opts.mode) || 'display';
+    const c = Object.assign({}, raw || {});
+    const presentation = c.presentation || c.prompt || c.clinical_vignette_summary || c.level_1_presentation || c.front || c.question || '';
+    const educational_objective = c.educational_objective || c.answer || c.level_2_three_second_exposure || c.quick_recall || c.back || '';
+    const sys = c.sys || c.system || c.subject || '';
+    const diagnosis = c.diagnosis || c.dx || c.title || String(educational_objective || presentation || '').slice(0, 80) || '';
+    const tags = Array.isArray(c.tags) ? c.tags : (c.tags ? String(c.tags).split(/[|;,]/).map(x => x.trim()).filter(Boolean) : []);
+
+    if (mode === 'export') {
+      const out = { card_id: canonicalCardId(raw) };
+      if (c.qid != null && c.qid !== '')  out.qid = c.qid;
+      if (sys)                             out.sys = sys;
+      if (diagnosis)                       out.diagnosis = diagnosis;
+      if (presentation)                    out.presentation = presentation;
+      if (c.one_thing)                     out.one_thing = c.one_thing;
+      if (educational_objective)           out.educational_objective = educational_objective;
+      if (c.board_trigger)                 out.board_trigger = c.board_trigger;
+      if (c.explanation)                   out.explanation = c.explanation;
+      if (c.why_not_others)                out.why_not_others = c.why_not_others;
+      if (c.test)                          out.test = c.test;
+      if (c.quick_recall)                  out.quick_recall = c.quick_recall;
+      if (c.cloze_source_text)             out.cloze_source_text = c.cloze_source_text;
+      if (c.cloze_enabled)                 out.cloze_enabled = c.cloze_enabled;
+      if (tags.length)                     out.tags = tags;
+      return out;
+    }
+
+    // mode:'display' — normalize aliases, keep computed views for gameplay rendering
+    c.presentation = presentation;
+    c.educational_objective = educational_objective;
+    c.sys = sys;
+    c.system = c.system || sys;
+    c.diagnosis = diagnosis;
+    c.level_1_presentation = presentation;
+    c.level_2_three_second_exposure = educational_objective;
+    c.prompt = presentation;
+    c.answer = educational_objective;
+    c.quick_recall = c.quick_recall || educational_objective;
+    c.tags = tags;
+    return c;
+  }
+
   function cleanDeckCard(card) {
-    const out = Object.assign({}, card, { card_id: canonicalCardId(card) });
-    ['seen_count','correct_count','wrong_count','reviewed_count','pinned','buried','suspended','repair_point','stage','last_rating','last_seen_at','next_due_at','interval_days','ease_factor','lapses','created_at','updated_at'].forEach(key => { delete out[key]; });
-    return out;
+    return canonicalizeCard(card, { mode: 'export' });
   }
 
   function cleanDeckPayload() {
@@ -11373,11 +11510,10 @@ function fixStableOneThingDropdown351() {
   }
 
   function backupPayload() {
-    const progress = deduplicateProgress(exportProgressMap(), appCards());
     return {
       metadata: { type: 'deck_with_progress', deck_fingerprint: deckFingerprint(), exported_at: nowIso(), schema_version: '3.0' },
       cards: cleanDeckPayload().cards,
-      progress
+      progress: exportProgressMap()
     };
   }
 
@@ -11422,7 +11558,7 @@ function fixStableOneThingDropdown351() {
         progress_count: Object.keys(phase3State.progress || {}).length
       },
       cards: _cards,
-      progress: phase3State.progress || {},
+      progress: exportProgressMap(),
       settings,
       persona
     };
@@ -11572,11 +11708,10 @@ function fixStableOneThingDropdown351() {
         session.poolKey = '';
       };
     }
-    if (q('limitlessExampleDeck')) q('limitlessExampleDeck').textContent = 'Download Deck';
+    if (q('limitlessExampleDeck')) { q('limitlessExampleDeck').textContent = 'Download'; q('limitlessExampleDeck').onclick = exportDeckWithProgress; }
     if (q('pauseExport')) { q('pauseExport').textContent = 'Export Progress'; q('pauseExport').onclick = exportProgressOnly; }
     if (q('drawerExport351')) q('drawerExport351').remove();
-    if (q('exportJson351')) { q('exportJson351').textContent = 'Download Deck'; q('exportJson351').onclick = exportCleanDeck; }
-    if (q('limitlessExampleDeck')) q('limitlessExampleDeck').onclick = exportDeckWithProgress;
+    if (q('exportJson351')) { q('exportJson351').textContent = 'Download'; q('exportJson351').onclick = exportDeckWithProgress; }
     if (q('settingsExportProgress351')) q('settingsExportProgress351').onclick = exportProgressOnly;
     if (q('exportProgress2')) { q('exportProgress2').textContent = 'Export Progress Only'; q('exportProgress2').onclick = exportProgressOnly; }
     if (q('exportMergeInfo2')) { q('exportMergeInfo2').textContent = 'Export Progress Summary'; q('exportMergeInfo2').onclick = exportSessionSummary; }
@@ -11616,7 +11751,7 @@ function fixStableOneThingDropdown351() {
             localStorage.setItem('cozy_arcade_limitless_cards_v1', payload);
           }
         }catch(qe){ console.warn('[Atlas] localStorage quota or write error:', qe); }
-        window.open('progress_beta.html', '_blank');
+        window.showAtlasScreen();
       };
     }
   }
@@ -11664,6 +11799,7 @@ function fixStableOneThingDropdown351() {
     window.rateCard = rateCard;
     window.getStudyPool = getStudyPool;
     window.migrateLegacyProgress = migrateLegacyProgress;
+    window.canonicalizeCard = canonicalizeCard;
     window.cozyPhase3 = { exportCleanDeck, exportProgressOnly, exportDeckWithProgress, exportFullGameState, importObjectPhase3, cleanDeckPayload, progressPayload, backupPayload, fullGameStatePayload, getStudyPool, clearSessionBuried, wireUi };
     try {
       const _fgsHooks = {};
@@ -12428,6 +12564,10 @@ function fixStableOneThingDropdown351() {
     min-width: 0 !important;
   }
 }
+.drawerStatusBar351{display:flex;align-items:center;gap:8px;padding:4px 2px 12px;flex-wrap:wrap;}
+.dsChip351{font-size:12px;font-family:Orbitron,monospace;letter-spacing:.06em;background:rgba(103,232,249,.07);border:1px solid rgba(103,232,249,.20);border-radius:999px;padding:4px 12px;color:rgba(200,225,255,.65);}
+.dsChip351 b{color:#67e8f9;font-weight:950;}
+.dsChipSrc351{color:rgba(160,200,220,.45);border-color:rgba(103,232,249,.12);}
 </style>
 <script id="cozy-mobile-shell-371-js">
 (function(){
@@ -12518,7 +12658,6 @@ function fixStableOneThingDropdown351() {
     const phase = pillFor(gameId === 'solo' ? 'soloGate' : 'domainRound');
     const pause = q(gameId === 'solo' ? 'soloPause' : 'domainPause');
     const exit = hud.querySelector('button[data-home]');
-    const settings = ensureSettingsButton(hud);
 
     let energy = gameId === 'solo' ? pillFor('hpFill') : (energyClones[0] || ensureEnergyPill(hud));
     if (gameId === 'solo') {
@@ -12540,7 +12679,6 @@ function fixStableOneThingDropdown351() {
     appendIf(actions, phase);
     appendIf(actions, pause);
     appendIf(actions, exit);
-    appendIf(actions, settings);
 
     iconize(pause, 'Pause', '⏸');
     iconize(exit, 'Close', '×');
@@ -12663,10 +12801,57 @@ function fixStableOneThingDropdown351() {
   new MutationObserver(run).observe(document.body, { childList: true, subtree: true });
 })();
 </script>
+<style id="v175374-rectifier-font-bionic-fix">
+/* soloTrack nudged 10px for clearance — prevents promptBox+timer overlapping choiceRow */
+.soloTrack{inset:240px 0 0!important;}
+@media(max-width:760px){.soloTrack{inset:220px 0 0!important;}}
+/* Bionic contrast — bold first-letters bright white, base text dimmed blue-gray */
+:root[data-cozy-bionic="1"] .promptText,:root[data-cozy-bionic="1"] .promptText *:not(b){color:rgba(160,200,255,0.62)!important;font-weight:500!important;}
+:root[data-cozy-bionic="1"] .promptText b{color:#ffffff!important;font-weight:950!important;}
+</style>
+<style id="htp-drawer-351">
+#howToPlay351 summary{cursor:pointer;user-select:none;}
+.htpBody351{padding:6px 2px 4px;display:flex;flex-direction:column;gap:10px;}
+.htpSection351{display:flex;flex-direction:column;gap:3px;}
+.htpLabel351{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:rgba(103,232,249,.55);font-family:Orbitron,monospace;margin-bottom:2px;}
+.htpRow351{font-size:12px;color:rgba(220,240,255,.75);line-height:1.6;display:flex;align-items:center;flex-wrap:wrap;gap:2px;}
+/* deck status chip bar — replaces useless Advanced Merge dropdown */
+.drawerStatusBar351{display:flex;align-items:center;gap:8px;padding:4px 2px 12px;flex-wrap:wrap;}
+.dsChip351{font-size:12px;font-family:Orbitron,monospace;letter-spacing:.06em;background:rgba(103,232,249,.07);border:1px solid rgba(103,232,249,.20);border-radius:999px;padding:4px 12px;color:rgba(200,225,255,.65);}
+.dsChip351 b{color:#67e8f9;font-weight:950;}
+.dsChipSrc351{color:rgba(160,200,220,.45);border-color:rgba(103,232,249,.12);}
+</style>
+<script id="v175375-new-count-kpi">
+(function(){
+  function refreshNewCount(){
+    const el = document.getElementById('newCount');
+    if(!el) return;
+    try{
+      const all = window.cards || [];
+      const progress = (window.phase3State && window.phase3State.progress) || {};
+      const n = all.filter(function(c){
+        const id = typeof canonicalCardId === 'function' ? canonicalCardId(c) : (c.card_id || c.qid || c.id || '');
+        const p = progress[id] || {};
+        return !p.buried && !p.suspended && !(Number(p.seen_count || 0) > 0);
+      }).length;
+      el.textContent = n;
+    }catch(_){}
+  }
+  const _prior = window.updateKpis;
+  window.updateKpis = function(){
+    if(_prior) _prior.apply(this, arguments);
+    refreshNewCount();
+  };
+  try{ updateKpis = window.updateKpis; }catch(_){}
+  setInterval(refreshNewCount, 2000);
+  document.addEventListener('DOMContentLoaded', refreshNewCount);
+})();
+</script>
 <script id="v175372-rectifier-undo-makechoices-smoke">
 (function(){
   const q = id => document.getElementById(id);
   const clone = obj => obj == null ? null : JSON.parse(JSON.stringify(obj));
+  const UNDO_LIMIT = 5;
   const cardIdFor = card => {
     try {
       if (typeof canonicalCardId === 'function') return canonicalCardId(card);
@@ -12683,6 +12868,8 @@ function fixStableOneThingDropdown351() {
     };
     window.makeChoices.__rectifierReturn372 = true;
   }
+
+  window.__cozyUndoStack372 = window.__cozyUndoStack372 || [];
 
   function captureUndoSnapshot(){
     const card = typeof current !== 'undefined' ? current : null;
@@ -12729,14 +12916,13 @@ function fixStableOneThingDropdown351() {
     try { show('solo'); } catch (_) {}
     try { renderSolo(); } catch (_) {}
     try { loopSolo(); } catch (_) {}
-    try { toast('Last review undone'); } catch (_) {}
+    const remaining = window.__cozyUndoStack372.length;
+    try { toast(remaining > 0 ? 'Undone (' + remaining + ' more)' : 'Undone'); } catch (_) {}
     return true;
   }
 
   window.undoReview = window.undoLastReview = window.cozyUndoReview = function(){
-    const done = restoreUndoSnapshot(window.__cozyLastReviewUndo372);
-    if (done) window.__cozyLastReviewUndo372 = null;
-    return done;
+    return restoreUndoSnapshot(window.__cozyUndoStack372.pop());
   };
 
   function installUndoSelectWrapper(){
@@ -12746,7 +12932,10 @@ function fixStableOneThingDropdown351() {
       const revealOpen = q('soloReveal') && !q('soloReveal').classList.contains('hidden');
       const snap = revealOpen ? null : captureUndoSnapshot();
       const out = priorSelectSolo.apply(this, arguments);
-      if (snap) window.__cozyLastReviewUndo372 = snap;
+      if (snap) {
+        window.__cozyUndoStack372.push(snap);
+        if (window.__cozyUndoStack372.length > UNDO_LIMIT) window.__cozyUndoStack372.shift();
+      }
       return out;
     };
     wrapped.__rectifierUndo372 = true;
@@ -12760,7 +12949,7 @@ function fixStableOneThingDropdown351() {
   document.addEventListener('keydown', function(ev){
     if (!((ev.metaKey || ev.ctrlKey) && String(ev.key).toLowerCase() === 'z')) return;
     if (document.activeElement && (/^(TEXTAREA|INPUT|SELECT)$/i.test(document.activeElement.tagName) || document.activeElement.isContentEditable)) return;
-    if (window.__cozyLastReviewUndo372) {
+    if (window.__cozyUndoStack372 && window.__cozyUndoStack372.length) {
       ev.preventDefault();
       ev.stopImmediatePropagation();
       window.undoReview();
@@ -12772,11 +12961,729 @@ function fixStableOneThingDropdown351() {
     const a = ev.accelerationIncludingGravity || ev.acceleration || {};
     const force = Math.abs(a.x || 0) + Math.abs(a.y || 0) + Math.abs(a.z || 0);
     const now = Date.now();
-    if (force > 32 && now - lastShake372 > 1600 && window.__cozyLastReviewUndo372) {
+    if (force > 32 && now - lastShake372 > 1600 && window.__cozyUndoStack372 && window.__cozyUndoStack372.length) {
       lastShake372 = now;
       window.undoReview();
     }
   }, { passive: true });
+})();
+</script>
+<script id="neural-atlas-embedded">
+;(function(){
+'use strict';
+// ── CSS ──────────────────────────────────────────────────────────────────
+var naStyle=document.createElement('style');naStyle.id='neural-atlas-style';
+naStyle.textContent=`
+#atlas{position:fixed;inset:0;z-index:500;overflow:hidden;display:flex;flex-direction:column;
+  font-family:'DM Sans',system-ui,sans-serif;font-size:13px;-webkit-font-smoothing:antialiased;
+  --na-bg:#030713;--na-cyan:#67e8f9;--na-blue:#0ea5e9;--na-purple:#a855f7;
+  --na-bg2:#05091a;--na-bg3:#071228;--na-bg-glass:rgba(5,9,24,.82);
+  --na-blue2:#4163ff;--na-magenta:#e040fb;--na-green:#22c55e;--na-amber:#f59e0b;
+  --na-red:#ef4444;--na-orange:#f97316;
+  --na-text:#e9f4ff;--na-text2:#7a86a0;
+  --na-border:rgba(103,232,249,.18);--na-border-dim:rgba(103,232,249,.07);
+  --na-glow-cyan:0 0 18px rgba(103,232,249,.45),0 0 36px rgba(103,232,249,.15);
+  --na-sidebar-w:340px;--na-topbar-h:52px;
+  color:var(--na-text);}
+#atlas.hidden{display:none!important}
+#na-topbar{position:relative;height:var(--na-topbar-h);display:flex;align-items:center;gap:10px;padding:0 14px;background:rgba(3,7,19,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--na-border);z-index:200;flex-shrink:0;}
+#na-topbar-title{font-family:'Orbitron',monospace;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--na-cyan);text-shadow:var(--na-glow-cyan);white-space:nowrap;flex-shrink:0;}
+#na-topbar-sub{flex:1;font-size:10px;color:var(--na-text2);letter-spacing:.06em;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#na-topbar-btns{display:flex;gap:6px;flex-shrink:0;align-items:center;}
+#na-upload-pill{position:relative;display:inline-flex;}
+#na-upload-pill input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0;}
+#na-upload-label{display:inline-block;border-radius:999px;padding:5px 11px;border:1px solid rgba(103,232,249,.45);background:rgba(103,232,249,.08);color:var(--na-cyan);font-weight:900;cursor:pointer;font-size:10px;letter-spacing:.06em;font-family:inherit;white-space:nowrap;}
+#na-upload-status{font-size:9px;color:var(--na-text2);margin-left:4px;white-space:nowrap;}
+#atlas .na-btn{border-radius:999px;padding:5px 12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:var(--na-text);font-weight:900;cursor:pointer;font-size:11px;letter-spacing:.06em;font-family:inherit;white-space:nowrap;}
+#atlas .na-btn:hover{border-color:var(--na-cyan);background:rgba(103,232,249,.09)}
+#atlas .na-btn.primary{background:linear-gradient(135deg,var(--na-blue),var(--na-cyan));color:#020611;border-color:transparent;}
+#atlas .na-btn.sm{padding:4px 9px;font-size:10px}
+#na-app{flex:1;display:flex;overflow:hidden;}
+#na-canvas-wrap{flex:1;position:relative;overflow:hidden;cursor:grab;background:radial-gradient(ellipse at 50% 40%,rgba(14,165,233,.07) 0%,transparent 60%);}
+#na-canvas-wrap:active{cursor:grabbing}
+#na-canvas{position:absolute;top:0;left:0;width:100%;height:100%}
+#na-hud{position:absolute;top:12px;left:14px;font-family:'Orbitron',monospace;font-size:8px;letter-spacing:.14em;color:rgba(103,232,249,.35);pointer-events:none;z-index:30;line-height:1.9;}
+#na-zoom-hint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);font-size:10px;color:rgba(255,255,255,.2);pointer-events:none;z-index:30;letter-spacing:.06em;font-weight:700;white-space:nowrap;}
+#na-sys-banner{position:absolute;top:12px;left:50%;transform:translateX(-50%);background:rgba(5,9,26,.88);border:1px solid var(--na-border);border-radius:999px;padding:5px 14px;font-size:11px;font-weight:900;letter-spacing:.1em;color:var(--na-cyan);pointer-events:none;z-index:40;opacity:0;transition:opacity .25s;white-space:nowrap;backdrop-filter:blur(8px);}
+#na-sys-banner.visible{opacity:1}
+#na-zoom-ctrls{position:absolute;bottom:14px;right:14px;display:flex;flex-direction:column;gap:5px;z-index:40;}
+#atlas .na-zoom-btn{width:30px;height:30px;border-radius:8px;border:1px solid var(--na-border);background:rgba(5,9,24,.8);color:var(--na-text);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
+#atlas .na-zoom-btn:hover{border-color:var(--na-cyan);}
+#na-sidebar{width:var(--na-sidebar-w);flex-shrink:0;display:flex;flex-direction:column;background:var(--na-bg-glass);border-left:1px solid var(--na-border);overflow:hidden;}
+#na-sb-head{padding:14px 16px 12px;border-bottom:1px solid var(--na-border-dim);flex-shrink:0;}
+#na-sb-title{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:.22em;color:var(--na-cyan);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
+#na-sb-scroll{flex:1;overflow-y:auto;padding:12px 16px 24px;scrollbar-width:thin;scrollbar-color:rgba(103,232,249,.18) transparent;}
+#atlas .ring-cluster{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+#atlas .ring-cluster svg{flex-shrink:0}
+#atlas .ring-meta{flex:1}
+#atlas .ring-big{font-family:'Orbitron',monospace;font-size:26px;font-weight:900;color:var(--na-cyan);text-shadow:var(--na-glow-cyan);line-height:1;display:block;}
+#atlas .ring-label{font-size:9px;letter-spacing:.16em;color:var(--na-text2);text-transform:uppercase;margin-top:3px;display:block;}
+#atlas .energy-wrap{margin-bottom:14px}
+#atlas .energy-row{display:flex;justify-content:space-between;font-size:10px;color:var(--na-text2);margin-bottom:4px}
+#atlas .energy-row span{color:var(--na-cyan);font-weight:900}
+#atlas .energy-track{background:rgba(255,255,255,.06);border-radius:999px;height:5px;overflow:hidden}
+#atlas .energy-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--na-blue),var(--na-cyan));box-shadow:0 0 8px rgba(103,232,249,.5);transition:width .9s cubic-bezier(.22,1,.36,1);}
+#atlas .kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:14px}
+#atlas .kpi-card{border:1px solid rgba(160,160,210,.12);border-radius:10px;background:rgba(255,255,255,.03);padding:9px 11px;}
+#atlas .kpi-card.hi{border-color:rgba(103,232,249,.28);background:rgba(103,232,249,.05)}
+#atlas .kpi-card.warn{border-color:rgba(239,68,68,.32);background:rgba(239,68,68,.06)}
+#atlas .kpi-n{font-family:'Orbitron',monospace;font-size:20px;font-weight:900;display:block;line-height:1;}
+#atlas .kpi-l{font-size:9px;color:var(--na-text2);letter-spacing:.1em;text-transform:uppercase;display:block;margin-top:3px;}
+#atlas .s-head{font-size:9px;letter-spacing:.18em;color:var(--na-text2);text-transform:uppercase;margin:14px 0 7px;font-weight:900;display:flex;align-items:center;justify-content:space-between;}
+#atlas .accent{color:var(--na-cyan)}
+#atlas .legend{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px;}
+#atlas .leg-item{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--na-text2);}
+#atlas .leg-dot{width:8px;height:8px;border-radius:50%;}
+#atlas .forecast-row{display:flex;gap:5px;align-items:flex-end;height:72px;margin-bottom:10px;}
+#atlas .fc-bar{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;flex:1;}
+#atlas .bar{width:100%;border-radius:3px 3px 0 0;min-height:3px;transition:height .5s ease;}
+#atlas .cnt{font-size:9px;font-weight:900;color:var(--na-cyan);}
+#atlas .dl{font-size:8px;color:var(--na-text2);}
+#atlas .sys-list{display:flex;flex-direction:column;gap:4px;margin-bottom:6px}
+#atlas .sys-row{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;border:1px solid transparent;cursor:pointer;transition:border-color .12s,background .12s;}
+#atlas .sys-row:hover{border-color:var(--na-border);background:rgba(103,232,249,.04)}
+#atlas .sys-row.active{border-color:var(--na-cyan);background:rgba(103,232,249,.08)}
+#atlas .sys-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+#atlas .sys-name{font-weight:900;font-size:11px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#atlas .sys-stat{font-size:10px;color:var(--na-text2);white-space:nowrap}
+#atlas .search-row{margin-bottom:7px}
+#atlas .search-input{width:100%;padding:7px 11px;border-radius:8px;border:1px solid var(--na-border-dim);background:rgba(255,255,255,.04);color:var(--na-text);font-size:11px;font-family:inherit;outline:none;}
+#atlas .search-input:focus{border-color:var(--na-cyan);}
+#atlas .filter-row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;}
+#atlas .filter-btn{padding:3px 9px;border-radius:999px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:var(--na-text2);font-size:10px;cursor:pointer;font-family:inherit;font-weight:700;}
+#atlas .filter-btn:hover{border-color:var(--na-border);color:var(--na-text);}
+#atlas .filter-btn.active{border-color:var(--na-cyan);color:var(--na-cyan);background:rgba(103,232,249,.08);}
+#atlas .mini-table{width:100%;border-collapse:collapse;font-size:10px;}
+#atlas .mini-table th{color:var(--na-text2);font-weight:900;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:5px 6px;border-bottom:1px solid var(--na-border-dim);text-align:left;}
+#atlas .mini-table td{padding:5px 6px;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle;cursor:pointer;}
+#atlas .mini-table tr:hover td{background:rgba(103,232,249,.04);}
+#atlas .pill{display:inline-block;padding:1px 5px;border-radius:4px;font-size:9px;font-weight:900;letter-spacing:.07em;}
+#atlas .p-new{background:rgba(103,232,249,.15);color:var(--na-cyan);}
+#atlas .p-rev{background:rgba(34,197,94,.15);color:#22c55e;}
+#atlas .p-rel{background:rgba(239,68,68,.15);color:#ef4444;}
+#atlas .p-ovr{color:#ef4444;font-weight:900;}
+#atlas .p-tdy{color:#f59e0b;font-weight:900;}
+#atlas .p-fut{color:var(--na-text2);}
+#na-card-detail{display:none;position:absolute;inset:0;z-index:100;background:var(--na-bg-glass);backdrop-filter:blur(18px);overflow-y:auto;padding:16px;border-left:1px solid var(--na-border);}
+#na-card-detail.open{display:block;}
+#atlas .cd-close{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+#atlas .cd-close-btn{background:none;border:1px solid var(--na-border);border-radius:999px;color:var(--na-text2);cursor:pointer;font-size:11px;padding:4px 10px;font-family:inherit;}
+#atlas .cd-close-btn:hover{color:var(--na-cyan);border-color:var(--na-cyan);}
+#atlas .cd-id{font-size:9px;letter-spacing:.18em;color:var(--na-text2);text-transform:uppercase;margin-bottom:4px;}
+#atlas .cd-sys{display:inline-block;font-size:9px;font-weight:900;padding:2px 8px;border-radius:999px;margin-bottom:12px;}
+#atlas .cd-section{margin-bottom:12px;}
+#atlas .cd-label{font-size:9px;letter-spacing:.14em;color:var(--na-text2);text-transform:uppercase;margin-bottom:4px;font-weight:900;}
+#atlas .cd-q{font-size:12px;line-height:1.6;color:var(--na-text);background:rgba(103,232,249,.05);border:1px solid var(--na-border-dim);border-radius:8px;padding:10px 12px;}
+#atlas .cd-ans{font-size:12px;font-weight:900;color:var(--na-cyan);background:rgba(103,232,249,.08);border:1px solid rgba(103,232,249,.25);border-radius:8px;padding:10px 12px;}
+#atlas .cd-body{font-size:11px;line-height:1.65;color:var(--na-text2);background:rgba(255,255,255,.03);border-radius:8px;padding:10px 12px;border:1px solid var(--na-border-dim);}
+#atlas .cd-star{font-size:11px;line-height:1.6;color:#f59e0b;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.22);border-radius:8px;padding:10px 12px;}
+#atlas .cd-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px;}
+#atlas .cd-stat{text-align:center;background:rgba(255,255,255,.04);border-radius:8px;padding:8px 4px;border:1px solid var(--na-border-dim);}
+#atlas .cd-stat-n{font-family:'Orbitron',monospace;font-size:15px;font-weight:900;display:block;}
+#atlas .cd-stat-l{font-size:8px;letter-spacing:.1em;color:var(--na-text2);text-transform:uppercase;}
+#atlas .cd-flags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+#atlas .cd-flag{font-size:9px;padding:3px 8px;border-radius:999px;font-weight:900;}
+#atlas .cd-flag.pinned{background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.35);color:#c084fc;}
+#atlas .cd-flag.repair{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;}
+#atlas .cd-flag.suspended{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#f87171;}
+#atlas .cd-flag.leech{background:rgba(107,33,168,.12);border:1px solid rgba(107,33,168,.3);color:#c084fc;}
+#atlas .cd-flag.due{background:rgba(251,88,118,.12);border:1px solid rgba(251,88,118,.3);color:#fb5876;}
+#na-diag-box{display:none;margin-top:14px;}
+#na-diag-out{font-size:9.5px;line-height:1.7;color:var(--na-text2);white-space:pre-wrap;background:rgba(255,255,255,.03);border:1px solid var(--na-border-dim);border-radius:8px;padding:10px;}
+#atlas .mini-table th{cursor:pointer;user-select:none;}
+#atlas .mini-table th:last-child{cursor:default;}
+#atlas .mini-table th.na-srt{color:var(--na-cyan);}
+#atlas .sort-arrow{font-size:9px;opacity:.65;margin-left:2px;}
+#atlas .sys-row.active-row{background:rgba(103,232,249,.10);border-left:2px solid var(--na-cyan);}
+#na-view-toggle-btn{float:right;background:rgba(103,232,249,.08);border:1px solid rgba(103,232,249,.2);border-radius:999px;color:var(--na-cyan);font-size:9px;font-weight:900;padding:2px 8px;cursor:pointer;font-family:inherit;letter-spacing:.05em;}
+#na-toast{display:none;position:absolute;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(5,9,24,.95);border:1px solid var(--na-border);border-radius:999px;padding:8px 18px;font-size:11px;font-weight:700;color:var(--na-cyan);z-index:9999;backdrop-filter:blur(8px);}
+#na-import-drop{display:none;position:absolute;inset:0;z-index:9000;background:rgba(3,7,19,.88);backdrop-filter:blur(8px);align-items:center;justify-content:center;flex-direction:column;gap:16px;}
+#na-import-drop.show{display:flex;}
+#na-import-drop-box{border:2px dashed var(--na-cyan);border-radius:16px;padding:40px 60px;text-align:center;}
+#na-import-drop-title{font-family:'Orbitron',monospace;font-size:14px;color:var(--na-cyan);margin-bottom:8px;}
+#na-import-drop-sub{font-size:11px;color:var(--na-text2);}
+@media(max-width:700px){
+  #atlas{--na-sidebar-w:100%}
+  #na-app{flex-direction:column}
+  #na-canvas-wrap{height:52vh}
+  #na-sidebar{width:100%;height:48vh;border-left:none;border-top:1px solid var(--na-border);}
+}
+@media(max-width:420px){#na-topbar-sub{display:none}}
+`;
+document.head.appendChild(naStyle);
+
+// ── HTML ─────────────────────────────────────────────────────────────────
+var naDiv=document.createElement('div');
+naDiv.id='atlas';naDiv.className='screen hidden';
+naDiv.innerHTML=`
+<div id="na-topbar">
+  <div id="na-topbar-title">⬡ Neural Atlas</div>
+  <div id="na-topbar-sub">Atlas of Forgetting · Clinical Signal Map · Cozy Arcade Board Prep</div>
+  <div id="na-topbar-btns">
+    <button class="na-btn sm" onclick="window.hideAtlasScreen()">← Home</button>
+    <div id="na-upload-pill">
+      <label id="na-upload-label" for="na-upload-file">⬆ Import</label>
+      <input type="file" id="na-upload-file" accept=".json" onchange="naHandleFileUpload(event)">
+    </div>
+    <button class="na-btn sm" onclick="naExportProgressOnly()">Progress</button>
+    <button class="na-btn primary sm" onclick="naExportDeckAndProgress()">Deck+Prog</button>
+    <span id="na-upload-status"></span>
+    <button class="na-btn sm" onclick="naFullRefresh()">↻</button>
+    <button class="na-btn sm" onclick="naRunDiagnostic()">Diag</button>
+  </div>
+</div>
+<div id="na-app">
+  <div id="na-canvas-wrap"
+    ondragover="event.preventDefault();document.getElementById('na-import-drop').classList.add('show');"
+    ondragleave="document.getElementById('na-import-drop').classList.remove('show')"
+    ondrop="naHandleDrop(event)">
+    <canvas id="na-canvas"></canvas>
+    <div id="na-hud"></div>
+    <div id="na-zoom-hint">scroll to zoom · drag to pan · click a node</div>
+    <div id="na-sys-banner"></div>
+    <div id="na-zoom-ctrls">
+      <button class="na-zoom-btn" onclick="naAdjustZoom(1.25)">+</button>
+      <button class="na-zoom-btn" onclick="naAdjustZoom(0.8)">−</button>
+      <button class="na-zoom-btn" style="font-size:12px" onclick="naResetView()">⌖</button>
+    </div>
+  </div>
+  <div id="na-sidebar">
+    <div id="na-card-detail">
+      <div class="cd-close">
+        <span style="font-family:'Orbitron',monospace;font-size:9px;letter-spacing:.2em;color:var(--na-cyan);">SIGNAL DETAIL</span>
+        <button class="cd-close-btn" onclick="naCloseCardDetail()">✕ Close</button>
+      </div>
+      <div id="na-cd-content"></div>
+    </div>
+    <div id="na-sb-head">
+      <div id="na-sb-title">
+        <span id="na-sb-title-text">Signal Intelligence</span>
+        <button class="na-btn sm" id="na-clear-sys-btn" onclick="naClearSelection()" style="display:none">✕ Clear</button>
+      </div>
+      <div class="ring-cluster">
+        <svg width="60" height="60" viewBox="0 0 60 60">
+          <circle cx="30" cy="30" r="24" fill="none" stroke="rgba(103,232,249,.1)" stroke-width="5"/>
+          <circle id="na-ret-circle" cx="30" cy="30" r="24" fill="none" stroke="url(#na-rg)" stroke-width="5"
+            stroke-dasharray="150.8" stroke-dashoffset="150.8" stroke-linecap="round" transform="rotate(-90 30 30)"/>
+          <defs><linearGradient id="na-rg" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#0ea5e9"/><stop offset="100%" stop-color="#67e8f9"/>
+          </linearGradient></defs>
+        </svg>
+        <div class="ring-meta">
+          <span class="ring-big" id="na-k-total">—</span>
+          <span class="ring-label">Total Signals</span>
+        </div>
+      </div>
+      <div class="energy-wrap">
+        <div class="energy-row"><span>Signal Energy (Retention)</span><span id="na-k-ret">—</span></div>
+        <div class="energy-track"><div class="energy-fill" id="na-energy-fill" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div id="na-sb-scroll">
+      <div class="kpi-grid">
+        <div class="kpi-card hi"><span class="kpi-n" id="na-k-due">—</span><span class="kpi-l">Due Now</span></div>
+        <div class="kpi-card"><span class="kpi-n" id="na-k-new">—</span><span class="kpi-l">New</span></div>
+        <div class="kpi-card warn"><span class="kpi-n" id="na-k-repair">—</span><span class="kpi-l">Repair Points</span></div>
+        <div class="kpi-card"><span class="kpi-n" id="na-k-pinned">—</span><span class="kpi-l">Pinned</span></div>
+        <div class="kpi-card warn"><span class="kpi-n" id="na-k-leech">—</span><span class="kpi-l">Leeches ≥4</span></div>
+        <div class="kpi-card"><span class="kpi-n" id="na-k-due7">—</span><span class="kpi-l">Due 7d</span></div>
+      </div>
+      <div class="s-head">Node Key</div>
+      <div class="legend">
+        <div class="leg-item"><div class="leg-dot" style="background:#22c55e"></div>Mastered ≥85%</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#f97316"></div>In Progress</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#ef4444"></div>Repair Needed</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#a855f7"></div>Heavy Pins</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#fb5876;width:6px;height:6px;outline:1.5px solid #fb5876"></div>Due indicator</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#4163ff"></div>Not Started</div>
+      </div>
+      <div class="s-head">7-Day Due Forecast</div>
+      <div class="forecast-row" id="na-forecast-row"></div>
+      <div class="s-head"><span id="na-sys-head-label">System Signals</span> <span class="accent" id="na-sys-count-badge"></span><button id="na-view-toggle-btn" onclick="naToggleView()">Tag View</button></div>
+      <div class="sys-list" id="na-sys-list"></div>
+      <div class="s-head" style="margin-top:10px">Tag Filter <span class="accent" id="na-tag-count-badge"></span></div>
+      <div class="sys-list" id="na-tag-list"></div>
+      <div class="s-head" style="margin-top:16px">Card Browser
+        <span id="na-browser-count" style="color:var(--na-text2);font-size:9px;font-weight:400;letter-spacing:.06em;text-transform:none;"></span>
+      </div>
+      <div id="na-deck-hint-msg" style="display:none;font-size:10px;color:var(--na-text2);margin:6px 0 10px;padding:7px 10px;border:1px solid rgba(160,160,210,.12);border-radius:6px;line-height:1.5">
+        ⚠ No deck loaded — open main app, upload deck, then click ↻ Sync
+      </div>
+      <div class="search-row">
+        <input class="search-input" id="na-search-input" placeholder="Search diagnosis, system, tags…" oninput="naRenderTable()">
+      </div>
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="naSetFilter('all',this)">All</button>
+        <button class="filter-btn" onclick="naSetFilter('due',this)">Due</button>
+        <button class="filter-btn" onclick="naSetFilter('new',this)">New</button>
+        <button class="filter-btn" onclick="naSetFilter('review',this)">Review</button>
+        <button class="filter-btn" onclick="naSetFilter('pinned',this)">📌</button>
+        <button class="filter-btn" onclick="naSetFilter('repair',this)">⚠</button>
+        <button class="filter-btn" onclick="naSetFilter('leech',this)">💀</button>
+        <button class="filter-btn" onclick="naSetFilter('suspended',this)">🚫</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="mini-table">
+          <thead><tr><th onclick="naToggleSort('diag')">Diagnosis <span id="na-sort-ind-diag" class="sort-arrow"></span></th><th onclick="naToggleSort('sys')">Sys <span id="na-sort-ind-sys" class="sort-arrow"></span></th><th onclick="naToggleSort('stage')">Stage <span id="na-sort-ind-stage" class="sort-arrow"></span></th><th onclick="naToggleSort('due')">Due <span id="na-sort-ind-due" class="sort-arrow">▲</span></th><th style="cursor:default">⚑</th></tr></thead>
+          <tbody id="na-table-body"></tbody>
+        </table>
+      </div>
+      <div id="na-diag-box"><div class="s-head" style="margin:14px 0 8px">Diagnostic Report</div><pre id="na-diag-out"></pre></div>
+    </div>
+  </div>
+</div>
+<div id="na-import-drop">
+  <div id="na-import-drop-box">
+    <div id="na-import-drop-title">⬡ Drop Progress JSON</div>
+    <div id="na-import-drop-sub">Drop your cozy_arcade_progress_*.json or deck JSON file</div>
+  </div>
+</div>
+<div id="na-toast"></div>
+`;
+document.body.appendChild(naDiv);
+
+// ── HELPERS ───────────────────────────────────────────────────────────────
+var naQ=function(id){return document.getElementById('na-'+id);};
+function parseTags(c){var t=c&&c.tags;if(!t)return[];if(Array.isArray(t))return t.map(function(s){return String(s).trim();}).filter(Boolean);return String(t).split(/[,;]+/).map(function(s){return s.trim();}).filter(Boolean);}
+
+// ── SECTION A: DATA LAYER ─────────────────────────────────────────────────
+var STATE_KEYS=['cozy_arcade_state_v3','cozy_arcade_progress_v1','soloStudyingState_v1757','cazy_v3'];
+var DECK_STORAGE_KEY='cozy_arcade_limitless_cards_v1';
+var PROGRESS_STORAGE_KEY='cozy_arcade_progress_v1';
+var MAIN_STATE_KEY='cozy_arcade_state_v3';
+var deckMap={};var naSelectedTag=null;var naSortCol='due';var naSortDir=1;var naViewMode='sys';
+var SYS_COLORS={'CV':'#ef4444','CARDIOLOGY':'#ef4444','CARD':'#ef4444','GI':'#f97316','GASTROENTEROLOGY':'#f97316','ID':'#84cc16','INFECTIOUS DISEASE':'#84cc16','INFECTIOUS':'#84cc16','ENDO':'#a855f7','ENDOCRINE':'#a855f7','ENDOCRINOLOGY':'#a855f7','PULM':'#3b82f6','PULMONOLOGY':'#3b82f6','PULM/CCM':'#3b82f6','NEPHRO':'#06b6d4','NEPHROLOGY':'#06b6d4','RENAL':'#06b6d4','NEURO':'#f59e0b','NEUROLOGY':'#f59e0b','ONC':'#ec4899','ONCOLOGY':'#ec4899','HEM/ONC':'#ec4899','RHEUM':'#10b981','RHEUMATOLOGY':'#10b981','HEM':'#6366f1','HEMATOLOGY':'#6366f1','DERM':'#fbbf24','DERMATOLOGY':'#fbbf24','PSYCH':'#8b5cf6','PSYCHIATRY':'#8b5cf6','MSK':'#78716c','MUSCULOSKELETAL':'#78716c','GYN':'#f43f5e','OB/GYN':'#f43f5e','GYNECOLOGY':'#f43f5e','GERIATRICS':'#94a3b8','PALLIATIVE':'#94a3b8','ETHICS':'#d97706','STATS':'#0891b2','ENT':'#7c3aed','OPHTHO':'#2563eb','ALLERGY':'#16a34a','—':'#4163ff','UNKNOWN':'#4163ff'};
+function normSys(s){if(!s)return'—';return String(s).trim().toUpperCase();}
+function sysColor(sys){var n=normSys(sys);return SYS_COLORS[n]||SYS_COLORS[sys]||'#4163ff';}
+function readProgress(){try{if(window.phase3State&&window.phase3State.progress&&Object.keys(window.phase3State.progress).length>0)return window.phase3State.progress;}catch(_){}for(var i=0;i<STATE_KEYS.length;i++){try{var r=localStorage.getItem(STATE_KEYS[i]);if(!r)continue;var p=JSON.parse(r);if(p&&p.progress&&typeof p.progress==='object')return p.progress;if(typeof p==='object'&&!Array.isArray(p)&&p!==null){var v=Object.values(p);if(v.length>0&&(v[0].stage||v[0].seen_count!==undefined))return p;}}catch(_){}}return{};}
+var atlasLoadDeck=function(){try{if(typeof window.appCards==='function'){var ac=window.appCards();if(ac&&ac.length){deckMap={};ac.forEach(function(c){var id=c&&(c.qid_unique||c.qid||c.card_id||c.id);if(id)deckMap[id]=c;});return Object.keys(deckMap).length;}}}catch(_){}try{var raw=localStorage.getItem(DECK_STORAGE_KEY);if(!raw){deckMap={};return 0;}var payload=JSON.parse(raw);var cards=Array.isArray(payload)?payload:(Array.isArray(payload&&payload.cards)?payload.cards:[]);deckMap={};cards.forEach(function(c){var id=c&&(c.qid_unique||c.qid||c.card_id||c.id);if(id)deckMap[id]=c;});return Object.keys(deckMap).length;}catch(_){deckMap={};return 0;}};
+function payloadCards(obj){return Array.isArray(obj)?obj:(Array.isArray(obj&&obj.cards)?obj.cards:(Array.isArray(obj&&obj.data)?obj.data:null));}
+function payloadProgress(obj){return(obj&&obj.progress&&typeof obj.progress==='object')?obj.progress:((obj&&obj.state&&typeof obj.state==='object')?obj.state:null);}
+function hydrateDeckMap(arr){deckMap={};(arr||[]).forEach(function(c){var id=c&&(c.qid_unique||c.qid||c.card_id||c.id);if(id)deckMap[id]=c;});}
+function atlasCompactCard(c,minimal){var fields=minimal?['qid','qid_unique','card_id','sys','diagnosis']:['qid','qid_unique','card_id','sys','diagnosis','presentation','one_thing','board_trigger','educational_objective'];var out={};fields.forEach(function(k){if(c&&c[k]!=null&&String(c[k]).length)out[k]=c[k];});return out;}
+function writeAtlasDeckCache(metadata,cardsArr){var stamp={stored_at:new Date().toISOString(),cards_embedded:cardsArr.length};var attempts=[{mode:'full deck cache',cards:cardsArr},{mode:'compact deck cache',cards:cardsArr.map(function(c){return atlasCompactCard(c,false);})},{mode:'atlas-minimal deck cache',cards:cardsArr.map(function(c){return atlasCompactCard(c,true);})},{mode:'sys-map only',cards:cardsArr.map(function(c){var id=c&&(c.qid_unique||c.qid||c.card_id||c.id);return id?{qid_unique:id,sys:(c&&(c.sys||c.system))||'—'}:null;}).filter(Boolean)}];for(var i=0;i<attempts.length;i++){try{localStorage.setItem(DECK_STORAGE_KEY,JSON.stringify({metadata:Object.assign({},metadata,stamp,{atlas_cache_mode:attempts[i].mode}),cards:attempts[i].cards}));return attempts[i];}catch(e){}}return{mode:'deck cache unavailable',cards:[]};}
+function storeHydratedPayload(obj,cardsArr,incomingProgress){var metadata=(obj&&(obj.metadata||obj.meta))||{};var deckCache=writeAtlasDeckCache(metadata,cardsArr);try{localStorage.setItem(MAIN_STATE_KEY,JSON.stringify({schema_version:metadata.schema_version||'3.0',deck_label:metadata.deck_label||metadata.name||'Cozy Arcade Board Prep Medicine',imported_at:new Date().toISOString(),metadata:Object.assign({},metadata,{atlas_cache_mode:deckCache.mode}),progress:incomingProgress}));}catch(_){}try{localStorage.setItem(PROGRESS_STORAGE_KEY,JSON.stringify({metadata:Object.assign({},metadata,{type:'progress'}),progress:incomingProgress}));}catch(_){}return deckCache.mode;}
+function handleFileUpload(e){var file=e.target.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(ev){ingestJSON(ev.target.result,file.name);};reader.readAsText(file);e.target.value='';}
+function handleDrop(e){e.preventDefault();naQ('import-drop').classList.remove('show');var file=e.dataTransfer.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(ev){ingestJSON(ev.target.result,file.name);};reader.readAsText(file);}
+function ingestJSON(text,filename){try{var obj=JSON.parse(text);var cardsArr=payloadCards(obj);var incomingProgress=payloadProgress(obj);var type=obj&&((obj.metadata&&obj.metadata.type)||(obj.meta&&obj.meta.type)||obj.type);if(cardsArr&&cardsArr.length>0&&incomingProgress&&(type==='deck_with_progress'||type==='full_gamestate'||obj.progress||obj.state)){progress=incomingProgress;hydrateDeckMap(cardsArr);var cacheMode=storeHydratedPayload(obj,cardsArr,progress);mergeSysFromDeck();showUploadStatus('✓ Deck+progress: '+cardsArr.length+' cards, '+Object.keys(progress).length+' signals','#22c55e');fullRefreshDisplay();return;}if((type==='progress'||incomingProgress)&&incomingProgress){progress=incomingProgress;try{localStorage.setItem(PROGRESS_STORAGE_KEY,JSON.stringify({metadata:obj.metadata||{type:'progress'},progress}));}catch(_){}mergeSysFromDeck();showUploadStatus('✓ '+Object.keys(progress).length+' signals loaded','#22c55e');fullRefreshDisplay();return;}if(cardsArr&&cardsArr.length>0&&cardsArr[0].qid_unique){hydrateDeckMap(cardsArr);try{localStorage.setItem(DECK_STORAGE_KEY,JSON.stringify({metadata:Object.assign({},{stored_at:new Date().toISOString(),cards_embedded:cardsArr.length}),cards:cardsArr}));}catch(_){}mergeSysFromDeck();showUploadStatus('✓ Deck: '+cardsArr.length+' cards','#67e8f9');fullRefreshDisplay();return;}var vals=Object.values(obj);if(vals.length>0&&vals[0].stage){progress=obj;mergeSysFromDeck();showUploadStatus('✓ '+vals.length+' signals','#22c55e');fullRefreshDisplay();return;}showUploadStatus('⚠ Unrecognized format','#ef4444');}catch(err){showUploadStatus('⚠ Parse error: '+err.message.slice(0,40),'#ef4444');}}
+function mergeSysFromDeck(){if(!Object.keys(deckMap).length)return;Object.entries(progress).forEach(function(e){var id=e[0],p=e[1];if(!p.sys){var card=deckMap[id];if(card&&card.sys)p.sys=normSys(card.sys);}});}
+function showUploadStatus(msg,color){var el=naQ('upload-status');if(el){el.textContent=msg;el.style.color=color||'var(--na-cyan)';}setTimeout(function(){if(el)el.textContent='';},4000);}
+function isDue(p){if(!p||p.stage==='new')return false;if(!p.seen_count&&!p.reviewed_count)return false;if(!p.next_due_at)return(p.seen_count||p.reviewed_count)>0;return new Date(p.next_due_at)<=new Date();}
+function isLeech(p){return Number((p&&p.lapses)||0)>=4;}
+function retentionPct(vals){var r=vals.filter(function(p){return Number(p.reviewed_count||p.reviewed||0)>0;});if(!r.length)return null;var c=r.reduce(function(s,p){return s+Number(p.correct_count||p.correct||0);},0);var t=r.reduce(function(s,p){return s+Number(p.reviewed_count||p.reviewed||0);},0);return t?Math.round(c/t*100):null;}
+function masteryPct(vals){if(!vals.length)return 0;return Math.round(vals.filter(function(p){return Number(p.seen_count||0)>0||p.seen;}).length/vals.length*100);}
+function buildSysMap(prog){var m={};Object.entries(prog).forEach(function(e){var id=e[0],p=e[1];var s=p.sys?normSys(p.sys):'—';if(!m[s])m[s]={total:0,reviewed:0,due:0,new:0,pinned:0,repair:0,leech:0,cards:[]};m[s].total++;m[s].cards.push({id:id,p:p});if(Number(p.seen_count||0)>0||p.seen)m[s].reviewed++;else m[s].new++;if(isDue(p))m[s].due++;if(p.pinned)m[s].pinned++;if(p.repair_point)m[s].repair++;if(isLeech(p))m[s].leech++;});return m;}
+function buildTagMap(prog){var m={};Object.entries(prog).forEach(function(e){var id=e[0],p=e[1];var card=deckMap[id]||{};var tags=parseTags(card);if(!tags.length)tags=['—'];tags.forEach(function(tag){if(!m[tag])m[tag]={total:0,reviewed:0,due:0,new:0,pinned:0,repair:0,leech:0,cards:[]};m[tag].total++;m[tag].cards.push({id:id,p:p});if(Number(p.seen_count||0)>0||p.seen)m[tag].reviewed++;else m[tag].new++;if(isDue(p))m[tag].due++;if(p.pinned)m[tag].pinned++;if(p.repair_point)m[tag].repair++;if(isLeech(p))m[tag].leech++;});});return m;}
+function nodeColor(sys,d){if(!d||!d.total)return sysColor(sys);if(d.repair/d.total>0.18)return'#ef4444';if(d.pinned/d.total>0.15)return'#a855f7';var pct=d.reviewed/d.total;if(pct>=0.85)return'#22c55e';if(pct>=0.55)return'#f97316';if(pct>=0.25)return'#fbbf24';return sysColor(sys);}
+
+// ── SECTION B: GRAPH MODEL ────────────────────────────────────────────────
+var naNodes=[],naEdges=[];
+function buildGraph(sysMap){naNodes=[];naEdges=[];naNodes.push({id:'__core__',label:'CORE',x:0,y:0,vx:0,vy:0,r:44,color:'#0ea5e9',sysColor:'#0ea5e9',isCore:true,data:null});var sysList=Object.keys(sysMap).filter(function(s){return s!=='—'||sysMap['—'].total>0;});if(!sysList.length)return;var angleStep=Math.PI*2/sysList.length;sysList.forEach(function(sys,i){var d=sysMap[sys];var angle=i*angleStep-Math.PI/2;var dist=170+Math.min(d.total*1.8,90);var r=Math.max(13,Math.min(36,9+Math.sqrt(d.total)*3.2));var jitter=function(){return(Math.random()-0.5)*50;};naNodes.push({id:sys,label:sys,x:Math.cos(angle)*dist+jitter(),y:Math.sin(angle)*dist+jitter(),vx:0,vy:0,r:r,color:nodeColor(sys,d),sysColor:sysColor(sys),isCore:false,data:d,ctrlOX:(Math.random()-0.5)*60,ctrlOY:(Math.random()-0.5)*60});naEdges.push({a:'__core__',b:sys,strength:0.035,isCoreEdge:true});if(i>0&&Math.random()<0.30){var j=Math.floor(Math.random()*i);naEdges.push({a:sys,b:sysList[j],strength:0.008,isCoreEdge:false});}});}
+
+// ── SECTION C: FORCE SIM ──────────────────────────────────────────────────
+var FORCE={repel:5200,damp:0.80,center:0.009,maxV:6};
+function runForces(steps){for(var s=0;s<steps;s++){for(var i=1;i<naNodes.length;i++){for(var j=i+1;j<naNodes.length;j++){var a=naNodes[i],b=naNodes[j];var dx=b.x-a.x,dy=b.y-a.y;var d2=dx*dx+dy*dy||1;var minD=a.r+b.r+50;if(d2>(minD*4)*(minD*4))continue;var f=FORCE.repel/d2,d=Math.sqrt(d2);var fx=(dx/d)*f,fy=(dy/d)*f;a.vx-=fx;a.vy-=fy;b.vx+=fx;b.vy+=fy;}}for(var ei=0;ei<naEdges.length;ei++){var e=naEdges[ei];var na2=naNodes.find(function(n){return n.id===e.a;}),nb=naNodes.find(function(n){return n.id===e.b;});if(!na2||!nb)continue;var dx2=nb.x-na2.x,dy2=nb.y-na2.y;var d3=Math.sqrt(dx2*dx2+dy2*dy2)||1;var target=e.isCoreEdge?185:130;var f2=(d3-target)*e.strength;var fx2=(dx2/d3)*f2,fy2=(dy2/d3)*f2;if(!na2.isCore){na2.vx+=fx2;na2.vy+=fy2;}if(!nb.isCore){nb.vx-=fx2;nb.vy-=fy2;}}for(var ni=0;ni<naNodes.length;ni++){var n=naNodes[ni];if(n.isCore)continue;n.vx-=n.x*FORCE.center;n.vy-=n.y*FORCE.center;n.vx*=FORCE.damp;n.vy*=FORCE.damp;n.vx=Math.max(-FORCE.maxV,Math.min(FORCE.maxV,n.vx));n.vy=Math.max(-FORCE.maxV,Math.min(FORCE.maxV,n.vy));n.x+=n.vx;n.y+=n.vy;}}}
+
+// ── SECTION D: CANVAS RENDERER ────────────────────────────────────────────
+var naCanvas=null,naCtx=null,naW=0,naH=0,naCamX=0,naCamY=0,naCamZ=1;
+var naTick=0,naHovNode=null,naRafId=null;
+var naReduced=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+var naStars=Array.from({length:70},function(){return{x:Math.random(),y:Math.random(),r:0.3+Math.random()*0.9,phase:Math.random()*Math.PI*2};});
+var naParticles=[];
+function naSpawnParticles(wx,wy,color,n){if(naReduced)return;n=n||10;for(var i=0;i<n;i++){var a=Math.random()*Math.PI*2,spd=0.6+Math.random()*2.8;naParticles.push({x:wx,y:wy,vx:Math.cos(a)*spd,vy:Math.sin(a)*spd,life:1,decay:0.016+Math.random()*0.028,r:1.2+Math.random()*2.8,color:color});}}
+function naTickParticles(){for(var i=naParticles.length-1;i>=0;i--){var p=naParticles[i];p.x+=p.vx;p.y+=p.vy;p.vx*=0.958;p.vy*=0.958;p.life-=p.decay;if(p.life<=0)naParticles.splice(i,1);}}
+function naW2s(wx,wy){return{x:(wx+naCamX)*naCamZ+naW/2,y:(wy+naCamY)*naCamZ+naH/2};}
+function naHexRgba(hex,a){if(!hex||hex[0]!=='#')return'rgba(103,232,249,'+a+')';var r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return'rgba('+r+','+g+','+b+','+a+')';}
+function naDrawBG(){naCtx.clearRect(0,0,naW,naH);var g=naCtx.createRadialGradient(naW/2,naH/2,0,naW/2,naH/2,Math.max(naW,naH)*0.7);g.addColorStop(0,'rgba(8,14,38,.96)');g.addColorStop(0.45,'rgba(5,9,24,.98)');g.addColorStop(1,'rgba(2,4,13,1)');naCtx.fillStyle=g;naCtx.fillRect(0,0,naW,naH);if(!naReduced){for(var i=0;i<naStars.length;i++){var s=naStars[i];var a=0.15+0.22*Math.sin(naTick*0.012+s.phase);naCtx.beginPath();naCtx.arc(s.x*naW,s.y*naH,s.r,0,Math.PI*2);naCtx.fillStyle='rgba(190,215,255,'+a+')';naCtx.fill();}}}
+function naRRect(x,y,w,h,r){naCtx.beginPath();naCtx.moveTo(x+r,y);naCtx.lineTo(x+w-r,y);naCtx.quadraticCurveTo(x+w,y,x+w,y+r);naCtx.lineTo(x+w,y+h-r);naCtx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);naCtx.lineTo(x+r,y+h);naCtx.quadraticCurveTo(x,y+h,x,y+h-r);naCtx.lineTo(x,y+r);naCtx.quadraticCurveTo(x,y,x+r,y);naCtx.closePath();}
+function naDrawEdges(){for(var i=0;i<naEdges.length;i++){var e=naEdges[i];var na2=naNodes.find(function(n){return n.id===e.a;}),nb=naNodes.find(function(n){return n.id===e.b;});if(!na2||!nb)continue;var pa=naW2s(na2.x,na2.y),pb=naW2s(nb.x,nb.y);var cx=(pa.x+pb.x)/2+(nb.ctrlOX||0)*naCamZ,cy=(pa.y+pb.y)/2+(nb.ctrlOY||0)*naCamZ;var grd=naCtx.createLinearGradient(pa.x,pa.y,pb.x,pb.y);grd.addColorStop(0,e.isCoreEdge?'rgba(103,232,249,0.28)':'rgba(103,232,249,0.06)');grd.addColorStop(1,naHexRgba(nb.sysColor,e.isCoreEdge?0.18:0.07));naCtx.beginPath();naCtx.moveTo(pa.x,pa.y);naCtx.quadraticCurveTo(cx,cy,pb.x,pb.y);naCtx.strokeStyle=grd;naCtx.lineWidth=e.isCoreEdge?0.85:0.4;naCtx.stroke();}}
+function naDrawCore(sx,sy,r){var pulse=naReduced?1:0.88+0.12*Math.sin(naTick*0.048);var pr=r*pulse;var bg=naCtx.createRadialGradient(sx-pr*0.18,sy-pr*0.18,0,sx,sy,pr);bg.addColorStop(0,'rgba(220,245,255,0.95)');bg.addColorStop(0.22,'rgba(103,232,249,0.88)');bg.addColorStop(0.6,'rgba(14,165,233,0.7)');bg.addColorStop(1,'rgba(14,165,233,0)');naCtx.beginPath();naCtx.arc(sx,sy,pr,0,Math.PI*2);naCtx.fillStyle=bg;naCtx.fill();var vals=Object.values(progress);var mp=masteryPct(vals);naCtx.save();naCtx.textAlign='center';naCtx.textBaseline='middle';naCtx.font='900 '+Math.max(8,r*0.3)+'px Orbitron,monospace';naCtx.fillStyle='rgba(0,16,24,0.85)';naCtx.fillText(mp+'%',sx,sy);naCtx.restore();}
+function naDrawSysNode(n,sx,sy,r){var hov=naHovNode===n.id,sel=naSelectedSys===n.id,d=n.data||{};var glR=r*(hov?2.3:1.7);var g=naCtx.createRadialGradient(sx,sy,r*0.4,sx,sy,glR);g.addColorStop(0,naHexRgba(n.color,hov?0.48:0.18));g.addColorStop(1,naHexRgba(n.color,0));naCtx.beginPath();naCtx.arc(sx,sy,glR,0,Math.PI*2);naCtx.fillStyle=g;naCtx.fill();var bg=naCtx.createRadialGradient(sx-r*0.18,sy-r*0.18,0,sx,sy,r);bg.addColorStop(0,naHexRgba(n.color,0.9));bg.addColorStop(0.65,naHexRgba(n.color,0.7));bg.addColorStop(1,naHexRgba(n.color,0.25));naCtx.beginPath();naCtx.arc(sx,sy,r,0,Math.PI*2);naCtx.fillStyle=bg;naCtx.fill();if(sel||hov){naCtx.beginPath();naCtx.arc(sx,sy,r+2.5,0,Math.PI*2);naCtx.strokeStyle=sel?'#67e8f9':naHexRgba(n.color,0.85);naCtx.lineWidth=1.5;naCtx.stroke();}if(d.due>0){naCtx.beginPath();naCtx.arc(sx+r*0.65,sy-r*0.65,Math.max(3.5,r*0.28),0,Math.PI*2);naCtx.fillStyle='#fb5876';naCtx.fill();}if(r>5){var fs=Math.max(7,Math.min(10.5,r*0.52));naCtx.save();naCtx.textAlign='center';naCtx.textBaseline='middle';naCtx.font='900 '+fs+'px "DM Sans",sans-serif';naCtx.fillStyle=r>14?'rgba(0,10,10,0.8)':'rgba(255,255,255,0.88)';naCtx.fillText(n.label.length>9?n.label.slice(0,8)+'…':n.label,sx,sy);naCtx.restore();}if(hov||sel){var txt=''+(d.total||0)+' signals · '+(d.reviewed||0)+' studied · '+(d.due||0)+' due';naCtx.font='700 9px "DM Sans",monospace';var tw=naCtx.measureText(txt).width,bw=tw+16,bh=17;var bx=sx-bw/2,by=sy-r*naCamZ-22;naCtx.fillStyle='rgba(5,9,26,.9)';naRRect(bx,by,bw,bh,4);naCtx.fill();naCtx.strokeStyle='rgba(103,232,249,.28)';naCtx.lineWidth=0.6;naRRect(bx,by,bw,bh,4);naCtx.stroke();naCtx.fillStyle='#9fe8ff';naCtx.textAlign='center';naCtx.textBaseline='middle';naCtx.fillText(txt,sx,by+bh/2);}}
+function naDrawNodes(){for(var i=0;i<naNodes.length;i++){var n=naNodes[i];var p=naW2s(n.x,n.y);var r=n.r*naCamZ;if(p.x<-r*3||p.x>naW+r*3||p.y<-r*3||p.y>naH+r*3)continue;if(n.isCore)naDrawCore(p.x,p.y,r);else naDrawSysNode(n,p.x,p.y,r);}}
+function naDrawParticles(){for(var i=0;i<naParticles.length;i++){var p2=naParticles[i];var ps=naW2s(p2.x,p2.y);naCtx.beginPath();naCtx.arc(ps.x,ps.y,p2.r,0,Math.PI*2);naCtx.fillStyle=naHexRgba(p2.color,p2.life*0.65);naCtx.fill();}}
+function naUpdateHUD(){var el=naQ('hud');if(!el)return;var total=Object.keys(progress).length;var due=Object.values(progress).filter(isDue).length;var rate=total?(due/total*100).toFixed(1):'0.0';el.textContent='ATLAS · nodes:'+naNodes.length+' · signals:'+total+'\nfiring:'+rate+'% · zoom:'+naCamZ.toFixed(2);}
+function naRender(){var screenEl=document.getElementById('atlas');if(!screenEl||screenEl.classList.contains('hidden')){naRafId=null;return;}naTick++;var forceSteps=naTick<120?5:naTick<300?2:1;if(!naReduced)runForces(forceSteps);if(!naReduced&&naTick%20===0){var core=naNodes[0];if(core)naSpawnParticles(core.x,core.y,'#0ea5e9',3);}naTickParticles();naDrawBG();naDrawEdges();naDrawNodes();naDrawParticles();naUpdateHUD();naRafId=requestAnimationFrame(naRender);}
+
+// ── SECTION F: INPUT ──────────────────────────────────────────────────────
+var naDrag=false,naDsx=0,naDsy=0,naDcx=0,naDcy=0,naTouchDist0=0;
+function naGetNodeAt(sx,sy){for(var i=naNodes.length-1;i>=0;i--){var n=naNodes[i];var p=naW2s(n.x,n.y);var r=n.r*naCamZ;var dx=sx-p.x,dy=sy-p.y;if(dx*dx+dy*dy<=r*r)return n;}return null;}
+function naBindCanvas(){var c=naCanvas;c.addEventListener('mousemove',function(e){var rect=c.getBoundingClientRect();var sx=e.clientX-rect.left,sy=e.clientY-rect.top;if(naDrag){naCamX=naDcx+(sx-naDsx)/naCamZ;naCamY=naDcy+(sy-naDsy)/naCamZ;return;}var hit=naGetNodeAt(sx,sy),prev=naHovNode;naHovNode=hit?hit.id:null;if(hit&&hit.id!==prev&&!hit.isCore&&hit.data)naSpawnParticles(hit.x,hit.y,hit.color,7);c.style.cursor=hit?'pointer':'grab';});c.addEventListener('mousedown',function(e){var rect=c.getBoundingClientRect();naDsx=e.clientX-rect.left;naDsy=e.clientY-rect.top;naDcx=naCamX;naDcy=naCamY;naDrag=true;c.style.cursor='grabbing';});c.addEventListener('mouseup',function(e){var rect=c.getBoundingClientRect();var sx=e.clientX-rect.left,sy=e.clientY-rect.top;var moved=Math.abs(sx-naDsx)+Math.abs(sy-naDsy);naDrag=false;c.style.cursor='grab';if(moved<6){var hit=naGetNodeAt(sx,sy);if(hit)naHandleNodeClick(hit);}});c.addEventListener('mouseleave',function(){naDrag=false;});c.addEventListener('wheel',function(e){e.preventDefault();var f=e.deltaY>0?0.87:1.15;naCamZ=Math.max(0.15,Math.min(5,naCamZ*f));},{passive:false});c.addEventListener('touchstart',function(e){e.preventDefault();if(e.touches.length===1){var rect=c.getBoundingClientRect();naDsx=e.touches[0].clientX-rect.left;naDsy=e.touches[0].clientY-rect.top;naDcx=naCamX;naDcy=naCamY;naDrag=true;}else if(e.touches.length===2){naDrag=false;var dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;naTouchDist0=Math.sqrt(dx*dx+dy*dy);}},{passive:false});c.addEventListener('touchmove',function(e){e.preventDefault();var rect=c.getBoundingClientRect();if(e.touches.length===1&&naDrag){naCamX=naDcx+(e.touches[0].clientX-rect.left-naDsx)/naCamZ;naCamY=naDcy+(e.touches[0].clientY-rect.top-naDsy)/naCamZ;}else if(e.touches.length===2&&naTouchDist0){var dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;var d=Math.sqrt(dx*dx+dy*dy);naCamZ=Math.max(0.15,Math.min(5,naCamZ*(d/naTouchDist0)));naTouchDist0=d;}},{passive:false});c.addEventListener('touchend',function(){naDrag=false;naTouchDist0=0;});}
+function adjustZoom(f){naCamZ=Math.max(0.15,Math.min(5,naCamZ*f));}
+function resetView(){naCamX=0;naCamY=0;naCamZ=1;}
+
+// ── SECTION G: NODE CLICK + SIDEBAR ──────────────────────────────────────
+var naSelectedSys=null;
+function naHandleNodeClick(node){if(node.isCore){clearSelection();return;}naSelectedSys=node.id;naSpawnParticles(node.x,node.y,node.color,22);naSmoothPanTo(node);naUpdateSysBanner(node);naHighlightSysRow(node.id);renderTable();setTimeout(function(){var el=naQ('sb-scroll');if(el)el.scrollTop=9999;},100);}
+function naSmoothPanTo(node){var tx=-node.x,ty=-node.y,sx0=naCamX,sy0=naCamY,t=0;var iv=setInterval(function(){t=Math.min(1,t+0.07);var ease=1-Math.pow(1-t,3);naCamX=sx0+(tx-sx0)*ease;naCamY=sy0+(ty-sy0)*ease;if(t>=1)clearInterval(iv);},16);}
+function naUpdateSysBanner(node){var el=naQ('sys-banner');if(!el)return;var d=node.data||{};el.textContent=node.label+'  ·  '+(d.total||0)+' signals  ·  '+(d.due||0)+' due';el.classList.add('visible');}
+function naHighlightSysRow(sys){document.querySelectorAll('#atlas .sys-row').forEach(function(el){el.classList.toggle('active',el.dataset.sys===sys);});var tt=naQ('sb-title-text');if(tt)tt.textContent=sys;var cb=naQ('clear-sys-btn');if(cb)cb.style.display='';}
+function clearSelection(){naSelectedSys=null;naSelectedTag=null;document.querySelectorAll('#atlas .sys-row').forEach(function(el){el.classList.remove('active');});var sb=naQ('sys-banner');if(sb)sb.classList.remove('visible');var tt=naQ('sb-title-text');if(tt)tt.textContent='Signal Intelligence';var cb=naQ('clear-sys-btn');if(cb)cb.style.display='none';naCurrentFilter='all';document.querySelectorAll('#atlas .filter-btn').forEach(function(b,i){b.classList.toggle('active',i===0);});renderTagList();renderTable();}
+
+// ── SECTION H: CARD DETAIL ────────────────────────────────────────────────
+function naEsc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function openCardDetail(cardId){var p=progress[cardId];if(!p)return;var card=deckMap[cardId]||{};var now=new Date();var sys=p.sys||card.sys||'—';var sc=sysColor(sys);var dueStr='—';if(p.next_due_at){var diff=new Date(p.next_due_at)-now;if(diff<0)dueStr='🔴 Overdue';else if(diff<86400000)dueStr='🟡 Today';else dueStr='in '+Math.ceil(diff/86400000)+' days';}var flags=[];if(p.pinned)flags.push('<span class="cd-flag pinned">📌 Pinned</span>');if(p.repair_point)flags.push('<span class="cd-flag repair">⚠ Repair Point</span>');if(p.suspended||p.buried)flags.push('<span class="cd-flag suspended">🚫 Suspended</span>');if(isLeech(p))flags.push('<span class="cd-flag leech">💀 Leech</span>');if(isDue(p))flags.push('<span class="cd-flag due">⚡ Due Now</span>');var retPct=p.reviewed_count>0?Math.round((p.correct_count||0)/p.reviewed_count*100):null;var oneThing=(card.one_thing||'').replace(/^⭐\s*ONETHING\s*TAKEAWAY:\s*/i,'').replace(/^⭐\s*PERSONAL\s*TAKEAWAY:\s*/i,'').trim();var cd=naQ('cd-content');if(!cd)return;var cardTags=parseTags(card);cd.innerHTML='<div class="cd-id">Card ID: '+naEsc(cardId)+'</div><div><span class="cd-sys" style="background:'+naHexRgba(sc,0.18)+';border:1px solid '+naHexRgba(sc,0.4)+';color:'+sc+'">'+naEsc(sys)+'</span>'+(card.test?'<span style="font-size:9px;color:var(--na-text2);margin-left:8px">'+naEsc(card.test)+'</span>':'')+'</div>'+(cardTags.length?'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">'+cardTags.map(function(t){return'<span onclick="naClickTag(\''+naEsc(t)+'\')" style="font-size:9px;background:rgba(103,232,249,.10);border:1px solid rgba(103,232,249,.2);border-radius:999px;padding:2px 8px;color:var(--na-cyan);cursor:pointer">'+naEsc(t)+'</span>';}).join('')+'</div>':'')+(card.presentation?'<div class="cd-section"><div class="cd-label">Presentation</div><div class="cd-q">'+naEsc(card.presentation)+'</div></div>':'')+(card.diagnosis?'<div class="cd-section"><div class="cd-label">Diagnosis</div><div class="cd-ans">'+naEsc(card.diagnosis)+'</div></div>':'')+(oneThing?'<div class="cd-section"><div class="cd-label">⭐ One Thing</div><div class="cd-star">'+naEsc(oneThing)+'</div></div>':'')+(card.board_trigger?'<div class="cd-section"><div class="cd-label">Board Trigger</div><div class="cd-body">'+naEsc(card.board_trigger)+'</div></div>':'')+(card.educational_objective?'<div class="cd-section"><div class="cd-label">Educational Objective</div><div class="cd-body">'+naEsc(card.educational_objective)+'</div></div>':'')+'<div class="cd-section"><div class="cd-label">SRS Signal</div><div class="cd-stats"><div class="cd-stat"><span class="cd-stat-n" style="color:var(--na-cyan)">'+(p.seen_count||0)+'</span><span class="cd-stat-l">Seen</span></div><div class="cd-stat"><span class="cd-stat-n" style="color:#22c55e">'+(p.correct_count||0)+'</span><span class="cd-stat-l">Correct</span></div><div class="cd-stat"><span class="cd-stat-n" style="color:#ef4444">'+(p.wrong_count||0)+'</span><span class="cd-stat-l">Wrong</span></div><div class="cd-stat"><span class="cd-stat-n" style="color:'+(retPct===null?'var(--na-text2)':retPct>=70?'#22c55e':'#ef4444')+'">'+(retPct!==null?retPct+'%':'—')+'</span><span class="cd-stat-l">Retention</span></div><div class="cd-stat"><span class="cd-stat-n" style="color:var(--na-amber)">'+(p.ease_factor?Number(p.ease_factor).toFixed(2):'—')+'</span><span class="cd-stat-l">Ease</span></div><div class="cd-stat"><span class="cd-stat-n" style="color:var(--na-text2)">'+(p.lapses||0)+'</span><span class="cd-stat-l">Lapses</span></div></div><div style="margin-top:10px;font-size:10px;color:var(--na-text2)"><span style="font-weight:900;color:var(--na-text)">Stage:</span> <span style="color:'+(p.stage==='review'?'#22c55e':p.stage==='relearning'?'#ef4444':'var(--na-cyan)')+'">'+( p.stage||'new')+'</span> · <span style="font-weight:900;color:var(--na-text)">Due:</span> '+dueStr+' · <span style="font-weight:900;color:var(--na-text)">Interval:</span> '+(p.interval_days||0)+'d'+(p.last_rating?' · <span style="font-weight:900;color:var(--na-text)">Last:</span> '+p.last_rating:'')+'</div></div>'+(flags.length?'<div class="cd-flags">'+flags.join('')+'</div>':'');var cd2=naQ('card-detail');if(cd2)cd2.classList.add('open');}
+function closeCardDetail(){var cd=naQ('card-detail');if(cd)cd.classList.remove('open');}
+
+// ── SECTION I: SIDEBAR RENDERS ────────────────────────────────────────────
+function naSet(id,v){var e=naQ(id);if(e)e.textContent=v;}
+function renderKpis(){var vals=Object.values(progress);var now=new Date(),in7=new Date(now.getTime()+7*86400000);var total=vals.length;var due=vals.filter(isDue).length;var newC=vals.filter(function(p){return(!p.seen_count||p.seen_count===0)&&p.stage==='new';}).length;var pinned=vals.filter(function(p){return p.pinned;}).length;var repair=vals.filter(function(p){return p.repair_point;}).length;var leech=vals.filter(isLeech).length;var due7=vals.filter(function(p){if(!p.next_due_at||p.stage==='new')return false;var d=new Date(p.next_due_at);return d>=now&&d<=in7;}).length;var ret=retentionPct(vals);naSet('k-total',total||'—');naSet('k-due',due);naSet('k-new',newC);naSet('k-pinned',pinned);naSet('k-repair',repair);naSet('k-leech',leech);naSet('k-due7',due7);naSet('k-ret',ret!==null?ret+'%':'—');var ef=naQ('energy-fill');if(ef)ef.style.width=(ret||0)+'%';var rc=naQ('ret-circle');if(rc)rc.style.strokeDashoffset=150.8*(1-masteryPct(vals)/100);}
+function renderSysList(){var sorted=Object.entries(naSysMap).sort(function(a,b){return b[1].total-a[1].total;});var container=naQ('sys-list');var badge=naQ('sys-count-badge');if(!container)return;if(badge)badge.textContent=sorted.length+(naViewMode==='tag'?' tags':' systems');container.innerHTML=sorted.map(function(e){var sys=e[0],d=e[1];var color=nodeColor(sys,d);var mp=d.total?Math.round(d.reviewed/d.total*100):0;return'<div class="sys-row" data-sys="'+naEsc(sys)+'" onclick="naClickSys(\''+naEsc(sys)+'\')" title="'+naEsc(sys)+': '+d.total+' cards, '+mp+'% studied, '+d.due+' due"><div class="sys-dot" style="background:'+color+'"></div><span class="sys-name">'+naEsc(sys)+'</span><span class="sys-stat">'+d.total+' · '+mp+'% · '+d.due+'↑</span></div>';}).join('');}
+function renderTagList(){var allTags={};Object.values(deckMap).forEach(function(c){parseTags(c).forEach(function(t){allTags[t]=(allTags[t]||0)+1;});});var sorted=Object.entries(allTags).sort(function(a,b){return b[1]-a[1];});var container=naQ('tag-list'),badge=naQ('tag-count-badge');if(!container)return;if(badge)badge.textContent=sorted.length+' tags';if(!sorted.length){container.innerHTML='<div style="font-size:10px;color:var(--na-text2);padding:4px 6px">No tags in deck</div>';return;}container.innerHTML=sorted.slice(0,60).map(function(e){var tag=e[0],count=e[1];var isActive=naSelectedTag===tag;return'<div class="sys-row'+(isActive?' active-row':'')+'" onclick="naClickTag(\''+naEsc(tag)+'\')" title="'+naEsc(tag)+'"><div class="sys-dot" style="background:rgba(103,232,249,.45)"></div><span class="sys-name">'+naEsc(tag)+'</span><span class="sys-stat">'+count+'</span></div>';}).join('');}
+function renderForecast(){var vals=Object.values(progress),now=new Date();var days=Array.from({length:7},function(_,i){var d=new Date(now.getTime()+i*86400000);return{label:i===0?'Now':['Su','Mo','Tu','We','Th','Fr','Sa'][d.getDay()],count:0};});vals.forEach(function(p){if(!p.next_due_at||p.stage==='new')return;var due=new Date(p.next_due_at);for(var i=0;i<7;i++){var s=new Date(now.getTime()+i*86400000);s.setHours(0,0,0,0);var en=new Date(now.getTime()+i*86400000);en.setHours(23,59,59,999);if(due>=s&&due<=en){days[i].count++;break;}}});var max=Math.max.apply(null,days.map(function(d){return d.count;}).concat([1]));var container=naQ('forecast-row');if(!container)return;container.innerHTML=days.map(function(d,i){return'<div class="fc-bar"><div class="bar" style="height:'+Math.max(3,Math.round(d.count/max*54))+'px;background:'+(i===0?'rgba(251,88,118,.55)':'rgba(103,232,249,.22)')+'"></div><div class="cnt">'+d.count+'</div><div class="dl">'+d.label+'</div></div>';}).join('');}
+var naCurrentFilter='all';
+function renderTable(){var q=(naQ('search-input')&&naQ('search-input').value||'').toLowerCase();var now=new Date();var rows=Object.entries(progress).map(function(e){return{id:e[0],p:e[1]};});if(naSelectedSys)rows=rows.filter(function(r){return normSys(r.p.sys||'')===naSelectedSys||(r.p.sys===naSelectedSys);});if(naSelectedTag)rows=rows.filter(function(r){var card=deckMap[r.id]||{};return parseTags(card).indexOf(naSelectedTag)>=0;});switch(naCurrentFilter){case'due':rows=rows.filter(function(r){return isDue(r.p);});break;case'new':rows=rows.filter(function(r){return(!r.p.seen_count||r.p.seen_count===0)&&r.p.stage==='new';});break;case'review':rows=rows.filter(function(r){return r.p.stage==='review';});break;case'pinned':rows=rows.filter(function(r){return r.p.pinned;});break;case'repair':rows=rows.filter(function(r){return r.p.repair_point;});break;case'leech':rows=rows.filter(function(r){return isLeech(r.p);});break;case'suspended':rows=rows.filter(function(r){return r.p.suspended||r.p.buried;});break;}if(q)rows=rows.filter(function(r){var card=deckMap[r.id]||{};return r.id.toLowerCase().includes(q)||(r.p.sys||'').toLowerCase().includes(q)||(card.diagnosis||'').toLowerCase().includes(q)||(card.presentation||'').toLowerCase().includes(q)||parseTags(card).join(' ').toLowerCase().includes(q);});rows.sort(function(a,b){var sd=naSortDir;if(naSortCol==='diag'){var ca=deckMap[a.id]||{},cb=deckMap[b.id]||{};return sd*((ca.diagnosis||a.id).localeCompare(cb.diagnosis||b.id));}if(naSortCol==='sys'){return sd*((a.p.sys||'—').localeCompare(b.p.sys||'—'));}if(naSortCol==='stage'){return sd*((a.p.stage||'new').localeCompare(b.p.stage||'new'));}var da=a.p.next_due_at?new Date(a.p.next_due_at):new Date(9e15);var db=b.p.next_due_at?new Date(b.p.next_due_at):new Date(9e15);return sd*(da-db);});naSet('browser-count',rows.length+' signals');var hint=naQ('deck-hint-msg');if(hint)hint.style.display=Object.keys(deckMap).length===0?'block':'none';var MAX=250,body=naQ('table-body');if(!body)return;body.innerHTML=rows.slice(0,MAX).map(function(r){var id=r.id,p=r.p;var card=deckMap[id]||{};var due=p.next_due_at?new Date(p.next_due_at):null;var ds='—',dc='';if(due){var diff=due-now;if(diff<0){ds='OVR';dc='p-ovr';}else if(diff<864e5){ds='TDY';dc='p-tdy';}else{ds=Math.ceil(diff/864e5)+'d';dc='p-fut';}}var st=p.stage||'new';var flags=[p.pinned?'📌':'',p.repair_point?'⚠':'',isLeech(p)?'💀':'',(p.suspended||p.buried)?'🚫':''].filter(Boolean).join('');var label=card.diagnosis||id;var sid=label.length>42?label.slice(0,42)+'…':label;var sys=p.sys||'—';return'<tr onclick="naOpenCardDetail(\''+naEsc(id)+'\')" title="'+naEsc(id)+'"><td style="max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+naEsc(sid)+'</td><td style="font-size:9px;color:'+sysColor(sys)+';font-weight:900;white-space:nowrap">'+naEsc(sys)+'</td><td><span class="pill p-'+st.slice(0,3)+'">'+st.slice(0,3)+'</span></td><td class="'+dc+'" style="font-size:10px;font-weight:900">'+ds+'</td><td style="white-space:nowrap">'+flags+'</td></tr>';}).join('');if(rows.length>MAX){var tr=document.createElement('tr');tr.innerHTML='<td colspan="5" style="color:var(--na-text2);text-align:center;padding:8px;font-size:10px">…'+(rows.length-MAX)+' more · use search to filter</td>';body.appendChild(tr);}}
+function clickSys(sys){var node=naNodes.find(function(n){return n.id===sys;});if(node)naHandleNodeClick(node);}
+function setFilter(f,el){naCurrentFilter=f;document.querySelectorAll('#atlas .filter-btn').forEach(function(b){b.classList.remove('active');});if(el)el.classList.add('active');renderTable();}
+function clickTag(tag){naSelectedTag=naSelectedTag===tag?null:tag;naSelectedSys=null;renderTagList();renderTable();var cb=naQ('clear-sys-btn');if(cb)cb.style.display=naSelectedTag?'inline-flex':'none';var tt=naQ('sb-title-text');if(tt)tt.textContent=naSelectedTag?'Tag: '+naSelectedTag:'Signal Intelligence';}
+function naToggleView(){naViewMode=naViewMode==='sys'?'tag':'sys';var btn=naQ('view-toggle-btn');if(btn)btn.textContent=naViewMode==='sys'?'Tag View':'Sys View';var lbl=naQ('sys-head-label');if(lbl)lbl.textContent=naViewMode==='sys'?'System Signals':'Tag Signals';fullRefreshDisplay();}
+function naToggleSort(col){if(naSortCol===col){naSortDir=-naSortDir;}else{naSortCol=col;naSortDir=1;}['diag','sys','stage','due'].forEach(function(c){var el=naQ('sort-ind-'+c);if(el)el.textContent=naSortCol===c?(naSortDir===1?'▲':'▼'):'';});renderTable();}
+
+// ── SECTION J: EXPORT + DIAGNOSTIC ────────────────────────────────────────
+function naDateStr(){return new Date().toISOString().slice(0,10);}
+function naDl(name,obj){var a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([JSON.stringify(obj,null,2)],{type:'application/json'})),download:name});document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);}
+function showToast(msg){var e=naQ('toast');if(!e)return;e.textContent=msg;e.style.display='block';setTimeout(function(){e.style.display='none';},2500);}
+function exportProgressOnly(){naDl('cozy_arcade_progress_'+naDateStr()+'.json',{metadata:{type:'progress',exported_at:new Date().toISOString(),schema_version:'3.0',source:'neural_atlas'},progress:progress});showToast('Progress exported');}
+function exportFullBackup(){var raw={};for(var i=0;i<STATE_KEYS.length;i++){try{var r2=localStorage.getItem(STATE_KEYS[i]);if(r2){raw=JSON.parse(r2);break;}}catch(_){}}naDl('cozy_arcade_full_backup_'+naDateStr()+'.json',{metadata:{type:'deck_with_progress',exported_at:new Date().toISOString(),schema_version:'3.0',source:'neural_atlas'},raw_state:raw,progress:progress});showToast('Full backup exported');}
+function fullRefresh(){atlasLoadDeck();progress=readProgress();mergeSysFromDeck();if(Object.keys(deckMap).length>0){var p2={};Object.keys(progress).forEach(function(id){if(deckMap[id])p2[id]=progress[id];});if(Object.keys(p2).length>0)progress=p2;}fullRefreshDisplay();showToast('Atlas refreshed ↻');}
+function fullRefreshDisplay(){naSysMap=naViewMode==='tag'?buildTagMap(progress):buildSysMap(progress);buildGraph(naSysMap);clearSelection();renderKpis();renderSysList();renderTagList();renderForecast();renderTable();}
+function runDiagnostic(){var vals=Object.values(progress),issues=[];vals.forEach(function(p){var id=(p.card_id||'?').slice(0,22);if(!p.seen_count&&p.last_seen_at)issues.push('⚠ ['+id+'] new card has last_seen_at');if(Number(p.reviewed_count||0)>0&&!p.last_rating)issues.push('⚠ ['+id+'] reviewed but no last_rating');if(p.stage==='review'&&!p.next_due_at)issues.push('⚠ ['+id+'] review stage, no next_due_at');if(isLeech(p))issues.push('💀 ['+id+'] leech: '+p.lapses+' lapses');if(Number(p.ease_factor||2.5)<1.4)issues.push('🔴 ['+id+'] ease low: '+p.ease_factor);});var ret=retentionPct(vals);var seenVals=vals.filter(function(p){return p.seen_count>0||p.seen;});var stageBreak={new:0,review:0,relearning:0};vals.forEach(function(p){stageBreak[p.stage||'new']=(stageBreak[p.stage||'new']||0)+1;});var noSys=vals.filter(function(p){return!p.sys||p.sys==='—';}).length;var report=['=== NEURAL ATLAS DIAGNOSTIC — '+new Date().toLocaleString()+' ===','Signals: '+vals.length+'  ·  Systems: '+Object.keys(naSysMap).length,'Stages: new='+stageBreak.new+' review='+stageBreak.review+' relearning='+stageBreak.relearning,'Seen: '+seenVals.length+'  ·  No-sys: '+noSys,'Issues: '+issues.length+'  ·  Leeches (≥4): '+vals.filter(isLeech).length,'Low ease (<2.0): '+vals.filter(function(p){return Number(p.ease_factor||2.5)<2.0;}).length,'Retention: '+(ret!=null?ret:'N/A')+'%',''].concat(issues.length?issues:['✅ No issues found']).filter(function(l){return l!=='';}).join('\n');var box=naQ('diag-box'),out=naQ('diag-out');if(box&&out){box.style.display='block';out.textContent=report;box.scrollIntoView({behavior:'smooth'});}}
+
+// ── SECTION K: RESIZE ─────────────────────────────────────────────────────
+function naResize(){var wrap=naQ('canvas-wrap');if(!wrap||!naCanvas)return;var dpr=window.devicePixelRatio||1;naW=wrap.offsetWidth;naH=wrap.offsetHeight;naCanvas.width=naW*dpr;naCanvas.height=naH*dpr;naCanvas.style.width=naW+'px';naCanvas.style.height=naH+'px';naCtx.scale(dpr,dpr);}
+
+// ── SECTION L: INIT ───────────────────────────────────────────────────────
+var progress={},naSysMap={};
+var naResizeWired=false;
+
+function naInit(){
+  naCanvas=naQ('canvas');
+  if(!naCanvas)return;
+  naCtx=naCanvas.getContext('2d');
+  naResize();
+  if(!naResizeWired){window.addEventListener('resize',naResize);naResizeWired=true;}
+  naBindCanvas();
+  naDrag=false;naCamX=0;naCamY=0;naCamZ=1;naTick=0;naParticles=[];naHovNode=null;
+  atlasLoadDeck();
+  progress=readProgress();
+  mergeSysFromDeck();
+  // Drop orphan progress entries (studied cards no longer in current deck).
+  // Only prune when deck is loaded; if no deck, keep all entries visible.
+  if(Object.keys(deckMap).length>0){
+    var pruned={};
+    Object.keys(progress).forEach(function(id){if(deckMap[id])pruned[id]=progress[id];});
+    if(Object.keys(pruned).length>0)progress=pruned;
+  }
+  naSysMap=buildSysMap(progress);
+  buildGraph(naSysMap);
+  if(naReduced)runForces(800);
+  renderKpis();renderSysList();renderForecast();renderTable();
+  if(naRafId)cancelAnimationFrame(naRafId);
+  naRafId=requestAnimationFrame(naRender);
+  var n=Object.keys(progress).length;
+  showToast(n?n+' signals loaded':'No signals — upload progress JSON or start studying');
+}
+
+// ── PUBLIC API ────────────────────────────────────────────────────────────
+window.showAtlasScreen=function(){
+  try{
+    var _ac=typeof appCards==='function'?appCards():[];
+    if(_ac&&_ac.length){
+      var sysMapData=_ac.map(function(c){var id=c&&(c.qid_unique||c.qid||c.card_id||c.id);return id?{qid_unique:id,sys:(c&&(c.sys||c.system))||'—'}:null;}).filter(Boolean);
+      try{localStorage.setItem('cozy_arcade_limitless_cards_v1',JSON.stringify({metadata:{atlas_cache_mode:'sys-map only',stored_at:new Date().toISOString()},cards:sysMapData}));}catch(_){}
+    }
+  }catch(_){}
+  if(typeof show==='function')show('atlas');
+  else{document.querySelectorAll('.screen').forEach(function(s){s.classList.add('hidden');});var el=document.getElementById('atlas');if(el)el.classList.remove('hidden');}
+  requestAnimationFrame(function(){naInit();});
+};
+window.hideAtlasScreen=function(){
+  if(naRafId){cancelAnimationFrame(naRafId);naRafId=null;}
+  var atlasEl=document.getElementById('atlas');
+  if(atlasEl)atlasEl.classList.add('hidden');
+  if(typeof window.home==='function')window.home();
+  else{var h=document.getElementById('home');if(h)h.classList.remove('hidden');}
+};
+
+// ── GLOBAL BRIDGES for HTML onclick attrs ─────────────────────────────────
+window.naHandleFileUpload=function(e){handleFileUpload(e);};
+window.naHandleDrop=function(e){handleDrop(e);};
+window.naFullRefresh=function(){fullRefresh();};
+window.naRunDiagnostic=function(){runDiagnostic();};
+window.naExportProgressOnly=function(){exportProgressOnly();};
+window.naExportFullBackup=function(){exportFullBackup();};
+window.naExportDeckAndProgress=function(){
+  try{if(typeof window.exportDeckWithProgress==='function'){window.exportDeckWithProgress();return;}}catch(e){}
+  exportFullBackup();
+};
+window.naClearSelection=function(){clearSelection();};
+window.naAdjustZoom=function(f){adjustZoom(f);};
+window.naResetView=function(){resetView();};
+window.naCloseCardDetail=function(){closeCardDetail();};
+window.naSetFilter=function(f,el){setFilter(f,el);};
+window.naRenderTable=function(){renderTable();};
+window.naClickTag=function(tag){clickTag(tag);};
+window.naToggleView=function(){naToggleView();};
+window.naToggleSort=function(col){naToggleSort(col);};
+window.naClickSys=function(sys){clickSys(sys);};
+window.naOpenCardDetail=function(id){openCardDetail(id);};
+
+})();
+</script>
+<script id="v175159-end-atlas-ux">
+// === v175159: Fix endHome + Continue button + Atlas tab navigation ===
+;(function(){
+'use strict';
+
+// ── FIX 1: endHome bypass exit-prompt + add Continue button ─────────────
+function fixEndScreen(){
+  var endEl=document.getElementById('end');
+  if(!endEl) return;
+
+  // Fix endHome: call home(true) so shouldPromptExit() is bypassed
+  var homeBtn=document.getElementById('endHome');
+  if(homeBtn) homeBtn.onclick=function(){
+    endEl.classList.add('hidden');
+    try{ if(typeof home==='function') home(true); }catch(e){}
+  };
+
+  // Add Continue button if not already present
+  if(document.getElementById('endContinue')) return;
+  var controls=endEl.querySelector('.controls');
+  if(!controls) return;
+  var btn=document.createElement('button');
+  btn.id='endContinue'; btn.className='btn primary'; btn.textContent='Continue';
+  btn.onclick=function(){
+    endEl.classList.add('hidden');
+    try{ hp=100; }catch(e){}
+    try{
+      if(typeof mode!=='undefined'){
+        if(mode==='solo'){
+          try{ if(typeof nextCard==='function') nextCard(); }catch(e){}
+          try{ gate=(typeof gate!=='undefined'?gate:1)+1; }catch(e){}
+          try{ if(typeof renderSolo==='function') renderSolo(); }catch(e){}
+          try{ if(typeof loopSolo==='function') loopSolo(); }catch(e){}
+        } else {
+          try{ if(typeof nextCard==='function') nextCard(); }catch(e){}
+          try{ domainRound=(typeof domainRound!=='undefined'?domainRound:1)+1; }catch(e){}
+          try{ if(typeof renderDomain==='function') renderDomain(); }catch(e){}
+          try{ if(typeof loopDomain==='function') loopDomain(); }catch(e){}
+        }
+      }
+    }catch(e){}
+  };
+  var restart=document.getElementById('endRestart');
+  if(restart) controls.insertBefore(btn, restart);
+  else controls.appendChild(btn);
+}
+
+// ── FIX 2: Atlas tab navigation ─────────────────────────────────────────
+var naCurrentView='atlas';
+
+// CSS
+var naUxStyle=document.createElement('style');
+naUxStyle.id='na-ux-159-style';
+naUxStyle.textContent=
+  '#na-app.browse-mode #na-canvas-wrap{display:none!important}'+
+  '#na-app.browse-mode #na-sidebar{width:100%!important;max-width:100%!important;border-left:none!important}'+
+  '#na-atlas-tab-group{display:flex;gap:4px;align-items:center;padding-right:8px;margin-right:4px;border-right:1px solid rgba(103,232,249,.15)}'+
+  '#atlas .na-btn.tab-active{background:rgba(103,232,249,.22)!important;border-color:var(--na-cyan)!important;color:var(--na-cyan)!important}'+
+  '#na-card-detail .cd-atlas-btn{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:999px;border:1px solid rgba(103,232,249,.3);background:rgba(103,232,249,.08);color:var(--na-cyan);font-size:10px;font-weight:900;cursor:pointer;font-family:inherit;letter-spacing:.05em}';
+document.head.appendChild(naUxStyle);
+
+function naUxUpdateTabs(){
+  var a=document.getElementById('na-atlas-tab-btn'),b=document.getElementById('na-browse-tab-btn');
+  if(a) a.classList.toggle('tab-active',naCurrentView==='atlas');
+  if(b) b.classList.toggle('tab-active',naCurrentView==='browse');
+}
+
+function naUxShowAtlas(){
+  naCurrentView='atlas';
+  var app=document.getElementById('na-app');
+  if(app) app.classList.remove('browse-mode');
+  try{ if(typeof window.naCloseCardDetail==='function') window.naCloseCardDetail(); }catch(e){}
+  naUxUpdateTabs();
+}
+
+function naUxShowBrowse(){
+  naCurrentView='browse';
+  var app=document.getElementById('na-app');
+  if(app) app.classList.add('browse-mode');
+  try{ if(typeof window.naCloseCardDetail==='function') window.naCloseCardDetail(); }catch(e){}
+  var scroll=document.getElementById('na-sb-scroll');
+  if(scroll) setTimeout(function(){scroll.scrollTop=0;},50);
+  naUxUpdateTabs();
+}
+
+window.naUxShowAtlas=naUxShowAtlas;
+window.naUxShowBrowse=naUxShowBrowse;
+
+// Reset to atlas view whenever atlas opens
+(function(){
+  var orig=window.showAtlasScreen;
+  if(orig) window.showAtlasScreen=function(){
+    naCurrentView='atlas';
+    var app=document.getElementById('na-app');
+    if(app) app.classList.remove('browse-mode');
+    return orig.apply(this,arguments);
+  };
+})();
+
+function injectAtlasTabs(){
+  var btns=document.getElementById('na-topbar-btns');
+  if(!btns||document.getElementById('na-atlas-tab-group')) return;
+  var wrap=document.createElement('div');
+  wrap.id='na-atlas-tab-group';
+  wrap.innerHTML=
+    '<button id="na-atlas-tab-btn" class="na-btn sm tab-active" onclick="window.naUxShowAtlas()">⬡ Atlas</button>'+
+    '<button id="na-browse-tab-btn" class="na-btn sm" onclick="window.naUxShowBrowse()">≡ Review Cards</button>';
+  btns.insertBefore(wrap, btns.children[1]);
+}
+
+function patchCardDetailCloseBtn(){
+  var btn=document.querySelector('#na-card-detail .cd-close-btn');
+  if(btn && !btn.dataset.patched159){
+    btn.textContent='← Atlas';
+    btn.dataset.patched159='1';
+  }
+}
+
+function boot(){
+  fixEndScreen();
+  injectAtlasTabs();
+  patchCardDetailCloseBtn();
+}
+
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot);
+else boot();
+setTimeout(boot,600);
+})();
+</script>
+
+<!-- v175160 — double-advance lock, selectSolo guard, auto-export on exit, card detail sidebar scope -->
+<script>
+;(function(){
+'use strict';
+
+// ── 1. CARD DETAIL: SCOPE TO SIDEBAR + BACK BUTTON + SCROLL SAVE/RESTORE ──
+var _naScrollSave160=0;
+
+var s160=document.createElement('style');
+s160.id='v175160-style';
+s160.textContent=
+  // Scope card detail to sidebar (not full atlas)
+  '#na-sidebar{position:relative!important}'+
+  // Styled ← Back pill
+  '#atlas .cd-back-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:999px;background:transparent;border:1px solid rgba(103,232,249,.35);color:var(--na-cyan);font-size:10px;cursor:pointer;letter-spacing:.07em;font-family:inherit;transition:border-color .15s,background .15s;}'+
+  '#atlas .cd-back-btn:hover{border-color:var(--na-cyan);background:rgba(103,232,249,.09);}'+
+  // Ensure topbar stays above card detail (z-index guard)
+  '#na-topbar{z-index:300!important}';
+document.head.appendChild(s160);
+
+// Save scroll when opening card detail, restore on close
+var _origOpen160=window.naOpenCardDetail;
+window.naOpenCardDetail=function(id){
+  var sc=document.getElementById('na-sb-scroll');
+  if(sc) _naScrollSave160=sc.scrollTop;
+  if(typeof _origOpen160==='function') _origOpen160(id);
+};
+
+var _origClose160=window.naCloseCardDetail;
+window.naCloseCardDetail=function(){
+  if(typeof _origClose160==='function') _origClose160();
+  requestAnimationFrame(function(){
+    var sc=document.getElementById('na-sb-scroll');
+    if(sc) sc.scrollTop=_naScrollSave160;
+  });
+};
+
+// Replace close button with ← Back pill
+function patchBackBtn(){
+  var btn=document.querySelector('#na-card-detail .cd-close-btn, #na-card-detail .cd-back-btn');
+  if(btn && !btn.dataset.v160){
+    btn.textContent='← Back';
+    btn.className='cd-back-btn';
+    btn.dataset.v160='1';
+  }
+}
+
+// ── 2. DOUBLE-ADVANCE LOCK: RESET ON RENDER, FALLBACK 12s ─────────────────
+var _adv160=false, _adv160t=null;
+
+var _prevAdv160=window.advance;
+if(typeof _prevAdv160==='function'){
+  window.advance=advance=function(which){
+    if(_adv160) return;
+    _adv160=true;
+    clearTimeout(_adv160t);
+    clearTimeout(window.answerAutoAdvanceHandle);
+    _adv160t=setTimeout(function(){_adv160=false;},12000);
+    return _prevAdv160.call(this,which);
+  };
+  // Release lock when new card renders
+  var _prevRS160=window.renderSolo;
+  if(typeof _prevRS160==='function'){
+    window.renderSolo=renderSolo=function(){
+      _adv160=false; clearTimeout(_adv160t);
+      return _prevRS160.apply(this,arguments);
+    };
+  }
+  var _prevRD160=window.renderDomain;
+  if(typeof _prevRD160==='function'){
+    window.renderDomain=renderDomain=function(){
+      _adv160=false; clearTimeout(_adv160t);
+      return _prevRD160.apply(this,arguments);
+    };
+  }
+}
+
+// ── 3. SELECTSOLO DEBOUNCE: 700ms GUARD ───────────────────────────────────
+var _selT160=0;
+var _prevSel160=window.selectSolo;
+if(typeof _prevSel160==='function'){
+  window.selectSolo=selectSolo=function(ok){
+    var n=Date.now();
+    if(n-_selT160<700) return;
+    _selT160=n;
+    return _prevSel160.call(this,ok);
+  };
+}
+
+// ── 4. AUTO-EXPORT PROGRESS ON GAME EXIT ──────────────────────────────────
+function autoExportOnExit(){
+  try{
+    if(typeof window.exportProgress351==='function') window.exportProgress351();
+  }catch(e){}
+}
+
+function patchExitBtns160(){
+  var ph=document.getElementById('pauseHome');
+  if(ph && !ph.dataset.v160){
+    var prevPH=ph.onclick;
+    ph.onclick=function(e){
+      autoExportOnExit();
+      if(typeof prevPH==='function') prevPH.call(this,e);
+    };
+    ph.dataset.v160='1';
+  }
+  var eh=document.getElementById('endHome');
+  if(eh && !eh.dataset.v160){
+    var prevEH=eh.onclick;
+    eh.onclick=function(e){
+      autoExportOnExit();
+      if(typeof prevEH==='function') prevEH.call(this,e);
+    };
+    eh.dataset.v160='1';
+  }
+}
+
+function boot160(){
+  patchBackBtn();
+  patchExitBtns160();
+}
+
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot160);
+else boot160();
+setTimeout(boot160,900);
 })();
 </script>
 </body></html>

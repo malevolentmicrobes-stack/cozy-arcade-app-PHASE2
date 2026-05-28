@@ -381,4 +381,4 @@ MIT — open source, fork freely, no franchise IP.
 *Built for: ABIM board prep · internal medicine · extensible to any MCQ domain*  
 *Aesthetic: Dark neon · cyan / purple / blue · game-like but clinical-systems tone*
 
-*v4.0 · May 2026 · Built for the generation that will face the next pandemic prepared.*
+*v4.0 · May 2026 · Built for the next generation.*
