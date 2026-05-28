@@ -61,11 +61,18 @@
 - ✅ SYS upload verified: `systems()` builds list dynamically from loaded cards (`c.sys`); no hardcoded validation — custom sys values flow through filters, atlas, shadow dungeon automatically
 - ✅ `37f5896`/`316db65`: Prompt AI text updated — "Flashcard app" branding, "Rephrase" rule removed; PHASE2 + cozy-arcade-app (cozy-arcade already had different text)
 
-### Game Completed + Atlas UX (2026-05-28) — planned
+### Game Completed + Atlas UX (2026-05-28) — all ✅
 - ✅ **Game Completed Home button fixed** — root cause was `patchedHome(force=undefined)` → `shouldPromptExit()` true (mode still `'solo'`). Fix: `endHome.onclick` now calls `home(true)`. Commit `v175159`.
 - ✅ **Continue button added** — `#end` modal now has Continue (primary) / Restart / Home. Continue resets HP=100, calls `nextCard()`, increments gate/round, rerenders.
 - ✅ **Atlas tabs injected in topbar** — `⬡ Atlas | ≡ Review Cards`. "Review Cards" adds `browse-mode` class: canvas hidden, sidebar fills 100% width. Active tab cyan highlight. Resets to Atlas view on each `showAtlasScreen()` call.
 - ✅ **Card detail close button** — relabeled `✕ Close` → `← Atlas`.
+
+### Atlas Topbar + Font Flicker Fix (2026-05-28) — planned
+- ⬜ **Atlas topbar: `← Home` to far left** — `injectAtlasTabs` inserts before `children[1]` (not `firstChild`) so Home stays first
+- ⬜ **Atlas topbar: Import + Export adjacent** — Progress / Deck+Prog buttons moved next to Import pill
+- ⬜ **Export consolidation** — "Progress" = FSRS data only; "Deck+Prog" = calls `window.exportDeckWithProgress` (canonical deck + FSRS progress)
+- ⬜ **TEST MODE removed from drawer** — checkbox at line 9195 removed; it was dev-only and its open-drawer layout shift triggers font reflow glitch
+- ⬜ **`renderSolo` body.className fix** — `document.body.className=''` at line 3941 wiped `cozyDrawerOpen351`, causing promptBox width to snap and text to reflow; fix preserves drawer class
 
 ### Atlas Tag Feature (2026-05-28) — all ✅
 - ✅ `003957c`: Tag filter + sortable columns + tag/sys constellation toggle (PHASE2 only)

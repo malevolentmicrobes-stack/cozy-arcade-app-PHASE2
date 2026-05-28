@@ -3938,7 +3938,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   }
 
   window.renderSolo = renderSolo = function(){
-    document.body.className='';
+    var _savedBodyClasses=document.body.className.split(' ').filter(function(c){return c&&/^cozy|^na-|Drawer/.test(c);});document.body.className='';_savedBodyClasses.forEach(function(c){document.body.classList.add(c);});
     q('soloScore').textContent=score; q('soloStreak').textContent=streak; q('soloGate').textContent=gate;
     try{q('hpFill').style.width=hp+'%';}catch(e){}
     q('soloSystem').textContent=current.system||current.sys||'';
@@ -9191,14 +9191,6 @@ Rules:
     drawer.innerHTML = `
       <div class="drawerHead351"><h2>Settings &amp; Gameplay</h2><button id="closeDrawer351" type="button" aria-label="Close settings">x</button></div>
       <div class="drawerBody351">
-        <section class="drawerPanel351">
-          <label class="drawerToggle351"><input type="checkbox" id="testModeToggle351"> TEST MODE - Live Side Screen</label>
-          <div id="testModeInfo351" class="drawerStats351 isHidden351">
-            <div>Cards loaded: <b id="liveCardCount351">0</b></div>
-            <div>Schema: <b>public_blank_limitless</b></div>
-            <div>One Thing storage: <b id="storageStatus351">none</b></div>
-          </div>
-        </section>
         <div class="drawerStatusBar351">
           <div id="drawerDataStatus351"></div>
         </div>
@@ -13130,14 +13122,14 @@ naDiv.innerHTML=`
   <div id="na-topbar-btns">
     <button class="na-btn sm" onclick="window.hideAtlasScreen()">← Home</button>
     <div id="na-upload-pill">
-      <label id="na-upload-label" for="na-upload-file">⬆ Import JSON</label>
+      <label id="na-upload-label" for="na-upload-file">⬆ Import</label>
       <input type="file" id="na-upload-file" accept=".json" onchange="naHandleFileUpload(event)">
     </div>
+    <button class="na-btn sm" onclick="naExportProgressOnly()">Progress</button>
+    <button class="na-btn primary sm" onclick="naExportDeckAndProgress()">Deck+Prog</button>
     <span id="na-upload-status"></span>
     <button class="na-btn sm" onclick="naFullRefresh()">↻</button>
     <button class="na-btn sm" onclick="naRunDiagnostic()">Diag</button>
-    <button class="na-btn primary sm" onclick="naExportProgressOnly()">Export</button>
-    <button class="na-btn sm" onclick="naExportFullBackup()">Backup</button>
   </div>
 </div>
 <div id="na-app">
@@ -13419,6 +13411,10 @@ window.naFullRefresh=function(){fullRefresh();};
 window.naRunDiagnostic=function(){runDiagnostic();};
 window.naExportProgressOnly=function(){exportProgressOnly();};
 window.naExportFullBackup=function(){exportFullBackup();};
+window.naExportDeckAndProgress=function(){
+  try{if(typeof window.exportDeckWithProgress==='function'){window.exportDeckWithProgress();return;}}catch(e){}
+  exportFullBackup();
+};
 window.naClearSelection=function(){clearSelection();};
 window.naAdjustZoom=function(f){adjustZoom(f);};
 window.naResetView=function(){resetView();};
@@ -13540,7 +13536,7 @@ function injectAtlasTabs(){
   wrap.innerHTML=
     '<button id="na-atlas-tab-btn" class="na-btn sm tab-active" onclick="window.naUxShowAtlas()">⬡ Atlas</button>'+
     '<button id="na-browse-tab-btn" class="na-btn sm" onclick="window.naUxShowBrowse()">≡ Review Cards</button>';
-  btns.insertBefore(wrap, btns.firstChild);
+  btns.insertBefore(wrap, btns.children[1]);
 }
 
 function patchCardDetailCloseBtn(){
