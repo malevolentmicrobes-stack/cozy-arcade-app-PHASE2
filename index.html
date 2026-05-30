@@ -12806,12 +12806,45 @@ function fixStableOneThingDropdown351() {
 })();
 </script>
 <style id="v175374-rectifier-font-bionic-fix">
-/* soloTrack nudged 10px for clearance — prevents promptBox+timer overlapping choiceRow */
+/* soloTrack nudged 10px for clearance — dead weight inside shell (shell uses flex, inset:auto) */
 .soloTrack{inset:240px 0 0!important;}
 @media(max-width:760px){.soloTrack{inset:220px 0 0!important;}}
 /* Bionic contrast — bold first-letters bright white, base text dimmed blue-gray */
 :root[data-cozy-bionic="1"] .promptText,:root[data-cozy-bionic="1"] .promptText *:not(b){color:rgba(160,200,255,0.62)!important;font-weight:500!important;}
 :root[data-cozy-bionic="1"] .promptText b{color:#ffffff!important;font-weight:950!important;}
+
+/* Shell specificity lock — beats #solo .promptBox (1,1,0) with (1,2,0).
+   Cancels L5703's top:58px, min(1680px,94vw) width, clamp(280px,38vh) min-height
+   which override the shell's class-only selectors when game-shell is active. */
+#solo .gameMain371 > .promptBox,
+#domain .gameMain371 > .promptBox {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+  width: min(100%, 820px) !important;
+  min-height: 140px !important;
+  max-height: min(32dvh, 270px) !important;
+  padding: 16px 20px 16px !important;
+  margin: 0 auto !important;
+}
+@media (max-width: 760px) {
+  #solo .gameMain371 > .promptBox,
+  #domain .gameMain371 > .promptBox {
+    width: 100% !important;
+    max-height: min(30dvh, 230px) !important;
+    padding: 14px 14px 14px !important;
+  }
+}
+@media (orientation: landscape) and (max-height: 560px) {
+  #solo .gameMain371 > .promptBox,
+  #domain .gameMain371 > .promptBox {
+    min-height: 96px !important;
+    max-height: 28dvh !important;
+    padding: 10px 14px !important;
+  }
+}
 </style>
 <style id="htp-drawer-351">
 #howToPlay351 summary{cursor:pointer;user-select:none;}
