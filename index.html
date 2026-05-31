@@ -6755,7 +6755,9 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     if(!box){
       box=document.createElement('div');
       box.className='fullDropdown350 hidden';
-      btn.closest('.controls')?.insertAdjacentElement('afterend',box);
+      const _insertAnchor=root.querySelector('#soloTrigger,#domainObj,.trigger');
+      if(_insertAnchor) _insertAnchor.insertAdjacentElement('afterend',box);
+      else btn.closest('.controls')?.insertAdjacentElement('afterend',box);
     }
     btn.textContent=box.classList.contains('hidden')?'Full Card ▼':'Full Card ▲';
     btn.dataset.v350='1';
@@ -6767,6 +6769,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
         if(close) close.onclick=ev=>{ev.preventDefault(); ev.stopPropagation(); box.classList.add('hidden'); box.textContent=''; btn.textContent='Full Card ▼';};
         box.classList.remove('hidden');
         btn.textContent='Full Card ▲';
+        try{box.scrollIntoView({behavior:'smooth',block:'nearest'});}catch(_){}
       }else{
         box.classList.add('hidden');
         box.textContent='';
