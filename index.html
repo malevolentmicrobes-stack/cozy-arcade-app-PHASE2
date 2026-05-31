@@ -5630,7 +5630,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   }
   function ensureFullDropdown(which){
     const root = which==='domain' ? $('domainReveal') : $('soloReveal');
-    if(!root || root.dataset.dropdown343) return;
+    if(!root || root.dataset.dropdown343 || root.querySelector('.fullDropdown350')) return;
     root.dataset.dropdown343='1';
     const fullBtn = which==='domain' ? $('domainFull') : $('soloFull');
     if(!fullBtn) return;
@@ -6898,6 +6898,8 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   if(typeof oldRenderSolo351==='function'){
     window.renderSolo=renderSolo=function(){
       const r=oldRenderSolo351.apply(this,arguments);
+      const _row=document.getElementById('choiceRow');
+      if(_row) _row.classList.remove('v175151-drop');
       setTimeout(startStableSoloDrop351,0);
       setTimeout(()=>{try{rerenderVisibleBionic351();}catch(e){}},0);
       return r;
