@@ -11931,13 +11931,14 @@ function fixStableOneThingDropdown351() {
     window.record = record = (card, ok) => {
       const id = canonicalCardId(card);
       session.seenThisSession.add(id);
-      const _existing = getProgress(id);
-      setProgress(id, {
+      const _cur = getProgress(id);
+      const _patch = {
         last_seen_at: nowIso(),
-        repair_point: ok === false ? true : (_existing.repair_point || false),
-        ...((_existing.stability != null) ? {stability: _existing.stability} : {}),
-        ...((_existing.difficulty != null) ? {difficulty: _existing.difficulty} : {}),
-      });
+        repair_point: ok === false ? true : (_cur.repair_point || false),
+      };
+      if (_cur.stability  != null) _patch.stability  = _cur.stability;
+      if (_cur.difficulty != null) _patch.difficulty = _cur.difficulty;
+      setProgress(id, _patch);
     };
     window.rate = rate = (card, rating) => {
       rateCard(canonicalCardId(card), rating);
