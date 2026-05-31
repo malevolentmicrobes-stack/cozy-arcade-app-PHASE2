@@ -5628,30 +5628,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     if(typeof advance==='function'){ advance(which); return true; }
     return false;
   }
-  function ensureFullDropdown(which){
-    const root = which==='domain' ? $('domainReveal') : $('soloReveal');
-    if(!root || root.dataset.dropdown343 || root.querySelector('.fullDropdown350')) return;
-    root.dataset.dropdown343='1';
-    const fullBtn = which==='domain' ? $('domainFull') : $('soloFull');
-    if(!fullBtn) return;
-    fullBtn.textContent = 'Full Card ▼';
-    let box = document.createElement('div');
-    box.id = which+'FullDropdown343';
-    box.className = 'fullDropdown343 hidden';
-    box.style.cssText = 'margin-top:10px;border:1px solid rgba(255,209,102,.35);border-radius:16px;background:rgba(5,8,20,.72);padding:12px;max-height:32vh;overflow:auto;white-space:pre-wrap;line-height:1.4;text-align:left;';
-    fullBtn.parentNode.insertAdjacentElement('afterend', box);
-    fullBtn.onclick = function(){
-      if(box.classList.contains('hidden')){
-        const c = (typeof current!=="undefined") ? current : {};
-        box.textContent = JSON.stringify(c,null,2);
-        box.classList.remove('hidden');
-        fullBtn.textContent = 'Full Card ▲';
-      }else{
-        box.classList.add('hidden');
-        fullBtn.textContent = 'Full Card ▼';
-      }
-    };
-  }
+  function ensureFullDropdown(which){ /* disabled — fullDropdown350 is the active implementation */ }
   window.addEventListener('keydown', function(e){
     if(document.activeElement&&(/^(TEXTAREA|INPUT|SELECT)$/i.test(document.activeElement.tagName)||document.activeElement.isContentEditable)) return;
     const which = (typeof mode!=='undefined' && mode==='domain') ? 'domain' : 'solo';
@@ -6769,7 +6746,6 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
         if(close) close.onclick=ev=>{ev.preventDefault(); ev.stopPropagation(); box.classList.add('hidden'); box.textContent=''; btn.textContent='Full Card ▼';};
         box.classList.remove('hidden');
         btn.textContent='Full Card ▲';
-        try{box.scrollIntoView({behavior:'smooth',block:'nearest'});}catch(_){}
       }else{
         box.classList.add('hidden');
         box.textContent='';
@@ -8858,7 +8834,7 @@ Rules:
     if(one.querySelector('textarea,.oneThingEdit351')) one.style.display='block';
     else renderOneThingStable351(one,card,false);
     const fullBox=root.querySelector('.fullDropdown350');
-    if(fullBox&&!fullBox.classList.contains('hidden')) fullBox.innerHTML='<button type="button" class="fullClose351">UP TO CLOSE</button><pre style="white-space:pre-wrap;margin:0">'+esc(sourceFull(card))+'</pre>';
+    // Never rewrite open fullDropdown350 — would reset scroll position and destroy UP TO CLOSE handler
   }
   function wire(){
     cleanHero();
@@ -12918,6 +12894,13 @@ function fixStableOneThingDropdown351() {
 @media (min-width: 901px) {
   .reveal {
     max-height: min(65dvh, 640px) !important;
+  }
+  /* Hide gameplay elements behind reveal on desktop (mirrors mobile shell rule) */
+  .gameMain371:has(.reveal:not(.hidden)) > .promptBox,
+  .gameMain371:has(.reveal:not(.hidden)) > .soloTrack,
+  .gameMain371:has(.reveal:not(.hidden)) > .orbArena,
+  .gameMain371:has(.reveal:not(.hidden)) > .domainTitle {
+    display: none !important;
   }
 }
 </style>
