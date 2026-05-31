@@ -12856,9 +12856,7 @@ function fixStableOneThingDropdown351() {
 :root[data-cozy-bionic="1"] .promptText,:root[data-cozy-bionic="1"] .promptText *:not(b){color:rgba(160,200,255,0.62)!important;font-weight:500!important;}
 :root[data-cozy-bionic="1"] .promptText b{color:#ffffff!important;font-weight:950!important;}
 
-/* Shell specificity lock — beats #solo .promptBox (1,1,0) with (1,2,0).
-   Cancels L5703's top:58px, min(1680px,94vw) width, clamp(280px,38vh) min-height
-   which override the shell's class-only selectors when game-shell is active. */
+/* Shell positioning fix — converts absolute to relative for shell flow on all sizes */
 #solo .gameMain371 > .promptBox,
 #domain .gameMain371 > .promptBox {
   position: relative !important;
@@ -12866,16 +12864,33 @@ function fixStableOneThingDropdown351() {
   left: auto !important;
   right: auto !important;
   transform: none !important;
-  width: min(100%, 820px) !important;
-  min-height: 140px !important;
-  max-height: min(32dvh, 270px) !important;
-  padding: 16px 20px 16px !important;
   margin: 0 auto !important;
+  overflow: auto !important;
 }
+/* Desktop: full-width extended prompt card */
+@media (min-width: 901px) {
+  #solo .gameMain371 > .promptBox {
+    width: min(1680px, 94vw) !important;
+    max-width: 94vw !important;
+    min-height: clamp(260px, 36dvh, 420px) !important;
+    max-height: 42dvh !important;
+    padding: 26px clamp(28px, 4vw, 64px) 24px !important;
+    border-radius: 0 0 28px 28px !important;
+  }
+  #domain .gameMain371 > .promptBox {
+    width: min(1320px, 92vw) !important;
+    max-width: 92vw !important;
+    min-height: 190px !important;
+    max-height: 38dvh !important;
+    padding: 22px clamp(24px, 3.5vw, 54px) 22px !important;
+  }
+}
+/* Mobile compact */
 @media (max-width: 760px) {
   #solo .gameMain371 > .promptBox,
   #domain .gameMain371 > .promptBox {
     width: 100% !important;
+    min-height: 140px !important;
     max-height: min(30dvh, 230px) !important;
     padding: 14px 14px 14px !important;
   }
