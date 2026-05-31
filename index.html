@@ -400,7 +400,7 @@ function notify(body,cb){$('notifyBody').textContent=body;$('notify').classList.
 function startSolo(){notify('Gate opening.',()=>{show('solo'); resetRun(); renderSolo(); loopSolo();})}
 function startDomain(){notify('Domain opening.',()=>{show('domain'); resetRun(); renderDomain(); loopDomain();})}
 function resetRun(){score=0;streak=0;hp=100;gate=1;domainRound=1;paused=false;index=0;nextCard();}
-function renderSolo(){document.body.className=''; $('soloScore').textContent=score;$('soloStreak').textContent=streak;$('soloGate').textContent=gate;$('hpFill').style.width=hp+'%';$('soloSystem').textContent=current.system||current.sys||'';$('soloQuestion').innerHTML=bionic(getPrompt(current));$('soloReveal').classList.add('hidden'); let row=$('choiceRow'); row.innerHTML=''; choices.forEach((ch,i)=>{let d=document.createElement('button');d.className='choice '+(i===selected?'selected':'');d.innerHTML=`<span class="letter">${'ABCD'[i]}</span>${escHTML(ch)}`;d.onclick=()=>selectSolo(i);row.appendChild(d)});moveHunter();timerMax=parseInt(localStorage.getItem('cozyQuestionSeconds351')||$('soloTimerInput')?.value||7)||7;timer=timerMax;}
+function renderSolo(){const _savedShell=document.body.classList.contains('cozyGameShellActive371');document.body.className='';if(_savedShell)document.body.classList.add('cozyGameShellActive371');$('soloScore').textContent=score;$('soloStreak').textContent=streak;$('soloGate').textContent=gate;$('hpFill').style.width=hp+'%';$('soloSystem').textContent=current.system||current.sys||'';$('soloQuestion').innerHTML=bionic(getPrompt(current));$('soloReveal').classList.add('hidden'); let row=$('choiceRow'); row.innerHTML=''; choices.forEach((ch,i)=>{let d=document.createElement('button');d.className='choice '+(i===selected?'selected':'');d.innerHTML=`<span class="letter">${'ABCD'[i]}</span>${escHTML(ch)}`;d.onclick=()=>selectSolo(i);row.appendChild(d)});moveHunter();timerMax=parseInt(localStorage.getItem('cozyQuestionSeconds351')||$('soloTimerInput')?.value||7)||7;timer=timerMax;}
 function updateSoloVisuals(){[...document.querySelectorAll('#choiceRow .choice')].forEach((d,i)=>d.classList.toggle('selected',i===selected));moveHunter();$('soloTimerFill').style.width=Math.max(0,timer/timerMax*100)+'%';}
 function moveHunter(){let pct=[12.5,37.5,62.5,87.5][selected]||50;let r=$('runner');r.style.left=pct+'%';r.classList.remove('lane0','lane1','lane2','lane3');r.classList.add('lane'+selected);$('groundGlow').style.left=pct+'%'}
 function loopSolo(){clearInterval(ticker);ticker=setInterval(()=>{if(mode!=='solo'||paused)return;timer-=.08;updateSoloVisuals();if(timer<=0&&autoSelect)selectSolo(selected)},80)}
@@ -6170,6 +6170,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     const modes=homeWrap.querySelector('.modeGrid');
     (modes||kpis||homeWrap).insertAdjacentElement('afterend',panel);
     const oldScope=$('homeScope175155'), oldSys=$('homeSystem175155'), oldTag=$('homeTag175155');
+    if(oldScope&&oldScope.closest){const oldPanel=oldScope.closest('div,label,p')||oldScope.parentElement;if(oldPanel)oldPanel.style.display='none';}
     const bs=$('browseScope351'), by=$('browseSystem351'), bt=$('browseTag351');
     const systems=[...new Set((cards||[]).map(c=>clean(c.system||c.sys||c.subject)).filter(Boolean))].sort();
     const tags=[...new Set((cards||[]).flatMap(c=>tagsOf(c)).filter(Boolean))].sort();
@@ -6380,6 +6381,8 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     }
     $('shadowStart351').onclick=()=>{
       const scope=$('shadowScope351')?.value||'review';
+      const shadowModeMap={'review':'review_deck','pinned':'pinned','scheduled':'due','due':'due','new':'random_new','random-new':'random_new'};
+      const studyMode=shadowModeMap[scope]||'review_deck';
       shadowType351=$('shadowType351')?.value||'solo';
       const drop=$('shadowDropSeconds351');
       if(drop){
@@ -6387,7 +6390,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
         try{localStorage.setItem('cozyShadowDropSeconds351',String(n));}catch(e){}
       }
       const homeScope=$('homeScope175155');
-      if(homeScope){homeScope.value=scope; homeScope.dispatchEvent(new Event('change',{bubbles:true}));}
+      if(homeScope){homeScope.value=studyMode; homeScope.dispatchEvent(new Event('change',{bubbles:true}));}
       shadowActive351=true;
       ov.classList.add('hidden');
       if(shadowType351==='domain') directStartGame351('domain'); else directStartGame351('solo');
@@ -10739,6 +10742,7 @@ function fixStableOneThingDropdown351() {
   }
 
   function appCards() {
+    try { if(phase3State?.cards?.length) return phase3State.cards; } catch(_) {}
     try { if (Array['isArray'](cards)) return cards; } catch (_) {}
     try { if (Array.isArray(window.cards)) return window.cards; } catch (_) {}
     try { if (window.DATA && Array.isArray(window.DATA.cards)) return window.DATA.cards; } catch (_) {}
@@ -11391,7 +11395,8 @@ function fixStableOneThingDropdown351() {
   }
 
   function poolKey(gameType) {
-    return [gameType, selectedOrder(gameType), deckFingerprint(), session.buriedToday.size, session.seenThisSession.size].join('|');
+    const scope = window.homeFilters?.scope || (typeof q === 'function' ? q('browseScope351')?.value : '') || '';
+    return [gameType, selectedOrder(gameType), deckFingerprint(), session.buriedToday.size, session.seenThisSession.size, scope].join('|');
   }
 
   function sessionPool(gameType) {
@@ -11926,7 +11931,13 @@ function fixStableOneThingDropdown351() {
     window.record = record = (card, ok) => {
       const id = canonicalCardId(card);
       session.seenThisSession.add(id);
-      setProgress(id, { last_seen_at: nowIso(), repair_point: ok === false ? true : getProgress(id).repair_point });
+      const _existing = getProgress(id);
+      setProgress(id, {
+        last_seen_at: nowIso(),
+        repair_point: ok === false ? true : (_existing.repair_point || false),
+        ...((_existing.stability != null) ? {stability: _existing.stability} : {}),
+        ...((_existing.difficulty != null) ? {difficulty: _existing.difficulty} : {}),
+      });
     };
     window.rate = rate = (card, rating) => {
       rateCard(canonicalCardId(card), rating);
@@ -12761,9 +12772,11 @@ function fixStableOneThingDropdown351() {
       start.dataset.mobileShell371 = '1';
       start.addEventListener('click', () => {
         const scope = q('shadowScope351')?.value || 'review';
+        const shadowModeMap={'review':'review_deck','pinned':'pinned','scheduled':'due','due':'due','new':'random_new','random-new':'random_new'};
+        const studyMode=shadowModeMap[scope]||'review_deck';
         const browse = q('browseScope351');
         if (browse) {
-          browse.value = scope;
+          browse.value = studyMode;
           browse.dispatchEvent(new Event('change', { bubbles: true }));
         }
         ov.classList.add('hidden');
@@ -12799,8 +12812,9 @@ function fixStableOneThingDropdown351() {
   }, true);
   setTimeout(run, 100);
   setTimeout(run, 700);
-  setInterval(run, 900);
-  new MutationObserver(run).observe(document.body, { childList: true, subtree: true });
+  setInterval(run, 4000);
+  let _moBusy=false;
+  new MutationObserver(()=>{ if(_moBusy)return; _moBusy=true; setTimeout(()=>{ run(); _moBusy=false; },800); }).observe(document.body,{childList:true,subtree:false});
 })();
 </script>
 <style id="v175374-rectifier-font-bionic-fix">
