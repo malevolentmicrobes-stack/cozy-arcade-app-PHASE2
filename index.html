@@ -8356,7 +8356,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       id:sourceId, card_id:clean(first(c.card_id,sourceId)), json_id:first(c.json_id,sourceId),
       qid_unique:qid, qid, original_qid:qid, legacy_id:clean(first(c.legacy_id,sourceId)),
       card_type:cardType, type:clean(first(c.type,cardType)), source,
-      input:first(c.input,c.front,presentation,clinical,''), output:first(c.output,c.back,c.answer,c.one_thing,c.educational_objective,c.board_trigger,reveal,''),
+      input:first(c.input,c.front,presentation,clinical,''), output:first(c.output,c.back,c.answer,c.educational_objective,c.educational_obj,c.board_trigger,reveal,''),
       sys:system, system, subject:clean(first(c.subject,system)),
       diagnosis:first(c.diagnosis,c.title,c.topic,c.answer_choice,c.dx,reveal,'Unknown'),
       tags, prompt:first(c.prompt,c.front,presentation,''), one_thing:first(c.one_thing,c.oneThing,c.takeaway,c.personal_takeaway,''),
@@ -11493,8 +11493,6 @@ function fixStableOneThingDropdown351() {
     c.sys = sys;
     c.system = c.system || sys;
     c.diagnosis = diagnosis;
-    c.level_1_presentation = presentation;
-    c.level_2_three_second_exposure = educational_objective;
     c.prompt = presentation;
     c.answer = educational_objective;
     c.quick_recall = c.quick_recall || educational_objective;
