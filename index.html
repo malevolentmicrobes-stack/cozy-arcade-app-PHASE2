@@ -6727,7 +6727,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     btn.onclick=e=>{
       if(e){e.preventDefault(); e.stopPropagation();}
       if(box.classList.contains('hidden')){
-        box.innerHTML='<button type="button" class="fullClose351">UP TO CLOSE</button><pre>'+escapeHTML(full(typeof current!=='undefined'?current:{}))+'</pre>';
+        box.innerHTML='<button type="button" class="fullClose351">UP TO CLOSE</button><pre>'+escapeHTML((window.full||full)(typeof current!=='undefined'?current:{}))+'</pre>';
         const close=box.querySelector('.fullClose351');
         if(close) close.onclick=ev=>{ev.preventDefault(); ev.stopPropagation(); box.classList.add('hidden'); box.textContent=''; btn.textContent='Full Card ▼';};
         box.classList.remove('hidden');
@@ -8324,8 +8324,6 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       diagnosis:first(c.diagnosis,c.title,c.topic,c.answer_choice,c.dx,reveal,'Unknown'),
       tags, prompt:first(c.prompt,c.front,presentation,''), one_thing:first(c.one_thing,c.oneThing,c.takeaway,c.personal_takeaway,''),
       presentation, clinical_vignette:clinical, clinical_vignette_summary:first(c.clinical_vignette_summary,clinical,''),
-      level_1:first(c.level_1,c.level_1_presentation,clinical,presentation,''), level_1_presentation:first(c.level_1_presentation,c.level_1,clinical,presentation,''),
-      level_2:first(c.level_2,c.level_2_three_second,c.level_2_three_second_exposure,reveal,''), level_2_three_second:first(c.level_2_three_second,c.level_2_three_second_exposure,c.level_2,reveal,''), level_2_three_second_exposure:first(c.level_2_three_second_exposure,c.level_2_three_second,c.level_2,reveal,''),
       level_3_recall:first(c.level_3_recall,c.level_3_quick_recall,c.quick_recall,quick,''), level_3_quick_recall:first(c.level_3_quick_recall,c.level_3_recall,c.quick_recall,quick,''), quick_recall:quick,
       level_3_treatment:first(c.level_3_treatment,c.treatment,''), treatment:first(c.treatment,c.level_3_treatment,''),
       level_3_next_step:first(c.level_3_next_step,c.next_step,''), next_step:first(c.next_step,c.level_3_next_step,''),
@@ -8620,8 +8618,6 @@ Rules:
       educational_objective:educationalObjective, educational_obj:educationalObjective,
       board_trigger:boardTrigger, one_thing:oneThing,
       explanation, why_not_others:first(c.why_not_others,explanation),
-      level_1:level1, level_1_presentation:first(c.level_1_presentation,level1),
-      level_2:level2, level_2_three_second:first(c.level_2_three_second,level2), level_2_three_second_exposure:first(c.level_2_three_second_exposure,level2),
       quick_recall:recall, level_3_recall:recall, level_3_quick_recall:first(c.level_3_quick_recall,recall),
       treatment, level_3_treatment:treatment, next_step:nextStep, level_3_next_step:nextStep,
       level_4_full:first(c.level_4_full,explanation), level_4_full_card:first(c.level_4_full_card,explanation),
