@@ -2203,13 +2203,7 @@ body:not(.hideContinueHint175158) .continueHint175158{display:block!important;ma
   }
 
   function addHudHome(){
-    document.querySelectorAll('#solo .hud .hudGroup:first-child,#domain .hud .hudGroup:first-child').forEach(group=>{
-      if(group.querySelector('.hudHome1751511')) return;
-      const b=document.createElement('button');
-      b.className='hudPill hudHome1751511'; b.title='Home'; b.textContent='⌂';
-      b.onclick=()=>{ try{ home(); }catch(e){ document.querySelectorAll('.game,.screen').forEach(x=>x.classList.add('hidden')); $('home')?.classList.remove('hidden'); } };
-      group.insertBefore(b, group.firstChild);
-    });
+    // Home button injection disabled — normalizeHud() is the sole owner of game HUD home/exit buttons
     document.querySelectorAll('#soloPause,#domainPause').forEach(b=>{ b.textContent='⏸'; b.title='Pause'; b.classList.add('hudPauseIcon1751511'); });
     document.querySelectorAll('#solo .hud [data-home],#domain .hud [data-home]').forEach(b=>{ b.textContent='×'; b.title='Exit'; b.classList.add('hudExitIcon1751511'); });
   }
@@ -2309,7 +2303,7 @@ body:not(.hideContinueHint175158) .continueHint175158{display:block!important;ma
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
   // Reapply after app dynamically rebuilds settings/review panels.
-  setInterval(()=>{ try{ normalizeTitle(); addHudHome(); settingsPolish(); pausePolish(); relabelMainFilters(); }catch(e){} },1200);
+  setInterval(()=>{ try{ normalizeTitle(); settingsPolish(); pausePolish(); relabelMainFilters(); }catch(e){} },1200);
 })();
 </script>
 
@@ -2366,16 +2360,8 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   }
 
   function standardHud(){
-    // Remove the duplicate free-floating top-home button; keep one home control embedded in the HUD.
+    // Home button injection disabled — normalizeHud() is the sole owner of game HUD home/exit buttons
     const floating=$('homeTopBtn'); if(floating){floating.style.display='none'; floating.onclick=null;}
-    document.querySelectorAll('#solo .hud .hudGroup:first-child,#domain .hud .hudGroup:first-child').forEach(group=>{
-      let b=group.querySelector('.hudHome1751511,.hudHome1751512');
-      if(!b){
-        b=document.createElement('button'); b.className='hudPill hudHome1751512'; b.title='Home'; b.textContent='⌂';
-        group.insertBefore(b, group.firstChild);
-      }
-      b.onclick=(e)=>{e.preventDefault(); e.stopPropagation(); try{home();}catch(err){show&&show('home');}};
-    });
     const gear=$('gearBtn'); if(gear){ gear.title='Settings'; }
     document.querySelectorAll('#soloPause,#domainPause').forEach(b=>{b.title='Pause';});
     document.querySelectorAll('#solo .hud [data-home],#domain .hud [data-home]').forEach(b=>{b.title='Exit';});
@@ -2556,7 +2542,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     normalizeTitle(); standardHud(); reorderHome(); settingsTextAndToggles(); safePatchGameplay(); patchReveal(); keyboardGuard(); clickOutsideSettings(); clickOutsideReveal(); pinLanguage();
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
-  setInterval(()=>{try{normalizeTitle();standardHud();reorderHome();settingsTextAndToggles();moveFullCardIntoReveal();pinLanguage();}catch(e){}},1000);
+  setInterval(()=>{try{normalizeTitle();reorderHome();settingsTextAndToggles();moveFullCardIntoReveal();pinLanguage();}catch(e){}},1000);
 })();
 </script>
 
