@@ -12676,12 +12676,18 @@ function fixStableOneThingDropdown351() {
     if (!game || !hud) return;
 
     game.classList.add('game-shell');
-    hud.classList.add('gameHud', 'mobileHud');
+    hud.classList.add('gameHud');
+    if (window.innerWidth <= 900) hud.classList.add('mobileHud');
 
-    // Remove duplicate home buttons from older HUD patches — keep only [data-home]
-    hud.querySelectorAll('.hudHome1751511, .hudHome1751512').forEach(btn => {
-      if(hud.querySelector('[data-home]')) btn.remove();
-    });
+    // Remove all legacy home buttons unconditionally; ensure exactly one [data-home] button
+    hud.querySelectorAll('.hudHome1751511, .hudHome1751512').forEach(btn => btn.remove());
+    if (!hud.querySelector('[data-home]')) {
+      const _hb = document.createElement('button');
+      _hb.className = 'hudPill'; _hb.setAttribute('data-home', '1');
+      _hb.title = 'Home'; _hb.textContent = '⌂';
+      _hb.onclick = e => { e.preventDefault(); e.stopPropagation(); try { home(); } catch(_) {} };
+      hud.appendChild(_hb);
+    }
 
     let stats = hud.querySelector(':scope > .hudStats371');
     let actions = hud.querySelector(':scope > .hudActions371');
@@ -12906,6 +12912,12 @@ function fixStableOneThingDropdown351() {
     min-height: 96px !important;
     max-height: 28dvh !important;
     padding: 10px 14px !important;
+  }
+}
+/* Desktop reveal cap — prevents full-viewport takeover on tall screens */
+@media (min-width: 901px) {
+  .reveal {
+    max-height: min(65dvh, 640px) !important;
   }
 }
 </style>
