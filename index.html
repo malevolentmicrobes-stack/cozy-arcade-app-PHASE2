@@ -619,7 +619,7 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
   function continueIfRevealVisible(which){
     const id = which==='solo' ? 'soloReveal' : 'domainReveal';
     const el=$(id);
-    if(el && !el.classList.contains('hidden')){ clearTimeout(answerAutoAdvanceHandle); if(typeof spacedOn!=='undefined'&&spacedOn&&typeof current!=='undefined'&&current&&typeof rateCard==='function'){try{rateCard(canonicalCardId(current),'good');}catch(_){}} advance(which); return true; }
+    if(el && !el.classList.contains('hidden')){ clearTimeout(answerAutoAdvanceHandle); advance(which); return true; }
     return false;
   }
 
@@ -11914,6 +11914,38 @@ function fixStableOneThingDropdown351() {
       index += 1;
       if (typeof makeChoices === 'function') makeChoices();
     };
+    // E2 fix: all advance() call sites (keyboard, click, continueReveal, advanceReveal)
+    // Some handlers use stopImmediatePropagation so per-handler patches miss them.
+    // Wrapping advance() catches every path. Dedup guard prevents double-rating when
+    // user explicitly clicked a rating button before hitting Enter/Continue.
+    (function(){
+      const _adv = window.advance || advance;
+      window.advance = advance = function(which){
+        const revId = which === 'domain' ? 'domainReveal' : 'soloReveal';
+        const revEl = document.getElementById(revId);
+        if(revEl && !revEl.classList.contains('hidden') &&
+           typeof spacedOn !== 'undefined' && spacedOn &&
+           typeof current !== 'undefined' && current &&
+           typeof rateCard === 'function'){
+          const cardId = typeof canonicalCardId === 'function' ? canonicalCardId(current) : (current.id || current.qid);
+          if(cardId && window.__cozyLastRatedId !== cardId){
+            window.__cozyLastRatedId = cardId;
+            try{ rateCard(cardId, 'good'); }catch(_){}
+          }
+        }
+        _adv(which);
+      };
+      const _rt = window.rate || (typeof rate !== 'undefined' ? rate : null);
+      if(_rt){
+        window.rate = rate = function(card, r){
+          if(card && r !== 'pin' && r !== 'bury'){
+            const cardId = typeof canonicalCardId === 'function' ? canonicalCardId(card) : (card && (card.id || card.qid));
+            if(cardId) window.__cozyLastRatedId = cardId;
+          }
+          return _rt(card, r);
+        };
+      }
+    })();
     window.resetRun = resetRun = () => {
       score = 0; streak = 0; hp = 100; gate = 1; domainRound = 1; paused = false; index = 0;
       clearSessionBuried();
