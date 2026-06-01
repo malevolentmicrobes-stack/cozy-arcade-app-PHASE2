@@ -619,7 +619,7 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
   function continueIfRevealVisible(which){
     const id = which==='solo' ? 'soloReveal' : 'domainReveal';
     const el=$(id);
-    if(el && !el.classList.contains('hidden')){ clearTimeout(answerAutoAdvanceHandle); advance(which); return true; }
+    if(el && !el.classList.contains('hidden')){ clearTimeout(answerAutoAdvanceHandle); if(typeof spacedOn!=='undefined'&&spacedOn&&typeof current!=='undefined'&&current&&typeof rateCard==='function'){try{rateCard(canonicalCardId(current),'good');}catch(_){}} advance(which); return true; }
     return false;
   }
 

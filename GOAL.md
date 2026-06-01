@@ -89,6 +89,10 @@
 - ✅ **TEST MODE removed from drawer** — checkbox at line 9195 removed; dev-only, its open-drawer layout shift triggers font reflow glitch
 - ✅ **`renderSolo` body.className fix** — `document.body.className=''` wiped `cozyDrawerOpen351` causing promptBox width snap on every card; now preserves `cozy*/na-/Drawer` classes
 
+### FSRS + UX Fixes (2026-06-01) — all ✅
+- ✅ **E2 fix**: `continueIfRevealVisible()` now calls `rateCard(canonicalCardId(current),'good')` before `advance()` when `spacedOn` is true — keyboard Enter/Arrow advance was silently bypassing FSRS rating, leaving 139 cards with `seen_count=0 / last_rating=null / next_due_at=null` forever
+- ✅ **Ports to PHASE1**: same E2 fix applied to cozy-arcade-app
+
 ### Atlas Tag Feature (2026-05-28) — all ✅
 - ✅ `003957c`: Tag filter + sortable columns + tag/sys constellation toggle (PHASE2 only)
   - `parseTags(card)` helper handles string or array `tags` field
@@ -121,6 +125,19 @@ Run in order — do not proceed to P7 until all pass:
 12. Atlas ↻ → refreshes from live app state; no `'—'` node when deck loaded
 
 ---
+
+## Open Bug Inventory (MASTER_FIX_PROMPT)
+
+| ID | Severity | Description | Status |
+|----|----------|-------------|--------|
+| E1 | 🔴 CRITICAL | FSRS stability/difficulty never persists to export — 48 rated cards have `stability:null`. `setProgress` writes `phase3State.progress` but `exportedProgress` in `savePhase3State` may strip FSRS fields before localStorage write | ❌ Unresolved |
+| E2 | 🔴 CRITICAL | Keyboard advance bypassed `rateCard()` — 139 cards stuck as `new` forever | ✅ Fixed 2026-06-01 |
+| E3 | 🟠 HIGH | 5 SM2-era cards got SM2 interval (1d) instead of FSRS (3d) | ❌ Unresolved (data patch) |
+| E4 | 🟠 HIGH | 6 cards have mutated `ease_factor` (2.1–2.35) from pre-FSRS SM2 logic | ❌ Unresolved (data patch) |
+| E5 | 🟠 HIGH | Shadow Dungeon breaks after card 1 — `nextCard()` falls back to full pinned set, ignores filter selection | ❌ Unresolved |
+| E6 | 🟠 HIGH | `deckMode:'due'` sorts 1249 new cards before 37 overdue ones — `dueScore()` has no `next_due_at` logic | ❌ Unresolved |
+| E7 | 🟠 HIGH | 12 competing `window.cardPool = cardPool` overrides, last writer wins unpredictably | ❌ Unresolved |
+| E8 | 🟡 MEDIUM | Full Card showed LEVEL 1/LEVEL 2 — whitelist formatter + alias write removal applied | ✅ Fixed prior session |
 
 ## Next Code Tasks (after validation)
 
