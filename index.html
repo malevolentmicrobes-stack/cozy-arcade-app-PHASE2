@@ -10779,6 +10779,9 @@ function fixStableOneThingDropdown351() {
       next_due_at: legacy?.next_due_at || (repair ? nowIso() : null),
       interval_days: Number(legacy?.interval_days || 0) || 0,
       ease_factor: Number(legacy?.ease_factor || 2.5) || 2.5,
+      stability: legacy?.stability != null ? Number(legacy.stability) : null,
+      difficulty: legacy?.difficulty != null ? Number(legacy.difficulty) : null,
+      retrievability: legacy?.retrievability != null ? Number(legacy.retrievability) : null,
       lapses: Number(legacy?.lapses || 0) || 0,
       created_at: legacy?.created_at || lastSeen || base.created_at,
       updated_at: legacy?.updated_at || lastSeen || base.updated_at
