@@ -131,7 +131,7 @@ Run in order — do not proceed to P7 until all pass:
 | ID | Severity | Description | Status |
 |----|----------|-------------|--------|
 | E1 | 🔴 CRITICAL | FSRS stability/difficulty never persists to export — 48 rated cards have `stability:null`. `setProgress` writes `phase3State.progress` but `exportedProgress` in `savePhase3State` may strip FSRS fields before localStorage write | ❌ Unresolved |
-| E2 | 🔴 CRITICAL | Keyboard advance bypassed `rateCard()` — 139 cards stuck as `new` forever | ✅ Fixed 2026-06-01 |
+| E2 | 🔴 CRITICAL | Keyboard advance bypassed `rateCard()` — 139 cards stuck as `new` forever | ✅ Fixed + browser-validated 2026-06-01: advance() wrapper in FSRS Phase 3 block; explicit rating guard via `__cozyLastRatedId`; confirmed seen_count:1 / last_rating:'good' / next_due_at set; explicit 'again' not overridden |
 | E3 | 🟠 HIGH | 5 SM2-era cards got SM2 interval (1d) instead of FSRS (3d) | ❌ Unresolved (data patch) |
 | E4 | 🟠 HIGH | 6 cards have mutated `ease_factor` (2.1–2.35) from pre-FSRS SM2 logic | ❌ Unresolved (data patch) |
 | E5 | 🟠 HIGH | Shadow Dungeon breaks after card 1 — `nextCard()` falls back to full pinned set, ignores filter selection | ❌ Unresolved |
