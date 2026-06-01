@@ -10889,8 +10889,9 @@ function fixStableOneThingDropdown351() {
         next_due_at: p.next_due_at || null,
         interval_days: Number(p.interval_days || 0),
         ease_factor: Number(p.ease_factor || 2.5),
-        stability: p.stability || null,
-        difficulty: p.difficulty || null,
+        stability: p.stability != null ? Number(p.stability) : null,
+        difficulty: p.difficulty != null ? Number(p.difficulty) : null,
+        retrievability: p.retrievability != null ? Number(p.retrievability) : null,
         lapses: Number(p.lapses || 0),
         created_at: p.created_at || nowIso(),
         updated_at: p.updated_at || nowIso()

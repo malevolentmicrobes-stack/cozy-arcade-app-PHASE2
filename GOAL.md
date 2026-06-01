@@ -130,7 +130,7 @@ Run in order — do not proceed to P7 until all pass:
 
 | ID | Severity | Description | Status |
 |----|----------|-------------|--------|
-| E1 | 🔴 CRITICAL | FSRS stability/difficulty never persists to export — 48 rated cards have `stability:null`. `setProgress` writes `phase3State.progress` but `exportedProgress` in `savePhase3State` may strip FSRS fields before localStorage write | ❌ Unresolved |
+| E1 | 🔴 CRITICAL | FSRS stability/difficulty never persists to export — 48 rated cards have `stability:null`. Root cause: `legacyToProgress()` omitted stability/difficulty/retrievability, so every reload reset fields to null | ✅ Fixed + browser-validated 2026-06-01: stability:3.1262 survives reload; `exportProgressMap` also fixed to include all three FSRS fields. Known: `W[15]=0.0000` (hard_penalty) — Hard doesn't reduce stability; fixing requires updating validation test too (deferred E4b) |
 | E2 | 🔴 CRITICAL | Keyboard advance bypassed `rateCard()` — 139 cards stuck as `new` forever | ✅ Fixed + browser-validated 2026-06-01: advance() wrapper in FSRS Phase 3 block; explicit rating guard via `__cozyLastRatedId`; confirmed seen_count:1 / last_rating:'good' / next_due_at set; explicit 'again' not overridden |
 | E3 | 🟠 HIGH | 5 SM2-era cards got SM2 interval (1d) instead of FSRS (3d) | ❌ Unresolved (data patch) |
 | E4 | 🟠 HIGH | 6 cards have mutated `ease_factor` (2.1–2.35) from pre-FSRS SM2 logic | ❌ Unresolved (data patch) |
