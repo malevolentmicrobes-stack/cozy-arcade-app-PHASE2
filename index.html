@@ -990,7 +990,7 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
     document.querySelectorAll('#review [data-home]').forEach(b=>b.onclick=home);
     q('clearBtn').onclick=()=>{state={};saveState();updateKpis();renderShadowDungeonList();};
     ['shadowPool','shadowSystem','shadowTag','shadowSearch'].forEach(id=>q(id).addEventListener('input',renderShadowDungeonList));
-    q('shadowStartFirst').onclick=()=>{const queue=filterShadowCards();if(!queue.length){try{toast('No cards match this filter');}catch(e){}return;}window.__shadowRunQueue=queue;window.__shadowRunQueueIdx=0;window.__shadowDungeonActive175164=true;startCard(queue[0]);};
+    q('shadowStartFirst').onclick=()=>{const queue=filterShadowCards();if(!queue.length){try{toast('No cards match this filter');}catch(e){}return;}window.__shadowRunQueue=queue;window.__shadowRunQueueIdx=1;window.__shadowDungeonActive175164=true;startCard(queue[0]);};
     q('shadowExportSubset').onclick=()=>downloadJSON({metadata:{app:'Solo Studying',version:'v17.5.15.2',type:'shadow_dungeon_subset',exportedAt:new Date().toISOString()},cards:filterShadowCards()},'solo_studying_shadow_dungeon_subset_v17_5_15_2.json');
     const setTab=(pool)=>{document.querySelectorAll('.shadowTab').forEach(t=>t.classList.remove('active')); if(pool==='flagged')q('shadowTabFlagged').classList.add('active'); else if(pool==='tagged')q('shadowTabTagged').classList.add('active'); else q('shadowTabDungeon').classList.add('active'); if(pool==='flagged')q('shadowPool').value='flagged'; if(pool==='tagged'){q('shadowPool').value='all'; q('shadowSearch').focus();} renderShadowDungeonList();};
     q('shadowTabDungeon').onclick=()=>setTab('dungeon'); q('shadowTabFlagged').onclick=()=>setTab('flagged'); q('shadowTabTagged').onclick=()=>setTab('tagged');
@@ -11291,6 +11291,14 @@ function fixStableOneThingDropdown351() {
 	      ];
     } else if (selected === 'due') {
       arr = arr.filter(c => isDue(progress(c)));
+      arr = [...arr].sort((a, b) => {
+        const ta = Date.parse(progress(a).next_due_at || '');
+        const tb = Date.parse(progress(b).next_due_at || '');
+        if (isNaN(ta) && isNaN(tb)) return 0;
+        if (isNaN(ta)) return 1;
+        if (isNaN(tb)) return -1;
+        return ta - tb;
+      });
 	    } else if (selected === 'review_deck') {
 	      arr = normalizeDeckIdentities().filter(c => !progressForCard(c).suspended).filter(c => {
 	        const p = progressForCard(c);
@@ -11911,6 +11919,17 @@ function fixStableOneThingDropdown351() {
     };
     window.cardPool = cardPool = () => sessionPool(mode === 'domain' ? 'expansion' : 'solo');
     window.nextCard = nextCard = () => {
+      // E5 fix: consume __shadowRunQueue in order when Shadow Dungeon (old review screen) is active.
+      // nextCard() bypasses window.cardPool entirely (calls sessionPool directly), so the
+      // cardPool-level shadow queue check at L3862 never fires. This guard fixes that.
+      // __shadowRunQueueIdx starts at 1 (card 0 already served by startCard on session start).
+      if (window.__shadowDungeonActive175164 && Array.isArray(window.__shadowRunQueue) && window.__shadowRunQueue.length) {
+        const idx = typeof window.__shadowRunQueueIdx === 'number' ? window.__shadowRunQueueIdx : 1;
+        current = window.__shadowRunQueue[idx % window.__shadowRunQueue.length];
+        window.__shadowRunQueueIdx = idx + 1;
+        if (typeof makeChoices === 'function') makeChoices();
+        return;
+      }
       const gameType = mode === 'domain' ? 'expansion' : 'solo';
       const pool = sessionPool(gameType);
       if (!pool.length) { try { toast('No cards available for this study mode'); } catch (_) {} return; }
