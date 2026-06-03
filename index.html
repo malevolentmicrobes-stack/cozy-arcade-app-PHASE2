@@ -13763,6 +13763,45 @@ function naReviewTargetForCard(card,p){
   return null;
 }
 
+function naInjectPinBuryButtons(cardId){
+  var cd=naQ('cd-content');
+  if(!cd)return;
+  var old=document.getElementById('na-pin-bury-btns');
+  if(old)old.remove();
+  var p=progress[cardId];
+  if(!p)return;
+  var wrap=document.createElement('div');
+  wrap.id='na-pin-bury-btns';
+  wrap.style.cssText='display:flex;gap:8px;margin-top:10px';
+  function makeBtn(label,active,onClick){
+    var b=document.createElement('button');
+    b.type='button';
+    b.className='btn'+(active?' primary':'');
+    b.style.cssText='flex:1;font-size:11px';
+    b.textContent=label;
+    b.onclick=onClick;
+    return b;
+  }
+  wrap.appendChild(makeBtn(p.pinned?'📌 Unpin':'📌 Pin', p.pinned, function(){
+    p.pinned=!p.pinned;
+    try{if(window.phase3State&&window.phase3State.progress&&window.phase3State.progress[cardId])window.phase3State.progress[cardId].pinned=p.pinned;}catch(_){}
+    try{var s=window.state;if(s){s[cardId]=s[cardId]||{};s[cardId].pinned=p.pinned;}}catch(_){}
+    try{if(typeof window.saveState==='function')window.saveState();}catch(_){}
+    try{if(typeof updateKpis==='function')updateKpis();}catch(_){}
+    renderTable();
+    naInjectPinBuryButtons(cardId);
+  }));
+  wrap.appendChild(makeBtn(p.buried?'✅ Unbury':'🚫 Bury', p.buried, function(){
+    p.buried=!p.buried;
+    try{if(window.phase3State&&window.phase3State.progress&&window.phase3State.progress[cardId])window.phase3State.progress[cardId].buried=p.buried;}catch(_){}
+    try{var s=window.state;if(s){s[cardId]=s[cardId]||{};s[cardId].buried=p.buried;}}catch(_){}
+    try{if(typeof window.saveState==='function')window.saveState();}catch(_){}
+    renderTable();
+    naInjectPinBuryButtons(cardId);
+  }));
+  cd.appendChild(wrap);
+}
+
 function naInjectReviewTagButton(cardId){
   var cd=naQ('cd-content');
   if(!cd)return;
@@ -13807,7 +13846,7 @@ window.naClickTag=function(tag){clickTag(tag);};
 window.naToggleView=function(){naToggleView();};
 window.naToggleSort=function(col){naToggleSort(col);};
 window.naClickSys=function(sys){clickSys(sys);};
-window.naOpenCardDetail=function(id){openCardDetail(id);naInjectReviewTagButton(id);};
+window.naOpenCardDetail=function(id){openCardDetail(id);naInjectPinBuryButtons(id);naInjectReviewTagButton(id);};
 
 })();
 </script>
