@@ -394,7 +394,7 @@ function getPrompt(c){if(promptField==='presentation')return c.presentation||c.c
 function cardPool(){let arr=cards.filter(c=>clean(c.diagnosis)&&clean(getPrompt(c))); if(deckMode==='pinned')arr=arr.filter(c=>state[c.id||c.qid]?.pinned); if(deckMode==='due')arr.sort((a,b)=>dueScore(b)-dueScore(a)); if(deckMode==='random')arr=shuffle(arr); return arr.length?arr:cards}
 function dueScore(c){let s=state[c.id||c.qid]||{}; return (s.pinned?1000:0)+(s.rating==='again'?500:0)+(s.seen?0:100)}
 function nextCard(){let pool=cardPool(); current=pool[index%pool.length]; index++; makeChoices();}
-function makeChoices(){let dx=clean(current.diagnosis); let others=shuffle(cards.map(c=>clean(c.diagnosis)).filter(d=>d&&d!==dx)); choices=shuffle([dx,...[...new Set(others)].slice(0,3)]); selected=choices.indexOf(clean(current.diagnosis));if(selected<0)selected=Math.floor(Math.random()*4);}
+function makeChoices(){let dx=clean(current.diagnosis); let others=shuffle(cards.map(c=>clean(c.diagnosis)).filter(d=>d&&d!==dx)); choices=shuffle([dx,...[...new Set(others)].slice(0,3)]); selected=0;}
 function shuffle(a){a=[...a]; for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function notify(body,cb){$('notifyBody').textContent=body;$('notify').classList.remove('hidden');let n=5;$('notifyTimer').textContent=n+'s';clearInterval(ticker);let done=false;let finish=()=>{if(done)return;done=true;clearInterval(ticker);$('notify').classList.add('hidden');cb&&cb()};$('notifyContinue').onclick=finish;ticker=setInterval(()=>{n--;$('notifyTimer').textContent=n+'s';if(n<=0)finish()},1000)}
 function startSolo(){notify('Gate opening.',()=>{show('solo'); resetRun(); renderSolo(); loopSolo();})}
@@ -1396,7 +1396,7 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
     let dx=clean(current.diagnosis || current.answer || '');
     let source=filteredCardsBase(); if(source.length<4) source=cards||[];
     let others=shuffle(source.map(c=>clean(c.diagnosis)).filter(d=>d&&d!==dx));
-    choices=shuffle([dx,...[...new Set(others)].slice(0,3)]); selected=choices.indexOf(clean(current.diagnosis));if(selected<0)selected=Math.floor(Math.random()*4);
+    choices=shuffle([dx,...[...new Set(others)].slice(0,3)]); selected=0;
   };
   function hasCardsOrWarn(){
     if((cards||[]).length) return true;
@@ -4030,7 +4030,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     const src=(cards||[]).map(c=>safeClean(window.getAnswerChoiceText(c))).filter(d=>d&&d!==dx);
     const unique=[...new Set(shuffle(src))].slice(0,3);
     choices=shuffle([dx,...unique]);
-    selected=choices.indexOf(clean(current.diagnosis));if(selected<0)selected=Math.floor(Math.random()*4);
+    selected=0;
   };
   window.nextCard = nextCard = function(){ const pool=cardPool(); current=pool[index%pool.length]; index++; makeChoices(); };
   window.reveal = reveal = function(which,ok){
@@ -5402,7 +5402,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     try{src=shuffle(src);}catch(e){src=src.sort(()=>Math.random()-.5);}
     choices=[dx,...src.slice(0,3)];
     try{choices=shuffle(choices);}catch(e){choices=choices.sort(()=>Math.random()-.5);}
-    selected=choices.indexOf(clean(current.diagnosis));if(selected<0)selected=Math.floor(Math.random()*4);
+    selected=0;
   };
   const oldNext=window.nextCard || (typeof nextCard!=='undefined'?nextCard:null);
   window.nextCard = nextCard = function(){
@@ -6068,6 +6068,9 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       sel.value=configs.some(x=>x[0]===old)?old:'new';
       sel.onchange=()=>{try{deckMode=sel.value;}catch(e){} try{updateKpis();}catch(e){}};
     });
+    // E7: after Phase 3 owns the session pool, this legacy home patch may still
+    // refresh dropdown labels, but it must not replace the authoritative cardPool.
+    if(window.cardPool && window.cardPool.__cozyStableRandom351 && window.cardPool.__energyBuriedFilter352) return;
     window.cardPool=cardPool=function(){
       let arr=(cards||[]).filter(c=>clean(answer(c))&&clean(prompt(c)));
       const sys=$('homeSystem175155')?.value||'all';
@@ -13706,15 +13709,16 @@ Visible bug cluster: General Study Mode glitches, duplicate gameplay pause/setti
 runner/selected lane appearing biased toward the correct answer, and progress/card state not
 translating cleanly between gameplay, Atlas, and export.
 
-Diagnosis: do not add another patch layer before fixing runtime authority. Older stable-random
-and Energy/System installers still wrap/own active functions after Phase 3. In prior browser
-runtime validation, active cardPool was the Energy scopedCardPool352(prior...) wrapper, and
-active nextCard was the older stable-random sessionCards() wrapper, not the Phase 3 nextCard
-with the Shadow Dungeon queue guard.
+Diagnosis: do not add another patch layer before respecting runtime authority. E7 runtime
+authority is fixed/validated as of 2026-06-03: Phase 3 cardPool is flagged for the Energy
+buried-filter and stable-random guards, Phase 3 nextCard is flagged for stable-random, and
+legacy patchStudyOptions() skips replacing Phase 3 cardPool. Cache-busted CDP validation:
+cardPool = sessionPool (not scopedCardPool352), nextCard includes the Shadow Dungeon queue
+guard, FSRS 17/17, smoke 6/6.
 
 Required rectifier order:
-1) Make Phase 3 the authoritative owner of cardPool/nextCard/resetRun/session pool.
-2) Guard older interval installers such as installBuriedPoolFilter() from rewrapping Phase 3.
+1) Keep Phase 3 the authoritative owner of cardPool/nextCard/resetRun/session pool.
+2) Do not introduce new runtime wrappers that re-own cardPool/nextCard after Phase 3.
 3) Normalize General Study Mode through one source of truth: browseScope351 -> dataset
    cozyLaunchScope -> phase3State.settings -> sessionPool.
 4) Make HUD normalization guarantee exactly one pause/home/settings/status control per game.
