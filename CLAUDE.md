@@ -42,3 +42,12 @@ Validation gates after rectifier:
 - Runtime `String(window.nextCard)` must include the Shadow Dungeon queue guard or call the guarded Phase 3 implementation.
 - Changing General Study Mode must update `browseScope351.value`, `document.documentElement.dataset.cozyLaunchScope`, `phase3State.settings.solo_order`, `deckMode`, `homeFilters.scope`, and the next solo pool count consistently.
 - Gameplay DOM must contain exactly one visible pause, close/home, settings, and energy/status control per game.
+
+## Claude Handoff Addendum — 2026-06-03 Data + Rating Paths
+
+Codex applied today's data patch and rating-path rectifier:
+- Patched exports are in `/Users/rebekahbetar/Documents/ *EXAMPLE JSON FILES /cozy_arcade_progress_2026-06-03_codex_E3_E4_ghost_patch.json` and `/Users/rebekahbetar/Documents/ *EXAMPLE JSON FILES /cozy_arcade_deck_with_progress_backup_2026-06-03_codex_E3_E4_ghost_patch.json`.
+- E3/E4 target cards now have populated FSRS stability/difficulty/next_due_at and `ease_factor:2.5`. Good-rated cards correctly have interval 3; hard-rated cards correctly have interval 1 per `runFSRSValidation()`.
+- E3b ghost-seen target cards are reset to new with zero seen/review counters and null rating/stability/due date, preserving pinned flags.
+- `index.html` now includes `cozy-rating-path-rectifier-2026-06-03`, which wraps only `selectSolo`, `advance`, and `rate`. It does not add `cardPool` or `nextCard` wrappers. It keeps a pending answer rating after selection, commits auto-selected answers through `rateCard()` after the auto fallback, commits Continue through `rateCard('good')`, and preserves explicit Hard/Again/Good choices.
+- Focused CDP validation passed: auto-correct -> good/review/3d, auto-wrong -> again/relearning/10m, Continue -> good/review/3d, Hard -> hard/review/1d, Again -> again/relearning/10m.

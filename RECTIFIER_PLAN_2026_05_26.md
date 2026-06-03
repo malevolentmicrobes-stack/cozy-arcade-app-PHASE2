@@ -256,6 +256,20 @@ window.hideAtlasScreen()
 
 ## Validation Tests
 
+### 2026-06-03 Codex Update — E3/E4/E3b Data Patch + Rating-Path Rectifier
+
+- Real deck/progress inputs validated:
+  - `/Users/rebekahbetar/Documents/ *EXAMPLE JSON FILES /A.A.ABIM_DATABASE_v18_FIXED copy 2.json`
+  - `/Users/rebekahbetar/Documents/ *EXAMPLE JSON FILES /cozy_arcade_deck_with_progress_backup-2 copy.json`
+  - `/Users/rebekahbetar/Documents/ *EXAMPLE JSON FILES /cozy_arcade_progress_2026-06-01-3 copy.json`
+- Exported patched progress:
+  - `/Users/rebekahbetar/Documents/ *EXAMPLE JSON FILES /cozy_arcade_progress_2026-06-03_codex_E3_E4_ghost_patch.json`
+  - `/Users/rebekahbetar/Documents/ *EXAMPLE JSON FILES /cozy_arcade_deck_with_progress_backup_2026-06-03_codex_E3_E4_ghost_patch.json`
+- E3/E4 result: six target cards now have populated FSRS stability/difficulty/next_due_at and `ease_factor:2.5`. Good-rated cards have interval 3; hard-rated cards have interval 1, matching the app's own FSRS hard-new validator.
+- E3b result: six ghost-seen cards reset to `stage:'new'`, zero seen/review/correct/wrong counters, null rating/stability/next_due_at, pinned flags preserved.
+- Rating-path diagnosis: `record()` could mark cards seen before deferred `rateCard()` fired; Continue also depended on reveal DOM state. Added `cozy-rating-path-rectifier-2026-06-03` in `index.html` to keep pending answer ratings and commit them through `rateCard()` on auto-select timeout or Continue/advance, while explicit Hard/Again/Good still win through `rate()`.
+- Validation after patch: FSRS 17/17, smoke 6/6, Phase 3 `cardPool` contains `sessionPool`, `nextCard` retains Shadow guard, E7B/E7C/E7D/A9 all green, focused rating probe passes auto-good, auto-again, Continue-good, explicit-hard, explicit-again.
+
 ```javascript
 // Core suites
 window.runFSRSValidation()   // 17/17

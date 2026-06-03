@@ -14109,5 +14109,104 @@ else boot160();
 setTimeout(boot160,900);
 })();
 </script>
+<script id="cozy-rating-path-rectifier-2026-06-03">
+;(function(){
+'use strict';
+if(window.__cozyRatingPathRectifier20260603) return;
+window.__cozyRatingPathRectifier20260603=true;
+
+function q(id){return document.getElementById(id);}
+function visible(el){return !!el && !el.classList.contains('hidden') && getComputedStyle(el).display!=='none';}
+function cleanText(value){
+  try{ if(typeof clean==='function') return clean(value); }catch(_){}
+  return String(value==null?'':value).replace(/NOT SPECIFIED IN SOURCE/g,'').replace(/\s+/g,' ').trim();
+}
+function cardIdFor(card){
+  try{ if(typeof canonicalCardId==='function') return canonicalCardId(card); }catch(_){}
+  return cleanText(card && (card.qid_unique || card.card_id || card.qid || card.id || card.json_id || card.diagnosis || card.answer));
+}
+function answerFor(card){
+  try{ if(typeof answer==='function') return cleanText(answer(card)); }catch(_){}
+  return cleanText(card && (card.diagnosis || card.answer || card.dx));
+}
+function ratingForSelection(card,index){
+  var choice='';
+  try{ choice=(choices||[])[Math.max(0,Math.min(Number(index)||0,(choices||[]).length-1))]; }catch(_){}
+  return cleanText(choice)===answerFor(card)?'good':'again';
+}
+function alreadyRated(id){return !!id && window.__cozyLastRatedId===id;}
+function markRated(id){if(id) window.__cozyLastRatedId=id;}
+function rateOnce(card,rating){
+  var id=cardIdFor(card);
+  if(!id || alreadyRated(id) || typeof rateCard!=='function') return false;
+  try{ rateCard(id,rating); markRated(id); return true; }catch(err){ console.warn('[RatingPath] rateCard failed:',err); return false; }
+}
+function pendingFor(card,rating){
+  var id=cardIdFor(card);
+  if(!id) return;
+  window.__cozyPendingRating20260603={id:id,rating:rating,card:card};
+  clearTimeout(window.__cozyAutoRateHandle20260603);
+  window.__cozyAutoRateHandle20260603=setTimeout(function(){
+    var p=window.__cozyPendingRating20260603;
+    if(p && p.id===id && !alreadyRated(id)) rateOnce(card,rating);
+  },8200);
+}
+
+function installRatingPathHooks20260603(){
+var priorSelect=window.selectSolo || (typeof selectSolo!=='undefined'?selectSolo:null);
+if(typeof priorSelect==='function' && !priorSelect.__cozyRatingPath20260603){
+  var wrappedSelect=function(i){
+    var card;
+    try{ card=current; }catch(_){}
+    var revealOpen=visible(q('soloReveal'));
+    var rating=!revealOpen && card ? ratingForSelection(card,i) : null;
+    var out=priorSelect.apply(this,arguments);
+    try{
+      if(rating && typeof spacedOn!=='undefined' && spacedOn!==false) pendingFor(card,rating);
+    }catch(_){}
+    return out;
+  };
+  wrappedSelect.__cozyRatingPath20260603=true;
+  if(priorSelect.__energyTrack352) wrappedSelect.__energyTrack352=true;
+  if(priorSelect.__rectifierUndo372) wrappedSelect.__rectifierUndo372=true;
+  window.selectSolo=selectSolo=wrappedSelect;
+}
+
+var priorAdvance=window.advance || (typeof advance!=='undefined'?advance:null);
+if(typeof priorAdvance==='function' && !priorAdvance.__cozyRatingPath20260603){
+  var wrappedAdvance=function(which){
+    var revealOpen=visible(q(which==='domain'?'domainReveal':'soloReveal'));
+    var card;
+    try{ card=current; }catch(_){}
+    var id=cardIdFor(card);
+    var pending=window.__cozyPendingRating20260603;
+    if((pending && pending.id===id) || revealOpen){
+      var rating=(pending && pending.id===id && pending.rating) || 'good';
+      try{ if(typeof spacedOn==='undefined' || spacedOn!==false) rateOnce(card,rating); }catch(_){}
+    }
+    return priorAdvance.apply(this,arguments);
+  };
+  wrappedAdvance.__cozyRatingPath20260603=true;
+  window.advance=advance=wrappedAdvance;
+}
+
+var priorRate=window.rate || (typeof rate!=='undefined'?rate:null);
+if(typeof priorRate==='function' && !priorRate.__cozyRatingPath20260603){
+  var wrappedRate=function(card,rating){
+    var out=priorRate.apply(this,arguments);
+    if(card && rating && rating!=='pin' && rating!=='bury') markRated(cardIdFor(card));
+    return out;
+  };
+  wrappedRate.__cozyRatingPath20260603=true;
+  window.rate=rate=wrappedRate;
+}
+}
+installRatingPathHooks20260603();
+setTimeout(installRatingPathHooks20260603,700);
+setTimeout(installRatingPathHooks20260603,1600);
+setTimeout(installRatingPathHooks20260603,3200);
+setTimeout(installRatingPathHooks20260603,5200);
+})();
+</script>
 <script>if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));</script>
 </body></html>
