@@ -134,8 +134,8 @@ Run in order — do not proceed to P7 until all pass:
 | E2 | 🔴 CRITICAL | Keyboard advance bypassed `rateCard()` — 139 cards stuck as `new` forever | ✅ Fixed + browser-validated 2026-06-01: advance() wrapper in FSRS Phase 3 block; explicit rating guard via `__cozyLastRatedId`; confirmed seen_count:1 / last_rating:'good' / next_due_at set; explicit 'again' not overridden |
 | E3 | 🟠 HIGH | 5 SM2-era cards got SM2 interval (1d) instead of FSRS (3d) | ❌ Unresolved (data patch) |
 | E4 | 🟠 HIGH | 6 cards have mutated `ease_factor` (2.1–2.35) from pre-FSRS SM2 logic | ❌ Unresolved (data patch) |
-| E5 | 🟠 HIGH | Shadow Dungeon breaks after card 1 — `nextCard()` falls back to full pinned set, ignores filter selection | ❌ Unresolved |
-| E6 | 🟠 HIGH | `deckMode:'due'` sorts 1249 new cards before 37 overdue ones — `dueScore()` has no `next_due_at` logic | ❌ Unresolved |
+| E5 | 🟠 HIGH | Shadow Dungeon breaks after card 1 — `nextCard()` falls back to full pinned set, ignores filter selection | ✅ Fixed 2026-06-03: Phase 3 `nextCard()` now checks `__shadowDungeonActive175164` + `__shadowRunQueue` before calling `sessionPool`; `__shadowRunQueueIdx` init changed 0→1 since card 0 consumed by `startCard`. PHASE1 + PHASE2. SW v26. |
+| E6 | 🟠 HIGH | `deckMode:'due'` sorts 1249 new cards before 37 overdue ones — `dueScore()` has no `next_due_at` logic | ✅ Fixed 2026-06-03: `getStudyPool('due')` already filtered correctly via `isDue()`; added ascending `next_due_at` sort so most-overdue card surfaces first. PHASE1 + PHASE2. |
 | E7 | 🟠 HIGH | 12 competing `window.cardPool = cardPool` overrides, last writer wins unpredictably | ❌ Unresolved |
 | E8 | 🟡 MEDIUM | Full Card showed LEVEL 1/LEVEL 2 — whitelist formatter + alias write removal applied | ✅ Fixed prior session |
 
