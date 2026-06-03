@@ -10679,6 +10679,45 @@ function fixStableOneThingDropdown351() {
     return SYS_MAP_PHASE3[key] || text.trim().toUpperCase();
   }
 
+  function tagsForPhase3(card) {
+    const raw = card?.tags;
+    if (Array.isArray(raw)) return raw.map(clean).filter(Boolean);
+    return String(raw || '').split(/[;,|]/).map(clean).filter(Boolean);
+  }
+
+  function systemForPhase3(card) {
+    return normSysPhase3(card?.system || card?.sys || card?.subject || card?.subspecialty || '');
+  }
+
+  function selectedSystemPhase3() {
+    const value = document.documentElement.dataset.cozyLaunchSystem
+      || window.homeFilters?.system
+      || q('browseSystem351')?.value
+      || q('homeSystem175155')?.value
+      || q('reviewSystem352')?.value
+      || 'all';
+    return value === 'all' ? 'all' : normSysPhase3(value);
+  }
+
+  function selectedTagPhase3() {
+    const value = clean(document.documentElement.dataset.cozyLaunchTag
+      || window.homeFilters?.tag
+      || q('browseTag351')?.value
+      || q('homeTag175155')?.value
+      || q('reviewTagOverlay17527')?.value
+      || 'all');
+    return value || 'all';
+  }
+
+  function applyStudyFiltersPhase3(cardsList) {
+    let arr = [...(cardsList || [])];
+    const system = selectedSystemPhase3();
+    const tag = selectedTagPhase3();
+    if (system && system !== 'all') arr = arr.filter(card => systemForPhase3(card) === system);
+    if (tag && tag !== 'all') arr = arr.filter(card => tagsForPhase3(card).includes(tag));
+    return arr;
+  }
+
   function normTestPhase3(value) {
     return clean(value).replace(/^Test:\s*/i, 'TEST ').replace(/^Test\s+/i, 'TEST ');
   }
@@ -11239,11 +11278,12 @@ function fixStableOneThingDropdown351() {
       wrong: 'review_deck',
       hard: 'hard',
       pinned: 'pinned',
+      tagged: 'tagged',
       due: 'due',
       reviewed: 'reviewed_first',
 	      reviewed_first: 'reviewed_first',
 	      new_only: 'new_only',
-	      new_first: 'new_first',
+      new_first: 'new_first',
       random_all: 'random_all',
       random_new: 'random_new',
       review_deck: 'review_deck',
@@ -11264,6 +11304,7 @@ function fixStableOneThingDropdown351() {
       'random-new': 'random-new',
       due: 'due',
       pinned: 'pinned',
+      tagged: 'tagged',
       hard: 'hard',
       review: 'review',
       reviewed: 'reviewed',
@@ -11331,7 +11372,7 @@ function fixStableOneThingDropdown351() {
 
   function getStudyPool(mode, gameType) {
     const selected = normalizeMode(mode || selectedOrder(gameType));
-    let arr = basePlayableCards();
+    let arr = applyStudyFiltersPhase3(basePlayableCards());
     const progress = card => progressForCard(card);
     const dueSort = (a, b) => {
       const pa = progress(a), pb = progress(b);
@@ -11369,7 +11410,7 @@ function fixStableOneThingDropdown351() {
         return ta - tb;
       });
 	    } else if (selected === 'review_deck') {
-	      arr = normalizeDeckIdentities().filter(c => !progressForCard(c).suspended).filter(c => {
+	      arr = applyStudyFiltersPhase3(normalizeDeckIdentities()).filter(c => !progressForCard(c).suspended).filter(c => {
 	        const p = progressForCard(c);
 	        return isReviewCandidate(c) && (!hasFutureDue(p) || isDue(p));
 	      }).sort((a, b) => {
@@ -11386,18 +11427,21 @@ function fixStableOneThingDropdown351() {
 	        const p = progress(c);
 	        return (p.repair_point || p.last_rating === 'hard' || p.last_rating === 'again' || p.rating === 'hard' || p.rating === 'again') && !hasFutureDue(p);
 	      });
+    } else if (selected === 'tagged') {
+      const tag = selectedTagPhase3();
+      if (!tag || tag === 'all') arr = arr.filter(c => tagsForPhase3(c).length);
     } else if (selected === 'suspended') {
-      arr = normalizeDeckIdentities().filter(c => progressForCard(c).suspended);
+      arr = applyStudyFiltersPhase3(normalizeDeckIdentities()).filter(c => progressForCard(c).suspended);
     }
 
-	    if (!arr.length && ['new_only', 'due', 'pinned', 'hard', 'suspended'].includes(selected)) return [];
+	    if (!arr.length && ['new_only', 'due', 'pinned', 'hard', 'tagged', 'suspended'].includes(selected)) return [];
 
     if (selected === 'random_new' && arr.length) {
       const active = arr.filter(c => !session.buriedToday.has(canonicalCardId(c)));
       return active.length ? active : arr;
     }
     const scheduledModes = ['new_first', 'reviewed_first', 'due', 'review_deck'];
-    const ordered = splitBuriedToBack(arr.length || scheduledModes.includes(selected) ? arr : basePlayableCards());
+    const ordered = splitBuriedToBack(arr.length || scheduledModes.includes(selected) ? arr : applyStudyFiltersPhase3(basePlayableCards()));
     const active = ordered.filter(c => {
       const id = canonicalCardId(c);
       return !session.buriedToday.has(id) && !getProgress(id).buried;
@@ -11406,7 +11450,7 @@ function fixStableOneThingDropdown351() {
     if (ordered.length) return ordered;
     clearSessionBuried();
     if (scheduledModes.includes(selected)) {
-      const refreshed = basePlayableCards();
+      const refreshed = applyStudyFiltersPhase3(basePlayableCards());
       if (selected === 'new_first') {
         return [
           ...refreshed.filter(isNewCard),
@@ -11422,18 +11466,18 @@ function fixStableOneThingDropdown351() {
       }
       if (selected === 'due') return refreshed.filter(c => isDue(progress(c)));
       if (selected === 'review_deck') {
-        return normalizeDeckIdentities().filter(c => !progressForCard(c).suspended).filter(c => {
+        return applyStudyFiltersPhase3(normalizeDeckIdentities()).filter(c => !progressForCard(c).suspended).filter(c => {
           const p = progressForCard(c);
           return isReviewCandidate(c) && (!hasFutureDue(p) || isDue(p));
         });
       }
     }
-    return shuffleCards(basePlayableCards());
+    return shuffleCards(applyStudyFiltersPhase3(basePlayableCards()));
   }
 
   function poolKey(gameType) {
     const scope = document.documentElement.dataset.cozyLaunchScope || window.homeFilters?.scope || (typeof q === 'function' ? q('browseScope351')?.value : '') || '';
-    return [gameType, selectedOrder(gameType), deckFingerprint(), session.buriedToday.size, session.seenThisSession.size, scope].join('|');
+    return [gameType, selectedOrder(gameType), deckFingerprint(), session.buriedToday.size, session.seenThisSession.size, scope, selectedSystemPhase3(), selectedTagPhase3()].join('|');
   }
 
   function sessionPool(gameType) {
@@ -11721,6 +11765,7 @@ function fixStableOneThingDropdown351() {
       ['reviewed', 'Reviewed cards first'],
       ['due', 'Due cards only'],
       ['pinned', 'Pinned only'],
+      ['tagged', 'Tagged selected'],
       ['review', 'Review deck: pinned / missed / hard']
     ];
     const selectedScope = legacyScopeToken(selected);
@@ -13666,6 +13711,81 @@ window.hideAtlasScreen=function(){
   else{var h=document.getElementById('home');if(h)h.classList.remove('hidden');}
 };
 
+function naSetStudySelect(id,value){
+  var el=document.getElementById(id);
+  if(!el||!value)return false;
+  var exists=false;
+  for(var i=0;i<el.options.length;i++){if(el.options[i].value===value){exists=true;break;}}
+  if(!exists)el.add(new Option(value,value));
+  el.value=value;
+  try{el.dispatchEvent(new Event('change',{bubbles:true}));}catch(_){}
+  return true;
+}
+
+function naLaunchReviewTarget(target){
+  if(!target||!target.value)return;
+  try{if(typeof window.hideAtlasScreen==='function')window.hideAtlasScreen();}catch(_){}
+  window.homeFilters=window.homeFilters||{scope:'all',system:'all',tag:'all'};
+  document.documentElement.dataset.cozyLaunchScope=target.scope;
+  if(target.kind==='tag'){
+    document.documentElement.dataset.cozyLaunchTag=target.value;
+    document.documentElement.dataset.cozyLaunchSystem='all';
+    window.homeFilters.tag=target.value;
+    window.homeFilters.system='all';
+    naSetStudySelect('browseTag351',target.value);
+    naSetStudySelect('homeTag175155',target.value);
+    naSetStudySelect('reviewTagOverlay17527',target.value);
+    naSetStudySelect('browseSystem351','all');
+    naSetStudySelect('homeSystem175155','all');
+    naSetStudySelect('reviewSystem352','all');
+  }else{
+    document.documentElement.dataset.cozyLaunchTag='all';
+    document.documentElement.dataset.cozyLaunchSystem=target.value;
+    window.homeFilters.tag='all';
+    window.homeFilters.system=target.value;
+    naSetStudySelect('browseSystem351',target.value);
+    naSetStudySelect('homeSystem175155',target.value);
+    naSetStudySelect('reviewSystem352',target.value);
+    naSetStudySelect('browseTag351','all');
+    naSetStudySelect('homeTag175155','all');
+    naSetStudySelect('reviewTagOverlay17527','all');
+  }
+  if(typeof window.syncGeneralStudyScopePhase3==='function')window.syncGeneralStudyScopePhase3(target.scope,{syncExpansion:false,log:true,source:'A9'});
+  else if(typeof window.__cozyApplyDeckMode351==='function')window.__cozyApplyDeckMode351(target.scope);
+  try{if(typeof window.startSolo==='function')window.startSolo();else{var start=document.getElementById('startSolo');if(start)start.click();}}catch(err){console.warn('[A9] Review Tag launch failed:',err);}
+}
+
+function naReviewTargetForCard(card,p){
+  var tags=parseTags(card);
+  if(tags.length)return{kind:'tag',value:tags[0],scope:'tagged'};
+  var sys=(card&&(card.sys||card.system))||(p&&p.sys)||'';
+  if(sys&&sys!=='—')return{kind:'system',value:String(sys).trim(),scope:'random'};
+  return null;
+}
+
+function naInjectReviewTagButton(cardId){
+  var cd=naQ('cd-content');
+  if(!cd)return;
+  var old=document.getElementById('na-review-tag-btn');
+  if(old)old.remove();
+  var card=deckMap[cardId]||{};
+  var p=progress[cardId]||{};
+  var target=naReviewTargetForCard(card,p);
+  var btn=document.createElement('button');
+  btn.id='na-review-tag-btn';
+  btn.type='button';
+  btn.className='btn primary';
+  btn.style.cssText='margin-top:10px;width:100%;font-size:11px;white-space:normal';
+  if(target){
+    btn.textContent=(target.kind==='tag'?'▶ Review Tag: ':'▶ Review System: ')+target.value;
+    btn.onclick=function(){naLaunchReviewTarget(target);};
+  }else{
+    btn.disabled=true;
+    btn.textContent='No tag — filter by system in Atlas';
+  }
+  cd.appendChild(btn);
+}
+
 // ── GLOBAL BRIDGES for HTML onclick attrs ─────────────────────────────────
 window.naHandleFileUpload=function(e){handleFileUpload(e);};
 window.naHandleDrop=function(e){handleDrop(e);};
@@ -13687,7 +13807,7 @@ window.naClickTag=function(tag){clickTag(tag);};
 window.naToggleView=function(){naToggleView();};
 window.naToggleSort=function(col){naToggleSort(col);};
 window.naClickSys=function(sys){clickSys(sys);};
-window.naOpenCardDetail=function(id){openCardDetail(id);};
+window.naOpenCardDetail=function(id){openCardDetail(id);naInjectReviewTagButton(id);};
 
 })();
 </script>
@@ -13843,15 +13963,22 @@ E7C HUD dedupe is also fixed/validated as of 2026-06-03. Gameplay HUD controls m
 through renderHudControls('solo'|'domain'), which dedupes by data-hud-role and guarantees
 one pause, one close/home, one settings, and one energy/status control inside each game HUD.
 
+A9 Atlas Review Tag is also fixed/validated as of 2026-06-03. Atlas card detail appends a
+single #na-review-tag-btn after the existing detail renderer runs. The launcher closes Atlas
+through hideAtlasScreen(), syncs tag/system filters through Phase 3, and starts Solo. Phase 3
+getStudyPool() now applies selected tag/system filters directly and poolKey includes those
+filters; do not move this back into legacy cardPool/nextCard wrappers.
+
 Required rectifier order:
 1) Keep Phase 3 the authoritative owner of cardPool/nextCard/resetRun/session pool.
 2) Do not introduce new runtime wrappers that re-own cardPool/nextCard after Phase 3.
 3) Preserve General Study Mode through one source of truth: browseScope351 ->
    syncGeneralStudyScopePhase3() -> sessionPool.
 4) Preserve renderHudControls() as the single gameplay HUD control normalizer.
-5) Reset selected/lane/orb state on every new card; never derive selected lane from correct answer
+5) Preserve A9 tag/system filtering inside Phase 3 getStudyPool()/poolKey.
+6) Reset selected/lane/orb state on every new card; never derive selected lane from correct answer
    before user/timer selection.
-6) Treat phase3State.progress as canonical; legacy state is mirror only.
+7) Treat phase3State.progress as canonical; legacy state is mirror only.
 
 See CLAUDE.md and RECTIFIER_PLAN_2026_05_26.md for the 2026-06-03 handoff.
 -->

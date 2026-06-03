@@ -103,13 +103,28 @@ Implemented behavior:
 - `sw.js` uses cache `cozy-arcade-PHASE2-v1`; app shell is stale-while-revalidate; external assets are cache-first with network fallback; same-origin non-shell requests are network-first with cache fallback.
 - Headless Chrome/CDP validation passed: manifest parsed; service worker registered at `http://127.0.0.1:8796/`; shell cache contains `./`, `./index.html`, and `./manifest.json`; offline reload served the app shell; `String(window.cardPool)` still references `sessionPool`; FSRS 17/17; smoke 6/6.
 
+### A9 Atlas Review Tag Result — 2026-06-03
+
+A9 is fixed and browser-validated for PHASE2.
+
+Implemented behavior:
+- Atlas card detail injects exactly one `#na-review-tag-btn` after the existing detail renderer runs.
+- Button text uses the first parsed card tag; if no usable tag exists, the launcher can fall back to the card/system value.
+- Clicking the button closes Atlas through existing `hideAtlasScreen()` so the Atlas RAF loop is cancelled by the existing `naRafId` path.
+- Launch sync writes `dataset.cozyLaunchScope`, `dataset.cozyLaunchTag`/`dataset.cozyLaunchSystem`, `window.homeFilters`, and matching home/browse selects, then calls `syncGeneralStudyScopePhase3()` and starts Solo.
+- Phase 3 `getStudyPool()` now applies selected tag/system filters directly and includes those filters in `poolKey`. This is required because older filter-aware wrappers no longer own `cardPool`.
+- No new `cardPool` or `nextCard` wrapper was added.
+
+Headless Chrome/CDP validation passed: `#na-review-tag-btn` count 1; `▶ Review Tag: A9Tag`; Atlas hidden after click; Solo visible after notification continue; pool IDs `a9-tag-1/a9-tag-2` only; `String(window.cardPool)` still references `sessionPool`; `String(window.nextCard)` includes `__shadowDungeonActive175164`; FSRS 17/17; smoke 6/6.
+
 ### Claude Rectifier Order — Do Not Skip
 
 1. **Runtime authority guard:** Complete. Do not re-open by adding another wrapper. Keep Phase 3 as owner of `cardPool`/`nextCard`; older installers must only refresh UI/state and must skip replacing flagged Phase 3 functions.
 2. **Scope normalization:** Complete. Preserve `syncGeneralStudyScopePhase3()` as the only General Study Mode state writer. Do not reintroduce independent writes to `dataset.cozyLaunchScope`, `phase3State.settings.solo_order`, `deckMode`, or `homeFilters.scope`.
 3. **HUD single contract:** Complete. Preserve `renderHudControls()` as the only gameplay HUD control normalizer. Do not add separate HUD injection loops for pause/home/settings/energy controls.
-4. **Selection neutrality:** On every `nextCard()` / `renderSolo()` / `renderDomain()`, reset `selected` and lane/orb classes before choices are rendered. Never infer selected lane from `choices.indexOf(correctAnswer)` except when explicitly marking the correct answer after a user selection.
-5. **Progress canonicalization:** Treat `phase3State.progress` as the only write source. Keep legacy `state` synced only as a compatibility mirror; Atlas/export should read the canonical map.
+4. **Atlas tag/system review launch:** Complete for A9. Preserve Phase 3 tag/system filtering in `getStudyPool()` and `poolKey`; do not move it back into legacy `cardPool` wrappers.
+5. **Selection neutrality:** On every `nextCard()` / `renderSolo()` / `renderDomain()`, reset `selected` and lane/orb classes before choices are rendered. Never infer selected lane from `choices.indexOf(correctAnswer)` except when explicitly marking the correct answer after a user selection.
+6. **Progress canonicalization:** Treat `phase3State.progress` as the only write source. Keep legacy `state` synced only as a compatibility mirror; Atlas/export should read the canonical map.
 
 ### Gates For This Rectifier
 

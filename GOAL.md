@@ -1,12 +1,12 @@
 # Project Goal Tracker
-*Updated 2026-06-03 — E7 runtime authority browser-validated + Claude rectifier handoff*
+*Updated 2026-06-03 — A9 Atlas Review Tag fixed + browser-validated*
 
 ---
 
 ## Active Goal
 
-**Goal:** E7 runtime authority + E7B scope consistency + E7C HUD dedupe + P7 PWA fixed and validated → next choose A9, E7D, or E7E
-**Phase:** E5/E6/E7/E7B/E7C/P7 browser validation complete; remaining symptom work is scoped below
+**Goal:** E7 runtime authority + E7B scope consistency + E7C HUD dedupe + P7 PWA + A9 Atlas Review Tag fixed and validated → next choose E7D, E7E, A10, or A11
+**Phase:** E5/E6/E7/E7B/E7C/P7/A9 browser validation complete; remaining symptom work is scoped below
 **Reference:** `RECTIFIER_PLAN_2026_05_26.md`, `ULTIMATE_GOALS.md`
 **Status:** E5, E6, E7 fixed 2026-06-03. Cache-busted headless browser validation passed: `String(window.cardPool)` references Phase 3 `sessionPool`, not `scopedCardPool352`; `String(window.nextCard)` includes the Shadow Dungeon guard; `runFSRSValidation()` returns 17/17; `runCozySmokeTests()` returns 6/6.
 
@@ -16,9 +16,10 @@
 - E7B scope consistency is fixed 2026-06-03: `syncGeneralStudyScopePhase3()` atomically updates `dataset.cozyLaunchScope`, `phase3State.settings.solo_order`, `deckMode`, and `homeFilters.scope`; mode-change console smoke logs `sessionPool()` non-empty status. Seeded headless validation: Random 3/3, Due 1 due card, Pinned 1 pinned card; FSRS 17/17; smoke 6/6; Phase 3 still owns `cardPool`.
 - E7C HUD dedupe is fixed 2026-06-03: `renderHudControls()` is the idempotent gameplay HUD normalizer for Solo/Domain and guarantees one pause, one close/home, one settings, and one energy/status control inside each game HUD. Headless validation: Solo 1/1/1/1, Domain 1/1/1/1; FSRS 17/17; smoke 6/6; Phase 3 still owns `cardPool`.
 - P7 PWA is fixed 2026-06-03: `sw.js`, `manifest.json`, manifest/theme tags, and service-worker registration are present. Service worker strategy matches the P7 plan: app shell stale-while-revalidate, external assets cache-first, same-origin non-shell requests network-first with cache fallback. Headless validation: manifest parsed, SW scope registered, cache contains `./`, `./index.html`, `./manifest.json`, offline reload works, FSRS 17/17, smoke 6/6.
+- A9 Atlas Review Tag is fixed 2026-06-03: Atlas card detail appends one `#na-review-tag-btn`; click closes Atlas through `hideAtlasScreen()`, syncs Phase 3 scope/tag/system filters, and launches Solo. Phase 3 `getStudyPool()` now applies selected tag/system filters directly and includes them in `poolKey`; no new `cardPool`/`nextCard` wrapper was added. Headless validation: button count 1, `▶ Review Tag: A9Tag`, Atlas hidden after click, Solo visible, pool IDs `a9-tag-1/a9-tag-2` only, `String(window.cardPool)` references `sessionPool`, FSRS 17/17, smoke 6/6.
 - User-visible glitch cluster originally included General Study Mode mismatch, duplicate pause/settings-style controls, solo runner/selected-lane bias, and card/progress translation drift. E7B resolves the General Study Mode scope mismatch; E7C resolves gameplay HUD control duplication; the other symptoms remain scoped below.
 - Current diagnosis after E7C: runtime `cardPool`/`nextCard` ownership, General Study Mode scope precedence, and gameplay HUD duplication are no longer blockers. Remaining likely contributors are stale selected/lane state and split progress read/write boundaries.
-- Before more feature work (`A9` Review Tag), decide whether to finish E7D/E7E symptom rectifiers or proceed with the now-passed runtime/scope/HUD/PWA gates.
+- After A9, decide whether to finish E7D/E7E symptom rectifiers or proceed to A10/A11 Atlas controls.
 
 ---
 
@@ -158,7 +159,7 @@ Run in order — do not proceed to P7 until all pass:
 | E7C | ✅ Fixed + browser-validated 2026-06-03: `renderHudControls()` dedupes gameplay HUD roles and render hooks call it after Solo/Domain render. | Headless validation: Solo and Domain each have exactly one pause, one close/home, one settings, and one energy/status display; Phase 3 `cardPool` still contains `sessionPool`; FSRS 17/17; smoke 6/6. |
 | E7D | Runner/answer selection neutrality: reset `selected` and lane visual state per new card; no code path derives lane from correct answer | First rendered lane is neutral/predictable, not answer-correlated |
 | E7E | Progress-state translation: `phase3State.progress` is canonical; legacy `state` mirror only; Atlas/export read canonical map | Atlas and export show same seen/rating/due state after answer |
-| A9 | Atlas: "▶ Review Tag" button in card detail → triggers home `browseTag351` + review session | Opens solo study filtered to selected tag |
+| A9 | ✅ Fixed + browser-validated 2026-06-03: Atlas card detail `#na-review-tag-btn` syncs selected tag/system into Phase 3 filters and launches Solo without adding runtime wrappers. | Headless validation: one button, Atlas closes, Solo opens, selected-tag pool contains only matching cards; Phase 3 `cardPool` still contains `sessionPool`; FSRS 17/17; smoke 6/6. |
 | A10 | Atlas: pin/bury toggle from card detail panel (write to `phase3State.progress`) | `p.pinned`/`p.buried` toggles persist after atlas close |
 | A11 | Atlas: one_thing inline edit from card detail (write to `window.phase3State.progress[id].user_one_thing`) | Card detail shows updated text immediately |
 | P7 | ✅ Fixed + browser-validated 2026-06-03: `sw.js`, `manifest.json`, manifest/theme tags, and SW registration are present. | Headless validation: manifest parsed, SW registered at repo root scope, shell cache contains `./`, `./index.html`, `./manifest.json`, offline reload served app shell, FSRS 17/17, smoke 6/6. |
