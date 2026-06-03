@@ -12725,40 +12725,55 @@ function fixStableOneThingDropdown351() {
     button.setAttribute('title', label);
   }
 
-  function ensureSettingsButton(hud) {
-    let button = hud.querySelector('[data-mobile-settings371]');
+  function ensureHudButton(hud, role, label, icon, onClick) {
+    let button = hud.querySelector('[data-hud-role="' + role + '"][data-hud-v1="1"]');
     if (!button) {
       button = document.createElement('button');
       button.type = 'button';
       button.className = 'hudPill';
-      button.dataset.mobileSettings371 = '1';
+      button.dataset.hudV1 = '1';
+      button.dataset.hudRole = role;
       button.addEventListener('click', event => {
         event.preventDefault();
         event.stopPropagation();
-        const gear = q('gearBtn') || q('settingsBtn');
-        if (gear) gear.click();
-        else {
-          try { if (typeof show === 'function') show('settings'); } catch (_) {}
-        }
+        onClick?.(event);
       });
-      hud.appendChild(button);
     }
-    iconize(button, 'Settings', '⚙');
+    iconize(button, label, icon);
     return button;
   }
 
   function ensureEnergyPill(hud) {
-    let pill = hud.querySelector('.energyHud352');
+    let pill = hud.querySelector('[data-hud-role="energy"][data-hud-v1="1"], .energyHud352');
     if (!pill) {
       pill = document.createElement('div');
       pill.className = 'hudPill energyHud352';
       pill.textContent = 'Energy Lv 1 · +0 CE';
-      hud.insertBefore(pill, hud.firstElementChild || null);
     }
+    pill.dataset.hudV1 = '1';
+    pill.dataset.hudRole = 'energy';
+    pill.classList.add('hudPill', 'energyHud352');
     return pill;
   }
 
-  function normalizeHud(gameId) {
+  function isHudButtonForRole(button, role, gameId) {
+    if (!button || button.tagName !== 'BUTTON') return false;
+    const text = cleanText(button.textContent).toLowerCase();
+    const aria = cleanText(button.getAttribute('aria-label') || button.title).toLowerCase();
+    if (button.dataset.hudRole === role) return true;
+    if (role === 'pause') return button.id === (gameId === 'solo' ? 'soloPause' : 'domainPause') || text === 'pause' || aria === 'pause';
+    if (role === 'home') return button.hasAttribute('data-home') || /^(home|close|×|x|⌂)$/.test(text) || aria === 'home' || aria === 'close';
+    if (role === 'settings') return button.dataset.mobileSettings371 === '1' || text === 'settings' || aria === 'settings';
+    return false;
+  }
+
+  function removeDuplicateRoleButtons(hud, role, keep, gameId) {
+    [...hud.querySelectorAll('button')].forEach(button => {
+      if (button !== keep && isHudButtonForRole(button, role, gameId)) button.remove();
+    });
+  }
+
+  function renderHudControls(gameId) {
     const game = q(gameId);
     const hud = game && game.querySelector(':scope > .hud, :scope > .gameHud');
     if (!game || !hud) return;
@@ -12766,16 +12781,6 @@ function fixStableOneThingDropdown351() {
     game.classList.add('game-shell');
     hud.classList.add('gameHud');
     if (window.innerWidth <= 900) hud.classList.add('mobileHud');
-
-    // Remove all legacy home buttons unconditionally; ensure exactly one [data-home] button
-    hud.querySelectorAll('.hudHome1751511, .hudHome1751512').forEach(btn => btn.remove());
-    if (!hud.querySelector('[data-home]')) {
-      const _hb = document.createElement('button');
-      _hb.className = 'hudPill'; _hb.setAttribute('data-home', '1');
-      _hb.title = 'Home'; _hb.textContent = '⌂';
-      _hb.onclick = e => { e.preventDefault(); e.stopPropagation(); try { home(); } catch(_) {} };
-      hud.appendChild(_hb);
-    }
 
     let stats = hud.querySelector(':scope > .hudStats371');
     let actions = hud.querySelector(':scope > .hudActions371');
@@ -12790,17 +12795,31 @@ function fixStableOneThingDropdown351() {
       hud.appendChild(actions);
     }
 
-    const energyClones = [...hud.querySelectorAll('.energyHud352')];
+    const pauseId = gameId === 'solo' ? 'soloPause' : 'domainPause';
     const score = pillFor(gameId === 'solo' ? 'soloScore' : 'domainScore');
     const streak = pillFor(gameId === 'solo' ? 'soloStreak' : 'domainStreak');
     const phase = pillFor(gameId === 'solo' ? 'soloGate' : 'domainRound');
-    const pause = q(gameId === 'solo' ? 'soloPause' : 'domainPause');
-    const exit = hud.querySelector('button[data-home]');
+    const pause = q(pauseId) || ensureHudButton(hud, 'pause', 'Pause', '⏸', () => { try { pauseGame(); } catch (_) {} });
+    pause.dataset.hudV1 = '1';
+    pause.dataset.hudRole = 'pause';
+    const exit = ensureHudButton(hud, 'home', 'Close', '×', () => { try { home(); } catch (_) {} });
+    exit.setAttribute('data-home', '1');
+    const settings = ensureHudButton(hud, 'settings', 'Settings', '⚙', () => {
+      const gear = q('gearBtn') || q('settingsBtn');
+      if (gear) gear.click();
+      else { try { if (typeof show === 'function') show('settings'); } catch (_) {} }
+    });
 
-    let energy = gameId === 'solo' ? pillFor('hpFill') : (energyClones[0] || ensureEnergyPill(hud));
+    removeDuplicateRoleButtons(hud, 'pause', pause, gameId);
+    removeDuplicateRoleButtons(hud, 'home', exit, gameId);
+    removeDuplicateRoleButtons(hud, 'settings', settings, gameId);
+
+    let energy = gameId === 'solo' ? pillFor('hpFill') : ensureEnergyPill(hud);
     if (gameId === 'solo') {
-      energyClones.forEach(el => el.remove());
+      hud.querySelectorAll('.energyHud352').forEach(el => el.remove());
       if (energy) {
+        energy.dataset.hudV1 = '1';
+        energy.dataset.hudRole = 'energy';
         energy.childNodes.forEach(node => {
           if (node.nodeType === Node.TEXT_NODE && /\bHP\b/.test(node.textContent || '')) {
             node.textContent = node.textContent.replace(/\bHP\b/, 'Energy Level');
@@ -12808,7 +12827,9 @@ function fixStableOneThingDropdown351() {
         });
       }
     } else {
-      energyClones.slice(1).forEach(el => el.remove());
+      hud.querySelectorAll('.energyHud352').forEach(el => {
+        if (el !== energy) el.remove();
+      });
     }
 
     appendIf(stats, energy);
@@ -12817,14 +12838,19 @@ function fixStableOneThingDropdown351() {
     appendIf(actions, phase);
     appendIf(actions, pause);
     appendIf(actions, exit);
+    appendIf(actions, settings);
 
     iconize(pause, 'Pause', '⏸');
     iconize(exit, 'Close', '×');
+    iconize(settings, 'Settings', '⚙');
 
     [...hud.children].forEach(child => {
       if (child.classList && child.classList.contains('hudGroup') && child !== stats && child !== actions && !child.children.length) child.remove();
     });
   }
+
+  window.renderHudControls = renderHudControls;
+  const normalizeHud = renderHudControls;
 
   function wrapGameMain(gameId) {
     const game = q(gameId);
@@ -12912,9 +12938,9 @@ function fixStableOneThingDropdown351() {
     ov.classList.remove('hidden');
   }
 
-  function run() {
-    normalizeHud('solo');
-    normalizeHud('domain');
+	  function run() {
+	    normalizeHud('solo');
+	    normalizeHud('domain');
     wrapGameMain('solo');
     wrapGameMain('domain');
     const gameActive = ['solo', 'domain'].some(id => {
@@ -12922,11 +12948,32 @@ function fixStableOneThingDropdown351() {
       return game && !game.classList.contains('hidden');
     });
     document.body.classList.toggle('cozyGameShellActive371', gameActive);
-    patchDomainGeometry();
+	    patchDomainGeometry();
+	  }
+
+  function patchRenderHudHooks() {
+    [['renderSolo', 'solo'], ['renderDomain', 'domain']].forEach(([name, gameId]) => {
+      const prior = window[name] || (typeof globalThis[name] !== 'undefined' ? globalThis[name] : null);
+      if (typeof prior !== 'function' || prior.__e7cHud371) return;
+      const patched = function() {
+        const result = prior.apply(this, arguments);
+        setTimeout(() => {
+          try {
+            renderHudControls(gameId);
+            wrapGameMain(gameId);
+          } catch (_) {}
+        }, 0);
+        return result;
+      };
+      patched.__e7cHud371 = true;
+      window[name] = patched;
+      try { globalThis[name] = patched; } catch (_) {}
+      try { eval(name + '=patched'); } catch (_) {}
+    });
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
-  else run();
+	  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+	  else run();
   document.addEventListener('click', event => {
     const trigger = event.target && event.target.closest && event.target.closest('#cozySDSection370,#shadow351,#shadowBtn');
     if (!trigger) return;
@@ -12935,9 +12982,11 @@ function fixStableOneThingDropdown351() {
     if (typeof window.openShadowSetup351 === 'function') window.openShadowSetup351();
     else openShadowSetupFallback371();
   }, true);
-  setTimeout(run, 100);
-  setTimeout(run, 700);
-  setInterval(run, 4000);
+	  setTimeout(run, 100);
+	  setTimeout(run, 700);
+  setTimeout(patchRenderHudHooks, 0);
+  setTimeout(patchRenderHudHooks, 700);
+	  setInterval(run, 4000);
   let _moBusy=false;
   new MutationObserver(()=>{ if(_moBusy)return; _moBusy=true; setTimeout(()=>{ run(); _moBusy=false; },800); }).observe(document.body,{childList:true,subtree:false});
 })();
@@ -13784,12 +13833,16 @@ must flow through syncGeneralStudyScopePhase3(), which updates dataset.cozyLaunc
 phase3State.settings.solo_order, deckMode, and homeFilters.scope atomically, then clears the
 Phase 3 session key. Do not split those writes across patch layers again.
 
+E7C HUD dedupe is also fixed/validated as of 2026-06-03. Gameplay HUD controls must flow
+through renderHudControls('solo'|'domain'), which dedupes by data-hud-role and guarantees
+one pause, one close/home, one settings, and one energy/status control inside each game HUD.
+
 Required rectifier order:
 1) Keep Phase 3 the authoritative owner of cardPool/nextCard/resetRun/session pool.
 2) Do not introduce new runtime wrappers that re-own cardPool/nextCard after Phase 3.
 3) Preserve General Study Mode through one source of truth: browseScope351 ->
    syncGeneralStudyScopePhase3() -> sessionPool.
-4) Make HUD normalization guarantee exactly one pause/home/settings/status control per game.
+4) Preserve renderHudControls() as the single gameplay HUD control normalizer.
 5) Reset selected/lane/orb state on every new card; never derive selected lane from correct answer
    before user/timer selection.
 6) Treat phase3State.progress as canonical; legacy state is mirror only.

@@ -1,6 +1,6 @@
-# Rectifier Plan — 2026-05-26 / 2026-05-27
+# Rectifier Plan — 2026-05-26 / 2026-05-27 / 2026-06-03
 *Cozy Arcade Board Prep-Medicine — Single-file HTML/JS (index.html ~13,300 lines)*
-*Updated 2026-05-27 to include both session compactions.*
+*Updated 2026-06-03 to include runtime authority diagnosis for Claude.*
 
 ---
 
@@ -42,6 +42,89 @@
 | `74ce963` | Neural Atlas embedded as `<script id="neural-atlas-embedded">` IIFE; `<div id="atlas" class="screen hidden">` injected at boot; Progress button → `window.showAtlasScreen()` | ✅ |
 | `c7e5c01` | `hideAtlasScreen`: explicit `#atlas.hidden` + `window.home()`; `readProgress()` reads `window.phase3State.progress` live; `atlasLoadDeck()` reads `window.appCards()` live | ✅ |
 | `20df845` | `naInit()` + `fullRefresh()`: prune orphan progress entries (no matching deckMap card) before `buildSysMap()` — eliminates `'—'` node | ✅ |
+
+---
+
+## Session Diagnosis — 2026-06-03 Runtime Authority Glitches
+
+The current visible bug reports should be handled as one rectifier family, not four unrelated fixes:
+
+| Symptom | Diagnosis | Primary source contributors |
+|---------|-----------|-----------------------------|
+| General Study Mode glitches when changed | Multiple scope authorities disagree: `browseScope351`, `homeFilters.scope`, `deckMode`, `dataset.cozyLaunchScope`, `__cozyApplyDeckMode351()`, stable-random `selectedScope()`, and Phase 3 `selectedOrder()` | `browseScope351` created around ~6132; stable-random selectedScope/buildPool around ~10003; Phase 3 selectedOrder/getStudyPool/sessionPool around ~11245 |
+| Multiple pause/settings controls on gameplay | HUD is mutated by several generations. Base HUD has `#soloPause`/`#domainPause`; mobile shell `normalizeHud()` moves controls and creates home/settings/status pills; pause/settings flow patches run separately | Base HUD around ~380; settings/gameplay hub around ~6163; pause settings cleanup around ~8092; mobile shell `normalizeHud()` around ~12686 |
+| Character/runner appears biased toward correct answer | Selection state is global and wrapped repeatedly. Correct answer is added/highlighted in select paths; stale `selected` or lane classes can carry across card transitions if not reset before `makeChoices()`/render | `setDomainSelected()` around ~6762; `selectDomain()` correct highlighting around ~6826; `selectSolo` wrapper around ~6849; undo wrapper around ~13061 |
+| Current card state does not translate | Progress is split across legacy `state`, `phase3State.progress`, alias sync, Atlas `readProgress()`, and import/export migration. Some layers use `cardState()`, some use `getProgress()`, some read localStorage | Energy `cardState()` around ~7419; Phase 3 `getProgress/progressForCard/savePhase3State` around ~10905; Atlas `readProgress()` around ~13390 |
+| E5 Shadow Dungeon appears fixed in source but not in runtime | Phase 3 `nextCard` guard exists, but older stable-random `patchGameFlow()` can remain the active runtime `nextCard` | stable-random `patchGameFlow()` around ~10094; Phase 3 `nextCard` around ~11921 |
+| `cardPool` winner uncertainty | Prior browser runtime validation showed active `cardPool` as Energy `scopedCardPool352(prior...)`, not Phase 3 `sessionPool` | Energy `installBuriedPoolFilter()` around ~7528; `setInterval(installBuriedPoolFilter,120)` around ~8282; Phase 3 assignment around ~11920 |
+
+### E7 Runtime Authority Result — 2026-06-03
+
+E7 is fixed and browser-validated. The actual deferred runtime conflict was:
+- `installBuriedPoolFilter()` runs repeatedly every 120ms and wraps `cardPool` unless `__energyBuriedFilter352` is present.
+- `patchGameFlow()` runs on start-button clicks and wraps `cardPool`/`nextCard` unless `__cozyStableRandom351` is present.
+- Legacy `patchStudyOptions()` can refresh home labels after Phase 3, but must not replace Phase 3 `cardPool`.
+
+Implemented guard/result:
+- Phase 3 `cardPool` is marked with `__energyBuriedFilter352=true` and `__cozyStableRandom351=true`.
+- Phase 3 `nextCard` is marked with `__cozyStableRandom351=true`.
+- `patchStudyOptions()` now returns before its old `cardPool` replacement when Phase 3 owns the pool.
+- Cache-busted headless Chrome/CDP validation passed before and after `startSolo` click: `String(window.cardPool)` is `() => sessionPool(...)`, does not include `scopedCardPool352`; `String(window.nextCard)` includes `__shadowDungeonActive175164`; FSRS 17/17; smoke 6/6.
+
+### E7B Scope Consistency Result — 2026-06-03
+
+E7B is fixed and browser-validated. General Study Mode changes now flow through `syncGeneralStudyScopePhase3()` instead of separate patch-layer writes.
+
+Implemented behavior:
+- `browseScope351` uses legacy-readable scope tokens (`random`, `due`, `pinned`, etc.) while Phase 3 converts them through `normalizeMode()` for `getStudyPool()`.
+- One sync function atomically updates `document.documentElement.dataset.cozyLaunchScope`, `phase3State.settings.solo_order`, `deckMode`, and `window.homeFilters.scope`, then clears the Phase 3 session pool key.
+- Existing `window.__cozyApplyDeckMode351()` delegates to this sync function; no new `cardPool` or `nextCard` wrapper was added.
+- Mode-change console smoke logs `[E7B] General Study Mode scope synchronized: <scope> pool non-empty: <bool> count: <n>`.
+- Seeded headless Chrome/CDP validation passed: Random pool 3 cards; Due pool 1 card and its `next_due_at` is past; Pinned pool 1 pinned card; `String(window.cardPool)` still references `sessionPool`; FSRS 17/17; smoke 6/6.
+
+### E7C Gameplay HUD Deduplication Result — 2026-06-03
+
+E7C is fixed and browser-validated. Gameplay HUD controls now flow through `renderHudControls(gameId)` inside the existing mobile shell block.
+
+Implemented behavior:
+- `renderHudControls('solo'|'domain')` is the single idempotent HUD contract for game screens only.
+- It dedupes visible gameplay HUD roles by `data-hud-role`: exactly one pause, one close/home, one settings, and one energy/status control.
+- It keeps existing score/streak/gate/round/HP pills, marks controls with `data-hud-v1="1"`, and does not touch drawer, settings panel, Atlas, review screen, or home.
+- Existing render paths are hooked so Solo/Domain call the normalizer immediately after render; the existing interval/mutation maintenance is now guarded by the role deduper.
+- Headless Chrome/CDP validation passed: Solo 1 pause / 1 home / 1 settings / 1 energy; Domain 1 pause / 1 home / 1 settings / 1 energy; `String(window.cardPool)` still references `sessionPool`; FSRS 17/17; smoke 6/6.
+
+### P7 PWA Result — 2026-06-03
+
+P7 is fixed and browser-validated for PHASE2.
+
+Implemented behavior:
+- `manifest.json` exists with app name, short name, standalone display, colors, and start URL.
+- `index.html` has the manifest link, theme-color meta tag, and service-worker registration before `</body>`.
+- `sw.js` uses cache `cozy-arcade-PHASE2-v1`; app shell is stale-while-revalidate; external assets are cache-first with network fallback; same-origin non-shell requests are network-first with cache fallback.
+- Headless Chrome/CDP validation passed: manifest parsed; service worker registered at `http://127.0.0.1:8796/`; shell cache contains `./`, `./index.html`, and `./manifest.json`; offline reload served the app shell; `String(window.cardPool)` still references `sessionPool`; FSRS 17/17; smoke 6/6.
+
+### Claude Rectifier Order — Do Not Skip
+
+1. **Runtime authority guard:** Complete. Do not re-open by adding another wrapper. Keep Phase 3 as owner of `cardPool`/`nextCard`; older installers must only refresh UI/state and must skip replacing flagged Phase 3 functions.
+2. **Scope normalization:** Complete. Preserve `syncGeneralStudyScopePhase3()` as the only General Study Mode state writer. Do not reintroduce independent writes to `dataset.cozyLaunchScope`, `phase3State.settings.solo_order`, `deckMode`, or `homeFilters.scope`.
+3. **HUD single contract:** Complete. Preserve `renderHudControls()` as the only gameplay HUD control normalizer. Do not add separate HUD injection loops for pause/home/settings/energy controls.
+4. **Selection neutrality:** On every `nextCard()` / `renderSolo()` / `renderDomain()`, reset `selected` and lane/orb classes before choices are rendered. Never infer selected lane from `choices.indexOf(correctAnswer)` except when explicitly marking the correct answer after a user selection.
+5. **Progress canonicalization:** Treat `phase3State.progress` as the only write source. Keep legacy `state` synced only as a compatibility mirror; Atlas/export should read the canonical map.
+
+### Gates For This Rectifier
+
+```javascript
+window.runFSRSValidation()   // must be 17/17
+window.runCozySmokeTests()   // must be 6/6
+String(window.cardPool)      // must be Phase 3/session-owned or a guarded approved wrapper
+String(window.nextCard)      // must include or call the Phase 3 Shadow Dungeon queue guard
+```
+
+Manual checks:
+- Change General Study Mode to `random-new`, `review`, `pinned`, and `due`; start Solo; verify the pool label/count and first card match the selected scope.
+- In Solo and Knowledge Expansion, count visible pause controls: exactly one per game.
+- Start a new Solo card repeatedly; runner starts in a neutral/predictable lane and does not jump to the correct answer before user input/timer.
+- Answer one card, export progress, open Atlas, and confirm the same card's seen/rating/due state appears in both.
 
 ---
 

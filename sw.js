@@ -1,10 +1,11 @@
 /* Cozy Arcade PHASE2 Service Worker — offline-first for ABIM study anywhere */
 const CACHE = 'cozy-arcade-PHASE2-v1';
+const APP_SHELL = ['./', './index.html', './manifest.json'];
 
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE)
-      .then(cache => cache.addAll(['./', './index.html']))
+      .then(cache => cache.addAll(APP_SHELL))
       .then(() => self.skipWaiting())
   );
 });
@@ -23,7 +24,7 @@ self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
   /* App shell: stale-while-revalidate */
-  if (url.pathname.endsWith('/') || url.pathname.endsWith('index.html') || url.pathname.endsWith('sw.js')) {
+  if (url.origin === self.location.origin && (url.pathname.endsWith('/') || url.pathname.endsWith('index.html') || url.pathname.endsWith('manifest.json'))) {
     event.respondWith(
       caches.open(CACHE).then(cache =>
         cache.match(event.request).then(cached => {
@@ -38,7 +39,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  /* CDN (Google Fonts, three.js, etc.): cache-first */
+  /* External assets: cache-first with network fallback */
   if (url.hostname !== self.location.hostname) {
     event.respondWith(
       caches.match(event.request).then(cached => {
@@ -52,5 +53,16 @@ self.addEventListener('fetch', event => {
         }).catch(() => new Response('', { status: 503, statusText: 'Offline' }));
       })
     );
+    return;
   }
+
+  /* Same-origin non-shell requests: network-first with cache fallback */
+  event.respondWith(
+    caches.open(CACHE).then(cache =>
+      fetch(event.request).then(res => {
+        if (res && res.status === 200) cache.put(event.request, res.clone());
+        return res;
+      }).catch(() => cache.match(event.request))
+    )
+  );
 });
