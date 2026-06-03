@@ -1,0 +1,9 @@
+{
+  "name": "Cozy Arcade ABIM",
+  "short_name": "CozyArcade",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0d0d1a",
+  "theme_color": "#0d0d1a",
+  "icons": []
+}

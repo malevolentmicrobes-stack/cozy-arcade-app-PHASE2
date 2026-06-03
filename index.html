@@ -376,7 +376,8 @@
   .choiceRow .choice{min-height:54px!important;font-size:12px!important;}
 }
 </style>
-
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#0d0d1a">
 </head><body><button id="homeTopBtn" class="homeTopBtn" title="Home">⌂</button><button id="gearBtn" class="settingsGear" title="Settings">⚙</button><div id="home" class="screen"><div class="homeWrap"><section class="hero"><div class="heroIcon">⚔️</div><div class="heroTitle">COZY ARCADE BOARD PREP-MEDICINE</div><div class="heroSub">BOARD PREP-MEDICINE</div></section><section class="modeGrid"><button id="startSolo" class="modeCard"><span class="modeIcon">⚔️</span><h2 class="modeTitle">Solo Studying</h2><p class="modeCaption">Game 1 · runner lanes</p></button><button id="startDomain" class="modeCard"><span class="modeIcon">🌀</span><h2 class="modeTitle">Knowledge Expansion</h2><p class="modeCaption">Game 2 · swipe/orb select</p></button></section><div class="controls"><button id="settingsBtn" class="btn">Settings</button></div><div id="limitlessHomeImport" class="limitlessHomeControls" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;align-items:center"><label class="btn primary" for="limitlessHomeDeckFile">Upload</label><input id="limitlessHomeDeckFile" type="file" accept=".json,.csv,application/json,text/csv" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0"><button id="limitlessExampleDeck" class="btn" type="button">Download</button><span class="btn" id="limitlessImportStatus"></span></div><div class="kpis"><div class="kpi"><b id="cardCount">0</b><span>Cards</span></div><div class="kpi"><b id="reviewedCount">0</b><span>Reviewed</span></div><div class="kpi"><b id="dueCount">0</b><span>Due</span></div><div class="kpi"><b id="newCount">0</b><span>New</span></div><div class="kpi"><b id="pinCount">0</b><span>Pinned</span></div></div></div></div><div id="solo" class="game solo hidden"><div class="hud"><div class="hudGroup"><div class="hudPill">HP <div class="hpWrap"><div id="hpFill" class="hpFill"></div></div></div><div class="hudPill">Score <span id="soloScore">0</span></div><div class="hudPill">Streak <span id="soloStreak">0</span></div><div class="hudPill">Gate <span id="soloGate">1</span></div></div><div class="hudGroup"><button id="soloPause" class="hudPill">Pause</button></div></div><div class="promptBox"><span id="soloSystem" class="systemBadge"></span><div id="soloQuestion" class="promptText"></div><div class="timer"><div id="soloTimerFill" class="timerFill"></div></div></div><div class="soloTrack"><div id="choiceRow" class="choiceRow"></div><div id="runner" class="hunter lane0"><i class="hair"></i><i class="head"></i><i class="coat"></i><i class="arm l"></i><i class="arm r"></i><i class="leg l"></i><i class="leg r"></i><i class="blade"></i></div><div id="groundGlow"></div><div id="gateComplete" class="gateBanner hidden">GATE COMPLETED</div><div class="soloHint">← / → move • 1–4 select • timer auto-locks selected answer</div></div><div id="soloReveal" class="reveal hidden"><h2 id="soloRevealTitle"></h2><div id="soloRevealDx" class="dx"></div><div id="soloTrigger" class="trigger"></div><div id="soloRevealRatings"></div><div class="controls" style="justify-content:center"><button id="soloFull" class="btn primary">Full Card</button></div></div><div class="mobileControls"><button id="leftBtn" class="btn">←</button><button id="selectBtn" class="btn primary">Select</button><button id="rightBtn" class="btn">→</button></div></div><div id="domain" class="game domain hidden"><div id="cursorGlow" class="cursorGlow"></div><div class="domainTitle">Knowledge Expansion</div><div class="hud"><div class="hudGroup"><div class="hudPill">Round <span id="domainRound">1</span></div><div class="hudPill">Score <span id="domainScore">0</span></div><div class="hudPill">Streak <span id="domainStreak">0</span></div></div><div class="hudGroup"><button id="domainPause" class="hudPill">Pause</button></div></div><div class="promptBox"><span id="domainSystem" class="systemBadge"></span><div id="domainQuestion" class="promptText"></div><div class="timer"><div class="timerFill" id="domainTimerFill"></div></div></div><div id="orbArena" class="orbArena"></div><div id="domainReveal" class="reveal hidden"><h2 id="domainRevealTitle"></h2><div id="domainDx" class="dx"></div><div id="domainObj" class="trigger"></div><div id="domainRevealRatings"></div><div class="controls" style="justify-content:center"><button id="domainFull" class="btn primary">Full Card</button></div></div></div><div id="review" class="screen settings hidden"><div class="box"><h1>Spaced Repetition</h1><div class="controls"><button class="btn" data-home>Home</button><button id="clearBtn" class="btn red">Clear Local State</button></div><div id="reviewList"></div></div></div><div id="settings" class="screen settings hidden"><div class="box"><h1>Settings</h1><div class="grid2"><div class="field"><label>Deck mode</label><select id="deckMode"><option value="sequential">Sequential</option><option value="random">Random</option><option value="due">Due + pinned first</option><option value="pinned">Pinned only</option></select></div><div class="field"><label>Prompt field</label><select id="promptField"><option value="quick">Quick recall</option><option value="presentation" selected>Presentation</option><option value="objective">Educational objective</option></select></div><div class="field"><label>Solo timer seconds</label><input id="soloTimerInput" type="number" min="4" max="40" value="7"></div><div class="field"><label>Import JSON deck</label><input id="deckFile" type="file" accept=".json,application/json"></div><div class="field"><label><input id="autoSelect" type="checkbox" checked> Timer auto-selects</label></div><div class="field"><label><input id="bionicToggle" type="checkbox"> Bionic emphasis</label></div><div class="field"><label><input id="spacedToggle" type="checkbox"> Spaced Repetition after answers</label></div></div><div class="controls"><button id="applyBtn" class="btn primary">Apply</button><button class="btn" data-home>Home</button></div></div></div><div id="notify" class="notification hidden"><div class="notifyBox"><div class="notifyLabel">NOTIFICATION</div><div id="notifyBody" class="notifyBody"></div><div class="controls" style="justify-content:center"><button id="notifyContinue" class="btn primary">Continue</button><span id="notifyTimer" class="btn">5s</span></div></div></div><div id="pause" class="pause hidden"><div class="pauseBox"><div class="notifyLabel">PAUSED</div><div id="pauseBody" class="notifyBody"></div><div class="controls" style="justify-content:center"><button id="pauseResume" class="btn primary">Resume</button><button id="pauseExport" class="btn">Export Progress</button><button id="pauseHome" class="btn">Exit to Home</button></div></div></div><div id="end" class="end hidden"><div class="endBox"><h1 id="endTitle"></h1><p id="endBody"></p><div class="controls" style="justify-content:center"><button id="endRestart" class="btn primary">Restart</button><button id="endHome" class="btn">Home</button></div></div></div><div id="modal" class="modal hidden"><div class="modalBox"><h2 id="modalTitle"></h2><pre id="modalText"></pre><button id="modalClose" class="btn primary">Close</button></div></div><div id="fx" class="fx"></div><div id="toast" class="toast hidden"></div><script>
 const DATA={"metadata":{"app":"Cozy Arcade Board Prep Medicine","title":"COZY ARCADE BOARD PREP-MEDICINE LIMITLESS","version":"v3.5.3 LIMITLESS card-id-repaired","rescue_base":"v3.5.3 public import shell","deck_label":"BLANK HTML LIMITLESS","limitless_text":"BLANK HTML LIMITLESS","created_at":"2026-05-17T00:36:59.356Z","mapping":"LIMITLESS: Card ID*, Card ID, card_id, cardId, json_id, id, qid_unique, qid, original_qid, legacy_id preserved; card_type/source/input/output retained.","cards_embedded":0,"import_ready":true},"cards":[]};
 let cards=(DATA.cards||[]), state=loadState(), deckMode='sequential', promptField='quick', autoSelect=true, bionicOn=(localStorage.getItem('bionicOn_v1751523')==='1');
@@ -11241,8 +11242,67 @@ function fixStableOneThingDropdown351() {
       random_new: 'random_new',
       review_deck: 'review_deck',
       suspended: 'suspended'
+	    };
+	    return map[mode] || 'new_first';
+	  }
+
+  function legacyScopeToken(mode) {
+    const map = {
+      new_only: 'new',
+      new_first: 'all',
+      random_all: 'random',
+      random_new: 'random-new',
+      reviewed_first: 'reviewed',
+      review_deck: 'review',
+      random: 'random',
+      'random-new': 'random-new',
+      due: 'due',
+      pinned: 'pinned',
+      hard: 'hard',
+      review: 'review',
+      reviewed: 'reviewed',
+      new: 'new',
+      all: 'all',
+      expansion: 'expansion',
+      suspended: 'suspended'
     };
-    return map[mode] || 'new_first';
+    return map[String(mode || '').trim()] || 'all';
+  }
+
+  function setSelectIfPresent(id, value) {
+    const el = q(id);
+    if (!el) return;
+    if ([...el.options].some(opt => opt.value === value)) el.value = value;
+  }
+
+  function syncGeneralStudyScopePhase3(rawMode, opts = {}) {
+    const browseValue = q('browseScope351')?.value || '';
+    const existing = rawMode || browseValue || document.documentElement.dataset.cozyLaunchScope || phase3State.settings.solo_order || 'all';
+    const scope = legacyScopeToken(existing);
+    document.documentElement.dataset.cozyLaunchScope = scope;
+    window.homeFilters = window.homeFilters || { scope: 'all', system: 'all', tag: 'all' };
+    window.homeFilters.scope = scope;
+    try { if (typeof deckMode !== 'undefined') deckMode = scope === 'random-new' ? 'random' : scope; } catch (_) {}
+    phase3State.settings.solo_order = scope;
+    if (opts.syncExpansion !== false) phase3State.settings.expansion_order = scope;
+    session.poolKey = '';
+    session.pool = [];
+    try { index = 0; } catch (_) {}
+    setSelectIfPresent('browseScope351', scope);
+    setSelectIfPresent('homeScope175155', scope);
+    setSelectIfPresent('reviewScope17526', scope);
+    savePhase3State();
+    if (opts.log) {
+      setTimeout(() => {
+        try {
+          const pool = sessionPool(opts.gameType || 'solo');
+          console.log('[E7B] General Study Mode scope synchronized:', scope, 'pool non-empty:', pool.length > 0, 'count:', pool.length);
+        } catch (err) {
+          console.warn('[E7B] General Study Mode scope sync check failed:', err);
+        }
+      }, 0);
+    }
+    return scope;
   }
 
   function selectedOrder(gameType) {
@@ -11250,8 +11310,8 @@ function fixStableOneThingDropdown351() {
     const hf = window.homeFilters || {};
     const general = hf.scope || q('browseScope351')?.value || q('generalStudyMode351')?.value || '';
     const expansion = q('expansionOrderPhase3')?.value || '';
-    if (gameType === 'expansion') return normalizeMode(expansion || phase3State.settings.expansion_order || general || explicit || 'new_first');
-    return normalizeMode(general || explicit || phase3State.settings.solo_order || 'random_new');
+    if (gameType === 'expansion') return normalizeMode(expansion || explicit || phase3State.settings.expansion_order || general || 'new_first');
+    return normalizeMode(explicit || phase3State.settings.solo_order || general || 'random_new');
   }
 
 	  function basePlayableCards() {
@@ -11366,7 +11426,7 @@ function fixStableOneThingDropdown351() {
   }
 
   function poolKey(gameType) {
-    const scope = window.homeFilters?.scope || (typeof q === 'function' ? q('browseScope351')?.value : '') || '';
+    const scope = document.documentElement.dataset.cozyLaunchScope || window.homeFilters?.scope || (typeof q === 'function' ? q('browseScope351')?.value : '') || '';
     return [gameType, selectedOrder(gameType), deckFingerprint(), session.buriedToday.size, session.seenThisSession.size, scope].join('|');
   }
 
@@ -11649,29 +11709,28 @@ function fixStableOneThingDropdown351() {
 
   function optionHtml(selected) {
     const opts = [
-      ['new_first', 'New cards first'],
-      ['random_all', 'Random - all cards'],
-      ['random_new', 'Random - new cards'],
-      ['reviewed_first', 'Reviewed cards first'],
+      ['all', 'New cards first'],
+      ['random', 'Random - all cards'],
+      ['random-new', 'Random - new cards'],
+      ['reviewed', 'Reviewed cards first'],
       ['due', 'Due cards only'],
-      ['review_deck', 'Review deck: pinned / missed / hard']
+      ['pinned', 'Pinned only'],
+      ['review', 'Review deck: pinned / missed / hard']
     ];
-    return opts.map(([value, label]) => '<option value="' + value + '"' + (value === selected ? ' selected' : '') + '>' + label + '</option>').join('');
+    const selectedScope = legacyScopeToken(selected);
+    return opts.map(([value, label]) => '<option value="' + value + '"' + (value === selectedScope ? ' selected' : '') + '>' + label + '</option>').join('');
   }
 
   function wireUi() {
     const browse = q('browseScope351');
     if (browse) {
-      const selected = normalizeMode(browse.value || phase3State.settings.solo_order);
+      const selected = legacyScopeToken(browse.value || phase3State.settings.solo_order);
       browse.dataset.phase3Options = '1';
       if (browse.innerHTML !== optionHtml(selected)) browse.innerHTML = optionHtml(selected);
       const label = browse.closest('div')?.querySelector('label');
       if (label) label.textContent = 'General Study Mode';
       browse.onchange = () => {
-        phase3State.settings.solo_order = normalizeMode(browse.value);
-        phase3State.settings.expansion_order = normalizeMode(browse.value);
-        savePhase3State();
-        session.poolKey = '';
+        syncGeneralStudyScopePhase3(browse.value, { log: true, source: 'browseScope351' });
         updateKpisPhase3();
       };
     }
@@ -11681,7 +11740,7 @@ function fixStableOneThingDropdown351() {
       wrap.innerHTML = '<label>Knowledge Expansion Order</label><select id="expansionOrderPhase3">' + optionHtml(phase3State.settings.expansion_order) + '</select>';
       anchor.insertBefore(wrap, q('browseReview351'));
       q('expansionOrderPhase3').onchange = event => {
-        phase3State.settings.expansion_order = normalizeMode(event.target.value);
+        phase3State.settings.expansion_order = legacyScopeToken(event.target.value);
         savePhase3State();
         session.poolKey = '';
       };
@@ -11776,6 +11835,10 @@ function fixStableOneThingDropdown351() {
     window.previewInterval = previewInterval;
     window.rateCard = rateCard;
     window.getStudyPool = getStudyPool;
+    window.syncGeneralStudyScopePhase3 = syncGeneralStudyScopePhase3;
+    window.__cozyApplyDeckMode351 = function(mode) {
+      return syncGeneralStudyScopePhase3(mode, { syncExpansion: false });
+    };
     window.migrateLegacyProgress = migrateLegacyProgress;
     window.canonicalizeCard = canonicalizeCard;
     window.cozyPhase3 = { exportCleanDeck, exportProgressOnly, exportDeckWithProgress, exportFullGameState, importObjectPhase3, cleanDeckPayload, progressPayload, backupPayload, fullGameStatePayload, getStudyPool, clearSessionBuried, wireUi };
@@ -11987,17 +12050,17 @@ function fixStableOneThingDropdown351() {
       nextCard();
     };
     const priorStartSolo = window.startSolo || startSolo;
-	    window.startSolo = startSolo = function() {
-	      try { if (typeof window.__cozyApplyDeckMode351 === 'function') window.__cozyApplyDeckMode351(); } catch (_) {}
-	      const selected = q('browseScope351')?.value || document.documentElement.dataset.cozyLaunchScope || phase3State.settings.solo_order;
-	      document.documentElement.dataset.cozyLaunchScope = selected;
-	      phase3State.settings.solo_order = normalizeMode(selected);
-	      session.poolKey = '';
-	      savePhase3State();
-	      return priorStartSolo.apply(this, arguments);
-	    };
+    window.startSolo = startSolo = function() {
+      syncGeneralStudyScopePhase3(q('browseScope351')?.value || document.documentElement.dataset.cozyLaunchScope || phase3State.settings.solo_order, { syncExpansion: false });
+      return priorStartSolo.apply(this, arguments);
+    };
     const priorStartDomain = window.startDomain || startDomain;
-    window.startDomain = startDomain = function() { phase3State.settings.expansion_order = normalizeMode(q('expansionOrderPhase3')?.value || phase3State.settings.expansion_order); savePhase3State(); return priorStartDomain.apply(this, arguments); };
+    window.startDomain = startDomain = function() {
+      syncGeneralStudyScopePhase3(q('browseScope351')?.value || document.documentElement.dataset.cozyLaunchScope || phase3State.settings.solo_order, { syncExpansion: false, gameType: 'expansion' });
+      phase3State.settings.expansion_order = legacyScopeToken(q('expansionOrderPhase3')?.value || phase3State.settings.expansion_order);
+      savePhase3State();
+      return priorStartDomain.apply(this, arguments);
+    };
     if (q('startSolo')) q('startSolo').onclick = startSolo;
     if (q('startDomain')) q('startDomain').onclick = startDomain;
   }
@@ -13716,11 +13779,16 @@ legacy patchStudyOptions() skips replacing Phase 3 cardPool. Cache-busted CDP va
 cardPool = sessionPool (not scopedCardPool352), nextCard includes the Shadow Dungeon queue
 guard, FSRS 17/17, smoke 6/6.
 
+E7B scope consistency is also fixed/validated as of 2026-06-03. General Study Mode changes
+must flow through syncGeneralStudyScopePhase3(), which updates dataset.cozyLaunchScope,
+phase3State.settings.solo_order, deckMode, and homeFilters.scope atomically, then clears the
+Phase 3 session key. Do not split those writes across patch layers again.
+
 Required rectifier order:
 1) Keep Phase 3 the authoritative owner of cardPool/nextCard/resetRun/session pool.
 2) Do not introduce new runtime wrappers that re-own cardPool/nextCard after Phase 3.
-3) Normalize General Study Mode through one source of truth: browseScope351 -> dataset
-   cozyLaunchScope -> phase3State.settings -> sessionPool.
+3) Preserve General Study Mode through one source of truth: browseScope351 ->
+   syncGeneralStudyScopePhase3() -> sessionPool.
 4) Make HUD normalization guarantee exactly one pause/home/settings/status control per game.
 5) Reset selected/lane/orb state on every new card; never derive selected lane from correct answer
    before user/timer selection.
@@ -13855,4 +13923,5 @@ else boot160();
 setTimeout(boot160,900);
 })();
 </script>
+<script>if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));</script>
 </body></html>
