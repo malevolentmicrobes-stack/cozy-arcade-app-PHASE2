@@ -1,14 +1,20 @@
 # Project Goal Tracker
-*Updated 2026-05-28 — reflects session compactions + 2026-05-28 session*
+*Updated 2026-06-03 — adds runtime glitch diagnosis + Claude rectifier handoff*
 
 ---
 
 ## Active Goal
 
-**Goal:** v175160 gameplay + atlas polish — COMPLETE
-**Phase:** Next → A9 (Review Tag button) or P7 (PWA service worker)
+**Goal:** E7 runtime authority fix deployed → validate in browser, then A9 (Review Tag) or P7 (PWA)
+**Phase:** Browser validation of E5/E6/E7, then next feature
 **Reference:** `RECTIFIER_PLAN_2026_05_26.md`, `ULTIMATE_GOALS.md`
-**Status:** v175160 live on both GitHub Pages sites. Infrastructure stabilized. Ready for next feature.
+**Status:** E5, E6, E7 all fixed 2026-06-03. Awaiting browser validation: `String(window.cardPool)` must reference `sessionPool`; `String(window.nextCard)` must include Shadow Dungeon guard. `runFSRSValidation()` 17/17 and `runCozySmokeTests()` 6/6 must still pass.
+
+### Current Project State — 2026-06-03
+- In-app Browser direct inspection of the current `file://.../index.html` tab was blocked by Browser URL policy, so this entry is based on source review plus prior real-browser runtime validation against the same `index.html`.
+- User-visible glitch cluster: General Study Mode selection does not reliably map to the active gameplay pool; gameplay can show duplicate pause/settings-style controls; solo runner/selected lane appears biased toward the correct answer; current card/progress state does not translate consistently across gameplay, Atlas, and export.
+- Probable common root: stacked patch contention. Older stable-random, Energy/System, HUD, and selection wrappers still run after Phase 3 and can override/wrap the intended authoritative session/pool/state functions.
+- Must rectify E7 before feature work (`A9` Review Tag, `P7` PWA). Adding new features before runtime authority is stabilized will likely add another conflicting layer.
 
 ---
 
@@ -136,13 +142,18 @@ Run in order — do not proceed to P7 until all pass:
 | E4 | 🟠 HIGH | 6 cards have mutated `ease_factor` (2.1–2.35) from pre-FSRS SM2 logic | ❌ Unresolved (data patch) |
 | E5 | 🟠 HIGH | Shadow Dungeon breaks after card 1 — `nextCard()` falls back to full pinned set, ignores filter selection | ✅ Fixed 2026-06-03: Phase 3 `nextCard()` now checks `__shadowDungeonActive175164` + `__shadowRunQueue` before calling `sessionPool`; `__shadowRunQueueIdx` init changed 0→1 since card 0 consumed by `startCard`. PHASE1 + PHASE2. SW v26. |
 | E6 | 🟠 HIGH | `deckMode:'due'` sorts 1249 new cards before 37 overdue ones — `dueScore()` has no `next_due_at` logic | ✅ Fixed 2026-06-03: `getStudyPool('due')` already filtered correctly via `isDue()`; added ascending `next_due_at` sort so most-overdue card surfaces first. PHASE1 + PHASE2. |
-| E7 | 🟠 HIGH | 12 competing `window.cardPool = cardPool` overrides, last writer wins unpredictably | ❌ Unresolved |
+| E7 | 🔴 CRITICAL | Runtime authority conflict: 14 `window.cardPool =` assignments + deferred installers. Prior browser validation: active `cardPool` was Energy `scopedCardPool352(prior...)`, active `nextCard` was stable-random `sessionCards()`. Drove General Study Mode glitch, duplicate HUD controls, biased lane behavior, state translation drift. | ✅ Fixed 2026-06-03: Phase 3 marks its `cardPool` with `__energyBuriedFilter352=true` + `__cozyStableRandom351=true` immediately after install — `installBuriedPoolFilter()` interval and `patchGameFlow()` click handler both see the flags and skip re-wrapping. Phase 3 `nextCard` marked with `__cozyStableRandom351=true`. PHASE1 + PHASE2. PHASE1 SW v27. Validate in browser: `String(window.cardPool)` must reference `sessionPool`, not `scopedCardPool352`. |
 | E8 | 🟡 MEDIUM | Full Card showed LEVEL 1/LEVEL 2 — whitelist formatter + alias write removal applied | ✅ Fixed prior session |
 
 ## Next Code Tasks (after validation)
 
 | Priority | Goal | Gate |
 |----------|------|------|
+| E7A | Runtime authority pass: Phase 3 owns `cardPool`, `nextCard`, `resetRun`, scope selection, and progress writes; older interval installers guarded | Runtime `cardPool`/`nextCard` are Phase 3 or approved guarded wrappers |
+| E7B | General Study Mode consistency: one normalized source of truth from `browseScope351` → `dataset.cozyLaunchScope` → `phase3State.settings` → `sessionPool` | Changing dropdown changes next solo pool deterministically |
+| E7C | Gameplay HUD dedupe: exactly one pause, one close/home, one settings, one energy/status display per game | DOM + screenshot confirm one visible pause per game |
+| E7D | Runner/answer selection neutrality: reset `selected` and lane visual state per new card; no code path derives lane from correct answer | First rendered lane is neutral/predictable, not answer-correlated |
+| E7E | Progress-state translation: `phase3State.progress` is canonical; legacy `state` mirror only; Atlas/export read canonical map | Atlas and export show same seen/rating/due state after answer |
 | A9 | Atlas: "▶ Review Tag" button in card detail → triggers home `browseTag351` + review session | Opens solo study filtered to selected tag |
 | A10 | Atlas: pin/bury toggle from card detail panel (write to `phase3State.progress`) | `p.pinned`/`p.buried` toggles persist after atlas close |
 | A11 | Atlas: one_thing inline edit from card detail (write to `window.phase3State.progress[id].user_one_thing`) | Card detail shows updated text immediately |

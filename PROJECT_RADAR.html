@@ -183,11 +183,13 @@ const NODES=[
    desc:'Intended active FSRS cardPool at L11908. Builds session from phase3State.progress with due/new logic. One of 12 cardPool assignments.',
    bugs:[], fixes:[], line:'L11908'},
 
-  {id:'cardPool', label:'window.cardPool (×12)', x:300, y:480, type:'state', status:'bug-pending',
-   desc:'window.cardPool is assigned 12 times. Last writer wins. sessionPool() at L11908 is the intended active version but execution order is unverified.',
-   bugs:[{id:'E7',text:'12 window.cardPool = cardPool assignments — execution order unknown',sev:'pending'}],
-   fixes:['Audit all 12, confirm sessionPool wins, remove or order-guard others'],
-   line:'L11908 (target)'},
+  {id:'cardPool', label:'window.cardPool (×14)', x:300, y:480, type:'state', status:'bug-fixed',
+   desc:'14 window.cardPool assignments. installBuriedPoolFilter() ran every 120ms and patchGameFlow() fired on every start-button click — both re-wrapped Phase 3 cardPool. Fixed: Phase 3 marks its cardPool with __energyBuriedFilter352 + __cozyStableRandom351 flags so both wrappers see the flags and skip.',
+   bugs:[{id:'E7',text:'Runtime cardPool was Energy buried-filter wrapper, not Phase 3 sessionPool — installBuriedPoolFilter 120ms interval won',sev:'fixed'}],
+   fixes:['Phase 3 cardPool.__energyBuriedFilter352 = true (blocks interval)',
+           'Phase 3 cardPool.__cozyStableRandom351 = true (blocks patchGameFlow)',
+           'Phase 3 nextCard.__cozyStableRandom351 = true (blocks nextCard re-wrap)'],
+   line:'L11920 (PHASE2) · L11957 (PHASE1)'},
 
   {id:'phase3State',label:'phase3State',   x:600, y:480, type:'state', status:'ok',
    desc:'Central FSRS state. progress map keyed by cardId with stability, difficulty, next_due_at, seen_count, last_rating, retrievability.',
