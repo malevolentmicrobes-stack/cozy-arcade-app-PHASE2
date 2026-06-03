@@ -11918,6 +11918,13 @@ function fixStableOneThingDropdown351() {
       return '<div class="ratingBar"><button class="btn ' + (pinned ? 'pinActive350' : '') + '" data-rate="pin">' + (pinned ? 'Unpin' : 'Pin') + '</button><button class="btn buryBtn352 ' + (buried ? 'buryActive352' : '') + '" data-rate="bury">' + (buried ? 'Suspended' : 'Bury') + '</button><button class="btn againBtn352 ratingBtn again" data-rate="again" data-rating="again">Again</button><button class="btn ratingBtn hard" data-rate="hard" data-rating="hard">Hard</button><button class="btn ratingBtn good" data-rate="good" data-rating="good">Good</button><button class="btn primary ratingBtn easy" data-rate="easy" data-rating="easy">EASY</button><button class="btn primary" data-rate="continue">Continue</button></div>';
     };
     window.cardPool = cardPool = () => sessionPool(mode === 'domain' ? 'expansion' : 'solo');
+    // E7 fix: mark Phase 3 cardPool with the flags that older wrappers already check.
+    // installBuriedPoolFilter() (L7528) skips if __energyBuriedFilter352 is set.
+    // patchGameFlow() (L10094) skips if __cozyStableRandom351 is set.
+    // Phase 3's sessionPool already filters buried cards in basePlayableCards(), so
+    // the buried-filter wrapper adds no value and only hides the authoritative pool.
+    window.cardPool.__energyBuriedFilter352 = true;
+    window.cardPool.__cozyStableRandom351 = true;
     window.nextCard = nextCard = () => {
       // E5 fix: consume __shadowRunQueue in order when Shadow Dungeon (old review screen) is active.
       // nextCard() bypasses window.cardPool entirely (calls sessionPool directly), so the
@@ -11937,6 +11944,8 @@ function fixStableOneThingDropdown351() {
       index += 1;
       if (typeof makeChoices === 'function') makeChoices();
     };
+    // E7: mark Phase 3 nextCard so patchGameFlow() click handler can't replace it.
+    window.nextCard.__cozyStableRandom351 = true;
     // E2 fix: all advance() call sites (keyboard, click, continueReveal, advanceReveal)
     // Some handlers use stopImmediatePropagation so per-handler patches miss them.
     // Wrapping advance() catches every path. Dedup guard prevents double-rating when
@@ -13691,6 +13700,30 @@ setTimeout(boot,600);
 })();
 </script>
 
+<!--
+2026-06-03 RECTIFIER NOTE FOR FUTURE AGENTS / CLAUDE:
+Visible bug cluster: General Study Mode glitches, duplicate gameplay pause/settings controls,
+runner/selected lane appearing biased toward the correct answer, and progress/card state not
+translating cleanly between gameplay, Atlas, and export.
+
+Diagnosis: do not add another patch layer before fixing runtime authority. Older stable-random
+and Energy/System installers still wrap/own active functions after Phase 3. In prior browser
+runtime validation, active cardPool was the Energy scopedCardPool352(prior...) wrapper, and
+active nextCard was the older stable-random sessionCards() wrapper, not the Phase 3 nextCard
+with the Shadow Dungeon queue guard.
+
+Required rectifier order:
+1) Make Phase 3 the authoritative owner of cardPool/nextCard/resetRun/session pool.
+2) Guard older interval installers such as installBuriedPoolFilter() from rewrapping Phase 3.
+3) Normalize General Study Mode through one source of truth: browseScope351 -> dataset
+   cozyLaunchScope -> phase3State.settings -> sessionPool.
+4) Make HUD normalization guarantee exactly one pause/home/settings/status control per game.
+5) Reset selected/lane/orb state on every new card; never derive selected lane from correct answer
+   before user/timer selection.
+6) Treat phase3State.progress as canonical; legacy state is mirror only.
+
+See CLAUDE.md and RECTIFIER_PLAN_2026_05_26.md for the 2026-06-03 handoff.
+-->
 <!-- v175160 — double-advance lock, selectSolo guard, auto-export on exit, card detail sidebar scope -->
 <script>
 ;(function(){
