@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PROJECT RADAR — Cozy Arcade</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;height:100vh;overflow:hidden;display:flex;flex-direction:column}
+header{background:#161b22;border-bottom:1px solid #30363d;padding:10px 20px;display:flex;align-items:center;gap:20px;flex-shrink:0}
+h1{font-size:15px;font-weight:700;color:#58a6ff;letter-spacing:2px;font-family:monospace}
+.tabs{display:flex;gap:4px}
+.tab{padding:5px 14px;border:1px solid #30363d;border-radius:6px;background:transparent;color:#8b949e;cursor:pointer;font-size:12px;font-family:inherit;transition:all .15s}
+.tab:hover{color:#e6edf3;border-color:#6e7681}
+.tab.active{background:#1f6feb;border-color:#1f6feb;color:#fff}
+.legend{margin-left:auto;display:flex;gap:14px;font-size:11px;color:#8b949e;align-items:center}
+.li{display:flex;align-items:center;gap:5px}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.main{flex:1;display:flex;overflow:hidden}
+#graph-view{flex:1;overflow:hidden;position:relative;display:flex}
+#svg-canvas{width:100%;height:100%;cursor:grab}
+#svg-canvas.dragging{cursor:grabbing}
+#info-panel{width:300px;background:#161b22;border-left:1px solid #30363d;display:flex;flex-direction:column;transform:translateX(300px);transition:transform .2s ease;flex-shrink:0}
+#info-panel.open{transform:translateX(0)}
+.ph{padding:14px 16px;border-bottom:1px solid #30363d;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ph .ptitle{font-size:13px;font-weight:600;color:#e6edf3}
+.pclose{background:none;border:none;color:#8b949e;cursor:pointer;font-size:20px;line-height:1;padding:0 4px}
+.pclose:hover{color:#e6edf3}
+.pbody{flex:1;overflow-y:auto;padding:14px}
+.ps{margin-bottom:14px}
+.ps h3{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#6e7681;margin-bottom:6px}
+.ps p{font-size:12px;line-height:1.6;color:#c9d1d9}
+.ps ul{list-style:none}
+.ps li{font-size:12px;line-height:1.5;padding:3px 0;display:flex;gap:6px;align-items:flex-start;color:#c9d1d9}
+.btag{font-size:10px;padding:1px 5px;border-radius:3px;font-weight:700;flex-shrink:0;margin-top:2px}
+.btag.active{background:#3d1414;color:#f85149}
+.btag.fixed{background:#0d2e0d;color:#3fb950}
+.btag.pending{background:#2d2010;color:#e3b341}
+.nbadge{font-size:10px;padding:2px 8px;border-radius:10px;display:inline-block;margin-bottom:10px;font-weight:600}
+.loc{font-family:monospace;font-size:11px;color:#8b949e;background:#0d1117;padding:3px 6px;border-radius:4px;display:inline-block;margin-top:2px}
+#codex-view,#premortem-view{flex:1;overflow-y:auto;padding:24px;display:none}
+.cc{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:18px;margin-bottom:18px}
+.cc h2{font-size:13px;font-weight:700;color:#58a6ff;margin-bottom:4px}
+.cc .cdesc{font-size:11px;color:#8b949e;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.cc pre{background:#0d1117;border:1px solid #21262d;border-radius:6px;padding:12px;font-size:11px;line-height:1.65;color:#c9d1d9;white-space:pre-wrap;word-break:break-word;font-family:'SF Mono',Consolas,monospace}
+.copy-btn{float:right;font-size:10px;padding:3px 10px;border:1px solid #30363d;border-radius:4px;background:transparent;color:#8b949e;cursor:pointer;font-family:inherit;margin-top:-2px}
+.copy-btn:hover{color:#e6edf3;border-color:#6e7681}
+.copy-btn.copied{color:#3fb950;border-color:#3fb950}
+.pm-item{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:14px;margin-bottom:12px}
+.pm-item h3{font-size:12px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.pm-item p{font-size:12px;color:#8b949e;line-height:1.6}
+.sev{font-size:9px;padding:2px 6px;border-radius:3px;font-weight:700}
+.sev.critical{background:#3d1414;color:#f85149}
+.sev.high{background:#2d2010;color:#e3b341}
+.sev.medium{background:#1a1a2e;color:#bc8cff}
+.section-hdr{font-size:16px;font-weight:700;color:#f85149;margin-bottom:16px}
+.edge-legend{margin-top:8px;display:flex;gap:12px;flex-wrap:wrap}
+.el-item{display:flex;align-items:center;gap:5px;font-size:10px;color:#8b949e}
+.el-line{width:24px;height:2px}
+</style>
+</head>
+<body>
+<header>
+  <h1>⬡ PROJECT RADAR</h1>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('graph',this)">Architecture Graph</button>
+    <button class="tab" onclick="switchTab('codex',this)">Codex Prompts</button>
+    <button class="tab" onclick="switchTab('premortem',this)">Pre-mortem</button>
+  </div>
+  <div class="legend">
+    <div class="li"><div class="dot" style="background:#f85149"></div>Active Bug</div>
+    <div class="li"><div class="dot" style="background:#3fb950"></div>Fixed</div>
+    <div class="li"><div class="dot" style="background:#e3b341"></div>Pending</div>
+    <div class="li" style="margin-left:8px;gap:10px">
+      <div class="edge-legend">
+        <div class="el-item"><div class="el-line" style="background:#8b949e"></div>Flow</div>
+        <div class="el-item"><div class="el-line" style="background:#3fb950"></div>Fixed</div>
+        <div class="el-item"><div class="el-line" style="background:#f85149;height:2px;background:repeating-linear-gradient(90deg,#f85149 0,#f85149 4px,transparent 4px,transparent 7px)"></div>Bug</div>
+        <div class="el-item"><div class="el-line" style="background:repeating-linear-gradient(90deg,#bc8cff 0,#bc8cff 3px,transparent 3px,transparent 6px)"></div>State</div>
+      </div>
+    </div>
+  </div>
+</header>
+<div class="main">
+  <div id="graph-view">
+    <svg id="svg-canvas">
+      <defs>
+        <marker id="arr-flow" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3z" fill="#8b949e"/></marker>
+        <marker id="arr-bug"  markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3z" fill="#f85149"/></marker>
+        <marker id="arr-state" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3z" fill="#bc8cff"/></marker>
+        <marker id="arr-fixed" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3z" fill="#3fb950"/></marker>
+      </defs>
+      <g id="root-g">
+        <g id="edges-g"></g>
+        <g id="nodes-g"></g>
+      </g>
+    </svg>
+  </div>
+  <div id="info-panel">
+    <div class="ph">
+      <span class="ptitle" id="ptitle">Select a node</span>
+      <button class="pclose" onclick="closePanel()">×</button>
+    </div>
+    <div class="pbody" id="pbody"><p style="font-size:12px;color:#6e7681;margin-top:8px">Click any node to inspect its status, bugs, and planned fixes.</p></div>
+  </div>
+  <div id="codex-view"></div>
+  <div id="premortem-view"></div>
+</div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────
+const NW=128, NH=42;
+
+const NODES=[
+  {id:'home',     label:'Home',            x:636, y:20,  type:'comp',  status:'ok',
+   desc:'Entry screen. Selects deck mode, launches game sessions, opens Atlas.',
+   bugs:[], fixes:[], line:'~L12500'},
+
+  {id:'solo',     label:'Solo Mode',       x:140, y:120, type:'comp',  status:'ok',
+   desc:'Solo flashcard gameplay. renderSolo() draws promptBox, reveal, rating buttons.',
+   bugs:[], fixes:['E2 advance() wrapper: keyboard now calls rateCard()'], line:'~L2800'},
+
+  {id:'domain',   label:'Domain Mode',     x:550, y:120, type:'comp',  status:'ok',
+   desc:'Domain-based flashcard session. Shares reveal/rating UI with Solo.',
+   bugs:[], fixes:['E2 fix applies via shared advance()'], line:'~L3000'},
+
+  {id:'shadow',   label:'Shadow Dungeon',  x:970, y:120, type:'comp',  status:'bug-active',
+   desc:'Pinned-card review mode. Card 1 works; card 2+ falls back to full pinned set because __shadowRunQueue is never set.',
+   bugs:[{id:'E5',text:'nextCard() falls back to full pinned set after card 1 — __shadowRunQueue never assigned',sev:'active'}],
+   fixes:['Set __shadowRunQueue in shadowStartFirst.onclick','Consume from queue in sessionPool/nextCard'],
+   line:'~L3200'},
+
+  {id:'HUD',      label:'HUD',             x:40,  y:230, type:'ui',    status:'ok',
+   desc:'HP bar, round counter, gate status. Renders via normalizeHud().',
+   bugs:[], fixes:[], line:'~L12600'},
+
+  {id:'promptBox',label:'PromptBox',       x:220, y:230, type:'ui',    status:'ok',
+   desc:'Main question display. Width used to snap on each card due to body.className wipe — fixed in v175160.',
+   bugs:[], fixes:['renderSolo body.className fix: now preserves cozy*/na-/Drawer classes'], line:'~L2820'},
+
+  {id:'reveal',   label:'Reveal / Full Card',x:450,y:230,type:'ui',   status:'ok',
+   desc:'Displays answer. Continue button and keyboard both call advance(). E2 fixed via advance() wrapper.',
+   bugs:[], fixes:['E2: all paths through advance() now auto-rate before advancing'], line:'~L3130'},
+
+  {id:'ratingBtns',label:'Rating Buttons', x:680, y:230, type:'ui',   status:'ok',
+   desc:'Again / Hard / Good / Easy. Call rate() → rateCard() → sets __cozyLastRatedId → advance().',
+   bugs:[], fixes:[], line:'~L3050'},
+
+  {id:'keydowns', label:'Keydown Handlers',x:910, y:230, type:'ui',   status:'bug-fixed',
+   desc:'6 handlers (L431, L674, L1267, L1684, L3173, L3268). L3173+L3268 use stopImmediatePropagation() in capture phase — per-handler patches are killed. Root cause of E2.',
+   bugs:[{id:'E2',text:'Keyboard advance bypassed rateCard() — 139 cards stuck as new forever',sev:'fixed'}],
+   fixes:['E2 fixed via advance() wrapper (not keydown patches) — immune to stopImmediatePropagation'],
+   line:'L3173, L3268'},
+
+  {id:'advance',  label:'advance()',        x:80,  y:360, type:'algo', status:'bug-fixed',
+   desc:'Core card-advance function. FSRS Phase 3 wrapper at L11951 auto-rates unrated cards. __cozyLastRatedId dedup guard prevents double-rating.',
+   bugs:[{id:'E2',text:'Was: keyboard advance bypassed rateCard()',sev:'fixed'}],
+   fixes:['FSRS Phase 3 wrapper: checks reveal visible + spacedOn + dedup guard before rateCard(cardId,"good")'],
+   line:'L417 (base) · L11951 (wrapper)'},
+
+  {id:'rateCard', label:'rateCard()',       x:300, y:360, type:'algo', status:'ok',
+   desc:'FSRS v5 engine. Computes stability, difficulty, next_due_at from W parameters. Calls setProgress().',
+   bugs:[], fixes:[], line:'~L11114'},
+
+  {id:'nextCard', label:'nextCard()',       x:520, y:360, type:'algo', status:'bug-pending',
+   desc:'Draws next card from active cardPool. 12 competing window.cardPool overrides — last writer wins. Also fails to consume __shadowRunQueue.',
+   bugs:[{id:'E7',text:'12 window.cardPool overrides — last writer wins unpredictably',sev:'pending'},
+         {id:'E5',text:'Shadow Dungeon: falls back to full pinned set after card 1',sev:'active'}],
+   fixes:['Map all 12 overrides, confirm sessionPool wins','Implement __shadowRunQueue shift guard'],
+   line:'~L11900'},
+
+  {id:'dueScore', label:'dueScore()',       x:740, y:360, type:'algo', status:'bug-active',
+   desc:'Scores cards for deckMode:due. Bug: new cards score 100, overdue cards score 0 — inverted priority.',
+   bugs:[{id:'E6',text:'1249 new cards sorted before 37 overdue ones — no next_due_at logic',sev:'active'}],
+   fixes:['Update dueScore() to use next_due_at < now for overdue priority'],
+   line:'~L11070'},
+
+  {id:'record',   label:'record()',         x:960, y:360, type:'algo', status:'ok',
+   desc:'Writes last_seen_at + repair_point only. By design does NOT write seen_count/last_rating (Phase 3 role split).',
+   bugs:[], fixes:[], line:'~L11887'},
+
+  {id:'sessionPool',label:'sessionPool()', x:1170,y:360, type:'algo', status:'ok',
+   desc:'Intended active FSRS cardPool at L11908. Builds session from phase3State.progress with due/new logic. One of 12 cardPool assignments.',
+   bugs:[], fixes:[], line:'L11908'},
+
+  {id:'cardPool', label:'window.cardPool (×12)', x:300, y:480, type:'state', status:'bug-pending',
+   desc:'window.cardPool is assigned 12 times. Last writer wins. sessionPool() at L11908 is the intended active version but execution order is unverified.',
+   bugs:[{id:'E7',text:'12 window.cardPool = cardPool assignments — execution order unknown',sev:'pending'}],
+   fixes:['Audit all 12, confirm sessionPool wins, remove or order-guard others'],
+   line:'L11908 (target)'},
+
+  {id:'phase3State',label:'phase3State',   x:600, y:480, type:'state', status:'ok',
+   desc:'Central FSRS state. progress map keyed by cardId with stability, difficulty, next_due_at, seen_count, last_rating, retrievability.',
+   bugs:[], fixes:['E1 fix: stability/difficulty/retrievability survive reload'], line:'~L10700'},
+
+  {id:'legacyToProgress',label:'legacyToProgress()', x:40, y:480, type:'state', status:'bug-fixed',
+   desc:'Called on every loadPhase3State(). Was silently dropping stability/difficulty/retrievability — FSRS fields reset to null on each page load.',
+   bugs:[{id:'E1',text:'Dropped stability/difficulty/retrievability — 48 rated cards had stability:null',sev:'fixed'}],
+   fixes:['Added: stability: legacy?.stability != null ? Number(legacy.stability) : null (and same for difficulty, retrievability)'],
+   line:'~L10758'},
+
+  {id:'setProgress',label:'setProgress()', x:890, y:480, type:'state', status:'ok',
+   desc:'Writes a progress entry to phase3State.progress[cardId]. Calls savePhase3State().',
+   bugs:[], fixes:[], line:'~L10978'},
+
+  {id:'exportProgressMap',label:'exportProgressMap()', x:1120, y:480, type:'state', status:'bug-fixed',
+   desc:'Serializes phase3State.progress for export. Was missing stability/difficulty/retrievability (PHASE1) or using || null coercion (breaks stability=0).',
+   bugs:[{id:'E1',text:'PHASE1 missing FSRS fields; || null coercion broke stability=0 edge case',sev:'fixed'}],
+   fixes:['Fixed: != null coercion; added retrievability; applied to both PHASE1 (~L10925) and PHASE2 (~L10892)'],
+   line:'~L10892 (P2) · ~L10925 (P1)'},
+
+  {id:'savePhase3State',label:'savePhase3State()', x:600, y:590, type:'state', status:'ok',
+   desc:'Persists phase3State to localStorage. Internally calls coerceState → migrateLegacyProgress → legacyToProgress on load. E1 lived on this path.',
+   bugs:[], fixes:[], line:'~L10800'},
+
+  {id:'atlas',    label:'Atlas Screen',    x:240, y:680, type:'atlas', status:'ok',
+   desc:'Neural Atlas — inline constellation + card browser. RAF halts when #atlas.hidden. Public API: showAtlasScreen() / hideAtlasScreen().',
+   bugs:[], fixes:['v175160: card detail scoped to sidebar; scroll position saved/restored; topbar z-index 300'], line:'~L7500'},
+
+  {id:'constellation',label:'Constellation', x:570, y:680, type:'atlas', status:'ok',
+   desc:'3D star-map grouped by sys or tag. Canvas renders via RAF. Tag View toggle switches grouping dynamically.',
+   bugs:[], fixes:['003957c: Tag View toggle (buildTagMap), sys-list highlights, naSelectedTag state'], line:'~L7600'},
+
+  {id:'cardBrowser',label:'Card Browser',  x:900, y:680, type:'atlas', status:'ok',
+   desc:'Sortable card table. Filterable by sys, tag, pill (due/new/pinned/buried). Click → card detail with tag pills.',
+   bugs:[], fixes:['003957c: sortable columns (Diagnosis/Sys/Stage/Due), tag filter pills in detail panel'], line:'~L7800'},
+];
+
+const EDGES=[
+  {f:'home',   t:'solo',    tp:'flow'},
+  {f:'home',   t:'domain',  tp:'flow'},
+  {f:'home',   t:'shadow',  tp:'flow'},
+  {f:'home',   t:'atlas',   tp:'flow'},
+  {f:'solo',   t:'promptBox',tp:'flow'},
+  {f:'solo',   t:'reveal',  tp:'flow'},
+  {f:'solo',   t:'HUD',     tp:'flow'},
+  {f:'domain', t:'reveal',  tp:'flow'},
+  {f:'shadow', t:'nextCard',tp:'bug'},
+  {f:'reveal', t:'ratingBtns',tp:'flow'},
+  {f:'reveal', t:'keydowns',tp:'flow'},
+  {f:'ratingBtns',t:'rateCard',tp:'flow'},
+  {f:'ratingBtns',t:'advance',tp:'flow'},
+  {f:'keydowns',t:'advance', tp:'fixed'},
+  {f:'advance',t:'rateCard', tp:'fixed'},
+  {f:'advance',t:'nextCard', tp:'flow'},
+  {f:'rateCard',t:'setProgress',tp:'flow'},
+  {f:'nextCard',t:'cardPool',tp:'bug'},
+  {f:'dueScore',t:'cardPool',tp:'bug'},
+  {f:'sessionPool',t:'cardPool',tp:'flow'},
+  {f:'setProgress',t:'phase3State',tp:'state'},
+  {f:'setProgress',t:'savePhase3State',tp:'flow'},
+  {f:'savePhase3State',t:'legacyToProgress',tp:'fixed'},
+  {f:'legacyToProgress',t:'phase3State',tp:'fixed'},
+  {f:'exportProgressMap',t:'phase3State',tp:'state'},
+  {f:'record', t:'phase3State',tp:'state'},
+  {f:'sessionPool',t:'phase3State',tp:'state'},
+  {f:'atlas',  t:'constellation',tp:'flow'},
+  {f:'atlas',  t:'cardBrowser',  tp:'flow'},
+  {f:'atlas',  t:'phase3State',  tp:'state'},
+  {f:'cardPool',t:'sessionPool', tp:'flow'},
+];
+
+const ESTYLE={
+  flow: {stroke:'#8b949e',dash:'',    w:1.5,marker:'arr-flow'},
+  bug:  {stroke:'#f85149',dash:'7,3', w:2,  marker:'arr-bug'},
+  state:{stroke:'#bc8cff',dash:'4,3', w:1.5,marker:'arr-state'},
+  fixed:{stroke:'#3fb950',dash:'',    w:2,  marker:'arr-fixed'},
+};
+const TSTYLE={
+  comp: {stroke:'#58a6ff',fill:'#0a1929',badge:'#102540',label:'Component'},
+  algo: {stroke:'#bc8cff',fill:'#150d26',badge:'#211040',label:'Algorithm'},
+  state:{stroke:'#e3b341',fill:'#1c1506',badge:'#2e2208',label:'State'},
+  ui:   {stroke:'#3fb950',fill:'#091e09',badge:'#103010',label:'UI'},
+  atlas:{stroke:'#f78166',fill:'#200a0a',badge:'#321010',label:'Atlas'},
+};
+const STATUS_DOT={'bug-active':'#f85149','bug-fixed':'#3fb950','bug-pending':'#e3b341'};
+
+const nodeMap={};
+NODES.forEach(n=>nodeMap[n.id]=n);
+function cx(n){return n.x+NW/2}
+function cy(n){return n.y+NH/2}
+
+// ── GRAPH RENDER ────────────────────────────────────
+function renderGraph(){
+  const EL=document.getElementById('edges-g');
+  const NL=document.getElementById('nodes-g');
+  EL.innerHTML='';NL.innerHTML='';
+  const SVG_NS='http://www.w3.org/2000/svg';
+
+  function mkEl(tag,attrs){
+    const el=document.createElementNS(SVG_NS,tag);
+    for(const[k,v]of Object.entries(attrs)) el.setAttribute(k,v);
+    return el;
+  }
+
+  // Edges — use quadratic bezier for slight curve
+  EDGES.forEach(e=>{
+    const fn=nodeMap[e.f],tn=nodeMap[e.t];
+    if(!fn||!tn)return;
+    const s=ESTYLE[e.tp]||ESTYLE.flow;
+    const x1=cx(fn),y1=cy(fn),x2=cx(tn),y2=cy(tn);
+    const mx=(x1+x2)/2, my=(y1+y2)/2 - 20;
+    const path=mkEl('path',{
+      d:`M${x1},${y1} Q${mx},${my} ${x2},${y2}`,
+      stroke:s.stroke,'stroke-width':s.w,fill:'none',
+      'marker-end':`url(#${s.marker})`,
+      opacity:'0.55',
+    });
+    if(s.dash) path.setAttribute('stroke-dasharray',s.dash);
+    EL.appendChild(path);
+  });
+
+  // Nodes
+  NODES.forEach(n=>{
+    const ts=TSTYLE[n.type]||TSTYLE.comp;
+    const g=mkEl('g',{transform:`translate(${n.x},${n.y})`});
+    g.style.cursor='pointer';
+    g.addEventListener('click',()=>openPanel(n.id));
+    g.addEventListener('mouseenter',()=>{
+      rect.setAttribute('opacity','0.9');
+      g.setAttribute('transform',`translate(${n.x},${n.y}) scale(1.04)`);
+      g.setAttribute('transform-origin',`${NW/2} ${NH/2}`);
+    });
+    g.addEventListener('mouseleave',()=>{
+      rect.setAttribute('opacity','1');
+      g.setAttribute('transform',`translate(${n.x},${n.y})`);
+    });
+
+    // glow
+    const glow=mkEl('rect',{x:3,y:3,width:NW,height:NH,rx:7,fill:ts.stroke,opacity:'0.12'});
+    g.appendChild(glow);
+
+    // main rect
+    const rect=mkEl('rect',{
+      width:NW,height:NH,rx:7,
+      fill:ts.fill,stroke:ts.stroke,
+      'stroke-width': n.status==='bug-active'?'2.5':'1.5',
+    });
+    g.appendChild(rect);
+
+    // label
+    const txt=mkEl('text',{
+      x:NW/2,y:NH/2+4.5,
+      'text-anchor':'middle',fill:'#e6edf3',
+      'font-size':'11','font-weight':'600',
+      'font-family':'-apple-system,BlinkMacSystemFont,monospace',
+    });
+    txt.textContent=n.label;
+    g.appendChild(txt);
+
+    // status dot
+    const dc=STATUS_DOT[n.status];
+    if(dc){
+      if(n.status==='bug-active'){
+        const ring=mkEl('circle',{cx:NW-10,cy:10,r:7,fill:'none',stroke:dc,'stroke-width':'1.5',opacity:'0.4'});
+        g.appendChild(ring);
+      }
+      const dot=mkEl('circle',{cx:NW-10,cy:10,r:4.5,fill:dc});
+      g.appendChild(dot);
+    }
+
+    NL.appendChild(g);
+  });
+}
+
+// ── PAN / ZOOM ───────────────────────────────────────
+let scale=0.78, tx=60, ty=20;
+let drag=false, dx=0, dy=0, stx=0, sty=0;
+const svgEl=document.getElementById('svg-canvas');
+const rootG=document.getElementById('root-g');
+
+function applyT(){rootG.setAttribute('transform',`translate(${tx},${ty}) scale(${scale})`)}
+
+svgEl.addEventListener('mousedown',e=>{
+  if(e.button!==0)return;
+  drag=true;dx=e.clientX;dy=e.clientY;stx=tx;sty=ty;
+  svgEl.classList.add('dragging');
+});
+window.addEventListener('mousemove',e=>{
+  if(!drag)return;
+  tx=stx+(e.clientX-dx);ty=sty+(e.clientY-dy);applyT();
+});
+window.addEventListener('mouseup',()=>{drag=false;svgEl.classList.remove('dragging')});
+svgEl.addEventListener('wheel',e=>{
+  e.preventDefault();
+  const f=e.deltaY>0?0.9:1.1;
+  scale=Math.min(2.5,Math.max(0.25,scale*f));applyT();
+},{passive:false});
+applyT();
+
+// ── PANEL ────────────────────────────────────────────
+function openPanel(id){
+  const n=nodeMap[id];if(!n)return;
+  const ts=TSTYLE[n.type];
+  document.getElementById('ptitle').textContent=n.label;
+  let h=`<span class="nbadge" style="background:${ts.badge};color:${ts.stroke}">${ts.label}</span>`;
+  h+=`<div class="ps"><h3>Description</h3><p>${n.desc}</p></div>`;
+  if(n.line) h+=`<div class="ps"><h3>Location in index.html</h3><span class="loc">${n.line}</span></div>`;
+  if(n.bugs?.length){
+    h+='<div class="ps"><h3>Bugs</h3><ul>';
+    n.bugs.forEach(b=>{h+=`<li><span class="btag ${b.sev}">${b.id}</span><span>${b.text}</span></li>`});
+    h+='</ul></div>';
+  }
+  if(n.fixes?.length){
+    h+='<div class="ps"><h3>Fixes / Planned</h3><ul>';
+    n.fixes.forEach(f=>{h+=`<li><span style="color:#3fb950;margin-top:2px">▶</span><span>${f}</span></li>`});
+    h+='</ul></div>';
+  }
+  document.getElementById('pbody').innerHTML=h;
+  document.getElementById('info-panel').classList.add('open');
+}
+function closePanel(){document.getElementById('info-panel').classList.remove('open')}
+
+// ── CODEX PROMPTS DATA ───────────────────────────────
+const CODEX=[
+  {id:'G1',title:'G1 — Gameplay Aesthetics Audit',
+   desc:'CSS / layout — promptBox, reveal, HUD, rating buttons, card transitions',
+   prompt:`You are a senior UI engineer auditing a single-file flashcard PWA (index.html).
+
+GOAL: Find and fix gameplay aesthetic issues without touching any JS logic.
+
+SCOPE:
+1. promptBox — font size on mobile (375px), padding, line-height
+2. reveal / Full Card modal — answer readability, Close button tap target
+3. HUD — HP bar at all viewport widths, gate counter alignment
+4. Rating buttons (Again/Hard/Good/Easy) — thumb tap size (min 44px), spacing
+5. Card enter animation — does text flash in abruptly? Smooth transition?
+6. Typography — is system font scaling consistent across prompt/answer/sidebar?
+
+CONSTRAINTS:
+- Do NOT touch any JS function (rateCard, advance, nextCard, cardPool, etc.)
+- Do NOT rename or add/remove IDs or classes that JS references
+- CSS-only changes only. If you add JS, flag it and explain why CSS was insufficient.
+- Test at 375px (iPhone SE), 430px (iPhone 15 Pro Max), 768px (iPad).
+
+OUTPUT FORMAT:
+[ISSUE] <element> — <what's wrong>
+[FIX] <CSS property: value> (scope: <selector>)
+⚠️ <risk note if any>
+
+Provide diffs ready to paste, not prose. Group by component.`},
+
+  {id:'G2',title:'G2 — FSRS Full Path Verification',
+   desc:'Verify rateCard() fires correctly across Solo → Knowledge Expansion → Shadow Dungeon',
+   prompt:`You are a debugging engineer verifying the FSRS rating pipeline in a flashcard app.
+
+CONTEXT:
+- FSRS v5 in index.html. rateCard(cardId, rating) must fire once per card.
+- advance() wrapper at ~L11951 auto-rates 'good' if card was not explicitly rated.
+- __cozyLastRatedId dedup guard prevents double-rating when user clicked a button first.
+- window.spacedOn must be true for FSRS to activate.
+
+RUN THESE IN BROWSER CONSOLE — paste after each card action:
+
+VALIDATION HELPER (paste once at session start):
+  window._chk = id => {
+    const p = window.phase3State?.progress?.[id];
+    console.table({id, rating:p?.last_rating, stability:p?.stability, due:p?.next_due_at, seen:p?.seen_count});
+  };
+
+STEP 1 — Solo keyboard advance (should auto-rate 'good'):
+  a. Confirm: window.spacedOn === true
+  b. Note card ID: const id = window.current?.id || window.current?.qid
+  c. Press ArrowDown (do NOT click a rating button)
+  d. Run: window._chk(id)
+  PASS: seen_count>=1, last_rating='good', next_due_at is a date string
+
+STEP 2 — Explicit 'Again' not overridden:
+  a. Note new card ID
+  b. Click "Again" button
+  c. Advance (ArrowDown or Continue)
+  d. Run: window._chk(id)
+  PASS: last_rating='again' (NOT 'good')
+
+STEP 3 — Double-advance guard:
+  a. Note card ID
+  b. Press ArrowDown twice rapidly (within 200ms)
+  c. Run: window._chk(id)
+  PASS: seen_count==1 (not 2), no double-rating
+
+STEP 4 — Shadow Dungeon path (E5 check):
+  a. Pin 3 specific cards. Enter Shadow Dungeon.
+  b. Play card 1 → advance. Run: window._chk(card1_id)  → PASS: FSRS fields set
+  c. Does card 2 load? If you see a DIFFERENT card from your 3 → E5 ACTIVE (nextCard fell back to full pinned set)
+  d. If E5 active: check window.__shadowRunQueue in console
+
+REPORT FORMAT:
+Step | Pass/Fail | Evidence (console output)
+If fail: exact line number of root cause + 1-line fix suggestion`},
+
+  {id:'G3',title:'G3 — cardPool Override Chain Analysis (E7)',
+   desc:'Map all 12 window.cardPool overrides, confirm sessionPool wins, fix E7',
+   prompt:`You are a code auditor investigating competing function assignments.
+
+PROBLEM: window.cardPool is assigned 12 times in index.html. Last assignment at runtime wins.
+The intended active version is sessionPool() at ~L11908 (FSRS Phase 3).
+
+TASK 1 — Enumerate all 12 (search for: window.cardPool =):
+For each occurrence record:
+  - Line number
+  - What the function returns (1 sentence)
+  - Is it inside: DOMContentLoaded / setTimeout / conditional block?
+  - Execution order (top-level runs at parse time; DOMContentLoaded runs after)
+
+TASK 2 — Determine winner:
+  - Which assignment runs LAST at page load?
+  - Is it sessionPool (~L11908)? If not, which line blocks it?
+
+TASK 3 — Shadow Dungeon fix (E5):
+Current broken flow:
+  shadowStartFirst.onclick → startCard(queue[0])
+  → next card → nextCard() → cardPool() → full pinned set (ignores queue)
+
+Fix to implement:
+  In shadowStartFirst.onclick (or shadowStart.onclick):
+    window.__shadowRunQueue = [...queue];  // save the filtered queue
+  In the sessionPool or active cardPool logic:
+    if (window.__shadowRunQueue?.length > 0) {
+      const next = window.__shadowRunQueue.shift();
+      return [next];  // serve queued card
+    }
+
+TASK 4 — Confirm fix didn't break override order:
+After implementing, search window.cardPool = again, confirm sessionPool still wins.
+
+OUTPUT:
+Table of all 12 overrides: line | summary | execution phase | winner?
+Then: recommended fix for E5 with exact line numbers.`},
+
+  {id:'G4',title:'G4 — Pre-mortem Edge Case Sweep',
+   desc:'Stress-test E1+E2 fixes for edge cases before shipping',
+   prompt:`You are a QA engineer stress-testing two recent FSRS fixes.
+
+FIX E1: legacyToProgress() now preserves stability/difficulty/retrievability on reload.
+FIX E2: advance() wrapper at ~L11951 auto-rates 'good' with __cozyLastRatedId dedup guard.
+
+BROWSER TEST MATRIX — paste helper first:
+  window._snap = id => {
+    const p = window.phase3State?.progress?.[id];
+    return JSON.stringify({rating:p?.last_rating, stab:p?.stability?.toFixed(4), due:p?.next_due_at, seen:p?.seen_count}, null, 2);
+  };
+
+E1 EDGE CASES:
+  EC1a. New card (never rated): after reload, stability must be null (not 0)
+        Test: reload page, pick unrated card, check _snap(id) → stab:null ✓
+  EC1b. Stability=0 edge: stab must survive as 0, not become null
+        Test: manually set phase3State.progress[id].stability=0, save, reload, check → stab:'0.0000' ✓
+  EC1c. Export after reload includes stability/difficulty/retrievability
+        Test: reload → export progress JSON → grep for 'stability' in output ✓
+  EC1d. Double-reload preserves: rate card → reload → reload again → stab still set ✓
+
+E2 EDGE CASES:
+  EC2a. Again → keyboard advance: last_rating must be 'again' NOT 'good'
+  EC2b. Good click → button advance: no double-rate (__cozyLastRatedId check)
+  EC2c. spacedOn=false: advance() wrapper must NOT call rateCard()
+        Test: window.spacedOn=false temporarily; advance; check no FSRS writes
+  EC2d. Rapid double ArrowDown: seen_count must be 1 (not 2)
+  EC2e. Domain mode: same advance() wrapper fires (not just Solo)
+        Test: switch to domain mode, keyboard advance a card, check FSRS fields set
+
+REPORT: 9-row pass/fail table. For each fail: console output + line number + fix.
+Priority order: EC2a (Again-override) > EC1b (stability=0) > EC2c (spacedOn gate) > rest`},
+];
+
+// ── PRE-MORTEM DATA ──────────────────────────────────
+const PREMORTEM=[
+  {title:'E5 ships silently: Shadow Dungeon reviews random cards',sev:'critical',
+   body:'After card 1, nextCard() ignores the filtered queue and returns any pinned card. Users believe they\'re doing a targeted review but the algorithm is serving random pins. Testable: pin cards A, B, C → play all three → verify exact order. Fix: __shadowRunQueue must be set before startCard() and consumed in the active cardPool.'},
+  {title:'E6 ships: users with overdue cards never see them',sev:'critical',
+   body:'dueScore() gives new cards score=100 and overdue cards score=0. A deck with 37 overdue and 1249 new: all new cards appear first indefinitely. The spaced repetition promise is broken. Fix: overdue cards (next_due_at < now) must score highest. Testable: rate a card → advance system clock 3 days via: window.phase3State.progress[id].next_due_at = new Date(Date.now()-1e8).toISOString() → check it appears first.'},
+  {title:'E7 regresses: future edit shifts cardPool winner',sev:'high',
+   body:'Any new window.cardPool = line — including the E5 fix itself — can silently make a non-FSRS pool win. After implementing E5, run G3 audit again to confirm sessionPool still wins. Consider wrapping sessionPool assignment in a DOMContentLoaded guard to always run last.'},
+  {title:'W[15]=0.0000: Hard rating is invisible to FSRS',sev:'high',
+   body:'Hard penalty weight is 0. Hard gives the same stability delta as Good. Users flagging cards as Hard get no corrective benefit. Fix: FSRS_W[15] = 0.1629. Caution: the validation test at ~L11740 explicitly expects interval_days===10 after Hard (calibrated for the broken value). W[15] fix MUST update that assertion simultaneously or runFSRSValidation() drops to 16/17.'},
+  {title:'E1 re-regression: future legacyToProgress edit drops fields again',sev:'high',
+   body:'legacyToProgress() is called on every save→load cycle. One missed field in a future refactor silently nulls out stability for all users. Mitigation: add an assertion to runFSRSValidation() that rates a card, reloads, and confirms stability is not null. Make the regression immediately visible.'},
+  {title:'exportProgressMap allowlist diverges from rateCard output',sev:'medium',
+   body:'If rateCard() writes new fields (lapses, elapsed_days) in a future FSRS upgrade, exportProgressMap() won\'t include them without an explicit allowlist update. Import→re-schedule will diverge. Fix: write a round-trip test: export after rating, import into fresh state, confirm re-scheduling gives identical interval.'},
+  {title:'Atlas RAF leak: #atlas.hidden fails to stop loop',sev:'medium',
+   body:'RAF is guarded by #atlas.hidden check. If hideAtlasScreen() races with a DOM paint, RAF keeps running at 60fps on an invisible canvas. On low-end iOS this triggers thermal throttle within minutes. Mitigation: add boolean naRunning flag (not just DOM class check) and verify it flips cleanly in Atlas→Home transition.'},
+  {title:'PHASE1 SW cache not bumped after E5/E6 fix',sev:'medium',
+   body:'Every PHASE1 bug fix must bump CACHE in sw.js (currently v25). If E5/E6 land in cozy-arcade-app without bumping, returning users load the broken cached version silently. Make "bump sw.js CACHE" a mandatory checklist item in every cozy-arcade-app commit that touches index.html.'},
+];
+
+// ── RENDER CODEX ─────────────────────────────────────
+function renderCodex(){
+  const v=document.getElementById('codex-view');
+  v.innerHTML=CODEX.map((p,i)=>`
+    <div class="cc">
+      <button class="copy-btn" onclick="copyPrompt(${i},this)">Copy prompt</button>
+      <h2>${esc(p.title)}</h2>
+      <div class="cdesc">${esc(p.desc)}</div>
+      <pre>${esc(p.prompt)}</pre>
+    </div>`).join('');
+}
+
+function copyPrompt(i,btn){
+  navigator.clipboard.writeText(CODEX[i].prompt).then(()=>{
+    btn.textContent='Copied!';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='Copy prompt';btn.classList.remove('copied')},2000);
+  });
+}
+
+// ── RENDER PREMORTEM ─────────────────────────────────
+function renderPremortem(){
+  const v=document.getElementById('premortem-view');
+  v.innerHTML=`<div class="section-hdr">⚠ Pre-mortem Analysis</div>`+
+    PREMORTEM.map(p=>`
+    <div class="pm-item">
+      <h3>${esc(p.title)}<span class="sev ${p.sev}">${p.sev}</span></h3>
+      <p>${esc(p.body)}</p>
+    </div>`).join('');
+}
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+// ── TAB SWITCH ───────────────────────────────────────
+function switchTab(tab,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('graph-view').style.display=tab==='graph'?'flex':'none';
+  document.getElementById('info-panel').style.display=tab==='graph'?'flex':'none';
+  document.getElementById('codex-view').style.display=tab==='codex'?'block':'none';
+  document.getElementById('premortem-view').style.display=tab==='premortem'?'block':'none';
+}
+
+// ── INIT ─────────────────────────────────────────────
+renderGraph();
+renderCodex();
+renderPremortem();
+</script>
+</body>
+</html>
