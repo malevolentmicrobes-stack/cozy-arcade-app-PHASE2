@@ -270,6 +270,13 @@ window.hideAtlasScreen()
 - Rating-path diagnosis: `record()` could mark cards seen before deferred `rateCard()` fired; Continue also depended on reveal DOM state. Added `cozy-rating-path-rectifier-2026-06-03` in `index.html` to keep pending answer ratings and commit them through `rateCard()` on auto-select timeout or Continue/advance, while explicit Hard/Again/Good still win through `rate()`.
 - Validation after patch: FSRS 17/17, smoke 6/6, Phase 3 `cardPool` contains `sessionPool`, `nextCard` retains Shadow guard, E7B/E7C/E7D/A9 all green, focused rating probe passes auto-good, auto-again, Continue-good, explicit-hard, explicit-again.
 
+### 2026-06-04 Codex Validation — Main Flash + Runner Bias + Between-Game State
+
+- Confirmed main-page dropdown flash: `ensureScopeOptions352()` injected `Suspended / buried` into visible `browseScope351` around the delayed legacy-install window, then Phase 3 removed it. Patched it to avoid visible home selects and only maintain the hidden review manager select.
+- Confirmed runner is not auto-placing the correct answer. Real 1,000-card deck sample after importing `A.A.ABIM_DATABASE_v18_FIXED copy 2.json`: correct answer lanes were 213 / 271 / 265 / 251. The runner starts at lane 0 every card because `makeChoices()` resets `selected=0`; timer auto-selecting without user movement picks lane 0, not the known correct lane.
+- Confirmed answer-state writes work: auto-good, auto-again, Continue-good, explicit-Hard, explicit-Again all write FSRS fields through `rateCard()`.
+- Confirmed between-game state bug and fix: newly rated Hard cards wrote progress correctly but were excluded from Review Deck because `review_deck` filtered out future-due cards. Patched Review Deck/Hard filters so pinned, repair, hard, and again cards enter the review pool immediately while ordinary scheduled reviewed cards still obey due timing.
+
 ```javascript
 // Core suites
 window.runFSRSValidation()   // 17/17

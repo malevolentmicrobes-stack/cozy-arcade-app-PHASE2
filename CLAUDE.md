@@ -51,3 +51,10 @@ Codex applied today's data patch and rating-path rectifier:
 - E3b ghost-seen target cards are reset to new with zero seen/review counters and null rating/stability/due date, preserving pinned flags.
 - `index.html` now includes `cozy-rating-path-rectifier-2026-06-03`, which wraps only `selectSolo`, `advance`, and `rate`. It does not add `cardPool` or `nextCard` wrappers. It keeps a pending answer rating after selection, commits auto-selected answers through `rateCard()` after the auto fallback, commits Continue through `rateCard('good')`, and preserves explicit Hard/Again/Good choices.
 - Focused CDP validation passed: auto-correct -> good/review/3d, auto-wrong -> again/relearning/10m, Continue -> good/review/3d, Hard -> hard/review/1d, Again -> again/relearning/10m.
+
+## Claude Handoff Addendum — 2026-06-04 Validation
+
+Codex validated the user's reported main-page flash and runner concern:
+- Main-page flash was real. Cause: legacy `ensureScopeOptions352()` temporarily inserted `Suspended / buried` into visible `browseScope351` during delayed install; Phase 3 later removed it. Fix keeps that legacy option maintenance away from visible home selects.
+- Runner is not automatically selecting the correct answer. Real-deck sample of 1,000 cards had correct answer lanes 213 / 271 / 265 / 251. The only deterministic behavior is `selected=0` on each new card, so timer auto-select without user movement chooses lane 0.
+- Progress between games was partly failing for Hard: `rateCard('hard')` wrote FSRS correctly, but `review_deck` excluded future-due hard cards. Fix makes pinned/repair/hard/again candidates appear in Review Deck immediately while normal due scheduling remains intact.

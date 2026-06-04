@@ -7802,7 +7802,12 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       ['review','Review deck: pinned / missed / hard'],
       ['all','All cards']
     ];
-    ['browseScope351','homeScope175155','reviewScope17526'].forEach(id => {
+    ['browseScope351','homeScope175155'].forEach(id => {
+      const sel = $(id);
+      const buried = sel && sel.querySelector('option[value="buried"]');
+      if(buried) buried.remove();
+    });
+    ['reviewScope17526'].forEach(id => {
       const sel = $(id);
       if(!sel) return;
       optionSpecs.forEach(([value,label]) => {
@@ -11054,9 +11059,13 @@ function fixStableOneThingDropdown351() {
 	    return !p.buried && !p.suspended && !isReviewedCard(card);
 	  }
 
-  function isReviewCandidate(card) {
-    const p = progressForCard(card);
-    return !!(p.pinned || p.repair_point || p.buried || p.suspended || p.rating === 'again' || p.rating === 'hard' || p.last_rating === 'again' || p.last_rating === 'hard' || p.wrong || p.missed || p.flagged || p.lastCorrect === false);
+	  function isReviewCandidate(card) {
+	    const p = progressForCard(card);
+	    return !!(p.pinned || p.repair_point || p.buried || p.suspended || p.rating === 'again' || p.rating === 'hard' || p.last_rating === 'again' || p.last_rating === 'hard' || p.wrong || p.missed || p.flagged || p.lastCorrect === false);
+	  }
+
+  function isImmediateReviewCandidate(progress) {
+    return !!(progress && (progress.pinned || progress.repair_point || progress.rating === 'again' || progress.rating === 'hard' || progress.last_rating === 'again' || progress.last_rating === 'hard' || progress.wrong || progress.missed || progress.flagged || progress.lastCorrect === false));
   }
 
   function hasFutureDue(progress) {
@@ -11412,7 +11421,7 @@ function fixStableOneThingDropdown351() {
 	    } else if (selected === 'review_deck') {
 	      arr = applyStudyFiltersPhase3(normalizeDeckIdentities()).filter(c => !progressForCard(c).suspended).filter(c => {
 	        const p = progressForCard(c);
-	        return isReviewCandidate(c) && (!hasFutureDue(p) || isDue(p));
+	        return isReviewCandidate(c) && (isImmediateReviewCandidate(p) || !hasFutureDue(p) || isDue(p));
 	      }).sort((a, b) => {
 	        const pa = progress(a), pb = progress(b);
 	        const score = p => (p.pinned ? 0 : p.repair_point ? 1 : 2);
@@ -11425,7 +11434,7 @@ function fixStableOneThingDropdown351() {
 	    } else if (selected === 'hard') {
 	      arr = arr.filter(c => {
 	        const p = progress(c);
-	        return (p.repair_point || p.last_rating === 'hard' || p.last_rating === 'again' || p.rating === 'hard' || p.rating === 'again') && !hasFutureDue(p);
+	        return (p.repair_point || p.last_rating === 'hard' || p.last_rating === 'again' || p.rating === 'hard' || p.rating === 'again');
 	      });
     } else if (selected === 'tagged') {
       const tag = selectedTagPhase3();
@@ -11468,7 +11477,7 @@ function fixStableOneThingDropdown351() {
       if (selected === 'review_deck') {
         return applyStudyFiltersPhase3(normalizeDeckIdentities()).filter(c => !progressForCard(c).suspended).filter(c => {
           const p = progressForCard(c);
-          return isReviewCandidate(c) && (!hasFutureDue(p) || isDue(p));
+	          return isReviewCandidate(c) && (isImmediateReviewCandidate(p) || !hasFutureDue(p) || isDue(p));
         });
       }
     }
