@@ -914,7 +914,11 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
 (function(){
 	  const q=id=>document.getElementById(id);
 	  const cleanText=v=>String(v||'').replace(/\s+/g,' ').trim();
-	  const keyOf=c=>c && (c.id || c.qid || c.original_qid);
+	  const keyOf=c=>{
+	    if(!c) return '';
+	    try{ if(typeof window.canonicalCardId==='function') return window.canonicalCardId(c); }catch(e){}
+	    return c.card_id || c.qid_unique || c.id || c.qid || c.original_qid || c.json_id || c.legacy_id || '';
+	  };
 	  function parseJsonLoose175152(text){
 	    try{return JSON.parse(text);}
 	    catch(err){
@@ -926,7 +930,13 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
     const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'});
     const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();URL.revokeObjectURL(a.href);
   }
-  function currentState(){ try{return state||{}}catch(e){return {}} }
+  function currentState(){
+    try{
+      const p3=window.phase3State&&window.phase3State.progress;
+      const legacy=state||{};
+      return p3&&Object.keys(p3).length?Object.assign({},legacy,p3):legacy;
+    }catch(e){return {}}
+  }
   function getCards(){ try{return cards||[]}catch(e){return []} }
   function cardText(c){return cleanText([c.diagnosis,c.system,c.sys,(c.tags||[]).join(' '),c.quick_recall,c.educational_objective,c.presentation,c.board_trigger].join(' ')).toLowerCase();}
   function systems(){return [...new Set(getCards().map(c=>cleanText(c.system||c.sys)).filter(Boolean))].sort();}
@@ -4279,7 +4289,17 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   const q=id=>document.getElementById(id);
   const now=()=>Date.now();
   const clean=v=>String(v||'').replace(/\s+/g,' ').trim();
-  function stateForCard(c){try{return (state||{})[c.id||c.qid]||{};}catch(e){return {};}}
+  function stateForCard(c){
+    try{
+      const keys=[c&&c.card_id,c&&c.qid_unique,c&&c.id,c&&c.qid,c&&c.original_qid,c&&c.json_id,c&&c.legacy_id]
+        .map(v=>String(v||'').trim()).filter(Boolean);
+      try{ if(typeof window.canonicalCardId==='function') keys.unshift(window.canonicalCardId(c)); }catch(_){}
+      const p3=window.phase3State&&window.phase3State.progress;
+      if(p3){ for(const k of keys){ if(p3[k]) return p3[k]; } }
+      for(const k of keys){ if((state||{})[k]) return (state||{})[k]; }
+    }catch(e){}
+    return {};
+  }
   function cardPrompt(c){
     try{ if(typeof getPrompt==='function') return getPrompt(c); }catch(e){}
     return c.presentation||c.clinical_vignette_summary||c.quick_recall||c.board_trigger||c.educational_objective||'';
@@ -4422,7 +4442,17 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   }
 
   // --- 2) New Cards means truly not seen and not rated; never silently falls back ---
-  function stateForCard(c){try{return (state||{})[c.id||c.qid]||{};}catch(e){return {};}}
+  function stateForCard(c){
+    try{
+      const keys=[c&&c.card_id,c&&c.qid_unique,c&&c.id,c&&c.qid,c&&c.original_qid,c&&c.json_id,c&&c.legacy_id]
+        .map(v=>String(v||'').trim()).filter(Boolean);
+      try{ if(typeof window.canonicalCardId==='function') keys.unshift(window.canonicalCardId(c)); }catch(_){}
+      const p3=window.phase3State&&window.phase3State.progress;
+      if(p3){ for(const k of keys){ if(p3[k]) return p3[k]; } }
+      for(const k of keys){ if((state||{})[k]) return (state||{})[k]; }
+    }catch(e){}
+    return {};
+  }
   function promptFor(c){try{return typeof getPrompt==='function'?getPrompt(c):(c.presentation||c.clinical_vignette_summary||c.quick_recall||c.board_trigger||c.educational_objective);}catch(e){return c.presentation||c.quick_recall||'';}}
   function tagsOf(c){let t=c.tags||[]; if(typeof t==='string') t=t.split(/[|,;]/); return t.map(cleanTxt).filter(Boolean);}
   function ensureNewCardsDropdown(){
@@ -14255,7 +14285,13 @@ if(typeof priorSelect==='function' && !priorSelect.__cozyRatingPath20260603){
     var rating=!revealOpen && card ? ratingForSelection(card,i) : null;
     var out=priorSelect.apply(this,arguments);
     try{
-      if(rating && typeof spacedOn!=='undefined' && spacedOn!==false) pendingFor(card,rating);
+      if(rating && typeof spacedOn!=='undefined' && spacedOn!==false){
+        if(!rateOnce(card,rating)) pendingFor(card,rating);
+        else {
+          clearTimeout(window.__cozyAutoRateHandle20260603);
+          window.__cozyPendingRating20260603=null;
+        }
+      }
     }catch(_){}
     return out;
   };
@@ -14299,6 +14335,8 @@ setTimeout(installRatingPathHooks20260603,700);
 setTimeout(installRatingPathHooks20260603,1600);
 setTimeout(installRatingPathHooks20260603,3200);
 setTimeout(installRatingPathHooks20260603,5200);
+setTimeout(installRatingPathHooks20260603,8000);
+setTimeout(installRatingPathHooks20260603,13000);
 })();
 </script>
 <script>if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));</script>

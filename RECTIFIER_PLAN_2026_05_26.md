@@ -338,3 +338,5 @@ If bionic appears broken:
 *Reference file:* `/Users/rebekahbetar/Documents/Codex/2026-05-16/cozy-arcade/index.html` (do not overwrite; CSS/logic comparison only)
 *Active gate tracking:* `GOAL.md`
 *Feature goals:* `ULTIMATE_GOALS.md`
+
+2026-06-06: Shadow Dungeon legacy review now reads canonical `phase3State.progress` records when listing imported pinned/No Idea cards; solo selection rating path now immediately calls `rateCard` for user and timer selections with 8s/13s hook reinstalls as backup; repaired backup export written to the external progress examples folder.
