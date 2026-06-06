@@ -277,6 +277,12 @@ window.hideAtlasScreen()
 - Confirmed answer-state writes work: auto-good, auto-again, Continue-good, explicit-Hard, explicit-Again all write FSRS fields through `rateCard()`.
 - Confirmed between-game state bug and fix: newly rated Hard cards wrote progress correctly but were excluded from Review Deck because `review_deck` filtered out future-due cards. Patched Review Deck/Hard filters so pinned, repair, hard, and again cards enter the review pool immediately while ordinary scheduled reviewed cards still obey due timing.
 
+### 2026-06-06 Codex Validation — Review Deck Scope + One Thing Persistence
+
+- Probe D flagged historical `last_rating` leakage: future-due cards with current `rating:'good'` but old `last_rating:'hard'` still passed review predicates. Patched legacy and Phase 3 review/hard filters to use current rating/repair flags only, and kept the visible General Study Mode select aligned with persisted Phase 3 scope.
+- Added `user_one_thing` to Phase 3 progress migration/export so Atlas inline edits round-trip through save/import/export.
+- Service worker cache bumped to `cozy-arcade-PHASE2-v2`.
+
 ```javascript
 // Core suites
 window.runFSRSValidation()   // 17/17

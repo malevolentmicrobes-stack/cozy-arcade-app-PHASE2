@@ -6019,7 +6019,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 	  }
 	  function reviewedFor(c){const s=stateFor(c); return !!(s.seen||s.reviewed===true||Number(s.seen_count||0)>0||Number(s.reviewed||0)>0||Number(s.reviewed_count||0)>0||s.rating||s.last_rating||s.stage==='review'||s.stage==='learning'||s.stage==='relearning');}
 	  function newFor(c){const s=stateFor(c); return !s.buried&&!s.suspended&&!reviewedFor(c);}
-	  function reviewFor(c){const s=stateFor(c); return !!(s.pinned||s.repair_point||s.buried||s.suspended||s.rating==='again'||s.rating==='hard'||s.last_rating==='again'||s.last_rating==='hard'||s.wrong||s.missed||s.flagged||s.lastCorrect===false);}
+	  function reviewFor(c){const s=stateFor(c); return !!(s.pinned||s.repair_point||s.rating==='again'||s.rating==='hard'||s.wrong||s.missed||s.flagged||s.lastCorrect===false);}
   function tagsOf(c){
     const raw=c&&c.tags;
     if(Array.isArray(raw)) return raw.map(clean).filter(Boolean);
@@ -6090,7 +6090,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 	      if(scope==='random') arr=shuffle350(arr);
 	      if(scope==='random-new') arr=shuffle350(arr.filter(newFor));
 	      if(scope==='review'||scope==='wrong') arr=arr.filter(reviewFor);
-	      if(scope==='hard') arr=arr.filter(c=>stateFor(c).rating==='hard'||stateFor(c).last_rating==='hard'||stateFor(c).rating==='again'||stateFor(c).last_rating==='again'||stateFor(c).repair_point);
+	      if(scope==='hard') arr=arr.filter(c=>stateFor(c).rating==='hard'||stateFor(c).rating==='again'||stateFor(c).repair_point);
       if(scope==='pinned') arr=arr.filter(c=>stateFor(c).pinned);
       if(scope==='due') arr=[...arr].sort((a,b)=>dueScore350(b)-dueScore350(a));
       if(scope==='tagged'){
@@ -9981,7 +9981,7 @@ function fixOneThingEditorOverflow351() {
 	  };
 	  const isReviewCandidateHot = card => {
 	    const st = stateForCard(card);
-	    return !!(st.pinned || st.repair_point || st.buried || st.suspended || st.rating === 'again' || st.rating === 'hard' || st.last_rating === 'again' || st.last_rating === 'hard' || st.wrong || st.missed || st.flagged || st.lastCorrect === false);
+	    return !!(st.pinned || st.repair_point || st.rating === 'again' || st.rating === 'hard' || st.wrong || st.missed || st.flagged || st.lastCorrect === false);
 	  };
   const dueScoreHot = card => {
     const p = (typeof getProgress === 'function') ? getProgress(canonicalCardId(card)) : stateForCard(card);
@@ -10059,7 +10059,7 @@ function fixOneThingEditorOverflow351() {
     else if (scope === 'random-new') arr = shuffleStable(arr.filter(card => !isSeen(card)));
     else if (scope === 'random') arr = shuffleStable(arr);
     else if (scope === 'pinned') arr = arr.filter(card => !!stateForCard(card).pinned);
-	    else if (scope === 'hard') arr = arr.filter(card => stateForCard(card).rating === 'hard' || stateForCard(card).last_rating === 'hard');
+	    else if (scope === 'hard') arr = arr.filter(card => stateForCard(card).rating === 'hard');
 	    else if (scope === 'review' || scope === 'wrong') {
 	      arr = arr.filter(isReviewCandidateHot);
     } else if (scope === 'due') {
@@ -10815,6 +10815,7 @@ function fixStableOneThingDropdown351() {
     const correct = Number(legacy?.correct || legacy?.correct_count || 0) || 0;
     const wrong = Number(legacy?.wrong_count || legacy?.wrong || legacy?.incorrect || 0) || 0;
     const rating = clean(legacy?.last_rating || legacy?.rating) || null;
+    const userOneThing = legacy?.user_one_thing ?? legacy?.userOneThing ?? null;
     const seenCount = Math.max(Number(legacy?.seen_count || 0) || 0, legacy?.seen ? 1 : 0, reviewed ? 1 : 0);
     const lastSeen = legacy?.last_seen_at || legacy?.last || legacy?.last_rating_at || null;
     const repair = !!(legacy?.repair_point || legacy?.wrong || legacy?.missed || rating === 'again' || rating === 'hard');
@@ -10837,6 +10838,7 @@ function fixStableOneThingDropdown351() {
       difficulty: legacy?.difficulty != null ? Number(legacy.difficulty) : null,
       retrievability: legacy?.retrievability != null ? Number(legacy.retrievability) : null,
       lapses: Number(legacy?.lapses || 0) || 0,
+      user_one_thing: userOneThing,
       created_at: legacy?.created_at || lastSeen || base.created_at,
       updated_at: legacy?.updated_at || lastSeen || base.updated_at
     });
@@ -10924,7 +10926,7 @@ function fixStableOneThingDropdown351() {
     appCards().forEach(c => { const id = canonicalCardId(c); if (c.one_thing) cardOneThingMap[id] = c.one_thing; });
     Object.keys(deduped || {}).forEach(cardId => {
       const p = syncProgressAliases(Object.assign(defaultProgress(cardId), deduped[cardId] || {}, { card_id: cardId }));
-      const oneThingVal = p.one_thing || cardOneThingMap[cardId];
+      const oneThingVal = p.user_one_thing ?? p.one_thing ?? cardOneThingMap[cardId];
       if (oneThingVal) p.one_thing = oneThingVal;
       phase3State.progress[cardId] = p;
       const entry = {
@@ -10950,6 +10952,7 @@ function fixStableOneThingDropdown351() {
         created_at: p.created_at || nowIso(),
         updated_at: p.updated_at || nowIso()
       };
+      if (p.user_one_thing != null) entry.user_one_thing = p.user_one_thing;
       if (oneThingVal) entry.one_thing = oneThingVal;
       out[cardId] = entry;
     });
@@ -11028,7 +11031,7 @@ function fixStableOneThingDropdown351() {
     progress.seen = Number(progress.seen_count || 0) > 0;
     progress.reviewed = Number(progress.reviewed_count || 0);
     progress.correct = Number(progress.correct_count || 0);
-    progress.rating = progress.last_rating || progress.rating || null;
+    progress.rating = progress.rating || progress.last_rating || null;
     progress.last = progress.last_seen_at || progress.last || null;
     return progress;
   }
@@ -11061,11 +11064,11 @@ function fixStableOneThingDropdown351() {
 
 	  function isReviewCandidate(card) {
 	    const p = progressForCard(card);
-	    return !!(p.pinned || p.repair_point || p.buried || p.suspended || p.rating === 'again' || p.rating === 'hard' || p.last_rating === 'again' || p.last_rating === 'hard' || p.wrong || p.missed || p.flagged || p.lastCorrect === false);
+	    return !!(p.pinned || p.repair_point || p.rating === 'again' || p.rating === 'hard' || p.wrong || p.missed || p.flagged || p.lastCorrect === false);
 	  }
 
   function isImmediateReviewCandidate(progress) {
-    return !!(progress && (progress.pinned || progress.repair_point || progress.rating === 'again' || progress.rating === 'hard' || progress.last_rating === 'again' || progress.last_rating === 'hard' || progress.wrong || progress.missed || progress.flagged || progress.lastCorrect === false));
+    return !!(progress && (progress.pinned || progress.repair_point || progress.rating === 'again' || progress.rating === 'hard' || progress.wrong || progress.missed || progress.flagged || progress.lastCorrect === false));
   }
 
   function hasFutureDue(progress) {
@@ -11335,7 +11338,8 @@ function fixStableOneThingDropdown351() {
     const browseValue = q('browseScope351')?.value || '';
     const existing = rawMode || browseValue || document.documentElement.dataset.cozyLaunchScope || phase3State.settings.solo_order || 'all';
     const scope = legacyScopeToken(existing);
-    document.documentElement.dataset.cozyLaunchScope = scope;
+    if (scope === 'all' || scope === 'random') delete document.documentElement.dataset.cozyLaunchScope;
+    else document.documentElement.dataset.cozyLaunchScope = scope;
     window.homeFilters = window.homeFilters || { scope: 'all', system: 'all', tag: 'all' };
     window.homeFilters.scope = scope;
     try { if (typeof deckMode !== 'undefined') deckMode = scope === 'random-new' ? 'random' : scope; } catch (_) {}
@@ -11434,7 +11438,7 @@ function fixStableOneThingDropdown351() {
 	    } else if (selected === 'hard') {
 	      arr = arr.filter(c => {
 	        const p = progress(c);
-	        return (p.repair_point || p.last_rating === 'hard' || p.last_rating === 'again' || p.rating === 'hard' || p.rating === 'again');
+	        return (p.repair_point || p.rating === 'hard' || p.rating === 'again');
 	      });
     } else if (selected === 'tagged') {
       const tag = selectedTagPhase3();
@@ -11784,7 +11788,7 @@ function fixStableOneThingDropdown351() {
   function wireUi() {
     const browse = q('browseScope351');
     if (browse) {
-      const selected = legacyScopeToken(browse.value || phase3State.settings.solo_order);
+      const selected = legacyScopeToken(document.documentElement.dataset.cozyLaunchScope || phase3State.settings.solo_order || window.homeFilters?.scope || browse.value);
       browse.dataset.phase3Options = '1';
       if (browse.innerHTML !== optionHtml(selected)) browse.innerHTML = optionHtml(selected);
       const label = browse.closest('div')?.querySelector('label');

@@ -1,16 +1,16 @@
-# Graph Report - cozy-arcade-app-PHASE2  (2026-06-03)
+# Graph Report - cozy-arcade-app-PHASE2  (2026-06-06)
 
 ## Corpus Check
-- 37 files · ~1,306,857 words
+- 37 files · ~1,307,498 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2141 nodes · 2157 edges · 133 communities (128 shown, 5 thin omitted)
+- 2144 nodes · 2162 edges · 130 communities (125 shown, 5 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `6abdd8ef`
+- Built from commit: `a2e9e02f`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -121,7 +121,6 @@
 - [[_COMMUNITY_Community 104|Community 104]]
 - [[_COMMUNITY_Community 105|Community 105]]
 - [[_COMMUNITY_Community 106|Community 106]]
-- [[_COMMUNITY_Community 107|Community 107]]
 - [[_COMMUNITY_Community 108|Community 108]]
 - [[_COMMUNITY_Community 109|Community 109]]
 - [[_COMMUNITY_Community 110|Community 110]]
@@ -129,11 +128,9 @@
 - [[_COMMUNITY_Community 112|Community 112]]
 - [[_COMMUNITY_Community 113|Community 113]]
 - [[_COMMUNITY_Community 114|Community 114]]
-- [[_COMMUNITY_Community 115|Community 115]]
 - [[_COMMUNITY_Community 116|Community 116]]
 - [[_COMMUNITY_Community 117|Community 117]]
 - [[_COMMUNITY_Community 118|Community 118]]
-- [[_COMMUNITY_Community 119|Community 119]]
 - [[_COMMUNITY_Community 120|Community 120]]
 - [[_COMMUNITY_Community 121|Community 121]]
 - [[_COMMUNITY_Community 122|Community 122]]
@@ -163,7 +160,7 @@
 ## Surprising Connections (you probably didn't know these)
 - None detected - all connections are within the same source files.
 
-## Communities (133 total, 5 thin omitted)
+## Communities (130 total, 5 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.04
@@ -342,8 +339,8 @@ Cohesion: 0.67
 Nodes (3): code:javascript ((async function runSRSValidation() {), code:block18 (✅ SRS VALIDATION: 27 passed, 0 failed), PART 7 — MASTER SMOKE TEST (Run All)
 
 ### Community 50 - "Community 50"
-Cohesion: 0.50
-Nodes (3): Claude Handoff — 2026-06-03 Runtime Glitch Diagnosis, Claude Handoff Addendum — 2026-06-03 Data + Rating Paths, graphify
+Cohesion: 0.40
+Nodes (4): Claude Handoff — 2026-06-03 Runtime Glitch Diagnosis, Claude Handoff Addendum — 2026-06-03 Data + Rating Paths, Claude Handoff Addendum — 2026-06-04 Validation, graphify
 
 ### Community 51 - "Community 51"
 Cohesion: 0.22
@@ -422,8 +419,8 @@ Cohesion: 0.08
 Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
 
 ### Community 70 - "Community 70"
-Cohesion: 0.08
-Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
+Cohesion: 0.04
+Nodes (44): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+36 more)
 
 ### Community 71 - "Community 71"
 Cohesion: 0.08
@@ -495,7 +492,7 @@ Nodes (15): Active Constraints (never violate), Architecture Notes (Current), Co
 
 ### Community 88 - "Community 88"
 Cohesion: 0.06
-Nodes (45): 10-Step Fix Plan (Remaining), 10-Step Fix Plan (Status), 2026-06-03 Codex Update — E3/E4/E3b Data Patch + Rating-Path Rectifier, A9 Atlas Review Tag Result — 2026-06-03, A — Bionic Toggle Never Hydrated (FIXED `45a26b6`), B — Bionic Visual Effect Invisible (FIXED `v175374`), B — Bionic Visual Effect Invisible (FIXED `v175374-...` style), C — Font Size / Timer Overlap (FIXED `bc333a9`) (+37 more)
+Nodes (47): 10-Step Fix Plan (Remaining), 10-Step Fix Plan (Status), 2026-06-03 Codex Update — E3/E4/E3b Data Patch + Rating-Path Rectifier, 2026-06-04 Codex Validation — Main Flash + Runner Bias + Between-Game State, 2026-06-06 Codex Validation — Review Deck Scope + One Thing Persistence, A9 Atlas Review Tag Result — 2026-06-03, A — Bionic Toggle Never Hydrated (FIXED `45a26b6`), B — Bionic Visual Effect Invisible (FIXED `v175374`) (+39 more)
 
 ### Community 89 - "Community 89"
 Cohesion: 0.12
@@ -530,8 +527,8 @@ Cohesion: 0.14
 Nodes (13): Bionic Reading CSS (confirmed working), code:block1 (┌─────────────────────────────────────────────────────┐ ← to), code:block2 (┌─────────────────────────────────────────────────────┐), code:block3 (┌──────────────────────┐), code:block4 (┌─────────────────────────────────────────────────────┐), Domain / Knowledge Expansion Mode (`#domain`), Global Chrome, Home Screen (`#home`) (+5 more)
 
 ### Community 97 - "Community 97"
-Cohesion: 0.18
-Nodes (10): Claude Code Terminal Session, code:js (// Paste into browser console after loading the app with the), code:block14 (□ window.runFSRSValidation()     → ✅ 17/17 passed), COZY ARCADE — MASTER FIX PROMPT, Generated: 2026-05-30 | Based on: index.html + 3 progress exports, IRON RULES (violating any = reject entire change), PHASE 6 — DATA REPAIR: Fix SM2-era cards and ghosts, PHASE 7 — VERIFICATION CHECKLIST (+2 more)
+Cohesion: 0.14
+Nodes (13): Claude Code Terminal Session, code:js (// Paste into browser console after loading the app with the), code:block14 (□ window.runFSRSValidation()     → ✅ 17/17 passed), code:block15 (Rating  stability  difficulty  interval  stage), code:block16 (S: 3.1262 → 6.9371   D: 5.3146 → 5.195   interval: 7d), COZY ARCADE — MASTER FIX PROMPT, Generated: 2026-05-30 | Based on: index.html + 3 progress exports, IRON RULES (violating any = reject entire change) (+5 more)
 
 ### Community 98 - "Community 98"
 Cohesion: 0.20
@@ -569,10 +566,6 @@ Nodes (7): code:bash (LOCAL_PATH=$(graphify clone <github-url> [--branch <branch
 Cohesion: 0.29
 Nodes (7): code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash (if [ ! -f graphify-out/.graphify_extract.json ]; then), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c "), For --update (incremental re-extraction)
 
-### Community 107 - "Community 107"
-Cohesion: 0.14
-Nodes (14): buried, card_id, correct_count, last_rating, last_seen_at, next_due_at, pinned, repair_point (+6 more)
-
 ### Community 108 - "Community 108"
 Cohesion: 0.29
 Nodes (7): code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash (if [ ! -f graphify-out/.graphify_extract.json ]; then), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c "), For --update (incremental re-extraction)
@@ -601,10 +594,6 @@ Nodes (6): 1. Smoke test (console), code:js (window.runCozySmokeTests()   // mus
 Cohesion: 0.29
 Nodes (6): metadata, deck_fingerprint, exported_at, schema_version, type, progress
 
-### Community 115 - "Community 115"
-Cohesion: 0.29
-Nodes (6): metadata, deck_fingerprint, exported_at, schema_version, type, progress
-
 ### Community 116 - "Community 116"
 Cohesion: 0.67
 Nodes (3): code:bash (graphify query "QUESTION"), code:bash ($(cat graphify-out/.graphify_python) -m graphify save-result), For /graphify query
@@ -616,10 +605,6 @@ Nodes (13): code:bash ($(cat graphify-out/.graphify_python) -c "), code:block11 
 ### Community 118 - "Community 118"
 Cohesion: 0.67
 Nodes (4): For native CLAUDE.md integration, code:bash (graphify claude install), code:bash (graphify claude uninstall  # remove the section), For native CLAUDE.md integration
-
-### Community 119 - "Community 119"
-Cohesion: 0.67
-Nodes (3): code:block15 (Rating  stability  difficulty  interval  stage), code:block16 (S: 3.1262 → 6.9371   D: 5.3146 → 5.195   interval: 7d), REFERENCE: FSRS v5 First-Review Expected Values
 
 ### Community 120 - "Community 120"
 Cohesion: 0.67
@@ -674,7 +659,7 @@ Cohesion: 0.67
 Nodes (3): code:bash (python3 -m graphify.serve graphify-out/graph.json), code:json ({), Step 7d - MCP server (only if --mcp flag)
 
 ## Knowledge Gaps
-- **1661 isolated node(s):** `schema`, `version`, `description`, `total`, `required_fields` (+1656 more)
+- **1662 isolated node(s):** `schema`, `version`, `description`, `total`, `required_fields` (+1657 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **5 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -683,12 +668,12 @@ _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `progress` connect `Community 114` to `Community 16`, `Community 17`, `Community 18`, `Community 19`, `Community 20`, `Community 21`, `Community 22`, `Community 23`, `Community 24`, `Community 25`, `Community 26`, `Community 27`, `Community 28`, `Community 29`, `Community 30`, `Community 31`, `Community 32`, `Community 33`, `Community 34`, `Community 35`, `Community 95`?**
   _High betweenness centrality (0.060) - this node is a cross-community bridge._
-- **Why does `progress` connect `Community 115` to `Community 54`, `Community 55`, `Community 56`, `Community 57`, `Community 58`, `Community 59`, `Community 60`, `Community 61`, `Community 62`, `Community 63`, `Community 64`, `Community 65`, `Community 66`, `Community 67`, `Community 68`, `Community 69`, `Community 70`, `Community 71`, `Community 72`, `Community 73`, `Community 107`?**
+- **Why does `progress` connect `Community 70` to `Community 54`, `Community 55`, `Community 56`, `Community 57`, `Community 58`, `Community 59`, `Community 60`, `Community 61`, `Community 62`, `Community 63`, `Community 64`, `Community 65`, `Community 66`, `Community 67`, `Community 68`, `Community 69`, `Community 71`, `Community 72`, `Community 73`?**
   _High betweenness centrality (0.058) - this node is a cross-community bridge._
 - **Why does `1 - 7713` connect `Community 18` to `Community 114`?**
   _High betweenness centrality (0.012) - this node is a cross-community bridge._
 - **What connects `schema`, `version`, `description` to the rest of the system?**
-  _1661 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1662 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.0425531914893617 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
