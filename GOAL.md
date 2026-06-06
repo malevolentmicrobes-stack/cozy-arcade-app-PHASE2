@@ -1,16 +1,22 @@
 # Project Goal Tracker
-*Updated 2026-06-03 — Full overnight rectifier complete: E7D/E7B/E7C/E7E/P7/A9 all fixed + validated in both repos*
+*Updated 2026-06-06 — SCOPE/SD/DATA/A10/A11 closed; PHASE2 SW v3; P8 CSP hardening is the active deployment milestone*
 
 ---
 
 ## Active Goal
 
-**Goal:** All overnight rectifiers complete (E7D/E7B/E7C/E7E/P7/A9) → next: data patches (E3/E4/ghost-seen), rating-path audit, A10/A11 Atlas features
-**Phase:** E5/E6/E7/E7B/E7C/P7/A9 browser validation complete; remaining symptom work is scoped below
+**Goal:** P8 deployment hardening: CSP/security headers through `vercel.json`; next milestones are M2 Stripe gate and iOS1 Capacitor scaffold.
+**Phase:** E5/E6/E7/E7B/E7C/E7G/P7/A9/SCOPE/SD/DATA/A10/A11 validation complete; P8 in progress.
 **Reference:** `RECTIFIER_PLAN_2026_05_26.md`, `ULTIMATE_GOALS.md`
-**Status:** E5, E6, E7 fixed 2026-06-03. Cache-busted headless browser validation passed: `String(window.cardPool)` references Phase 3 `sessionPool`, not `scopedCardPool352`; `String(window.nextCard)` includes the Shadow Dungeon guard; `runFSRSValidation()` returns 17/17; `runCozySmokeTests()` returns 6/6.
+**Status:** PHASE2 commit `6cce78e` fixed Shadow Dungeon progress sharing, data repair export, and ghost prevention; PHASE2 `sw.js` cache is `cozy-arcade-PHASE2-v3`. Cache-busted headless validation passed: `String(window.cardPool)` references Phase 3 `sessionPool`; `String(window.nextCard)` includes the Shadow Dungeon guard; `runFSRSValidation()` returns 17/17; `runCozySmokeTests()` returns 6/6.
 
-### Current Project State — 2026-06-03
+### Current Project State — 2026-06-06
+- SCOPE is fixed 2026-06-06: historical `last_rating` no longer drives review predicates, `rating` wins in `syncProgressAliases()`, `dataset.cozyLaunchScope` clears on all/random, and `user_one_thing` persists through progress import/export.
+- SD is fixed 2026-06-06: Shadow Dungeon `currentState()` and legacy `stateForCard()` readers prefer canonical `phase3State.progress`; imported backup validation saw flagged 102, pinned 97, missed 18; `cardPool`/`nextCard` ownership remained Phase 3.
+- DATA is repaired 2026-06-06: 42 `stability:null` review records were replayed through `rateCard()`, 10 ghost-seen records were reset to new-stage defaults, and repair export was written as `cozy_arcade_progress_2026-06-06_codex_stability_ghost_repair.json`.
+- Ghost prevention is fixed 2026-06-06: solo user/timer selection calls `rateCard()` immediately, and the rating hook reinstalls at 8s and 13s. Timer auto-select validation produced `last_rating:'good'` with non-null stability/difficulty.
+- A10/A11 are fixed: Atlas card detail pin/bury toggles update `phase3State.progress`, and inline `one_thing` edits persist via `user_one_thing`.
+- P8 is the active milestone: add Vercel CSP/security headers while preserving the single-file inline-script app requirements.
 - In-app Browser direct inspection of the current `file://.../index.html` tab was blocked by Browser URL policy, so validation used local HTTP + headless Chrome/CDP against the same `index.html`.
 - E7 runtime authority is now validated after cache-busted reload and start-click: Phase 3 owns `cardPool`/`nextCard`. Also guarded legacy `patchStudyOptions()` so it can refresh home labels without replacing Phase 3 `cardPool`.
 - E7B scope consistency is fixed 2026-06-03: `syncGeneralStudyScopePhase3()` atomically updates `dataset.cozyLaunchScope`, `phase3State.settings.solo_order`, `deckMode`, and `homeFilters.scope`; mode-change console smoke logs `sessionPool()` non-empty status. Seeded headless validation: Random 3/3, Due 1 due card, Pinned 1 pinned card; FSRS 17/17; smoke 6/6; Phase 3 still owns `cardPool`.
@@ -19,7 +25,7 @@
 - A9 Atlas Review Tag is fixed 2026-06-03: Atlas card detail appends one `#na-review-tag-btn`; click closes Atlas through `hideAtlasScreen()`, syncs Phase 3 scope/tag/system filters, and launches Solo. Phase 3 `getStudyPool()` now applies selected tag/system filters directly and includes them in `poolKey`; no new `cardPool`/`nextCard` wrapper was added. Headless validation: button count 1, `▶ Review Tag: A9Tag`, Atlas hidden after click, Solo visible, pool IDs `a9-tag-1/a9-tag-2` only, `String(window.cardPool)` references `sessionPool`, FSRS 17/17, smoke 6/6.
 - User-visible glitch cluster originally included General Study Mode mismatch, duplicate pause/settings-style controls, solo runner/selected-lane bias, and card/progress translation drift. E7B resolves the General Study Mode scope mismatch; E7C resolves gameplay HUD control duplication; the other symptoms remain scoped below.
 - Current diagnosis after E7C: runtime `cardPool`/`nextCard` ownership, General Study Mode scope precedence, and gameplay HUD duplication are no longer blockers. Remaining likely contributors are stale selected/lane state and split progress read/write boundaries.
-- After A9, decide whether to finish E7D/E7E symptom rectifiers or proceed to A10/A11 Atlas controls.
+- Next after P8: M2 Stripe Payment Link gate, then iOS1 Capacitor scaffold.
 
 ---
 
@@ -150,6 +156,11 @@ Run in order — do not proceed to P7 until all pass:
 | E6 | 🟠 HIGH | `deckMode:'due'` sorts 1249 new cards before 37 overdue ones — `dueScore()` has no `next_due_at` logic | ✅ Fixed 2026-06-03: `getStudyPool('due')` already filtered correctly via `isDue()`; added ascending `next_due_at` sort so most-overdue card surfaces first. PHASE1 + PHASE2. |
 | E7 | 🔴 CRITICAL | Runtime authority conflict: 14 `window.cardPool =` assignments + deferred installers. Prior browser validation: active `cardPool` was Energy `scopedCardPool352(prior...)`, active `nextCard` was stable-random `sessionCards()`. Drove General Study Mode glitch, duplicate HUD controls, biased lane behavior, state translation drift. | ✅ Fixed + browser-validated 2026-06-03: Phase 3 marks `cardPool` with `__energyBuriedFilter352=true` + `__cozyStableRandom351=true`, marks `nextCard` with `__cozyStableRandom351=true`, and legacy `patchStudyOptions()` now skips replacing Phase 3 `cardPool`. Cache-busted CDP validation: `cardPool` = `() => sessionPool(...)`, no `scopedCardPool352`, `nextCard` has Shadow Dungeon guard, FSRS 17/17, smoke 6/6. |
 | E8 | 🟡 MEDIUM | Full Card showed LEVEL 1/LEVEL 2 — whitelist formatter + alias write removal applied | ✅ Fixed prior session |
+| SCOPE | 🔴 CRITICAL | Review Deck scope drift from historical `last_rating`, stale launch dataset, and `user_one_thing` serialization gaps | ✅ Fixed 2026-06-06: removed `last_rating` from review predicates, `rating` wins alias reconciliation, `dataset.cozyLaunchScope` clears on all/random, and `user_one_thing` round-trips through progress import/export. |
+| SD | 🔴 CRITICAL | Shadow Dungeon ignored imported progress because legacy readers looked at `state[]` before `phase3State.progress` | ✅ Fixed + validated 2026-06-06: `currentState()`/`stateForCard()` prefer canonical progress; imported backup counts flagged 102, pinned 97, missed 18; `nextCard` still retains Shadow guard. |
+| DATA | 🔴 CRITICAL | Backup had 42 `stability:null` review cards and 10 ghost-seen records | ✅ Repaired 2026-06-06: stability-null records replayed via `rateCard()`, ghost-seen records reset to new defaults, repair export `cozy_arcade_progress_2026-06-06_codex_stability_ghost_repair.json` created. |
+| A10 | 🟡 MEDIUM | Atlas card detail needed pin/bury toggles writing to canonical progress | ✅ Fixed: card detail toggles update `phase3State.progress` and persist after Atlas close. |
+| A11 | 🟡 MEDIUM | Atlas card detail needed inline `one_thing` edit writing as `user_one_thing` | ✅ Fixed: inline edit writes `window.phase3State.progress[id].user_one_thing` and reflects immediately in card detail/export. |
 
 ## Next Code Tasks (after validation)
 
@@ -163,10 +174,10 @@ Run in order — do not proceed to P7 until all pass:
 | E7F | ✅ Fixed + browser-validated 2026-06-03: `cozy-rating-path-rectifier-2026-06-03` preserves Phase 3 pool ownership and only wraps `selectSolo`, `advance`, and `rate` so answer-state writes reach `rateCard()`. Auto-correct → good/review/3d; auto-wrong → again/relearning/10m; Continue → good/review/3d; Hard → hard/review/1d; Again → again/relearning/10m. | Focused CDP probe: all 5 rating paths pass; core validation FSRS 17/17 + smoke 6/6 |
 | E7G | ✅ Fixed + browser-validated 2026-06-04: main-page mode select flash was legacy `ensureScopeOptions352()` temporarily injecting `Suspended / buried` into `browseScope351`; now limited to the hidden review manager select and cleans visible home selects. Review Deck now includes pinned/repair/hard/again cards immediately, even when FSRS scheduled due is in the future. Runner diagnosis: correct answers are not lane-biased; 1,000-card real-deck sample distributed 213/271/265/251 across lanes, while `selected` intentionally resets to lane 0. | Core validation green; boot samples stable at 0.7/1.7/3.4/6.2s; real-deck Hard card enters Review Deck after rating. |
 | A9 | ✅ Fixed + browser-validated 2026-06-03: Atlas card detail `#na-review-tag-btn` syncs selected tag/system into Phase 3 filters and launches Solo without adding runtime wrappers. | Headless validation: one button, Atlas closes, Solo opens, selected-tag pool contains only matching cards; Phase 3 `cardPool` still contains `sessionPool`; FSRS 17/17; smoke 6/6. |
-| A10 | Atlas: pin/bury toggle from card detail panel (write to `phase3State.progress`) | `p.pinned`/`p.buried` toggles persist after atlas close |
-| A11 | Atlas: one_thing inline edit from card detail (write to `window.phase3State.progress[id].user_one_thing`) | Card detail shows updated text immediately |
+| A10 | ✅ Fixed: Atlas card detail pin/bury toggles write to `phase3State.progress`. | `p.pinned`/`p.buried` toggles persist after Atlas close |
+| A11 | ✅ Fixed: Atlas card detail inline `one_thing` edit writes `window.phase3State.progress[id].user_one_thing`. | Card detail shows updated text immediately and export preserves `user_one_thing` |
 | P7 | ✅ Fixed + browser-validated 2026-06-03: `sw.js`, `manifest.json`, manifest/theme tags, and SW registration are present. | Headless validation: manifest parsed, SW registered at repo root scope, shell cache contains `./`, `./index.html`, `./manifest.json`, offline reload served app shell, FSRS 17/17, smoke 6/6. |
-| P8 | CSP headers via `vercel.json` | `curl -I` shows `Content-Security-Policy` header |
+| P8 | ✅ Added 2026-06-06: CSP/security headers via `vercel.json`; CSP keeps `'unsafe-inline'` for the single-file app's inline scripts/styles. | `vercel.json` validates as JSON; Vercel deploy should emit `Content-Security-Policy` header |
 | M2 | Stripe Payment Link | Test purchase + `localStorage.getItem('cozy_paid_v1') === '1'` |
 | iOS1 | Capacitor scaffold | `npx cap sync` exits 0 |
 
