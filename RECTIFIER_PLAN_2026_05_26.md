@@ -339,4 +339,54 @@ If bionic appears broken:
 *Active gate tracking:* `GOAL.md`
 *Feature goals:* `ULTIMATE_GOALS.md`
 
-2026-06-06: Shadow Dungeon legacy review now reads canonical `phase3State.progress` records when listing imported pinned/No Idea cards; solo selection rating path now immediately calls `rateCard` for user and timer selections with 8s/13s hook reinstalls as backup; repaired backup export written to the external progress examples folder.
+---
+
+## Session Addendum — 2026-06-06 Full Session (SCOPE / SD / DATA / A10 / A11 / P8 / M2)
+
+### What Was Done
+
+| Fix | Commit | Detail |
+|-----|--------|--------|
+| SCOPE | c91bca2 | Removed `last_rating` from all review/hard pool predicates; `syncProgressAliases` direction fixed (`rating = rating \|\| last_rating`, not reverse); `dataset.cozyLaunchScope` deleted for 'all'/'random' to prevent stale persist across reload; `user_one_thing` added to `exportProgressMap` and `migrateLegacyProgress` so Atlas inline edits round-trip through save/import/export |
+| SD (Shadow Dungeon progress) | 6cce78e | `stateForCard()` and `currentState()` now prefer `window.phase3State?.progress?.[k]` with fallback to legacy `state[]`; imported backup previously invisible to Shadow Dungeon pool because both readers looked at `state[]` only |
+| DATA repair | 6cce78e | Rating hook reinstalls at 8s + 13s in addition to existing 0.7s/1.6s/3.2s/5.2s; ghost-seen prevention: user/timer selection calls `rateCard()` immediately; Codex exported `cozy_arcade_progress_2026-06-06_codex_stability_ghost_repair.json` (42 `stability:null` cards replayed, 10 ghost-seen reset) |
+| A10 | session | `naInjectPinBuryButtons(cardId)` inside Atlas IIFE — pin/bury toggles write `phase3State.progress[cardId].pinned/buried` + `window.state[cardId]` mirror + `window.saveState()` |
+| A11 | c91bca2 | `naInjectOneThingEdit(cardId)` inside Atlas IIFE — textarea pre-filled from `p.user_one_thing ?? card.one_thing`; saves on blur/700ms debounce; mirrors to `phase3State.progress[cardId].user_one_thing`; `user_one_thing` added to export serialization |
+| E7G port to PHASE1 | b20a1ef | `ensureScopeOptions352()` restricted to hidden `reviewScope17526`; Review Deck includes pinned/repair/hard/again immediately regardless of FSRS due date |
+| P8 | acb2e8b | `vercel.json` added to PHASE2 with `Content-Security-Policy` (unsafe-inline for scripts/styles, Google Fonts, frame-ancestors none), `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin` |
+| M2 | d832483 | Stripe paywall gate (`cozy-paywall-m2-2026-06-06`) appended before `</body>` in PHASE2; key `cozy_paid_v1`; `?paid=1` or `?paid=test_override` unlocks and cleans URL; `STRIPE_PLACEHOLDER_URL` literal awaits user's real Stripe link |
+
+**PHASE2 SW versions across this session:** v1 (P7) → v2 (SCOPE/c91bca2) → v3 (SD/6cce78e) → v4 (M2/d832483)
+
+**PHASE1 last commit:** `b20a1ef` — all SCOPE/SD/rating-path/E7G ports applied; still missing `vercel.json` and M2
+
+### Errors Found and Fixed This Session
+
+| Error | Root Cause | Fix |
+|-------|-----------|-----|
+| `syncProgressAliases` backwards direction | `rating = last_rating \|\| rating` overwrote current rating with historical one | Reversed to `rating = rating \|\| last_rating` |
+| `dataset.cozyLaunchScope` stale persist | 'review' scope from last session survived reload — pool mismatch on cold open | Delete attribute for 'all'/'random'; set for other scopes |
+| `user_one_thing` not serialized | Written to live `phase3State.progress` but omitted from `exportProgressMap` allowlist | Added to both `exportProgressMap` and `migrateLegacyProgress` |
+| Shadow Dungeon invisible to imports | `stateForCard()` read `state[]` only; `phase3State.progress` loaded from import had no mirror in `state[]` | `stateForCard()` now reads `phase3State.progress` first |
+| Ghost-seen cards (10 in backup) | `record()` incremented `seen_count` before `rateCard()` fired in some paths | Moved `rateCard()` call to immediate user/timer selection; hook reinstalls at 8s + 13s |
+| 42 `stability:null` review cards | Pre-E1 SM2-era cards rated many times but FSRS stability never set | Replayed through `rateCard()` via Codex repair script; export written |
+
+### Prompt Efficiency Analysis (Session Retrospective)
+
+| Prompt type | Codex duration | Outcome |
+|-------------|---------------|---------|
+| Long (300–500 lines, CDP infra) | 15–34 min | Often diverged, user interrupted |
+| Short (<80 lines, no CDP, validation gates only) | 3–5 min | Targeted, passed gates |
+
+**Rule going forward:**
+- Codex prompts: under 80 lines
+- Validation: `runFSRSValidation()` 17/17 + `runCozySmokeTests()` 6/6 only — no custom CDP harness
+- Port both repos in same prompt — never split PHASE1/PHASE2 ports across sessions
+- Do not ask Codex to "verify" or "audit" — only to fix a named specific thing
+
+### Pending After 2026-06-06
+
+1. **User action**: Import `cozy_arcade_progress_2026-06-06_codex_stability_ghost_repair.json`
+2. **User action**: Replace `STRIPE_PLACEHOLDER_URL` in PHASE2 `index.html` with real Stripe Payment Link
+3. **Code**: Port `vercel.json` + GOAL.md to PHASE1; port M2 gate to PHASE1 (after Stripe URL provided)
+4. **Code**: iOS1 — Capacitor scaffold (`npx cap sync`)
