@@ -14340,4 +14340,68 @@ setTimeout(installRatingPathHooks20260603,13000);
 })();
 </script>
 <script>if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));</script>
+<script id="cozy-paywall-m2-2026-06-06">
+;(function(){
+  'use strict';
+  if(window.__cozyPaywallM2) return;
+  window.__cozyPaywallM2 = true;
+
+  // Stripe success redirect sets ?paid=1
+  const params = new URLSearchParams(location.search);
+  if(params.get('paid') === '1' || params.get('paid') === 'test_override'){
+    try{ localStorage.setItem('cozy_paid_v1','1'); }catch(_){}
+    params.delete('paid');
+    const clean = params.toString() ? '?'+params : location.pathname;
+    history.replaceState(null,'',clean);
+  }
+
+  if(localStorage.getItem('cozy_paid_v1') === '1') return; // already paid
+
+  // Build paywall overlay
+  const STRIPE_LINK = 'STRIPE_PLACEHOLDER_URL'; // user will replace
+  const ov = document.createElement('div');
+  ov.id = 'cozy-paywall-overlay';
+  ov.style.cssText = [
+    'position:fixed;inset:0;z-index:99999',
+    'background:rgba(6,8,20,0.97)',
+    'display:flex;flex-direction:column',
+    'align-items:center;justify-content:center',
+    'font-family:Orbitron,monospace;color:#edf7ff',
+    'padding:24px;text-align:center'
+  ].join(';');
+  ov.innerHTML = `
+    <div style="font-size:clamp(22px,5vw,38px);font-weight:950;
+                letter-spacing:.12em;color:#67e8f9;margin-bottom:16px">
+      COZY ARCADE
+    </div>
+    <div style="font-size:clamp(13px,2vw,17px);font-weight:800;
+                letter-spacing:.06em;margin-bottom:8px">
+      ABIM BOARD PREP
+    </div>
+    <div style="font-size:clamp(11px,1.5vw,14px);color:rgba(235,245,255,.6);
+                max-width:420px;line-height:1.6;margin-bottom:32px;
+                font-family:'DM Sans',system-ui,sans-serif;font-weight:500">
+      Full access to 1,249 ABIM flashcards with spaced repetition,
+      Neural Atlas, and offline study.
+    </div>
+    <button id="cozy-buy-btn"
+      style="background:linear-gradient(135deg,#0ea5e9,#6366f1);
+             color:#fff;border:none;border-radius:16px;
+             padding:16px 40px;font-family:Orbitron,monospace;
+             font-size:clamp(13px,1.8vw,16px);font-weight:900;
+             letter-spacing:.10em;cursor:pointer;
+             box-shadow:0 0 32px rgba(103,232,249,.3)">
+      PURCHASE ACCESS
+    </button>
+    <div style="margin-top:20px;font-size:11px;
+                color:rgba(235,245,255,.3);letter-spacing:.08em">
+      One-time purchase · Offline-capable · No subscription
+    </div>
+  `;
+  document.body.appendChild(ov);
+  document.getElementById('cozy-buy-btn').onclick = function(){
+    window.open(STRIPE_LINK, '_blank');
+  };
+})();
+</script>
 </body></html>
