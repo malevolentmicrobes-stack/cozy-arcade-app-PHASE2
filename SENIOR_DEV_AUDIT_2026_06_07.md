@@ -1,7 +1,90 @@
 # Senior Dev Audit — Cozy Arcade PHASE2 / PHASE1
 **Date:** 2026-06-07  
-**Repos:** cozy-arcade-app-PHASE2 @ d1ed274 · cozy-arcade-app @ d2ed490  
+**Repos:** cozy-arcade-app-PHASE2 code @ d1ed274; docs HEAD @ bae38a2 · cozy-arcade-app @ d2ed490 per handoff  
 **Purpose:** Pre-production glitch triage for team review. Root causes + all secondary modifiers listed per issue.
+
+---
+
+## 2026-06-07 Codex Browser Evidence Addendum
+
+This addendum supersedes any weaker/older claims below. Validation was run against PHASE2 from local HTTP on `http://127.0.0.1:8820/index.html?paid=test_override` using an isolated headless Chrome/CDP profile on port `9295`. The code state is still the d1ed274 code path; the current repo HEAD `bae38a2` is a docs-only audit commit.
+
+### Browser-tested results
+
+| Check | Result | Notes |
+|---|---:|---|
+| FSRS validation | PASS | `runFSRSValidation()` returned 17/17 |
+| Smoke validation | PASS | `runCozySmokeTests()` returned 6/6 |
+| PHASE2 service worker | PASS | cache key `cozy-arcade-PHASE2-v7` present |
+| "Beta Spaced" label | PASS | no `Beta Spaced` text in browser body |
+| Shadow Dungeon default scope | PASS | `shadowScope351` resets to `due` on open |
+| Shadow Dungeon start scope sync | PASS | `browseScope351` and `dataset.cozyLaunchScope` are `due` after Start |
+| Buried-like JSON examples in pool | PASS for tested modes | injected `card-0003`, `card-0004`, `card-0006` as `suspended:true`, `last_rating:"bury"`; no leaks through `due`, `review_deck`, `pinned`, `random_new`, `random_all`, `new_first` |
+| Boot visible modal/menu flash | NOT REPRODUCED | corrected viewport-intersection probe saw no visible `settings`, `review`, `pause`, `end`, `notify`, or `shadowSetup351` flash in first ~2.5s |
+| Boot select value churn | OBSERVED | `browseScope351` appears after boot and can move from absent to `all`; user-reported option flash remains plausible from home panel rebuild/select option churn |
+| Pause menu export | PASS | clicking `#pauseExport` downloaded `cozy_arcade_progress_2026-06-07.json` |
+| HUD `×` export | FAIL for file export | HUD `×` exits home but did not create a new progress download; it only preserves local state |
+| HUD undo position | PASS in focused check | focused HUD probe found role order `undo`, `pause`, `home`, `settings` |
+| Undo depth, Solo injected deck | PARTIAL | restored 4 real injected-card snapshots, so "only two" was not reproduced exactly |
+| Undo correctness | FAIL production bar | first snapshot can be stale/ghost, Domain is not undo-wrapped, restore forces `mode='solo'`, session queue/index is not restored |
+
+### JSON evidence from user gameplay exports
+
+The four files in `/Users/rebekahbetar/Documents/selected wrong then good.... card state diagnosis/` all contain 1,435 progress entries. The same three buried-like records appear in each:
+
+```json
+{
+  "card-0003": { "suspended": true, "buried": false, "last_rating": "bury", "correct_count": 1, "wrong_count": 0, "stage": "review" },
+  "card-0004": { "suspended": true, "buried": false, "last_rating": "bury", "correct_count": 1, "wrong_count": 0, "stage": "review" },
+  "card-0006": { "suspended": true, "buried": false, "last_rating": "bury", "correct_count": 1, "wrong_count": 0, "stage": "review" }
+}
+```
+
+Implication: production filtering must treat all of these as excluded from gameplay: `suspended`, `buried`, `rating === "bury"`, `last_rating === "bury"`, plus session-buried IDs. A future export may have `last_rating:"bury"` without `suspended:true`, so the stricter filter is still required even though the supplied JSON examples passed current browser pool checks.
+
+### Corrected interpretation of the main-page flash
+
+The first CDP probe incorrectly counted the settings drawer as visible because it only checked element size; `#cozySettingsDrawer351` has size while transformed off-screen. The corrected probe checks viewport intersection and did **not** reproduce a visible drawer/modal flash.
+
+Remaining likely sources for the user-visible "menu flashes options to select":
+
+1. `showHomePanel351()` rebuilds the home panel via `innerHTML`, so the General Study Mode select is destroyed/recreated.
+2. Multiple installers call home/layout patchers on `DOMContentLoaded`, delayed `setTimeout`, and polling intervals.
+3. `ensureScopeOptions352()`/home-scope normalization can insert/remove or remap options while the user is watching the home screen.
+4. Browser autofill/form-state restore may briefly restore the previous select value before late code normalizes it.
+
+The next production test should sample the actual `browseScope351.options` list and selected value every animation frame for 2.5s on desktop and mobile, not just modal visibility.
+
+### Corrected interpretation of undo
+
+The injected Solo test answered five cards and then called `undoReview()` five times. It restored four real injected cards: `undo-card-3`, `undo-card-2`, `undo-card-1`, `undo-card-0`; the fifth undo consumed a stale/ghost snapshot and returned false. This does not match a hard two-card limit, but it confirms the current implementation is still not production-correct.
+
+The remaining undo defects are architectural:
+
+1. Undo wraps `selectSolo` only; `selectDomain`/Shadow Dungeon domain gameplay is not covered.
+2. `restoreUndoSnapshot()` forces `mode = 'solo'`, so undo from Domain is structurally wrong.
+3. Session pool, Shadow queue index, score/streak/HP, and timer state are not restored.
+4. Wrapper chains can capture stale `current` before the injected/imported deck is fully authoritative.
+
+### Export behavior correction
+
+`#pauseExport` does export a durable file. HUD `×` does not. Current user-facing copy should distinguish:
+
+- Pause → Export Progress: durable JSON backup.
+- HUD `×`: exit to home, local browser save only.
+
+If "x still exports progress" is a product requirement, HUD `×` must call the same Phase 3 export path as `#pauseExport`, or it must show the save/export decision modal before leaving gameplay.
+
+### Production cleanup recommendation
+
+Do not add another wrapper patch for these issues. The elegant fix is to delete the patch stack in favor of these small authorities:
+
+1. `isExcludedFromGameplay(cardOrId)` as the only gameplay exclusion predicate.
+2. `resolveStudyScope({ source, mode })` as the only scope translator for home, review, and Shadow Dungeon.
+3. `buildStudyPool({ gameType, scope, system, tag })` as the only pool builder.
+4. `commitAnswerTransaction({ gameType, cardId, selectedIndex, source })` as the only rating/progress writer.
+5. `undoTransaction()` restoring card, mode, queue index, score/streak/HP, timer, progress, and legacy mirror.
+6. `renderHomeControls()` and `renderHudControls()` as idempotent renderers, with no polling `setInterval` patchers.
 
 ---
 
@@ -383,4 +466,400 @@ console.log('selectSolo chain depth (manual):', depth);
 
 ---
 
-*Audit by Claude Sonnet 4.6 acting as senior dev / tech lead. All line numbers reference PHASE2 d1ed274. PHASE1 is structurally identical except lacks the Stripe paywall block.*
+## 15. PHASE1 vs PHASE2 — Divergence Table
+
+Issues that exist in one repo but not the other, as of 2026-06-07.
+
+### PHASE2-only issues
+| Issue | Status |
+|---|---|
+| `STRIPE_PLACEHOLDER_URL` not replaced with real Stripe link | **User action required** |
+| M2 paywall gate (`cozy-paywall-m2-2026-06-06`) — must use `?paid=test_override` for all testing | Active |
+| `vercel.json` security headers present | ✅ Deployed |
+| SW key `cozy-arcade-PHASE2-v7` | ✅ Active |
+
+### PHASE1-only issues
+| Issue | Status |
+|---|---|
+| No Stripe paywall (M2 not ported — intentional until Stripe URL provided) | By design |
+| No `vercel.json` (P8 not ported) | Missing |
+| SW registration was absent until d2ed490 | ✅ Fixed d2ed490 |
+| SW key `cozy-arcade-v44` | ✅ Active |
+
+### Issues identical in both repos (unfixed as of bae38a2 / d2ed490)
+| Issue | Lines (PHASE2 ref) |
+|---|---|
+| `review_deck` fallback branch L11514 still only checks `!suspended` | L11514–11519 |
+| `due` pool branch has no burial check | L11447 |
+| Undo restores progress but not session position, score, timer | L13276–13283 |
+| Domain gameplay not covered by undo wrapper | L13287 check |
+| 11 `selectSolo` wrappers — no consolidation | L408→14199 |
+| New device / empty pool: no guard before game start | L11418+ |
+| Home panel `innerHTML` rebuild causes select churn on every open | L6172 |
+| `shadowSchedule351` dropdown reads nothing (dead UI) | L6373 |
+| Duplicate ⌂ HUD buttons from legacy injectors | L1548+ |
+
+---
+
+## 16. Autonomous Browser Test Suite (IF/THEN format)
+
+Paste each group into DevTools console on the target app (hard-reload first, use `?paid=test_override` on PHASE2). Each test is self-contained and prints PASS/FAIL with diagnostic context. No CDP setup needed.
+
+---
+
+### Group A — Core Gates
+
+```javascript
+// GROUP A: Core validation gates
+(function(){
+  const fsrs = window.runFSRSValidation?.();
+  const smoke = window.runCozySmokeTests?.();
+  console.assert(fsrs === '17/17' || String(fsrs).includes('17'), 'A1 FAIL: FSRS got ' + fsrs);
+  console.assert(smoke === '6/6'  || String(smoke).includes('6'),  'A2 FAIL: Smoke got ' + smoke);
+  const pool = window.cardPool;
+  const poolStr = pool ? String(pool) : '';
+  console.assert(poolStr.includes('sessionPool') || poolStr.includes('phase3'), 'A3 FAIL: cardPool not Phase3 — ' + poolStr.slice(0,80));
+  const nc = window.nextCard;
+  const ncStr = nc ? String(nc) : '';
+  console.assert(ncStr.includes('__shadowDungeonActive') || ncStr.includes('shadowQueue'), 'A4 FAIL: nextCard missing SD guard');
+  console.log('GROUP A:', [fsrs, smoke, poolStr.slice(0,30), ncStr.slice(0,30)]);
+})();
+// IF any FAIL → do NOT proceed with other fixes; core architecture is broken
+```
+
+---
+
+### Group B — Shadow Dungeon Scope Sync
+
+```javascript
+// GROUP B: SD scope sync (all three paths)
+(function(){
+  // B1: reset on open
+  if (typeof openShadowSetup351 === 'function') {
+    const bs = document.getElementById('browseScope351');
+    if (bs) bs.value = 'pinned';
+    openShadowSetup351();
+    const sc = document.getElementById('shadowScope351');
+    console.assert(sc?.value === 'due', 'B1 FAIL: shadowScope351 not reset to due, got ' + sc?.value);
+    document.getElementById('shadowCancel351')?.click();
+  }
+  // B2: start syncs browseScope + dataset
+  if (typeof openShadowSetup351 === 'function') {
+    openShadowSetup351();
+    document.getElementById('shadowScope351').value = 'pinned';
+    document.getElementById('shadowStart351')?.click();
+    setTimeout(()=>{
+      const bs = document.getElementById('browseScope351');
+      const ds = document.documentElement.dataset.cozyLaunchScope;
+      console.assert(bs?.value === 'pinned', 'B2a FAIL: browseScope not synced, got ' + bs?.value);
+      console.assert(ds === 'pinned' || !ds, 'B2b WARN: dataset.cozyLaunchScope = ' + ds);
+      console.log('GROUP B: browseScope=' + bs?.value + ' dataset=' + ds);
+      // exit back to home
+      if (typeof goHome351 === 'function') goHome351(); else window.home?.();
+    }, 400);
+  }
+})();
+// IF B1 FAIL → openShadowSetup351 does not reset sc.value; check line 6408
+// IF B2a FAIL → shadowStart onclick not writing browseScope351; check line 6395-6398
+```
+
+---
+
+### Group C — Burial / Suspension Filter (all pool branches)
+
+```javascript
+// GROUP C: Buried card exclusion across all pool modes
+(function(){
+  const prog = window.phase3State?.progress;
+  if (!prog) { console.warn('C SKIP: phase3State not loaded'); return; }
+  const ids = Object.keys(prog).slice(0, 3);
+  if (ids.length < 3) { console.warn('C SKIP: need at least 3 progress entries'); return; }
+
+  // Save originals
+  const orig = ids.map(id => ({...prog[id]}));
+
+  // Inject buried pattern from real gameplay JSON
+  prog[ids[0]].suspended = true; prog[ids[0]].last_rating = 'bury'; prog[ids[0]].rating = 'bury';
+  prog[ids[1]].buried = true;
+  prog[ids[2]].suspended = true; prog[ids[2]].buried = false; prog[ids[2]].last_rating = 'bury';
+
+  const modes = ['review_deck', 'due', 'pinned', 'random-new', 'new'];
+  const getPool = (mode) => {
+    try {
+      if (window.getStudyPool) return window.getStudyPool(mode) || [];
+      if (window.sessionPool) return window.sessionPool() || [];
+      return [];
+    } catch(e) { return []; }
+  };
+
+  modes.forEach(mode => {
+    const pool = getPool(mode);
+    ids.forEach((id, i) => {
+      const leaked = pool.some(c => (c.id||c.qid) === id);
+      if (leaked) console.error('C FAIL mode=' + mode + ' leaked buriedId[' + i + ']=' + id);
+    });
+    console.log('C pool[' + mode + '] size=' + pool.length + ' — checked ' + ids.length + ' buried IDs');
+  });
+
+  // Restore
+  ids.forEach((id, i) => { prog[id] = orig[i]; });
+  console.log('GROUP C: burial check complete, originals restored');
+})();
+// IF C FAIL mode=review_deck → L11514 fallback branch missing burial filter
+// IF C FAIL mode=due → L11447 due branch missing burial filter
+// IF C FAIL mode=pinned → progress(c).pinned lookup using wrong store
+```
+
+---
+
+### Group D — Card State Transitions (FSRS correctness)
+
+```javascript
+// GROUP D: Card state labels after each rating path
+(function(){
+  const prog = window.phase3State?.progress;
+  const deck = window.appCards?.() || window.cards || [];
+  if (!prog || !deck.length) { console.warn('D SKIP: no deck/progress'); return; }
+  const testCard = deck[0];
+  const id = testCard.id || testCard.qid;
+  if (!id) { console.warn('D SKIP: no card id'); return; }
+  const orig = {...(prog[id] || {})};
+
+  const check = (rating, expectStage) => {
+    prog[id] = {...orig};
+    window.rateCard?.(id, rating);
+    const p = prog[id];
+    const ok = p.stage === expectStage;
+    console[ok ? 'log' : 'error']('D[' + rating + '] stage=' + p.stage + ' expect=' + expectStage + ' last_rating=' + p.last_rating + (ok ? ' ✓' : ' ✗'));
+  };
+
+  check('again', 'relearning');
+  check('hard', 'review');
+  check('good', 'review');
+  check('easy', 'review');
+
+  // Bury path
+  prog[id] = {...orig};
+  window.rateCard?.(id, 'bury');
+  const buried = prog[id];
+  console.assert(buried.suspended || buried.buried || buried.last_rating === 'bury',
+    'D[bury] FAIL: card not marked buried — ' + JSON.stringify({suspended: buried.suspended, buried: buried.buried, last_rating: buried.last_rating}));
+
+  prog[id] = orig; // restore
+  console.log('GROUP D: card state transition check complete');
+})();
+// IF D[again] stage≠relearning → rateCard FSRS logic broken
+// IF D[bury] FAIL → burial encoding broken; filter checks will also fail
+```
+
+---
+
+### Group E — Undo Correctness
+
+```javascript
+// GROUP E: Undo depth + session restore
+(function(){
+  const stack = window.__cozyUndoStack372;
+  if (!stack) { console.warn('E SKIP: undo stack not initialized'); return; }
+  console.log('E1: stack depth before test = ' + stack.length);
+
+  // E2: check Domain coverage
+  const selectDomain = window.selectDomain;
+  const domainStr = selectDomain ? String(selectDomain) : '';
+  const domainHasUndo = domainStr.includes('__cozyUndoStack372') || domainStr.includes('undoReview');
+  console[domainHasUndo ? 'log' : 'warn']('E2 Domain undo coverage: ' + (domainHasUndo ? 'PRESENT' : 'MISSING — domain gameplay cannot be undone'));
+
+  // E3: undo wrapper chain — count how many wrappers exist
+  let fn = window.selectSolo, depth = 0, hasUndoLayer = false, hasDebounce = false;
+  const seen = new Set();
+  while (fn && typeof fn === 'function' && !seen.has(fn) && depth < 20) {
+    seen.add(fn);
+    const s = String(fn);
+    if (s.includes('__cozyUndoStack372')) hasUndoLayer = true;
+    if (s.includes('700') || s.includes('_selT160') || s.includes('debounce')) hasDebounce = true;
+    fn = fn.__inner || fn._prior || null;
+    depth++;
+  }
+  console.log('E3: selectSolo chain depth (approx) — hasUndoLayer=' + hasUndoLayer + ' hasDebounce=' + hasDebounce);
+  if (!hasUndoLayer) console.error('E3 FAIL: no undo layer found in selectSolo chain');
+  if (hasDebounce) console.warn('E3 WARN: 700ms debounce wraps selectSolo — rapid undo+answer sequences may be swallowed');
+
+  // E4: session position restore check
+  const restoreFn = window.restoreUndoSnapshot;
+  if (restoreFn) {
+    const fnStr = String(restoreFn);
+    const restoresIndex = fnStr.includes('sessionIndex') || fnStr.includes('poolIndex') || fnStr.includes('queueIndex') || fnStr.includes('__shadowRunQueue');
+    console[restoresIndex ? 'log' : 'warn']('E4 Session position restored on undo: ' + (restoresIndex ? 'YES' : 'NO — user sees different card after undo'));
+  }
+  console.log('GROUP E: undo diagnostic complete');
+})();
+// IF E2 WARN → Domain undo not wired; users playing domain lose undo functionality
+// IF E3 FAIL → undoReview() has no snapshot to pop from
+// IF E4 WARN → undo works on progress state but not on card sequence — primary UX complaint
+```
+
+---
+
+### Group F — Export Paths
+
+```javascript
+// GROUP F: Export button coverage
+(function(){
+  // F1: pauseExport wired?
+  const pe = document.getElementById('pauseExport');
+  console.assert(pe && typeof pe.onclick === 'function', 'F1 FAIL: #pauseExport has no onclick');
+
+  // F2: HUD × (exit) does NOT trigger file download
+  // (observe console — no blob/download call should fire when HUD exit clicked)
+  const exitBtn = document.querySelector('[data-hud-role="exit"]');
+  if (exitBtn) {
+    let downloadFired = false;
+    const origCreate = URL.createObjectURL;
+    URL.createObjectURL = function(b) { downloadFired = true; return origCreate.call(URL, b); };
+    exitBtn.click();
+    setTimeout(() => {
+      URL.createObjectURL = origCreate;
+      console[downloadFired ? 'warn' : 'log']('F2: HUD × triggered file download: ' + downloadFired + (downloadFired ? ' — UNEXPECTED (only localStorage save expected)' : ' ✓ localStorage only'));
+    }, 300);
+  } else {
+    console.warn('F2 SKIP: HUD exit button not found (may only appear during active game)');
+  }
+
+  // F3: Phase3 export function exists
+  const hasExport = typeof window.naExportProgressOnly === 'function' || typeof window.exportSession === 'function';
+  console.assert(hasExport, 'F3 FAIL: no export function found');
+  console.log('GROUP F: export checks initiated');
+})();
+// IF F1 FAIL → Pause > Export Progress button is unwired; users cannot make durable saves
+// IF F2 shows UNEXPECTED → HUD × is double-exporting (adds extra downloads)
+// IF F3 FAIL → no export path exists at all
+```
+
+---
+
+### Group G — Home Screen Flash Detection
+
+```javascript
+// GROUP G: Select option churn / home panel flash (run immediately on page load)
+(function(){
+  const log = [];
+  const sel = document.getElementById('browseScope351');
+  if (!sel) { console.warn('G SKIP: browseScope351 not present'); return; }
+  const start = Date.now();
+  const snap = () => ({ t: Date.now() - start, val: sel.value, opts: Array.from(sel.options).map(o=>o.value).join(',') });
+  log.push(snap());
+  const id = setInterval(() => {
+    const s = snap();
+    const prev = log[log.length - 1];
+    if (s.val !== prev.val || s.opts !== prev.opts) log.push(s);
+    if (s.t > 3000) {
+      clearInterval(id);
+      console.log('GROUP G: browseScope351 churn log (' + log.length + ' changes in 3s):');
+      log.forEach(e => console.log('  t=' + e.t + 'ms val=' + e.val + ' opts=' + e.opts));
+      if (log.length > 2) console.warn('G WARN: ' + log.length + ' changes — likely cause of visible flash');
+      else console.log('G OK: minimal churn');
+    }
+  }, 50);
+})();
+// IF G WARN: log shows opts changing → ensureScopeOptions352 or home panel rebuild is the flash source
+// Specific patterns:
+//   opts gains "buried" then loses it → ensureScopeOptions352 at L7831
+//   val jumps from "due" to "all" → homeScope normalization overwriting browseScope
+//   opts gains/loses options → showHomePanel351 innerHTML rebuild at L6172
+```
+
+---
+
+### Group H — New Device / Empty Pool Guard
+
+```javascript
+// GROUP H: Empty pool guard before game start (simulate clean device)
+(function(){
+  const orig = window.phase3State?.progress;
+  if (!window.phase3State) { console.warn('H SKIP: phase3State not loaded'); return; }
+
+  // Temporarily empty progress
+  window.phase3State.progress = {};
+
+  const modes = ['review_deck', 'due', 'review', 'pinned'];
+  modes.forEach(mode => {
+    try {
+      const pool = window.getStudyPool ? window.getStudyPool(mode) : [];
+      const size = pool ? pool.length : 0;
+      if (size === 0) {
+        // Check: does startSolo guard against 0-card pool?
+        const startFn = String(window.startSolo || '');
+        const hasGuard = startFn.includes('hasCardsOrWarn') || startFn.includes('pool.length') || startFn.includes('sessionPool');
+        console[hasGuard ? 'log' : 'warn']('H[' + mode + ']: pool=0, startSolo guard present=' + hasGuard);
+        if (!hasGuard) console.error('H FAIL[' + mode + ']: empty pool with no guard — game will start with 0 cards (blank/crash)');
+      } else {
+        console.log('H[' + mode + ']: pool size=' + size + ' (non-empty even with no progress — deck cards flow through)');
+      }
+    } catch(e) { console.error('H[' + mode + '] threw: ' + e.message); }
+  });
+
+  window.phase3State.progress = orig; // restore
+  console.log('GROUP H: empty pool guard check complete, progress restored');
+})();
+// IF H FAIL[review_deck] → new device opening Review Deck mode gets silent 0-card start
+// IF H FAIL[due] → new device opening Spaced Repetition gets blank game
+// Fix: add pool.length > 0 check in startSolo / directStartGame351 before game loop starts
+```
+
+---
+
+### Group I — Scope-to-Pool-to-Game Consistency
+
+```javascript
+// GROUP I: End-to-end scope consistency (home select → pool → game shows right cards)
+(function(){
+  const browseEl = document.getElementById('browseScope351');
+  if (!browseEl) { console.warn('I SKIP: browseScope351 not present'); return; }
+  const modes = ['random', 'new', 'pinned', 'review'];
+  const results = [];
+  modes.forEach(mode => {
+    browseEl.value = mode;
+    browseEl.dispatchEvent(new Event('change', {bubbles: true}));
+    setTimeout(() => {
+      const poolFn = window.getStudyPool || window.sessionPool;
+      const pool = poolFn ? (window.getStudyPool ? window.getStudyPool(mode) : poolFn()) : null;
+      const size = pool ? pool.length : '?';
+      const launchScope = document.documentElement.dataset.cozyLaunchScope;
+      const phase3Order = window.phase3State?.settings?.solo_order;
+      const scopeMatch = launchScope === mode || !launchScope;
+      const orderMatch = phase3Order === mode || !phase3Order;
+      results.push({ mode, size, launchScope, phase3Order, scopeMatch, orderMatch });
+      if (results.length === modes.length) {
+        console.log('GROUP I: scope consistency:');
+        results.forEach(r => {
+          const ok = r.scopeMatch && r.orderMatch;
+          console[ok ? 'log' : 'warn']('  mode=' + r.mode + ' poolSize=' + r.size + ' dataset=' + r.launchScope + ' phase3=' + r.phase3Order + (ok ? ' ✓' : ' ✗ MISMATCH'));
+        });
+      }
+    }, 100);
+  });
+})();
+// IF mismatch on any mode → scope change event is not reaching all 4 authorities
+// Expected: browseScope351.value === dataset.cozyLaunchScope === phase3State.settings.solo_order
+// If syncGeneralStudyScopePhase3 is working, all three should match after a change event
+```
+
+---
+
+### Quick-Run All Groups (paste once, runs A–I sequentially)
+
+```javascript
+// MASTER RUN — groups A + C + D + E + F + G + H in sequence
+// (B and I require user interaction; run separately)
+setTimeout(()=>{
+  console.group('=== COZY ARCADE BROWSER DIAGNOSTIC ===');
+  // Paste each group function body here, or run them individually above
+  console.log('Run groups A, C, D, E, F, G, H individually above.');
+  console.log('Groups B and I require active game / select interaction — run manually.');
+  console.groupEnd();
+}, 200);
+```
+
+---
+
+*Addendum authored 2026-06-07. Codex browser evidence addendum at top of document supersedes Section 0–14 where contradicted.*

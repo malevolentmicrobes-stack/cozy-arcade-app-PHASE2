@@ -389,4 +389,119 @@ If bionic appears broken:
 1. **User action**: Import `cozy_arcade_progress_2026-06-06_codex_stability_ghost_repair.json`
 2. **User action**: Replace `STRIPE_PLACEHOLDER_URL` in PHASE2 `index.html` with real Stripe Payment Link
 3. **Code**: Port `vercel.json` + GOAL.md to PHASE1; port M2 gate to PHASE1 (after Stripe URL provided)
+
+---
+
+## Session Addendum — 2026-06-07 Senior Dev Audit + Stepwise Testing Plan
+
+See `SENIOR_DEV_AUDIT_2026_06_07.md` (Sections 15–16) for the full IF/THEN browser test suite (Groups A–I). This section records the fix queue and Codex prompt contracts derived from that audit.
+
+### Current Fix Queue — Priority Order
+
+| ID | Priority | Both repos? | Issue | Source line(s) |
+|----|----------|------------|-------|----------------|
+| FQ-1 | P0 | ✅ Both | `review_deck` fallback (L11514) still only checks `!suspended` | PHASE2 L11514, PHASE1 ~same |
+| FQ-2 | P0 | ✅ Both | `due` pool branch has no burial check | PHASE2 L11447, PHASE1 ~same |
+| FQ-3 | P0 | ✅ Both | Undo restores FSRS state but not session queue index, score, HP, timer | L13276 |
+| FQ-4 | P1 | ✅ Both | New device empty pool — no guard before game start | L11418+, startSolo |
+| FQ-5 | P1 | ✅ Both | `shadowSchedule351` dropdown is dead (never read by start handler) | L6373 |
+| FQ-6 | P2 | ✅ Both | Home panel `innerHTML` rebuild causes select value churn (flash source) | L6172 |
+| FQ-7 | P2 | ✅ Both | Duplicate ⌂ HUD buttons from legacy injectors | L1548+ |
+| FQ-8 | P2 | ✅ Both | Domain gameplay not covered by undo wrapper | L13287 |
+| FQ-9 | P3 | PHASE1 only | Port `vercel.json` P8 security headers | — |
+| FQ-10 | User | PHASE2 only | Replace `STRIPE_PLACEHOLDER_URL` with real Stripe link | — |
+| FQ-11 | User | Both | Import stability/ghost-seen repair JSON | — |
+
+### Codex Prompt Contracts for FQ-1 + FQ-2 (next session)
+
+**Prompt (under 80 lines):**
+```
+File: index.html in BOTH repos
+PHASE2: /Users/rebekahbetar/Documents/GitHub/cozy-arcade-app-PHASE2/index.html
+PHASE1: /Users/rebekahbetar/Documents/GitHub/cozy-arcade-app/index.html
+
+── FIX FQ-1: review_deck fallback burial filter ──
+In getStudyPool(), find the SECOND review_deck branch (approximately):
+  if (selected === 'review_deck') {
+    return applyStudyFiltersPhase3(normalizeDeckIdentities()).filter(c => !progressForCard(c).suspended).filter(c => {
+Change the .filter(c => !progressForCard(c).suspended) to:
+  .filter(c => { const p=progressForCard(c); return !p.suspended && !p.buried && p.rating!=='bury' && p.last_rating!=='bury'; })
+
+── FIX FQ-2: due branch burial filter ──
+In getStudyPool(), find:
+  arr = arr.filter(c => isDue(progress(c)));
+Change to:
+  arr = arr.filter(c => { const p=progressForCard(c); return isDue(p) && !p.suspended && !p.buried && p.rating!=='bury' && p.last_rating!=='bury'; });
+
+── FIX FQ-4: empty pool guard ──
+In startSolo() (or directStartGame351 for SD), after the pool is resolved and before
+the game loop starts, add:
+  if (!pool || pool.length === 0) { toast('No cards match this filter — try a different scope'); return; }
+
+── Validation ──
+window.runFSRSValidation()   // 17/17
+window.runCozySmokeTests()   // 6/6
+// Run Group C browser test from SENIOR_DEV_AUDIT_2026_06_07.md Section 16
+// Confirm no leaks for modes: review_deck, due, pinned, random-new
+// Confirm toast appears when pool is empty
+
+Bump PHASE2 sw.js: v7→v8. Bump PHASE1 sw.js: v44→v45.
+Commit each repo to its own remote only. Do NOT cross-push.
+```
+
+### Codex Prompt Contract for FQ-3 (undo session restore)
+
+**Prompt (under 80 lines):**
+```
+File: index.html in BOTH repos
+PHASE2: /Users/rebekahbetar/Documents/GitHub/cozy-arcade-app-PHASE2/index.html
+PHASE1: /Users/rebekahbetar/Documents/GitHub/cozy-arcade-app/index.html
+
+── FIX FQ-3: undo session restore ──
+In the undo snapshot wrapper (find: window.__cozyUndoStack372.push(snap)):
+The snap object must also capture: sessionPoolIndex, score, streak, hp, gate.
+In restoreUndoSnapshot(), after restoring phase3State.progress[snap.id]:
+  Also restore: score, streak, hp, gate to snap values.
+  Call nextCard() with the snapped card directly rather than advancing pool index.
+  If window.__shadowRunQueue exists and snap has queueIndex, restore __shadowRunQueueIdx.
+
+── FIX FQ-8: Domain undo coverage ──
+Wrap selectDomain the same way selectSolo is wrapped for undo:
+  - Push snapshot before selection (same snap structure as selectSolo wrapper)
+  - The restoreUndoSnapshot must handle mode==='domain' without forcing mode='solo'
+
+── Validation ──
+window.runFSRSValidation()   // 17/17
+window.runCozySmokeTests()   // 6/6
+// Run Group E browser test from SENIOR_DEV_AUDIT_2026_06_07.md Section 16
+// Answer 5 cards, undoReview() 5 times → each undo shows the prior card (not a different card)
+// Test in both Solo and Domain
+
+Bump PHASE2 sw.js: v8→v9. Bump PHASE1 sw.js: v45→v46.
+Commit each repo to its own remote only.
+```
+
+### Browser Test Execution Order (for next Codex session)
+
+After each Codex code fix, run these groups from `SENIOR_DEV_AUDIT_2026_06_07.md` Section 16:
+
+| After fix | Run groups | Pass criteria |
+|---|---|---|
+| FQ-1 + FQ-2 applied | A, C | A: 17/17, 6/6; C: 0 leaks in all modes |
+| FQ-4 applied | A, H | A green; H: toast fires on empty pool |
+| FQ-3 + FQ-8 applied | A, E | A green; E: undo restores card sequence + Domain covered |
+| FQ-6 applied | A, G | A green; G: ≤2 browseScope changes in 3s |
+| All FQ-1 to FQ-8 | A, B, C, D, E, F, G, H, I | All groups pass |
+
+### Rectifier Rules — Carry Forward
+
+These rules have not changed and must be followed in every subsequent fix:
+
+1. Do NOT add new `cardPool` or `nextCard` wrappers.
+2. `syncGeneralStudyScopePhase3()` is the only writer for scope state.
+3. `renderHudControls()` is the only HUD control normalizer.
+4. `rateCard()` is the only FSRS write path.
+5. All burial checks must test: `!p.suspended && !p.buried && p.rating!=='bury' && p.last_rating!=='bury'` (four conditions — see real gameplay JSON in Section 2 of audit).
+6. Every Codex prompt: under 80 lines, no CDP infra request, validation gates `runFSRSValidation()` 17/17 + `runCozySmokeTests()` 6/6, port BOTH repos in same prompt.
+7. SW version must be bumped on every code commit (PHASE2 tracks separately from PHASE1).
 4. **Code**: iOS1 — Capacitor scaffold (`npx cap sync`)
