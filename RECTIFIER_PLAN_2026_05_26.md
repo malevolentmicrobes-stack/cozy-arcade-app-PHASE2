@@ -505,3 +505,5 @@ These rules have not changed and must be followed in every subsequent fix:
 6. Every Codex prompt: under 80 lines, no CDP infra request, validation gates `runFSRSValidation()` 17/17 + `runCozySmokeTests()` 6/6, port BOTH repos in same prompt.
 7. SW version must be bumped on every code commit (PHASE2 tracks separately from PHASE1).
 4. **Code**: iOS1 — Capacitor scaffold (`npx cap sync`)
+
+2026-06-07: Applied FQ-1/FQ-2/FQ-4 burial-safe study-pool filters and empty Solo guard in PHASE2; browser CDP validation passed FSRS 17/17, smoke 6/6, buried-card exclusion, and empty-pool toast.
