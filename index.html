@@ -5721,10 +5721,14 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 .reviewBrowse351{display:grid;grid-template-columns:1.1fr 1fr 1fr auto;gap:14px;align-items:end;margin-bottom:22px}
 .reviewBrowse351 label,.gameplayPanel351 label{display:block;margin-bottom:6px;color:#aeb8cf;font-family:Orbitron,monospace;font-size:11px;text-transform:uppercase;letter-spacing:.16em;font-weight:900}
 .reviewBrowse351 select,.gameplayPanel351 select,.gameplayPanel351 textarea{width:100%;border-radius:12px;border:1px solid rgba(103,232,249,.28);background:#040816;color:#edf7ff;padding:12px 14px;font-weight:900}
-.homeModeButtons351{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.homeBig351{border-radius:18px!important;min-height:86px!important;font-size:clamp(18px,1.85vw,26px)!important;line-height:1.16!important;white-space:normal!important}
-.homeBig351 .keepLine351{white-space:nowrap!important}
-.homeBig351 small{display:block;font-size:12px;color:#aeb8cf;margin-top:4px;letter-spacing:.04em}
+.homeModeButtons351{display:grid;grid-template-columns:1fr;gap:0;margin-top:26px}
+#home #shadow351.modeCard{border-color:rgba(167,139,250,.42)!important;
+  background:linear-gradient(145deg,rgba(30,18,60,.72),rgba(12,8,28,.84))!important;
+  box-shadow:0 0 42px rgba(124,58,237,.18),0 18px 64px rgba(0,0,0,.24)!important}
+#home #shadow351.modeCard:hover{border-color:rgba(167,139,250,.68)!important;
+  box-shadow:0 0 64px rgba(124,58,237,.30),0 0 38px rgba(167,139,250,.14)!important}
+@media(max-width:820px){.homeModeButtons351{margin-top:18px}
+  #home #shadow351.modeCard{min-height:160px!important}}
 .gameplayPanel351{display:grid;gap:16px}
 .gameplayCard351{border:1px solid rgba(103,232,249,.18);border-radius:18px;background:rgba(255,255,255,.035);padding:16px}
 .gameplayCard351 h2,.gameplayCard351 h3{margin:0 0 10px;font-family:Orbitron,monospace;text-transform:uppercase;letter-spacing:.16em;color:#9feaff}
@@ -6169,7 +6173,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     const panel=document.createElement('section');
     panel.id='homeActions351';
     panel.className='homeActions351';
-    panel.innerHTML='<h3>Review Deck</h3><div id="personaHome351" class="personaHome351"></div><div class="reviewBrowse351"><div><label>General Study Mode</label><select id="browseScope351"><option value="new">New cards - not reviewed</option><option value="random">Random - all cards</option><option value="random-new">Random - new cards</option><option value="review">Review deck: pinned / missed / hard</option><option value="hard">Hard only</option><option value="pinned">Pinned only</option><option value="tagged">Tagged selected</option><option value="due">Due-weighted review</option><option value="all">All cards</option></select></div><div><label>System</label><select id="browseSystem351"><option value="all">All systems</option></select></div><div><label>Tags</label><select id="browseTag351"><option value="all">All tags</option></select></div><button id="browseReview351" class="btn primary">Review deck</button></div><div class="homeModeButtons351"><button id="shadow351" class="btn homeBig351"><span class="keepLine351">Shadow Dungeon</span><small>Review pinned and missed cards</small></button></div>';
+    panel.innerHTML='<h3>Review Deck</h3><div id="personaHome351" class="personaHome351"></div><div class="reviewBrowse351"><div><label>General Study Mode</label><select id="browseScope351"><option value="new">New cards - not reviewed</option><option value="random">Random - all cards</option><option value="random-new">Random - new cards</option><option value="review">Review deck: pinned / missed / hard</option><option value="hard">Hard only</option><option value="pinned">Pinned only</option><option value="tagged">Tagged selected</option><option value="due">Due-weighted review</option><option value="all">All cards</option></select></div><div><label>System</label><select id="browseSystem351"><option value="all">All systems</option></select></div><div><label>Tags</label><select id="browseTag351"><option value="all">All tags</option></select></div><button id="browseReview351" class="btn primary">Review deck</button></div><div class="homeModeButtons351"><button id="shadow351" class="modeCard"><span class="modeIcon">🌑</span><h2 class="modeTitle">Shadow Dungeon</h2><p class="modeCaption">Spaced Repetition · pinned · missed</p></button></div>';
     const modes=homeWrap.querySelector('.modeGrid');
     (modes||kpis||homeWrap).insertAdjacentElement('afterend',panel);
     const oldScope=$('homeScope175155'), oldSys=$('homeSystem175155'), oldTag=$('homeTag175155');
@@ -10433,7 +10437,6 @@ function fixCanonicalDisplayTitle351() {
 
 #homeActions351 #personaHome351,
 #homeActions351 .personaHome351{display:none!important;}
-#homeActions351 .homeModeButtons351{display:none!important;}
 
 #homeActions351{position:relative!important;}
 #homeActions351 h3{
@@ -11483,7 +11486,7 @@ function fixStableOneThingDropdown351() {
       arr = applyStudyFiltersPhase3(normalizeDeckIdentities()).filter(c => progressForCard(c).suspended);
     }
 
-	    if (!arr.length && ['new_only', 'due', 'pinned', 'hard', 'tagged', 'suspended'].includes(selected)) return [];
+	    if (!arr.length && ['new_only', 'pinned', 'hard', 'tagged', 'suspended'].includes(selected)) return [];
 
     if (selected === 'random_new' && arr.length) {
       const active = arr.filter(c => !session.buriedToday.has(canonicalCardId(c)));
@@ -11513,7 +11516,10 @@ function fixStableOneThingDropdown351() {
           ...refreshed.filter(isNewCard)
         ];
       }
-      if (selected === 'due') return refreshed.filter(c => { const p=progressForCard(c); return isDue(p) && !p.suspended && !p.buried && p.rating!=='bury' && p.last_rating!=='bury'; });
+	      if (selected === 'due') {
+	        const dueOnly = refreshed.filter(c => { const p=progressForCard(c); return isDue(p) && !p.suspended && !p.buried && p.rating!=='bury' && p.last_rating!=='bury'; });
+	        return dueOnly.length ? dueOnly : splitBuriedToBack(refreshed);
+	      }
       if (selected === 'review_deck') {
         return applyStudyFiltersPhase3(normalizeDeckIdentities()).filter(c => { const p=progressForCard(c); return !p.suspended && !p.buried && p.rating!=='bury' && p.last_rating!=='bury'; }).filter(c => {
           const p = progressForCard(c);
@@ -12050,10 +12056,12 @@ function fixStableOneThingDropdown351() {
       console.log(`${passed === results.length ? '✅' : '❌'} SRS: ${passed}/${results.length} passed`);
       return { passed, total: results.length, failed };
     }
-    window.runSRSValidation = runSRSValidation;
-    window.runCozySmokeTests = runCozySmokeTestsPhase3;
-    window.appCards = appCards;
-    window.importLimitlessDeck = importObjectPhase3;
+	    window.runSRSValidation = runSRSValidation;
+	    window.runCozySmokeTests = runCozySmokeTestsPhase3;
+	    window.appCards = appCards;
+	    window.getStudyPool = getStudyPool;
+	    window.progressForCard = progressForCard;
+	    window.importLimitlessDeck = importObjectPhase3;
     window.importLimitlessFile = importFilePhase3;
     window.exportSession = exportProgressOnly;
     window.exportDeckJson351 = exportCleanDeck;
@@ -14420,11 +14428,12 @@ setTimeout(installRatingPathHooks20260603,13000);
     history.replaceState(null,'',clean);
   }
 
-  if(localStorage.getItem('cozy_paid_v1') === '1') return; // already paid
+	  const STRIPE_LINK = 'STRIPE_PLACEHOLDER_URL'; // user will replace
+	  if(localStorage.getItem('cozy_paid_v1') === '1') return; // already paid
+	  if(!STRIPE_LINK || STRIPE_LINK === 'STRIPE_PLACEHOLDER_URL') return; // do not block the app until checkout is configured
 
-  // Build paywall overlay
-  const STRIPE_LINK = 'STRIPE_PLACEHOLDER_URL'; // user will replace
-  const ov = document.createElement('div');
+	  // Build paywall overlay
+	  const ov = document.createElement('div');
   ov.id = 'cozy-paywall-overlay';
   ov.style.cssText = [
     'position:fixed;inset:0;z-index:99999',
