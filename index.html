@@ -6370,7 +6370,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     ov=document.createElement('div');
     ov.id='shadowSetup351';
     ov.className='shadowSetup351 hidden';
-    ov.innerHTML='<div class="shadowBox351"><h2>Shadow Dungeon</h2><p>Review pinned, missed, hard, or scheduled cards with the same timing as Solo Studying.</p><div class="shadowGrid351"><div><label>Option review</label><select id="shadowScope351"><option value="review">Review pinned and missed cards</option><option value="pinned">Pinned only</option><option value="due">Review scheduled - beta spaced repetition</option><option value="random-new">Random new cards</option></select></div><div><label>Type</label><select id="shadowType351"><option value="solo">Solo Studying: Runner</option><option value="domain">Knowledge Expansion: orb select</option></select></div><div><label>Game timing</label><select id="shadowDropSeconds351"><option value="3">3 seconds</option><option value="4">4 seconds</option><option value="5">5 seconds</option><option value="6">6 seconds</option><option value="7">7 seconds</option><option value="8">8 seconds</option><option value="9">9 seconds</option><option value="10">10 seconds</option></select></div><div><label>Review scheduled</label><select id="shadowSchedule351"><option value="due">Beta spaced repetition</option><option value="review">Pinned / missed / hard</option></select></div></div><div class="controls"><button id="shadowStart351" class="btn primary">Start Shadow Dungeon</button><button id="shadowCancel351" class="btn red">Cancel</button></div></div>';
+    ov.innerHTML='<div class="shadowBox351"><h2>Shadow Dungeon</h2><p>Review pinned, missed, hard, or scheduled cards with the same timing as Solo Studying.</p><div class="shadowGrid351"><div><label>Option review</label><select id="shadowScope351"><option value="due" selected>Spaced Repetition</option><option value="review">Review pinned and missed cards</option><option value="pinned">Pinned only</option><option value="random-new">Random new cards</option></select></div><div><label>Type</label><select id="shadowType351"><option value="solo">Solo Studying: Runner</option><option value="domain">Knowledge Expansion: orb select</option></select></div><div><label>Game timing</label><select id="shadowDropSeconds351"><option value="3">3 seconds</option><option value="4">4 seconds</option><option value="5">5 seconds</option><option value="6">6 seconds</option><option value="7">7 seconds</option><option value="8">8 seconds</option><option value="9">9 seconds</option><option value="10">10 seconds</option></select></div><div><label>Review scheduled</label><select id="shadowSchedule351"><option value="due">Spaced Repetition</option><option value="review">Pinned / missed / hard</option></select></div></div><div class="controls"><button id="shadowStart351" class="btn primary">Start Shadow Dungeon</button><button id="shadowCancel351" class="btn red">Cancel</button></div></div>';
     document.body.appendChild(ov);
     $('shadowCancel351').onclick=()=>ov.classList.add('hidden');
     const dropSel=$('shadowDropSeconds351');
@@ -12896,6 +12896,7 @@ function fixStableOneThingDropdown351() {
     const pause = q(pauseId) || ensureHudButton(hud, 'pause', 'Pause', '⏸', () => { try { pauseGame(); } catch (_) {} });
     pause.dataset.hudV1 = '1';
     pause.dataset.hudRole = 'pause';
+    const undo = ensureHudButton(hud, 'undo', 'Undo', '↩', () => { try { if (window.undoReview) window.undoReview(); } catch (_) {} });
     const exit = ensureHudButton(hud, 'home', 'Close', '×', () => { try { home(); } catch (_) {} });
     exit.setAttribute('data-home', '1');
     const settings = ensureHudButton(hud, 'settings', 'Settings', '⚙', () => {
@@ -12905,6 +12906,7 @@ function fixStableOneThingDropdown351() {
     });
 
     removeDuplicateRoleButtons(hud, 'pause', pause, gameId);
+    removeDuplicateRoleButtons(hud, 'undo', undo, gameId);
     removeDuplicateRoleButtons(hud, 'home', exit, gameId);
     removeDuplicateRoleButtons(hud, 'settings', settings, gameId);
 
@@ -12930,10 +12932,12 @@ function fixStableOneThingDropdown351() {
     appendIf(stats, score);
     appendIf(stats, streak);
     appendIf(actions, phase);
+    appendIf(actions, undo);
     appendIf(actions, pause);
     appendIf(actions, exit);
     appendIf(actions, settings);
 
+    iconize(undo, 'Undo', '↩');
     iconize(pause, 'Pause', '⏸');
     iconize(exit, 'Close', '×');
     iconize(settings, 'Settings', '⚙');
@@ -13004,7 +13008,7 @@ function fixStableOneThingDropdown351() {
       ov = document.createElement('div');
       ov.id = 'shadowSetup351';
       ov.className = 'shadowSetup351 hidden';
-      ov.innerHTML = '<div class="shadowBox351"><h2>Shadow Dungeon</h2><p>Review pinned, missed, hard, or scheduled cards with the same timing as Solo Studying.</p><div class="shadowGrid351"><div><label>Option review</label><select id="shadowScope351"><option value="review">Review pinned and missed cards</option><option value="pinned">Pinned only</option><option value="due">Review scheduled - beta spaced repetition</option><option value="random-new">Random new cards</option></select></div><div><label>Type</label><select id="shadowType351"><option value="solo">Solo Studying: Runner</option><option value="domain">Knowledge Expansion: orb select</option></select></div><div><label>Game timing</label><select id="shadowDropSeconds351"><option value="3">3 seconds</option><option value="4">4 seconds</option><option value="5">5 seconds</option><option value="6">6 seconds</option><option value="7">7 seconds</option><option value="8">8 seconds</option><option value="9">9 seconds</option><option value="10">10 seconds</option></select></div><div><label>Review scheduled</label><select id="shadowSchedule351"><option value="due">Beta spaced repetition</option><option value="review">Pinned / missed / hard</option></select></div></div><div class="controls"><button id="shadowStart351" class="btn primary">Start Shadow Dungeon</button><button id="shadowCancel351" class="btn red">Cancel</button></div></div>';
+      ov.innerHTML = '<div class="shadowBox351"><h2>Shadow Dungeon</h2><p>Review pinned, missed, hard, or scheduled cards with the same timing as Solo Studying.</p><div class="shadowGrid351"><div><label>Option review</label><select id="shadowScope351"><option value="due" selected>Spaced Repetition</option><option value="review">Review pinned and missed cards</option><option value="pinned">Pinned only</option><option value="random-new">Random new cards</option></select></div><div><label>Type</label><select id="shadowType351"><option value="solo">Solo Studying: Runner</option><option value="domain">Knowledge Expansion: orb select</option></select></div><div><label>Game timing</label><select id="shadowDropSeconds351"><option value="3">3 seconds</option><option value="4">4 seconds</option><option value="5">5 seconds</option><option value="6">6 seconds</option><option value="7">7 seconds</option><option value="8">8 seconds</option><option value="9">9 seconds</option><option value="10">10 seconds</option></select></div><div><label>Review scheduled</label><select id="shadowSchedule351"><option value="due">Spaced Repetition</option><option value="review">Pinned / missed / hard</option></select></div></div><div class="controls"><button id="shadowStart351" class="btn primary">Start Shadow Dungeon</button><button id="shadowCancel351" class="btn red">Cancel</button></div></div>';
       document.body.appendChild(ov);
     }
     const cancel = q('shadowCancel351');
