@@ -507,3 +507,4 @@ These rules have not changed and must be followed in every subsequent fix:
 4. **Code**: iOS1 — Capacitor scaffold (`npx cap sync`)
 
 2026-06-07: Applied FQ-1/FQ-2/FQ-4 burial-safe study-pool filters and empty Solo guard in PHASE2; browser CDP validation passed FSRS 17/17, smoke 6/6, buried-card exclusion, and empty-pool toast.
+2026-06-07: Applied FQ-3/FQ-8 undo session restore in PHASE2; undo snapshots now restore score/streak/hp/gate/index/current card and cover Domain without forcing Solo.

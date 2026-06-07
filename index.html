@@ -13234,19 +13234,48 @@ function fixStableOneThingDropdown351() {
 
   window.__cozyUndoStack372 = window.__cozyUndoStack372 || [];
 
-  function captureUndoSnapshot(){
+  function findCardByUndoId(id){
+    if (!id) return null;
+    const pools = [];
+    try { if (Array.isArray(cards)) pools.push(cards); } catch (_) {}
+    try { if (typeof normalizeDeckIdentities === 'function') pools.push(normalizeDeckIdentities()); } catch (_) {}
+    try { if (Array.isArray(window.cards)) pools.push(window.cards); } catch (_) {}
+    for (const pool of pools) {
+      const match = pool.find(card => cardIdFor(card) === id);
+      if (match) return match;
+    }
+    return null;
+  }
+
+  function captureUndoSnapshot(gameMode){
     const card = typeof current !== 'undefined' ? current : null;
     const id = cardIdFor(card);
     return {
       card,
       id,
+      mode: gameMode || (typeof mode !== 'undefined' ? mode : 'solo'),
       choices: Array.isArray(choices) ? choices.slice() : [],
       selected: typeof selected === 'number' ? selected : 0,
+      score: typeof score === 'number' ? score : 0,
+      streak: typeof streak === 'number' ? streak : 0,
+      hp: typeof hp === 'number' ? hp : 100,
+      gate: typeof gate === 'number' ? gate : 1,
+      sessionPoolIndex: typeof index === 'number' ? index : 0,
+      queueIndex: typeof window.__shadowRunQueueIdx === 'number' ? window.__shadowRunQueueIdx : null,
       progress: id && window.phase3State && window.phase3State.progress ? clone(window.phase3State.progress[id]) : null,
       state: id && typeof state !== 'undefined' && state ? clone(state[id]) : null,
       hadProgress: !!(id && window.phase3State && window.phase3State.progress && window.phase3State.progress[id]),
       hadState: !!(id && typeof state !== 'undefined' && state && state[id])
     };
+  }
+
+  function pushUndoSnapshot(snap){
+    if (!snap || !snap.id) return;
+    const top = window.__cozyUndoStack372[window.__cozyUndoStack372.length - 1];
+    if (!top || top.id !== snap.id || top.mode !== snap.mode) {
+      window.__cozyUndoStack372.push(snap);
+      if (window.__cozyUndoStack372.length > UNDO_LIMIT) window.__cozyUndoStack372.shift();
+    }
   }
 
   function restoreUndoSnapshot(snap){
@@ -13270,15 +13299,24 @@ function fixStableOneThingDropdown351() {
     try { if (typeof savePhase3State === 'function') savePhase3State(); } catch (_) {}
     try { if (typeof saveState === 'function') saveState(); } catch (_) {}
 
-    current = snap.card;
+    const restoredCard = findCardByUndoId(snap.id) || snap.card;
+    current = restoredCard;
+    try { window.current = restoredCard; } catch (_) {}
     choices = snap.choices.slice();
     selected = snap.selected;
-    mode = 'solo';
+    score = snap.score;
+    streak = snap.streak;
+    hp = snap.hp;
+    gate = snap.gate;
+    index = snap.sessionPoolIndex;
+    try { window.score = snap.score; window.streak = snap.streak; window.hp = snap.hp; window.gate = snap.gate; } catch (_) {}
+    if (snap.queueIndex != null && window.__shadowRunQueue) window.__shadowRunQueueIdx = snap.queueIndex;
+    mode = snap.mode === 'domain' ? 'domain' : 'solo';
     paused = false;
-    try { q('soloReveal')?.classList.add('hidden'); } catch (_) {}
-    try { show('solo'); } catch (_) {}
-    try { renderSolo(); } catch (_) {}
-    try { loopSolo(); } catch (_) {}
+    try { q(mode === 'domain' ? 'domainReveal' : 'soloReveal')?.classList.add('hidden'); } catch (_) {}
+    try { show(mode); } catch (_) {}
+    try { if (mode === 'domain') renderDomain(); else renderSolo(); } catch (_) {}
+    try { if (mode === 'domain') loopDomain(); else loopSolo(); } catch (_) {}
     const remaining = window.__cozyUndoStack372.length;
     try { toast(remaining > 0 ? 'Undone (' + remaining + ' more)' : 'Undone'); } catch (_) {}
     return true;
@@ -13293,24 +13331,35 @@ function fixStableOneThingDropdown351() {
     if (typeof priorSelectSolo !== 'function' || priorSelectSolo.__rectifierUndo372) return;
     const wrapped = function(i){
       const revealOpen = q('soloReveal') && !q('soloReveal').classList.contains('hidden');
-      const snap = revealOpen ? null : captureUndoSnapshot();
+      const snap = revealOpen ? null : captureUndoSnapshot('solo');
       const out = priorSelectSolo.apply(this, arguments);
-      if (snap) {
-        const top = window.__cozyUndoStack372[window.__cozyUndoStack372.length - 1];
-        if (!top || top.id !== snap.id) {
-          window.__cozyUndoStack372.push(snap);
-          if (window.__cozyUndoStack372.length > UNDO_LIMIT) window.__cozyUndoStack372.shift();
-        }
-      }
+      if (snap) pushUndoSnapshot(snap);
       return out;
     };
     wrapped.__rectifierUndo372 = true;
     if (priorSelectSolo.__energyTrack352) wrapped.__energyTrack352 = true;
     window.selectSolo = selectSolo = wrapped;
   }
+  function installUndoDomainWrapper(){
+    const priorSelectDomain = window.selectDomain || (typeof selectDomain !== 'undefined' ? selectDomain : null);
+    if (typeof priorSelectDomain !== 'function' || priorSelectDomain.__rectifierUndo372) return;
+    const wrapped = function(i){
+      const revealOpen = q('domainReveal') && !q('domainReveal').classList.contains('hidden');
+      const snap = revealOpen ? null : captureUndoSnapshot('domain');
+      const out = priorSelectDomain.apply(this, arguments);
+      if (snap) pushUndoSnapshot(snap);
+      return out;
+    };
+    wrapped.__rectifierUndo372 = true;
+    if (priorSelectDomain.__energyTrack352) wrapped.__energyTrack352 = true;
+    window.selectDomain = selectDomain = wrapped;
+  }
   installUndoSelectWrapper();
+  installUndoDomainWrapper();
   setTimeout(installUndoSelectWrapper, 1200);
+  setTimeout(installUndoDomainWrapper, 1200);
   setTimeout(installUndoSelectWrapper, 2600);
+  setTimeout(installUndoDomainWrapper, 2600);
 
   document.addEventListener('keydown', function(ev){
     if (!((ev.metaKey || ev.ctrlKey) && String(ev.key).toLowerCase() === 'z')) return;
