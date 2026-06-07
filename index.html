@@ -416,7 +416,7 @@ function reveal(which,ok){let dx=clean(current.diagnosis), obj=clean(current.edu
 function ratingsHTML(){return `<div class="ratingBar"><button class="btn" data-rate="pin">Pin</button><button class="btn buryBtn352" data-rate="bury">Bury</button><button class="btn againBtn352" data-rate="again">Again</button><button class="btn" data-rate="hard">Hard</button><button class="btn" data-rate="good">Good</button><button class="btn primary" data-rate="easy">EASY</button><button class="btn primary" data-rate="continue">Continue</button></div>`}
 function bindRatings(which){document.querySelectorAll('[data-rate]').forEach(b=>b.onclick=()=>{let r=b.dataset.rate;if(r==='continue'){try{if(current&&typeof rateCard==='function')rateCard(canonicalCardId(current),'good');}catch(e){}advance(which);return}rate(current,r);try{if(current&&r!=='pin'&&typeof rateCard==='function')rateCard(canonicalCardId(current),r);}catch(e){} if(r==='pin')toast('Pinned'); else advance(which)})}
 function advance(which){if(hp<=0&&which==='solo')return endRun('Game Completed');nextCard(); if(which==='solo'){gate++;renderSolo();loopSolo()}else{domainRound++;renderDomain();loopDomain()}}
-function record(c,ok){let k=c.id||c.qid;state[k]=state[k]||{};state[k].seen=true;state[k].reviewed=(state[k].reviewed||0)+1;state[k].correct=(state[k].correct||0)+(ok?1:0);state[k].last=new Date().toISOString();state[k].rating=ok?'good':'again';try{const p=window.phase3State?.progress?.[k];if(p){state[k].pinned=!!p.pinned;state[k].buried=!!p.buried;state[k].next_due_at=p.next_due_at||state[k].next_due_at;state[k].last_rating=p.last_rating||state[k].rating;}}catch(_){}saveState();updateKpis()}
+function record(c,ok){let k=c.id||c.qid;state[k]=state[k]||{};state[k].seen=true;if(typeof ok==='boolean')state[k].reviewed=(state[k].reviewed||0)+1;state[k].correct=(state[k].correct||0)+(ok?1:0);state[k].last=new Date().toISOString();state[k].rating=ok?'good':'again';try{const p=window.phase3State?.progress?.[k];if(p){state[k].pinned=!!p.pinned;state[k].buried=!!p.buried;state[k].next_due_at=p.next_due_at||state[k].next_due_at;state[k].last_rating=p.last_rating||state[k].rating;}}catch(_){}saveState();updateKpis()}
 function rate(c,r){let k=c.id||c.qid;state[k]=state[k]||{};if(r==='pin')state[k].pinned=!state[k].pinned;else state[k].rating=r;state[k].last=new Date().toISOString();saveState();updateKpis()}
 function fireworks(x,y,color='cyan'){for(let i=0;i<42;i++){let s=document.createElement('i');s.className='spark '+(color==='red'?'red':'');let a=Math.random()*Math.PI*2,dist=40+Math.random()*150;s.style.left=x+'px';s.style.top=y+'px';s.style.setProperty('--dx',Math.cos(a)*dist+'px');s.style.setProperty('--dy',Math.sin(a)*dist+'px');$('fx').appendChild(s);setTimeout(()=>s.remove(),800)}}
 function pauseGame(){paused=true;$('pause').classList.remove('hidden');$('pauseBody').textContent=mode==='solo'?'Solo Studying paused.':'Knowledge Expansion paused.'}
@@ -6394,6 +6394,8 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       }
       const homeScope=$('homeScope175155');
       if(homeScope){homeScope.value=studyMode; homeScope.dispatchEvent(new Event('change',{bubbles:true}));}
+      const bs=$('browseScope351'); if(bs){bs.value=studyMode; bs.dispatchEvent(new Event('change',{bubbles:true}));}
+      if(typeof syncGeneralStudyScopePhase3==='function') syncGeneralStudyScopePhase3(studyMode);
       shadowActive351=true;
       ov.classList.add('hidden');
       if(shadowType351==='domain') directStartGame351('domain'); else directStartGame351('solo');
@@ -11454,7 +11456,7 @@ function fixStableOneThingDropdown351() {
         return ta - tb;
       });
 	    } else if (selected === 'review_deck') {
-	      arr = applyStudyFiltersPhase3(normalizeDeckIdentities()).filter(c => !progressForCard(c).suspended).filter(c => {
+	      arr = applyStudyFiltersPhase3(normalizeDeckIdentities()).filter(c => { const p=progressForCard(c); return !p.suspended && !p.buried && p.rating!=='bury' && p.last_rating!=='bury'; }).filter(c => {
 	        const p = progressForCard(c);
 	        return isReviewCandidate(c) && (isImmediateReviewCandidate(p) || !hasFutureDue(p) || isDue(p));
 	      }).sort((a, b) => {
