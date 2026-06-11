@@ -1,5 +1,5 @@
 /* Cozy Arcade PHASE2 Service Worker — offline-first for ABIM study anywhere */
-const CACHE = 'cozy-arcade-PHASE2-v15';
+const CACHE = 'cozy-arcade-PHASE2-v16';
 const APP_SHELL = ['./', './index.html', './manifest.json'];
 
 self.addEventListener('install', event => {
@@ -23,17 +23,14 @@ self.addEventListener('fetch', event => {
 
   if (event.request.method !== 'GET') return;
 
-  /* App shell: stale-while-revalidate */
+  /* App shell: network-first so deployments are visible immediately; cache fallback for offline */
   if (url.origin === self.location.origin && (url.pathname.endsWith('/') || url.pathname.endsWith('index.html') || url.pathname.endsWith('manifest.json'))) {
     event.respondWith(
       caches.open(CACHE).then(cache =>
-        cache.match(event.request).then(cached => {
-          const fresh = fetch(event.request).then(res => {
-            if (res && res.status === 200) cache.put(event.request, res.clone());
-            return res;
-          }).catch(() => cached);
-          return cached || fresh;
-        })
+        fetch(event.request).then(res => {
+          if (res && res.status === 200) cache.put(event.request, res.clone());
+          return res;
+        }).catch(() => cache.match(event.request))
       )
     );
     return;
