@@ -58,6 +58,8 @@ All fixes verified by git log as of 2026-06-10:
 
 **2026-06-10 Codex update:** Applied FQ-AUTO-1/FQ-AUTO-2 to PHASE2 and PHASE1: undo restores runner lane 0, explicit rating cancels deferred auto-rate, Full Card closes on caret/ArrowUp, and service worker caches bumped to PHASE2 v14 / PHASE1 v51.
 
+**2026-06-11 Codex update:** Applied Task 2A in PHASE2 and PHASE1: raised the five active card-timer `Math.min(10, ...)` caps to `15` for Solo drop timing, Knowledge Expansion shared timing, and Shadow Dungeon timing paths.
+
 ---
 
 ## 4. Active Glitch: Auto-Select Correct Re-emergence
