@@ -13311,7 +13311,7 @@ function fixStableOneThingDropdown351() {
     current = restoredCard;
     try { window.current = restoredCard; } catch (_) {}
     choices = snap.choices.slice();
-    selected = snap.selected;
+    selected = 0;
     score = snap.score;
     streak = snap.streak;
     hp = snap.hp;
@@ -14395,6 +14395,9 @@ if(typeof priorAdvance==='function' && !priorAdvance.__cozyRatingPath20260603){
 var priorRate=window.rate || (typeof rate!=='undefined'?rate:null);
 if(typeof priorRate==='function' && !priorRate.__cozyRatingPath20260603){
   var wrappedRate=function(card,rating){
+    clearTimeout(window.__cozyAutoRateHandle20260603);
+    window.__cozyPendingRating20260603=null;
+    try { window.cozyPhase3Session?.seenThisSession?.add(cardIdFor(card)); } catch(_) {}
     var out=priorRate.apply(this,arguments);
     if(card && rating && rating!=='pin' && rating!=='bury') markRated(cardIdFor(card));
     return out;

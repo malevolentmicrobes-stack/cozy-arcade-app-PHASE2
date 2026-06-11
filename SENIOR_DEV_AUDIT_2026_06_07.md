@@ -863,3 +863,110 @@ setTimeout(()=>{
 ---
 
 *Addendum authored 2026-06-07. Codex browser evidence addendum at top of document supersedes Section 0–14 where contradicted.*
+
+---
+
+## 17. Auto-Select Correct Re-emergence — 2026-06-10 Addendum
+
+**Reported:** Runner appears to auto-select the correct answer after undo is used. Previously ruled out (2026-06-04 validation: "runner is not auto-placing the correct answer"). Re-emerged after FQ-3 undo session restore fix (commit `dcb492e` / `6cb4e07`, 2026-06-07).
+
+### Root Cause (code-confirmed)
+
+`restoreUndoSnapshot()` contains:
+```javascript
+selected = snap.selected;
+```
+
+`captureUndoSnapshot()` captures `selected` at the moment just before `selectSolo` fires — this is wherever the runner was when the user answered. If the user answered correctly (moved runner to correct lane, then selected), `snap.selected` equals the correct answer's index.
+
+After undo:
+1. `selected = snap.selected` → runner set to correct-answer lane
+2. `renderSolo()` + `moveHunter()` → runner visually at that lane
+3. `loopSolo()` starts; if user doesn't move, `if(timer<=0&&autoSelect)selectSolo(selected)` fires the correct answer
+
+This is architecturally correct (undo is replaying state) but perceptually wrong (user expects fresh start after undo, not a replay).
+
+### Secondary Issues (existing, unchanged)
+
+**17-A. Duplicate wrapper accumulation (confirmed ongoing)**
+Rating-path rectifier installs at t=700, 1600, 3200, 5200, 8000, 13000ms.
+Undo wrapper installs at t=1200, 2600ms.
+Each install wraps the output of the last install. Guards are one-sided:
+- Undo guard checks `!priorFn.__rectifierUndo372`
+- Rectifier guard checks `!priorFn.__cozyRatingPath20260603`
+Neither checks for the OTHER flag, so they alternate wrapping each other.
+By t=13s: 15–20 total wrapper layers.
+Effect: mostly harmless (each wrapper calls through) but adds latency and risks stale `current` captures.
+
+**17-B. 8-second base rateCard deferred may overwrite explicit rating**
+Base `selectSolo` (L408):
+```javascript
+setTimeout(()=>{ if(!session.seenThisSession.has(_autoCardId)) rateCard(_autoCardId,ok?'good':'again'); }, 8000);
+```
+If user rates explicitly (e.g., Good after wrong auto-select) before 8s, the 8s timer fires with 'again' if `seenThisSession` hasn't been updated. Whether `rateCard` updates `seenThisSession` before 8s is not confirmed — needs verification (Task 2).
+
+### Fix (FQ-AUTO-1 — 1 line)
+
+In `restoreUndoSnapshot()`, `index.html` (find: `selected = snap.selected;`):
+```javascript
+// Change:
+selected = snap.selected;
+// To:
+selected = 0;
+```
+
+Runner resets to neutral lane 0 after every undo. User must actively move to re-answer. `renderSolo()` calls `moveHunter()` which respects the new `selected=0`.
+
+### Contingency Plan
+
+If re-emerges after fix:
+1. Check `window.selected` in DevTools after undo → should be 0
+2. If non-zero: a wrapper is overriding `selected` after `restoreUndoSnapshot`
+3. Search for any code that sets `selected = ` after `renderSolo()` in the undo path
+4. Emergency patch: at the end of `restoreUndoSnapshot`, add:
+   `setTimeout(()=>{ selected=0; if(typeof moveHunter==='function')moveHunter(); }, 50);`
+5. `git revert HEAD` if emergency patch is needed; permanent fix in next Codex session
+
+### Validation Test for FQ-AUTO-1
+
+```javascript
+// GROUP E addendum — Undo runner position
+(function(){
+  console.log('Undo runner test: answer a card, then call undoReview()');
+  // After undoReview():
+  setTimeout(()=>{
+    const sel = window.selected;
+    const cls = document.getElementById('runner')?.className || '';
+    console.assert(sel === 0, 'FQ-AUTO-1 FAIL: selected=' + sel + ' (expected 0)');
+    console.assert(cls.includes('lane0'), 'FQ-AUTO-1 FAIL: runner class=' + cls + ' (expected lane0)');
+    if(sel === 0 && cls.includes('lane0')) console.log('FQ-AUTO-1 PASS: runner at lane0 after undo');
+  }, 500);
+})();
+```
+
+---
+
+## 18. Number Key Selection + Full Card Close — 2026-06-10 Addendum
+
+### Number Key Selection (1–4)
+
+Base keydown handler (L432) already has: `let n=parseInt(e.key); if(n>=1&&n<=4)selectSolo(n-1)`
+
+This works for Solo. For KE (domain): `if(n>=1&&n<=4)selectDomain(n-1)` — also present.
+
+**Risk:** The 700ms debounce wrapper (layer 11) at L14199 wraps the outermost `selectSolo`. If a user presses a number key within 700ms of the prior answer, it may be silently swallowed. This is acceptable for the timer (prevents accidental double-select) but wrong for explicit keypresses.
+
+**Test to determine if debounce affects key presses:**
+```javascript
+// During gameplay, press 1 rapidly after answering:
+// If no visual response → debounce is swallowing it
+// If lane changes → debounce is not affecting explicit key presses
+```
+
+**Fix only if needed:** Set `window.__cozyKeySelect = true` in keydown before calling selectSolo; bypass debounce if flag is true.
+
+### Full Card Modal ("^" Close)
+
+`fullCard()` currently uses `#modal` with a single "Close" button (`#modalClose`). No top-close control exists. User wants a "^" (chevron/caret) button as a quick touch/click dismiss target.
+
+**Implementation note:** Add button INSIDE `.modalBox` positioned `top:8px; right:12px; position:absolute`. Connect `onclick` to `$('modal').classList.add('hidden')`. Also handle `^` keypress when modal is open. No wrapper chains, no new globals needed.

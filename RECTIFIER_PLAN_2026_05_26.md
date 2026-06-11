@@ -509,3 +509,63 @@ These rules have not changed and must be followed in every subsequent fix:
 2026-06-07: Applied FQ-1/FQ-2/FQ-4 burial-safe study-pool filters and empty Solo guard in PHASE2; browser CDP validation passed FSRS 17/17, smoke 6/6, buried-card exclusion, and empty-pool toast.
 2026-06-07: Applied FQ-3/FQ-8 undo session restore in PHASE2; undo snapshots now restore score/streak/hp/gate/index/current card and cover Domain without forcing Solo.
 2026-06-07: M2 paywall trigger spec recorded: paywall must not appear on first launch; it should trigger only after 100 cards reviewed AND both Solo Studying and Shadow Dungeon have been used at least once.
+
+---
+
+## Session Addendum — 2026-06-10 Glitch Re-emergence + User Extension Features
+
+### New Glitches Identified
+
+| ID | Issue | Root Cause | Fix |
+|----|-------|-----------|-----|
+| FQ-AUTO-1 | Runner auto-selects correct answer after undo | `restoreUndoSnapshot` sets `selected = snap.selected`; snap captured pre-answer = where user was when answering | Change `selected = snap.selected` → `selected = 0` in `restoreUndoSnapshot` (1-line fix) |
+| FQ-AUTO-2 | Explicit Good after wrong auto-select may be overwritten | Base `selectSolo` defers `rateCard(ok?'good':'again')` 8000ms; explicit `rate('good')` fires but 8s timer may overwrite | In `wrappedRate` (rectifier): clear `__cozyAutoRateHandle20260603` + add id to `seenThisSession` before `priorRate` fires |
+| FQ-NEW-3 | No "^" close on Full Card modal; number key debounce unclear | `#modal` has only "Close" button; 700ms debounce wrapper may swallow 1–4 keypresses | Add `^` button to modal; verify/bypass debounce for explicit keypresses |
+
+### Updated Fix Queue (2026-06-10)
+
+| ID | Priority | Repos | Issue |
+|----|----------|-------|-------|
+| FQ-AUTO-1 | P0 | Both | Undo runner resets to lane0 |
+| FQ-AUTO-2 | P1 | Both | Explicit rating wins over auto-select deferred |
+| FQ-NEW-3 | P1 | Both | "^" close Full Card + number key verify |
+| FQ-5 | P1 | Both | `shadowSchedule351` dead dropdown |
+| FQ-6 | P2 | Both | Home panel flash |
+| FQ-7 | P2 | Both | Duplicate ⌂ HUD buttons |
+| FQ-9 | P3 | PHASE1 | Port `vercel.json` |
+| FQ-NEW-4 | P2 | Both | Review Deck pin/suspend inline controls (future) |
+| FQ-10 | User | PHASE2 | Replace `STRIPE_PLACEHOLDER_URL` |
+| FQ-11 | User | Both | Import stability/ghost-seen repair JSON |
+| iOS1 | Final | — | Capacitor scaffold |
+
+### Codex Prompt Contracts (2026-06-10)
+
+See `COZY_ARCADE_PROJECT_STATUS_2026-06-10.md` Section 7 for full prompt text.
+
+**FQ-AUTO-1 summary (1-line fix):**
+In `restoreUndoSnapshot()`: `selected = snap.selected` → `selected = 0`
+
+**FQ-AUTO-2 summary:**
+In `wrappedRate` inside `cozy-rating-path-rectifier-2026-06-03`: before `priorRate.apply()`, add:
+`clearTimeout(window.__cozyAutoRateHandle20260603); window.__cozyPendingRating20260603=null; try{window.cozyPhase3Session?.seenThisSession?.add(cardIdFor(card));}catch(_){}`
+
+**FQ-NEW-3 summary:**
+Add `^` button to `fullCard()` modal. Verify 1–4 key selection not swallowed by 700ms debounce; bypass debounce for explicit keypresses if needed.
+
+### Browser Test After Each Fix
+
+| After fix | Run | Pass criteria |
+|-----------|-----|---------------|
+| FQ-AUTO-1 | A + E | A: gates green; E: undo runner at lane0, selected=0 |
+| FQ-AUTO-2 | A + D | A: gates green; D: explicit Good wins over auto-select 'again' |
+| FQ-NEW-3 | A | A: gates green; manual 1–4 keys respond; ^ closes modal |
+
+### Rectifier Rules — Carry Forward (unchanged)
+
+1. Do NOT add new `cardPool` or `nextCard` wrappers.
+2. `syncGeneralStudyScopePhase3()` is the only writer for scope state.
+3. `renderHudControls()` is the only HUD control normalizer.
+4. `rateCard()` is the only FSRS write path.
+5. All burial checks must test all 4 conditions.
+6. Codex prompts: under 80 lines, no CDP infra, port BOTH repos in same prompt.
+7. SW version bumped on every code commit.

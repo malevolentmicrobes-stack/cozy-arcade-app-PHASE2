@@ -6,6 +6,33 @@
 - 2026-05-26 Codex: Browser-validated Steps 1+6-8 plus undo review; `makeChoices`, no double-advance, `loopSolo`, legacy choiceRow classes, FSRS 17/17, and smoke 6/6 all pass.
 - 2026-05-26 Codex: Browser-validated Step 2 bionic consolidation; fresh default true, ON/OFF single-key round-trip, no `cozyBionic351` writes, FSRS 17/17, and smoke 6/6 all pass.
 
+---
+
+## 2026-06-10 Patch History Entry
+
+**Status at session start:** PHASE2 SW v10 (`cozy-arcade-PHASE2-v10`), commit 209adab. PHASE1 SW v47 (`cozy-arcade-v47`), commit 86fca1e. FQ-1 through FQ-4 and FQ-8 all committed and verified.
+
+**Glitches identified this session (no code changes yet — analysis only):**
+
+| Glitch | Root Cause | First appeared |
+|--------|-----------|---------------|
+| FQ-AUTO-1: Runner auto-selects correct after undo | FQ-3 fix (`dcb492e`) restored `selected = snap.selected`; snap = runner position at answer time | Re-emerged after 2026-06-07 FQ-3 fix |
+| FQ-AUTO-2: Explicit Good overwritten by 8s deferred 'again' | Base `selectSolo` defers `rateCard(ok?'good':'again')` for 8000ms; `seenThisSession` guard may not fire in time | Existing risk — not yet confirmed |
+| FQ-NEW-3: "^" close missing on Full Card | Feature never added | New request |
+
+**Documents updated this session:**
+- Created: `COZY_ARCADE_PROJECT_STATUS_2026-06-10.md`
+- Updated: `RECTIFIER_PLAN_2026_05_26.md` (2026-06-10 addendum)
+- Updated: `SENIOR_DEV_AUDIT_2026_06_07.md` (Sections 17–18)
+- Updated: this file
+
+**Code changes pending (Codex Tasks 1–3 not yet run):**
+- FQ-AUTO-1: `restoreUndoSnapshot`: `selected = snap.selected` → `selected = 0`
+- FQ-AUTO-2: `wrappedRate` in rectifier: cancel 8s deferred + update seenThisSession on explicit rating
+- FQ-NEW-3: Add "^" button to Full Card modal; verify/bypass 700ms debounce for number keys
+
+**SW versions expected after Tasks 1–3:** PHASE2 v13, PHASE1 v50 (3 bumps each).
+
 ## File Inventory
 
 | # | Path | Lines | Bytes | Role |
