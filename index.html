@@ -14415,6 +14415,22 @@ setTimeout(installRatingPathHooks20260603,8000);
 setTimeout(installRatingPathHooks20260603,13000);
 })();
 </script>
+<script id="cozy-full-card-caret-close-2026-06-10">
+;(function(){
+'use strict';
+if(window.__cozyFullCardCaretClose20260610) return;
+window.__cozyFullCardCaretClose20260610=true;
+document.addEventListener('keydown',function(ev){
+  if(document.activeElement&&(/^(TEXTAREA|INPUT|SELECT)$/i.test(document.activeElement.tagName)||document.activeElement.isContentEditable)) return;
+  if(ev.key!=='^'&&ev.key!=='ArrowUp'&&ev.key!=='Up') return;
+  var modal=document.getElementById('modal');
+  if(!modal||modal.classList.contains('hidden')) return;
+  ev.preventDefault();
+  ev.stopImmediatePropagation();
+  modal.classList.add('hidden');
+},true);
+})();
+</script>
 <script>if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));</script>
 <script id="cozy-paywall-m2-2026-06-06">
 ;(function(){

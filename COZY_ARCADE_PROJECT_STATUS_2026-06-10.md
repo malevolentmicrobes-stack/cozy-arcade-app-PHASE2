@@ -56,7 +56,7 @@ All fixes verified by git log as of 2026-06-10:
 
 **New glitches identified 2026-06-10:** See Section 4.
 
-**2026-06-10 Codex update:** Applied FQ-AUTO-1/FQ-AUTO-2 to PHASE2 and PHASE1: undo restores runner lane 0, explicit rating cancels deferred auto-rate, and service worker caches bumped to PHASE2 v14 / PHASE1 v51.
+**2026-06-10 Codex update:** Applied FQ-AUTO-1/FQ-AUTO-2 to PHASE2 and PHASE1: undo restores runner lane 0, explicit rating cancels deferred auto-rate, Full Card closes on caret/ArrowUp, and service worker caches bumped to PHASE2 v14 / PHASE1 v51.
 
 ---
 
