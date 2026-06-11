@@ -1,16 +1,16 @@
-# Graph Report - cozy-arcade-app-PHASE2  (2026-06-10)
+# Graph Report - cozy-arcade-app-PHASE2  (2026-06-11)
 
 ## Corpus Check
-- 40 files · ~1,321,490 words
+- 42 files · ~1,323,736 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2287 nodes · 2302 edges · 155 communities (149 shown, 6 thin omitted)
+- 2318 nodes · 2331 edges · 149 communities (141 shown, 8 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `fb840cfb`
+- Built from commit: `02c57c22`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -162,12 +162,6 @@
 - [[_COMMUNITY_Community 145|Community 145]]
 - [[_COMMUNITY_Community 146|Community 146]]
 - [[_COMMUNITY_Community 147|Community 147]]
-- [[_COMMUNITY_Community 148|Community 148]]
-- [[_COMMUNITY_Community 149|Community 149]]
-- [[_COMMUNITY_Community 150|Community 150]]
-- [[_COMMUNITY_Community 151|Community 151]]
-- [[_COMMUNITY_Community 152|Community 152]]
-- [[_COMMUNITY_Community 153|Community 153]]
 - [[_COMMUNITY_Community 154|Community 154]]
 
 ## God Nodes (most connected - your core abstractions)
@@ -185,7 +179,7 @@
 ## Surprising Connections (you probably didn't know these)
 - None detected - all connections are within the same source files.
 
-## Communities (155 total, 6 thin omitted)
+## Communities (149 total, 8 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.04
@@ -204,8 +198,8 @@ Cohesion: 0.22
 Nodes (8): cards, meta, description, optional_fields, required_fields, schema, total, version
 
 ### Community 4 - "Community 4"
-Cohesion: 0.10
-Nodes (21): code:bash (mkdir -p graphify-out), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash (graphify export svg), code:bash (graphify export graphml), code:bash (graphify benchmark), code:bash ($(cat graphify-out/.graphify_python) -c "), code:block31 (Graph complete. Outputs in PATH_TO_DIR/graphify-out/), code:bash (# Detect the correct Python interpreter (handles uv tool, pi) (+13 more)
+Cohesion: 0.04
+Nodes (46): code:bash ($(cat graphify-out/.graphify_python) -c "), code:block11 ([Agent tool call 1: files 1-15, subagent_type="general-purpo), code:bash (PROJECT_ROOT=$(cat graphify-out/.graphify_root)), code:block13 (You are a graphify extraction subagent. Read the files liste), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c ") (+38 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.05
@@ -224,16 +218,16 @@ Cohesion: 0.33
 Nodes (5): Current State, Follow-up Work Completed This Session, Handoff - 2026-05-21 Random Order and Progress Export, Notes, Validation Expectations
 
 ### Community 9 - "Community 9"
-Cohesion: 0.11
-Nodes (17): code:block1 (/graphify                                             # full), code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -m graphify save-result --question "), code:bash ($(cat .graphify_python) -c "), code:bash (python3 -m graphify.watch INPUT_PATH --debounce 3), code:bash (graphify hook install    # install) (+9 more)
+Cohesion: 0.06
+Nodes (34): code:block1 (/graphify                                             # full), code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -c "), code:bash (if [ ! -f graphify-out/.graphify_extract.json ]; then), code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -c ") (+26 more)
 
 ### Community 10 - "Community 10"
 Cohesion: 0.13
 Nodes (14): code:block1 (/graphify                                             # full), code:bash (graphify cluster-only .), code:bash (graphify path "NODE_A" "NODE_B"), code:bash ($(cat graphify-out/.graphify_python) -m graphify save-result), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash (python3 -m graphify.watch INPUT_PATH --debounce 3), For --cluster-only, For /graphify add (+6 more)
 
 ### Community 11 - "Community 11"
-Cohesion: 0.12
-Nodes (16): code:block1 (/graphify                                             # full), code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -c "), code:bash (python3 -m graphify.watch INPUT_PATH --debounce 3), code:bash (graphify hook install    # install), code:bash (graphify claude install), code:bash (graphify claude uninstall  # remove the section), For --cluster-only (+8 more)
+Cohesion: 0.06
+Nodes (34): code:block1 (/graphify                                             # full), code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -c "), code:bash (if [ ! -f graphify-out/.graphify_extract.json ]; then), code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -c ") (+26 more)
 
 ### Community 12 - "Community 12"
 Cohesion: 0.16
@@ -244,8 +238,8 @@ Cohesion: 0.20
 Nodes (9): Based on direct analysis of: `index.html` (10,604 lines, 654KB), `ABIM_DATABASE_first_10_cards_in_order.json`, `ABIM_DATABASE_random_20_cards_seed_20260521_PRETTY.json`, code:block12 (You are implementing Phase 1 of a refactor of a single-file ), code:block13 (TEST 1: Import first_10_cards_in_order.json), CODEX HANDOFF PROMPT, COZY ARCADE BOARD PREP MEDICINE, NON-NEGOTIABLES, Senior Developer Refactor Plan — v1.0, Smoke Tests (run after every phase) (+1 more)
 
 ### Community 16 - "Community 16"
-Cohesion: 0.08
-Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
+Cohesion: 0.04
+Nodes (44): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+36 more)
 
 ### Community 17 - "Community 17"
 Cohesion: 0.08
@@ -296,8 +290,8 @@ Cohesion: 0.08
 Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
 
 ### Community 29 - "Community 29"
-Cohesion: 0.04
-Nodes (44): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+36 more)
+Cohesion: 0.08
+Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
 
 ### Community 30 - "Community 30"
 Cohesion: 0.08
@@ -524,8 +518,8 @@ Cohesion: 0.12
 Nodes (16): code:javascript (window.runFSRSValidation()   // 17/17), Cozy Arcade Board Prep — Ultimate Goals, Guiding Principles (User-Stated), Priority 1 — Active Rectifier (Complete), Priority 1 — Active Rectifier (Must Complete), Priority 2 — Display & Layout, Priority 2 — Display & Layout (Complete), Priority 2b — Export / Undo (Active) (+8 more)
 
 ### Community 90 - "Community 90"
-Cohesion: 0.08
-Nodes (24): code:bash (graphify export wiki), Step 6b - Wiki (only if --wiki flag), code:bash (mkdir -p graphify-out), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash (graphify export obsidian), code:bash (graphify export html  # auto-aggregates to community view if), code:bash (graphify export wiki), code:bash (graphify export svg) (+16 more)
+Cohesion: 0.14
+Nodes (14): code:bash (mkdir -p graphify-out), code:bash (graphify export obsidian), code:bash (graphify export html  # auto-aggregates to community view if), code:bash (graphify export svg), code:bash (graphify export graphml), code:bash (# Detect the correct Python interpreter (handles uv tool, pi), code:bash (GRAPHIFY_WHISPER_MODEL=base  # or whatever --whisper-model t), Step 1 - Ensure graphify is installed (+6 more)
 
 ### Community 91 - "Community 91"
 Cohesion: 0.05
@@ -620,8 +614,8 @@ Cohesion: 0.33
 Nodes (6): 1. Smoke test (console), code:js (window.runCozySmokeTests()   // must be 6/6), code:block14 (window.runSRSValidation()   → must output: ✅ SRS: 13/13 pass), code:block6 (Node.js install → FSRS v5 → due-count widget → LLC ($102) → ), SM-2 SRS Spec (verified 13/13 — do not re-implement), This Session — Step-by-Step Build Plan + Premortem (2026-05-26)
 
 ### Community 114 - "Community 114"
-Cohesion: 0.15
-Nodes (13): code:bash ($(cat graphify-out/.graphify_python) -c "), code:block11 ([Agent tool call 1: files 1-15, subagent_type="general-purpo), code:bash (PROJECT_ROOT=$(cat graphify-out/.graphify_root)), code:block13 (You are a graphify extraction subagent. Read the files liste), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c ") (+5 more)
+Cohesion: 0.11
+Nodes (17): All identified sources (primary → secondary):, BUG 1 — Character auto-trends toward correct answer, BUG 2 — Selecting alternative timer breaks gameplay, BUG 3 — PHASE2 production served stale HTML (resolved 2026-06-11), code:javascript ((function(){), code:bash (git worktree add /tmp/phase2-public origin/public), Cozy Arcade — Bug Diagnosis & Root Cause Analysis, CRITICAL ARCHITECTURE FACT (discovered 2026-06-11) (+9 more)
 
 ### Community 115 - "Community 115"
 Cohesion: 0.11
@@ -640,8 +634,8 @@ Cohesion: 0.67
 Nodes (4): For native CLAUDE.md integration, code:bash (graphify claude install), code:bash (graphify claude uninstall  # remove the section), For native CLAUDE.md integration
 
 ### Community 119 - "Community 119"
-Cohesion: 0.15
-Nodes (13): code:bash ($(cat graphify-out/.graphify_python) -c "), code:block11 ([Agent tool call 1: files 1-15, subagent_type="general-purpo), code:bash (PROJECT_ROOT=$(cat graphify-out/.graphify_root)), code:block13 (You are a graphify extraction subagent. Read the files liste), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c ") (+5 more)
+Cohesion: 0.25
+Nodes (8): code:bash ($(cat graphify-out/.graphify_python) -c "), code:block11 ([Agent tool call 1: files 1-15, subagent_type="general-purpo), code:bash (PROJECT_ROOT=$(cat graphify-out/.graphify_root)), code:block13 (You are a graphify extraction subagent. Read the files liste), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c "), Part B - Semantic extraction (parallel subagents)
 
 ### Community 120 - "Community 120"
 Cohesion: 0.67
@@ -724,80 +718,48 @@ Cohesion: 0.67
 Nodes (3): 1. Shadow Dungeon Defaults to "Review Pinned" on Start, code:javascript (// In DevTools console after hard reload:), Confirmed root causes
 
 ### Community 141 - "Community 141"
-Cohesion: 0.33
-Nodes (6): code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -c "), code:bash (if [ ! -f graphify-out/.graphify_extract.json ]; then), code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -c "), For --update (incremental re-extraction)
+Cohesion: 0.15
+Nodes (12): Cozy Arcade — Project Status & Task Registry, CURRENT PRODUCTION STATE, DEPLOYMENT ARCHITECTURE (critical — burned twice already), KNOWN WORKING — DO NOT RE-PATCH, NEXT CODEX PROMPT (ready to run), P1 — Critical / gameplay breaking, P2 — UI / usability, P3 — Data / export (+4 more)
 
 ### Community 142 - "Community 142"
 Cohesion: 0.33
 Nodes (6): Browser Test After Each Fix, Codex Prompt Contracts (2026-06-10), New Glitches Identified, Rectifier Rules — Carry Forward (unchanged), Session Addendum — 2026-06-10 Glitch Re-emergence + User Extension Features, Updated Fix Queue (2026-06-10)
 
 ### Community 143 - "Community 143"
-Cohesion: 0.33
-Nodes (6): code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -c "), code:bash (if [ ! -f graphify-out/.graphify_extract.json ]; then), code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -c "), For --update (incremental re-extraction)
+Cohesion: 0.40
+Nodes (5): code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c "), Part A - Structural extraction for code files, Part C - Merge AST + semantic into final extraction, Step 3 - Extract entities and relationships
 
 ### Community 144 - "Community 144"
-Cohesion: 0.50
-Nodes (4): code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -m graphify save-result --question "), For /graphify query
-
-### Community 145 - "Community 145"
-Cohesion: 0.50
-Nodes (4): code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -m graphify save-result --question "), For /graphify explain
+Cohesion: 0.67
+Nodes (3): code:bash ($(cat graphify-out/.graphify_python) -c "), code:block31 (Graph complete. Outputs in PATH_TO_DIR/graphify-out/), Step 9 - Save manifest, update cost tracker, clean up, and report
 
 ### Community 146 - "Community 146"
 Cohesion: 0.50
 Nodes (4): 18. Number Key Selection + Full Card Close — 2026-06-10 Addendum, code:javascript (// During gameplay, press 1 rapidly after answering:), Full Card Modal ("^" Close), Number Key Selection (1–4)
-
-### Community 147 - "Community 147"
-Cohesion: 0.50
-Nodes (4): code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -m graphify save-result --question "), For /graphify query
-
-### Community 148 - "Community 148"
-Cohesion: 0.50
-Nodes (4): code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -m graphify save-result --question "), For /graphify path
-
-### Community 149 - "Community 149"
-Cohesion: 0.50
-Nodes (4): code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -c "), code:bash ($(cat .graphify_python) -m graphify save-result --question "), For /graphify explain
-
-### Community 150 - "Community 150"
-Cohesion: 0.67
-Nodes (3): code:bash (graphify claude install), code:bash (graphify claude uninstall  # remove the section), For native CLAUDE.md integration
-
-### Community 151 - "Community 151"
-Cohesion: 0.67
-Nodes (3): code:bash (graphify export obsidian), code:bash (graphify export html  # auto-aggregates to community view if), Step 6 - Generate Obsidian vault (opt-in) + HTML
-
-### Community 152 - "Community 152"
-Cohesion: 0.67
-Nodes (3): code:bash (graphify export neo4j), code:bash (graphify export neo4j --push bolt://localhost:7687 --user ne), Step 7 - Neo4j export (only if --neo4j or --neo4j-push flag)
-
-### Community 153 - "Community 153"
-Cohesion: 0.67
-Nodes (3): code:bash (python3 -m graphify.serve graphify-out/graph.json), code:json ({), Step 7d - MCP server (only if --mcp flag)
 
 ### Community 154 - "Community 154"
 Cohesion: 0.67
 Nodes (3): code:bash (graphify query "QUESTION"), code:bash ($(cat graphify-out/.graphify_python) -m graphify save-result), For /graphify query
 
 ## Knowledge Gaps
-- **1749 isolated node(s):** `schema`, `version`, `description`, `total`, `required_fields` (+1744 more)
+- **1771 isolated node(s):** `schema`, `version`, `description`, `total`, `required_fields` (+1766 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **6 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **8 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
+- **Why does `progress` connect `Community 16` to `Community 17`, `Community 18`, `Community 19`, `Community 20`, `Community 21`, `Community 22`, `Community 23`, `Community 24`, `Community 25`, `Community 26`, `Community 27`, `Community 28`, `Community 29`, `Community 30`, `Community 31`, `Community 32`, `Community 33`, `Community 34`, `Community 35`?**
+  _High betweenness centrality (0.051) - this node is a cross-community bridge._
 - **Why does `progress` connect `Community 107` to `Community 54`, `Community 55`, `Community 56`, `Community 57`, `Community 58`, `Community 59`, `Community 60`, `Community 61`, `Community 62`, `Community 63`, `Community 64`, `Community 65`, `Community 66`, `Community 67`, `Community 68`, `Community 69`, `Community 70`, `Community 71`, `Community 72`, `Community 73`, `Community 101`?**
-  _High betweenness centrality (0.052) - this node is a cross-community bridge._
-- **Why does `progress` connect `Community 29` to `Community 16`, `Community 17`, `Community 18`, `Community 19`, `Community 20`, `Community 21`, `Community 22`, `Community 23`, `Community 24`, `Community 25`, `Community 26`, `Community 27`, `Community 28`, `Community 30`, `Community 31`, `Community 32`, `Community 33`, `Community 34`, `Community 35`?**
-  _High betweenness centrality (0.052) - this node is a cross-community bridge._
+  _High betweenness centrality (0.047) - this node is a cross-community bridge._
+- **Why does `card-0002` connect `Community 29` to `Community 16`?**
+  _High betweenness centrality (0.011) - this node is a cross-community bridge._
 - **What connects `schema`, `version`, `description` to the rest of the system?**
-  _1749 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1771 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.0425531914893617 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.05272895467160037 - nodes in this community are weakly interconnected._
 - **Should `Community 4` be split into smaller, more focused modules?**
-  _Cohesion score 0.09523809523809523 - nodes in this community are weakly interconnected._
-- **Should `Community 5` be split into smaller, more focused modules?**
-  _Cohesion score 0.046511627906976744 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.043478260869565216 - nodes in this community are weakly interconnected._

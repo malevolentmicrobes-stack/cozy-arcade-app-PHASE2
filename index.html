@@ -405,7 +405,7 @@ function renderSolo(){const _savedShell=document.body.classList.contains('cozyGa
 function updateSoloVisuals(){[...document.querySelectorAll('#choiceRow .choice')].forEach((d,i)=>d.classList.toggle('selected',i===selected));moveHunter();$('soloTimerFill').style.width=Math.max(0,timer/timerMax*100)+'%';}
 function moveHunter(){let pct=[12.5,37.5,62.5,87.5][selected]||50;let r=$('runner');r.style.left=pct+'%';r.classList.remove('lane0','lane1','lane2','lane3');r.classList.add('lane'+selected);$('groundGlow').style.left=pct+'%'}
 function loopSolo(){clearInterval(ticker);ticker=setInterval(()=>{if(mode!=='solo'||paused)return;timer-=.08;updateSoloVisuals();if(timer<=0&&autoSelect)selectSolo(selected)},80)}
-function selectSolo(i){if($('soloReveal').classList.contains('hidden')===false)return;selected=i;updateSoloVisuals();clearInterval(ticker);let ok=choices[i]===clean(current.diagnosis); [...document.querySelectorAll('#choiceRow .choice')].forEach((d,j)=>{if(choices[j]===clean(current.diagnosis))d.classList.add('correct'); else if(j===i)d.classList.add('wrong')}); if(ok){score+=1000+streak*200;streak++;runGateBanner();fireworks(innerWidth*.5,innerHeight*.62,'cyan')}else{hp=Math.max(0,hp-25);streak=0;fireworks(innerWidth*.5,innerHeight*.62,'red')} record(current,ok); setTimeout(()=>reveal('solo',ok),650); if(typeof spacedOn!=='undefined'&&spacedOn&&current){const _autoCardId=current.id||current.qid;if(_autoCardId&&typeof session!=='undefined'&&!session.seenThisSession.has(_autoCardId)){setTimeout(()=>{if(session&&!session.seenThisSession.has(_autoCardId)){rateCard(_autoCardId,ok?'good':'again');}},8000);}}}
+function selectSolo(i){if($('soloReveal').classList.contains('hidden')===false)return;selected=i;updateSoloVisuals();clearInterval(ticker);let ok=choices[i]===clean(current.diagnosis); [...document.querySelectorAll('#choiceRow .choice')].forEach((d,j)=>{if(choices[j]===clean(current.diagnosis))d.classList.add('correct'); else if(j===i)d.classList.add('wrong')}); if(ok){score+=1000+streak*200;streak++;runGateBanner();fireworks(innerWidth*.5,innerHeight*.62,'cyan')}else{hp=Math.max(0,hp-25);streak=0;fireworks(innerWidth*.5,innerHeight*.62,'red')} record(current,ok); setTimeout(()=>reveal('solo',ok),650); if(typeof spacedOn!=='undefined'&&spacedOn&&current){const _autoCardId=current.id||current.qid;if(_autoCardId&&typeof session!=='undefined'&&!session.seenThisSession.has(_autoCardId)){window.__cozyAutoRateHandle20260603=setTimeout(()=>{if(session&&!session.seenThisSession.has(_autoCardId)){rateCard(_autoCardId,ok?'good':'again');}},8000);}}}
 function runGateBanner(){let b=$('gateComplete');b.classList.remove('hidden');b.style.animation='none';void b.offsetWidth;b.style.animation='gateRun 1.45s ease-in-out forwards';setTimeout(()=>b.classList.add('hidden'),1500)}
 function renderDomain(){document.body.className='';$('domainRound').textContent=domainRound;$('domainScore').textContent=score;$('domainStreak').textContent=streak;$('domainSystem').textContent=current.system||current.sys||'';$('domainQuestion').innerHTML=bionic(getPrompt(current));$('domainReveal').classList.add('hidden');$('orbArena').innerHTML='';timerMax=parseInt(localStorage.getItem('cozyQuestionSeconds351')||7)||7;timer=timerMax;makeOrbs();}
 function makeOrbs(){orbData=[];let cx=innerWidth/2, cy=innerHeight*.63, r=60;choices.forEach((ch,i)=>{let ang=(-Math.PI/2)+i*Math.PI/2;let el=document.createElement('button');el.className='orb';el.dataset.idx=i;el.innerHTML=escHTML(ch);el.onclick=()=>selectDomain(i);$('orbArena').appendChild(el);orbData.push({el,ang,x:cx+r*Math.cos(ang),y:cy+r*Math.sin(ang),startX:cx+r*Math.cos(ang),startY:cy+r*Math.sin(ang)})});positionOrbs(0)}
@@ -7280,7 +7280,8 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       return;
     }
     const gameType351 = which === 'domain' ? 'expansion' : 'solo';
-    const pool351 = typeof sessionPool === 'function' ? sessionPool(gameType351) : (typeof getStudyPool === 'function' ? getStudyPool(selectedOrder(gameType351), gameType351) : []);
+    const order351 = typeof selectedOrder === 'function' ? selectedOrder(gameType351) : (document.documentElement.dataset.cozyLaunchScope || (gameType351 === 'expansion' ? 'new_first' : 'random_new'));
+    const pool351 = typeof sessionPool === 'function' ? sessionPool(gameType351) : (typeof getStudyPool === 'function' ? getStudyPool(order351, gameType351) : []);
     if (!pool351 || pool351.length === 0) { try{toast('No cards match this filter — change scope or upload a deck');}catch(e){} return; }
     try{$('notify')?.classList.add('hidden');}catch(e){}
     try{$('pause')?.classList.add('hidden');}catch(e){}
@@ -14413,6 +14414,60 @@ setTimeout(installRatingPathHooks20260603,3200);
 setTimeout(installRatingPathHooks20260603,5200);
 setTimeout(installRatingPathHooks20260603,8000);
 setTimeout(installRatingPathHooks20260603,13000);
+})();
+</script>
+<script id="cozy-explicit-rating-stabilizer-2026-06-11">
+;(function(){
+'use strict';
+if(window.__cozyExplicitRatingStabilizer20260611) return;
+window.__cozyExplicitRatingStabilizer20260611=true;
+function cardIdFor(card){
+  try{ if(typeof canonicalCardId==='function') return canonicalCardId(card); }catch(_){}
+  return card && (card.qid_unique || card.card_id || card.qid || card.id || card.json_id || card.diagnosis || card.answer);
+}
+function clearDeferredAutoRate(){
+  clearTimeout(window.__cozyAutoRateHandle20260603);
+  window.__cozyAutoRateHandle20260603=null;
+  window.__cozyPendingRating20260603=null;
+}
+function requeueAgainCard(card,rating){
+  if(rating!=='again' || !card) return;
+  try{
+    var sess=window.cozyPhase3Session;
+    if(!sess || !Array.isArray(sess.pool)) return;
+    var ids=[cardIdFor(card),card.id,card.qid,card.qid_unique,card.card_id].filter(Boolean);
+    ids.forEach(function(id){ try{ sess.seenThisSession && sess.seenThisSession.delete(id); }catch(_){} });
+    var idx=(typeof index==='number') ? index : (typeof sess.poolIdx==='number' ? sess.poolIdx : 0);
+    var exhausted=sess.pool.length<=idx;
+    var at=Math.min(sess.pool.length,Math.max(0,idx)+3);
+    sess.pool.splice(at,0,Object.assign({},card));
+    if(exhausted && typeof index==='number') index=0;
+  }catch(_){}
+}
+function wrapRate(){
+  var prior=window.rate || (typeof rate!=='undefined' ? rate : null);
+  if(typeof prior!=='function' || prior.__cozyExplicitRatingStabilizer20260611) return;
+  var wrapped=function(card,rating){
+    if(rating && rating!=='pin' && rating!=='bury') clearDeferredAutoRate();
+    var out=prior.apply(this,arguments);
+    requeueAgainCard(card,rating);
+    return out;
+  };
+  wrapped.__cozyExplicitRatingStabilizer20260611=true;
+  window.rate=rate=wrapped;
+}
+function wrapRateCard(){
+  var prior=window.rateCard;
+  if(typeof prior!=='function' || prior.__cozyExplicitRatingStabilizer20260611) return;
+  window.rateCard=function(cardId,rating){
+    if(rating && rating!=='pin' && rating!=='bury') clearDeferredAutoRate();
+    return prior.apply(this,arguments);
+  };
+  window.rateCard.__cozyExplicitRatingStabilizer20260611=true;
+}
+function install(){wrapRate();wrapRateCard();}
+install();
+[700,1600,3200,5200,8000].forEach(function(ms){setTimeout(install,ms);});
 })();
 </script>
 <script id="cozy-full-card-caret-close-2026-06-10">
