@@ -156,34 +156,37 @@ Do not begin coding until this plan is written and the user has approved it (or 
 | FQ-ALGO-1 | Explicit rating cancels deferred auto-rate (Again no longer overwritten by good) | 048d073 |
 | FQ-AUTO-1 | `selected=0` on undo restore (runner not biased toward correct lane) | 8eb10a4 |
 | FQ-RENDER-2 | `document.body.className` save/restore in System 2 render path | line 3939 |
+| FQ-DUE-1 | `getStudyPool('due')` filters `isDue\|\|pinned` before sort | dfb2ecc |
+| FQ-DUE-1b | Phase 3 `cardPool('due')` fallback: pinned-only (not all cards) | 477b25e |
+| Test A | Auto-correct writes FSRS immediately via rateOnce-first | 477b25e |
+| Dead writes | LEGACY_STATE_KEYS loop, Atlas STATE_KEYS, spacedOn v1759/v175157, cozy_persona | dfb2ecc (PHASE2), b0defd5 (PHASE1) |
 
-### P1 — Fix next (in this order)
+### P1 — Fix next (CURRENT PRIORITY)
 
-**FQ-DUE-1 is confirmed by browser audit — fix FIRST before PHASE1 port.**
-**Rating matrix A–I all passed — do not re-run rating audit unless touching rate()/rateCard()/selectSolo.**
+**User-visible symptom: correctly-answered cards circle back in Shadow Dungeon.**
+**Codex browser audit: tests A/H/I/M now fixed. K still open. Render fixes applied but unvalidated.**
 
 | ID | What | Where | Fix |
 |---|---|---|---|
-| **FQ-DUE-1** | `getStudyPool('due')` never filters — only sorts. `dueScoreHot()` gives future-due Again cards score ~1660, so they sort to top of Spaced Rep / Shadow Dungeon pool despite `isDue()=false`. PHASE1 port blocked until fixed. | line 10106–10107 in Phase 3 `getStudyPool` | Filter to `isDue(p) \|\| p.pinned` before sort; fall back to full sort only if empty |
-| FQ-RENDER-1 | Dual drop engines → selectSolo fires twice → double FSRS writes possible | `startStableSoloDrop351` line ~6951 | `try{clearSoloDrop();}catch(e){}` after mode guard |
-| FQ-RENDER-3 | Triple bionic writer → font flickers plain↔bionic | `installBionicQuestionPatch352` line ~7446 | Guard: `!(el.innerHTML.includes('<b>') && _b)` |
-| FQ-ALGO-3 | 18 review-stage rows `next_due_at=null` → `isDue()=true` always | progress data | Data repair via `rateCard()` replay |
+| **FQ-POOL-1** | Pinned cards pass `isDue\|\|p.pinned` every pool pass — no `buriedToday` protection after correct rating → pinned cards always recirculate | `rateCard()` ~line 11261 | Add `session.buriedToday.add(cardId)` for good/easy ratings regardless of pinned status (already done for hard/good/easy via `buried=true`) — the issue is the filter in pool building, not rateCard. See `cardPool` line ~11497 filter. |
+| **FQ-POOL-2** | Shadow Dungeon 'random'/'spaced' scopes don't filter `session.buriedToday` or `session.seenThisSession` — cards rated good/easy come back immediately | `cardPool()` non-'due' branches ~line 11535 | Apply `splitBuriedToBack` + seenThisSession filter to all scopes, not just 'due' |
+| **FQ-DATA-1** | `repair_point=True` never cleared when answer is correct — cards stay in always-due pool forever | `record()` or `rateCard()` | Add `repair_point: false` when `rating==='good'\|\|\|easy'` in `rateCard` setProgress call |
+| **FQ-RENDER-1** | clearSoloDrop() fix applied but not browser-validated — selectSolo may still fire twice | `startStableSoloDrop351` line ~6951 | Browser validate: count selectSolo fires per card (expect 1) |
+| **FQ-RENDER-3** | Bionic guard applied but not browser-validated — font may still flicker | `installBionicQuestionPatch352` line ~7446 | Browser validate: MutationObserver write count (expect 1) |
 
 ### P2 — Fix after P1 clears
-| ID | What | Fix approach |
-|---|---|---|
-| FQ-ALGO-4 | "Again" cards don't return in current session (Anki gap) | Edit `requeueAgainCard`: splice card at idx+3 when not future-due |
-| FQ-RENDER-4 | 700ms debounce at wrong selectSolo layer (outer wrappers bypass it) | Structural — move debounce to outermost position after P1 stable |
-| State-A1 | `savePhase3State` writes dead key `soloStudyingState_v1757` on every save | Remove line 11008 LEGACY_STATE_KEYS loop |
-| State-A2 | Atlas reads typo key `cazy_v3` + dead key `soloStudyingState_v1757` | Remove from STATE_KEYS array at line 13674 |
-| State-A3/4 | Dead spacedOn writes (`v1759`, `v175157`) | Remove lines 511 and 1511 dead setItem calls |
-| State-A5 | Persona written twice per change (`cozy_persona` duplicate) | Remove second setItem at line 5877 |
-
-### P3 — After all above
 | ID | What |
 |---|---|
-| FQ-ALGO-5 | Shared guard flag for `rate()` wrapper accumulation |
-| State-B | Deck/progress consistency gate (Cards 0 / Reviewed 93 display) |
+| FQ-ALGO-3 | 18 review-stage rows null next_due_at — always due |
+| FQ-ALGO-4 | Again not requeued same session (Anki gap) |
+| FQ-DATA-2 | wrong_count bloat from legacy counter |
+| FQ-ALGO-6 | K: wrong_count conflates lane accuracy + self-rating |
+| State-B | Deck restore after hard reload (Cards 0 / Reviewed 93) |
+
+### P3 — After P2
+| ID | What |
+|---|---|
+| FQ-ALGO-5 | stability/difficulty not written on good/hard/easy reviews |
 | M2 | Stripe Payment Link |
 | iOS1 | Capacitor scaffold |
 

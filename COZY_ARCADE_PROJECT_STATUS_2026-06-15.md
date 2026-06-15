@@ -1,6 +1,6 @@
 # Cozy Arcade — Project Status, Test Suite & Next Steps
 **Date:** 2026-06-15 | **Active branch:** PHASE2 main → origin/public (production)
-**SW version:** cozy-arcade-PHASE2-**v19** (bumped this session) | **PHASE1 SW:** audit separately
+**SW version:** cozy-arcade-PHASE2-**v20** | **PHASE1 SW:** v55 | Last commits: PHASE2 `477b25e`, PHASE1 `b0defd5`
 
 ---
 
@@ -476,6 +476,135 @@ localStorage.setItem('cozy_arcade_progress_v1', ...)   // semi-redundant ← kee
 | `GOAL.md` | Active gate + open bug inventory |
 | `Chronological_Patch_Hx_RECTIFIER_PLAN_2026_05_26.md` | Every session entry with validation results |
 | `AGENTS.md` | Codex agent constraints + next render-fix task brief |
+| `CODEX_PROMPT_1_ALGORITHM_GLITCH.md` | 13-test rating matrix + pool tests (A–M) |
+| `CODEX_PROMPT_2_HARD_RESET_SAVE.md` | localStorage hygiene + deck restore verification |
+| `CODEX_PROMPT_3_POOL_RECIRCULATION.md` | Shadow Dungeon / pinned card recirculation tests (NEXT TASK) |
+
+---
+
+## SESSION 2 — 2026-06-15 (afternoon) — CHANGES APPLIED
+
+### Commits This Session
+| Repo | Commit | SW | What |
+|------|--------|-----|------|
+| PHASE2 | `dfb2ecc` | v19 | Debulk 7 dead state writes + FQ-DUE-1/RENDER-1/RENDER-3 |
+| PHASE2 | `477b25e` | v20 | Fix test A (auto-correct), FQ-DUE-1 cardPool fallback, wrappedRate lastRatedId clear |
+| PHASE1 | `b0defd5` | v55 | Remove LEGACY_STATE_KEYS dead write (soloStudyingState_v1757) |
+
+### Codex Browser Audit Results (run before commit 477b25e)
+| Test | Result | Note |
+|------|--------|------|
+| A — auto-correct | ❌ FAIL → **FIXED** in 477b25e | pendingFor-only blocked rateOnce; restored rateOnce-first |
+| B — auto-wrong | ✅ PASS | |
+| C — explicit Again cancel | ✅ PASS | |
+| D — explicit Hard | ✅ PASS | |
+| E — explicit Good | ✅ PASS | |
+| F — explicit Easy | ✅ PASS | |
+| G — Again twice | ✅ PASS | |
+| H — due pool no future-due cards | ❌ FAIL → **FIXED** in 477b25e | phase3 cardPool fallback was splitBuriedToBack(all) |
+| I — Shadow/due no future-due | ❌ FAIL → **FIXED** in 477b25e | same fallback |
+| J — repair_point cleared on good | ✅ PASS | |
+| K — correct lane + Again counters | ❌ OPEN | wrong_count conflates lane accuracy + self-rating |
+| L — stability written on review good | ✅ PASS | |
+| M — ghost card-000X not in due pool | ❌ FAIL → **FIXED** in 477b25e | same fallback |
+
+### Fix Details (commit 477b25e)
+
+**Test A — auto-correct:**
+`wrappedSelect` was calling `pendingFor(card, rating)` only (our change in dfb2ecc). `pendingFor` sets an 8.2s timer. That timer fires `rateOnce` → `rateCard`. Race condition: something was blocking `rateOnce` before the timer fired. Fix: restored `rateOnce`-first (immediate write on card selection). Added `window.__cozyLastRatedId=null` in `wrappedRate` so explicit ratings override even after auto-rate wrote good.
+
+**H/I/M — FQ-DUE-1 cardPool fallback:**
+`cardPool('due')` in Phase 3 had two layers. We fixed `getStudyPool('due')` (line 10106, Shadow Dungeon path) in dfb2ecc, but the Phase 3 main `cardPool` at line 11524 still used `splitBuriedToBack(refreshed)` as fallback when `dueOnly` was empty. This returned ALL 1,700 cards. Fixed: fallback now returns `pinnedFallback` (pinned cards only) or empty array.
+
+---
+
+## PROGRESS EXPORT AUDIT — 2026-06-15 SESSION 2 (cozy_arcade_progress_2026-06-15(3).json)
+
+**Export time:** during active play session after fixes pushed | Total rows: 1,734
+
+### New Symptom: Cards Circling Back After Correct Answer
+
+| Card | Seen | Rating | Due | Pinned | Repair | Verdict |
+|------|------|--------|-----|--------|--------|---------|
+| `104-1-8626` | **9×** | easy | FUTURE +24h | No | No | ❌ Bug — should never recircle |
+| `104-2-7802` | **6×** | again | FUTURE +8min | No | Yes | ⚠️ repair_point always-due (FQ-ALGO-2) |
+| `104-7-7993` | 3× | good | FUTURE +3d | **Yes** | No | ⚠️ pinned always-in-pool |
+| `104-28-8682` | 3× | good | FUTURE +24h | No | No | ❌ Bug — pool leak |
+| `104-30-7913` | 3× | good | FUTURE +24h | **Yes** | No | ⚠️ pinned always-in-pool |
+
+**31 good/easy cards have seen_count > 1** — confirming widespread same-session recirculation.
+
+### Recirculation Diagnoses (most → least probable)
+
+| # | ID | Root Cause | Evidence |
+|---|---|---|---|
+| 1 | **FQ-POOL-1** | Pinned cards pass `isDue(p)\|\|p.pinned` filter every pool pass — no `buriedToday` protection after correct rating | `104-7-7993` (pinned=True, good, seen=3, due+3d); `104-30-7913` (pinned=True, seen=3) |
+| 2 | **FQ-POOL-2** | Shadow Dungeon pool does NOT filter `session.buriedToday` or `session.seenThisSession` for non-'due' scopes | `104-1-8626` (seen=9, easy, future, NOT pinned) — can only recircle if pool ignores buriedToday |
+| 3 | **FQ-ALGO-2** | `repair_point=True` bypasses `isDue()` in review_deck — always immediately due | `104-2-7802` (seen=6, repair=True) |
+| 4 | **FQ-DATA-1** | `repair_point` never cleared when `record(ok=true)` fires — confirmed from session 1 audit | Cards `3-13710`, `16-8553` still repair=True after correct answers |
+| 5 | **FQ-RENDER-1** | Dual selectSolo fire inflates `reviewed_count` (each card rated twice per appearance) | clearSoloDrop fix applied but not browser-validated |
+| 6 | **FQ-ALGO-5** | `__cozyLastRatedId` only tracks ONE card — if same card appears twice in pool, second appearance re-rates | Amplifies seen_count but not root cause of pool leak |
+| 7 | **FQ-DUE-1 (old)** | Before 477b25e, splitBuriedToBack served ALL cards as fallback — `104-1-8626` would have been in every 'due' session | Export may partially reflect pre-fix play |
+
+### What Is NOT the Cause
+- Progress state is NOT corrupted — FSRS intervals are correct (easy→15d, good→3d)
+- This is a POOL filter problem, not a scheduling problem
+- Solo Studying appears unaffected because its scope uses `seenThisSession` gating differently
+- Shadow Dungeon is the primary suspect per user observation
+
+---
+
+## COMPLETE BUG INVENTORY (as of 2026-06-15 session 2)
+
+### P0 — Fixed, must not regress
+| ID | Fix | Commit |
+|----|-----|--------|
+| FQ-ALGO-1 | Auto-rate timer cancelled by explicit rating | 048d073 |
+| FQ-AUTO-1 | selected=0 on undo restore | 8eb10a4 |
+| FQ-RENDER-2 | body.className save/restore | line 3939 |
+| FQ-DUE-1 | getStudyPool('due') filters isDue\|\|pinned | dfb2ecc |
+| FQ-DUE-1b | cardPool('due') fallback returns pinned-only not all | 477b25e |
+| Test A | auto-correct writes FSRS immediately | 477b25e |
+| Dead writes | LEGACY_STATE_KEYS, Atlas STATE_KEYS, spacedOn, persona | dfb2ecc + b0defd5 |
+
+### P1 — Fix next (blocking good UX)
+| ID | What | Where |
+|----|------|-------|
+| **FQ-POOL-1** | Pinned cards recircle every pool pass — need buriedToday after correct rating | `rateCard()` line 11246: add `session.buriedToday.add(cardId)` for good/easy on pinned cards; OR filter pinned from pool if already in seenThisSession |
+| **FQ-POOL-2** | Shadow Dungeon non-'due' scope ignores buriedToday/seenThisSession — 104-1-8626 seen 9× | `cardPool()` for 'random'/'spaced' scopes — add `splitBuriedToBack` or `seenThisSession` filter |
+| **FQ-DATA-1** | repair_point never cleared on correct answer | `record()` or `rateCard()` — add `repair_point: false` when `ok===true` or `rating==='good'\|\|\|easy` |
+| **FQ-RENDER-1** | Dual drop engines — selectSolo fires twice (clearSoloDrop fix applied, unvalidated) | `startStableSoloDrop351` — browser validate |
+| **FQ-RENDER-3** | Triple bionic writer — font flicker (bionic guard applied, unvalidated) | `installBionicQuestionPatch352` — browser validate |
+
+### P2 — Fix after P1
+| ID | What |
+|----|------|
+| FQ-ALGO-3 | 18 review-stage cards with null next_due_at — always due |
+| FQ-ALGO-4 | Again cards not requeued in current session (Anki gap) |
+| FQ-DATA-2 | wrong_count bloat from legacy counter |
+| FQ-DATA-3 | card-000X ghost cards (KE import artifacts) |
+| FQ-ALGO-6 | K: wrong_count conflates lane accuracy + self-rating |
+| State-B | Deck restore after hard reload (Cards 0 / Reviewed 93) |
+
+### P3 — After P2
+| ID | What |
+|----|------|
+| FQ-ALGO-5 | stability/difficulty not written on good/hard/easy (only on first again) |
+| M2 | Stripe Payment Link |
+| iOS1 | Capacitor scaffold |
+
+---
+
+## NEXT CODEX TASK
+
+See `CODEX_PROMPT_3_POOL_RECIRCULATION.md` for full copy-paste prompt.
+
+**Priority order:**
+1. Validate FQ-RENDER-1 + FQ-RENDER-3 (render fixes applied unvalidated)
+2. Fix FQ-POOL-1 (pinned cards in pool every pass)
+3. Fix FQ-POOL-2 (Shadow Dungeon seenThisSession/buriedToday filter)
+4. Fix FQ-DATA-1 (repair_point not cleared on correct answer)
+5. Port to PHASE1 after PHASE2 validates all P1 items
 
 ---
 
