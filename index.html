@@ -11312,6 +11312,11 @@ function fixStableOneThingDropdown351() {
     return active.concat(buried);
   }
 
+  function isSessionBlockedCard(card) {
+    const id = canonicalCardId(card);
+    return session.seenThisSession.has(id) || session.buriedToday.has(id) || getProgress(id).buried;
+  }
+
   function clearSessionBuried() {
     session.buriedToday.clear();
     session.seenThisSession.clear();
@@ -11494,14 +11499,13 @@ function fixStableOneThingDropdown351() {
 	    if (!arr.length && ['new_only', 'pinned', 'hard', 'tagged', 'suspended'].includes(selected)) return [];
 
     if (selected === 'random_new' && arr.length) {
-      const active = arr.filter(c => !session.buriedToday.has(canonicalCardId(c)));
+      const active = arr.filter(c => !isSessionBlockedCard(c));
       return active.length ? active : arr;
     }
     const scheduledModes = ['new_first', 'reviewed_first', 'due', 'review_deck'];
     const ordered = splitBuriedToBack(arr.length || scheduledModes.includes(selected) ? arr : applyStudyFiltersPhase3(basePlayableCards()));
     const active = ordered.filter(c => {
-      const id = canonicalCardId(c);
-      return !session.buriedToday.has(id) && !getProgress(id).buried;
+      return !isSessionBlockedCard(c);
     });
     if (active.length) return active;
     if (ordered.length) return ordered;
@@ -11534,7 +11538,9 @@ function fixStableOneThingDropdown351() {
         });
       }
     }
-    return shuffleCards(applyStudyFiltersPhase3(basePlayableCards()));
+    const base = applyStudyFiltersPhase3(basePlayableCards())
+      .filter(c => !session.seenThisSession.has(canonicalCardId(c)));
+    return shuffleCards(base.length ? base : applyStudyFiltersPhase3(basePlayableCards()));
   }
 
   function poolKey(gameType) {
@@ -12083,7 +12089,7 @@ function fixStableOneThingDropdown351() {
       const _cur = getProgress(id);
       const _patch = {
         last_seen_at: nowIso(),
-        repair_point: ok === false ? true : (_cur.repair_point || false),
+        repair_point: ok === false ? true : false,
       };
       if (_cur.stability  != null) _patch.stability  = _cur.stability;
       if (_cur.difficulty != null) _patch.difficulty = _cur.difficulty;
@@ -12113,10 +12119,18 @@ function fixStableOneThingDropdown351() {
       // __shadowRunQueueIdx starts at 1 (card 0 already served by startCard on session start).
       if (window.__shadowDungeonActive175164 && Array.isArray(window.__shadowRunQueue) && window.__shadowRunQueue.length) {
         const idx = typeof window.__shadowRunQueueIdx === 'number' ? window.__shadowRunQueueIdx : 1;
-        current = window.__shadowRunQueue[idx % window.__shadowRunQueue.length];
-        window.__shadowRunQueueIdx = idx + 1;
-        if (typeof makeChoices === 'function') makeChoices();
-        return;
+        for (let step = 0; step < window.__shadowRunQueue.length; step += 1) {
+          const nextIdx = (idx + step) % window.__shadowRunQueue.length;
+          const candidate = window.__shadowRunQueue[nextIdx];
+          if (!isSessionBlockedCard(candidate)) {
+            current = candidate;
+            window.__shadowRunQueueIdx = nextIdx + 1;
+            if (typeof makeChoices === 'function') makeChoices();
+            return;
+          }
+        }
+        window.__shadowRunQueue = [];
+        window.__shadowRunQueueIdx = 0;
       }
       const gameType = mode === 'domain' ? 'expansion' : 'solo';
       const pool = sessionPool(gameType);

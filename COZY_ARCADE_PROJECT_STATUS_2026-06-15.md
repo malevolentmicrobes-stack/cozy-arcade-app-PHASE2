@@ -490,6 +490,7 @@ localStorage.setItem('cozy_arcade_progress_v1', ...)   // semi-redundant ← kee
 | PHASE2 | `dfb2ecc` | v19 | Debulk 7 dead state writes + FQ-DUE-1/RENDER-1/RENDER-3 |
 | PHASE2 | `477b25e` | v20 | Fix test A (auto-correct), FQ-DUE-1 cardPool fallback, wrappedRate lastRatedId clear |
 | PHASE1 | `b0defd5` | v55 | Remove LEGACY_STATE_KEYS dead write (soloStudyingState_v1757) |
+| PHASE2/PHASE1 | pending | v21/v56 | FQ-POOL-1/2 session-blocked pool + Shadow Dungeon queue skip; correct `record()` clears repair_point |
 
 ### Codex Browser Audit Results (run before commit 477b25e)
 | Test | Result | Note |
