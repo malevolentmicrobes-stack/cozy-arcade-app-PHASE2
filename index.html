@@ -11523,7 +11523,9 @@ function fixStableOneThingDropdown351() {
       }
 	      if (selected === 'due') {
 	        const dueOnly = refreshed.filter(c => { const p=progressForCard(c); return isDue(p) && !p.suspended && !p.buried && p.rating!=='bury' && p.last_rating!=='bury'; });
-	        return dueOnly.length ? dueOnly : splitBuriedToBack(refreshed);
+	        if (dueOnly.length) return dueOnly;
+	        const pinnedFallback = refreshed.filter(c => { const p=progressForCard(c); return p && p.pinned && !p.suspended && !p.buried; });
+	        return pinnedFallback;
 	      }
       if (selected === 'review_deck') {
         return applyStudyFiltersPhase3(normalizeDeckIdentities()).filter(c => { const p=progressForCard(c); return !p.suspended && !p.buried && p.rating!=='bury' && p.last_rating!=='bury'; }).filter(c => {
@@ -14364,7 +14366,8 @@ if(typeof priorSelect==='function' && !priorSelect.__cozyRatingPath20260603){
     var out=priorSelect.apply(this,arguments);
     try{
       if(rating && typeof spacedOn!=='undefined' && spacedOn!==false){
-        pendingFor(card,rating);
+        if(!rateOnce(card,rating)) pendingFor(card,rating);
+        else { clearTimeout(window.__cozyAutoRateHandle20260603); window.__cozyPendingRating20260603=null; }
       }
     }catch(_){}
     return out;
@@ -14398,6 +14401,7 @@ if(typeof priorRate==='function' && !priorRate.__cozyRatingPath20260603){
   var wrappedRate=function(card,rating){
     clearTimeout(window.__cozyAutoRateHandle20260603);
     window.__cozyPendingRating20260603=null;
+    window.__cozyLastRatedId=null;
     try { window.cozyPhase3Session?.seenThisSession?.add(cardIdFor(card)); } catch(_) {}
     var out=priorRate.apply(this,arguments);
     if(card && rating && rating!=='pin' && rating!=='bury') markRated(cardIdFor(card));
