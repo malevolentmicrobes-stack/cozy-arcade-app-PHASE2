@@ -138,3 +138,59 @@ window.hideAtlasScreen()   // returns to home
 
 *Full step-by-step history: `RECTIFIER_PLAN_2026_05_26.md`*
 *Active gate tracking: `GOAL.md`*
+
+---
+
+## Root Cause Log — 2026-06-15 (Codex Browser Audit)
+
+**Method:** Headless Chrome/CDP against PHASE2 local HTTP server. Instrumented `selectSolo` call count, CSS variable mutations, `document.body.className`, and `soloQuestion.innerHTML` write events.
+
+### New Root Causes Confirmed
+
+**RC-6 — Dual drop engines running concurrently**
+System 2 (`raf175164`, `--soloDropY`) and System 3 (`soloStableRaf351`, `--soloDropY351`) both animate simultaneously. Both `--soloDropY` and `--soloDropY351` CSS variables moved during a single card drop. `selectSolo` fired **twice within 42ms** at timer expiry. The 700ms debounce (layer 11) suppresses the inner re-select but ALL outer wrappers fire twice: undo snapshot, rating rectifier, energy tracker. Root effect: potential double FSRS write, double undo snapshots, double energy charge per card answer.
+
+**RC-7 — `installBionicQuestionPatch352` is a third prompt writer**
+Sequence on each card: (1) plain write via renderSolo/applyPromptText, (2) bionic write via `rerenderVisibleBionic351()` at setTimeout(0), (3) repeated plain rewrites via `installBionicQuestionPatch352` at ~line 7438. Step (3) runs after step (2) and strips `<b>` markup back to plain text. This is the cause of the persistent "font flickers back and forth" glitch that a hard reset does not fix, because the writer is installed permanently at page load.
+
+**RC-8 — `document.body.className=''` in the live render path is ~line 3939 (System 2), not only ~line 832 (System 1)**
+Claude's static analysis targeted line ~832. Codex browser trace showed the active clear is in System 2's render path. Both paths exist and must be fixed, but the live symptom originates from ~3939.
+
+### Diagnosis Correction (Claude Static Analysis Was Wrong On)
+
+| Claim | Correction |
+|---|---|
+| System 1 RAF fires `selectSolo(0)` at 7s hardcoded | System 1's RAF is not the live timer path. With 13s setting, selectSolo fired at ~13.0s — System 3 is active. |
+| Font flicker = two writers (bionic vs plain) | Three writers. `installBionicQuestionPatch352` is the third and the primary cause. A guard in `rerenderVisibleBionic351` alone would not fix it. |
+| Body class clear at line ~832 | Active clear is at ~3939 (System 2 path). Line ~832 also clears but is not the primary symptom source. |
+
+### Protected Invariants — Still In Force
+
+All prior invariants remain unchanged. Specifically:
+- Do NOT add new `cardPool` or `nextCard` wrappers
+- Do NOT add new `<script>` blocks — all fixes are inline edits to existing source
+- `runFSRSValidation()` 17/17 + `runCozySmokeTests()` 6/6 required after every change
+- Bump SW CACHE version after every code change
+- NEVER cross-push between PHASE1 and PHASE2 repos
+
+---
+
+## Root Cause Log — 2026-06-15 (Session 2) — FSRS Algorithm Bug
+
+**Symptom:** Cards scheduled as Good/Easy too soon. Explicit "Again" button had no effect on interval.
+
+**RC-9 — Anonymous deferred `rateCard(good)` timer overwrote explicit "Again" (FQ-ALGO-1)**
+Base `selectSolo` (line ~408) fired `setTimeout(rateCard(id,'good'), 8000)` as an anonymous timer with no stored handle. When user clicked "Again" explicitly, the explicit `rateCard('again')` ran first (correct), but 8.2 seconds later the anonymous timer fired `rateCard('good')`, overwriting the FSRS schedule to 3 days. The prior rating-path-rectifier could not cancel it because it stored its OWN handle separately; the base selectSolo timer was a different object.
+
+**Fix:** Changed anonymous setTimeout to `window.__cozyAutoRateHandle20260603=setTimeout(...)` in base selectSolo. New `cozy-explicit-rating-stabilizer-2026-06-11` wraps `rate()` and `rateCard()` to call `clearDeferredAutoRate()` before any explicit rating commits. Commit 048d073. Probe: Again→10m ✅, Hard→1d ✅, Good→3d ✅, Easy→15d ✅.
+
+**RC-10 — repair_point + E7G causes again-rated cards to appear immediately (FQ-ALGO-2)**
+`record()` sets `repair_point=true` when answer is wrong. E7G design: Review Deck always shows repair_point cards as immediately due, bypassing `next_due_at`. So a card rated "Again" (next_due_at=10min) reappears in the very next Review Deck session, which feels like it came back too fast. This is by design (repair workflow) but conflicts with Anki 10-minute step behavior. Status: open design decision.
+
+**RC-11 — 18 review-stage rows with null next_due_at in progress data (FQ-ALGO-3)**
+`isDue(p)` returns `(seen_count||reviewed_count)>0` when `next_due_at=null`. Cards in this state are always considered due. With 18 such rows in the current export, these cards surface at the top of every session, creating the illusion of no spacing. Status: requires data repair (replay through rateCard or assign valid next_due_at).
+
+**RC-12 — "Again" not requeued in current session (FQ-ALGO-4 — Anki gap)**
+`requeueAgainCard` removes cards from seenThisSession but does NOT splice into the live session pool. Failed cards only return in the NEXT session, not within 10 minutes in the current session. Anki brings failed learning-step cards back within the same review session. Fix: add `sess.pool.splice(at, 0, ...)` in the due/null path of `requeueAgainCard`. Status: open architectural gap.
+
+**GOAL: Function like Anki FSRS** — Full Anki parity requires all four: correct intervals ✅ (RC-9 fixed), same-session requeue ❌ (RC-12 open), no immediate repair bypass ❌ (RC-10 open by design), clean data ❌ (RC-11 open).

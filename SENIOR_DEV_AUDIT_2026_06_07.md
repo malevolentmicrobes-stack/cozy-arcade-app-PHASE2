@@ -970,3 +970,157 @@ This works for Solo. For KE (domain): `if(n>=1&&n<=4)selectDomain(n-1)` — also
 `fullCard()` currently uses `#modal` with a single "Close" button (`#modalClose`). No top-close control exists. User wants a "^" (chevron/caret) button as a quick touch/click dismiss target.
 
 **Implementation note:** Add button INSIDE `.modalBox` positioned `top:8px; right:12px; position:absolute`. Connect `onclick` to `$('modal').classList.add('hidden')`. Also handle `^` keypress when modal is open. No wrapper chains, no new globals needed.
+
+---
+
+## Section 19 — 2026-06-15 Codex Browser Audit: Card Render Glitch Diagnosis
+
+**Date:** 2026-06-15 | **Method:** Headless Chrome/CDP against local PHASE2 HTTP server (port 8897). Instrumented `selectSolo`, CSS variable mutations, `document.body.className`, and `soloQuestion.innerHTML` writes. FSRS 17/17; smoke 6/6 confirmed during audit.
+
+### What Claude's Static Analysis Claimed vs. What Browser Confirmed
+
+| Claude's Claim | Browser Result |
+|---|---|
+| System 1 RAF fires `selectSolo(0)` at 7s hardcoded (`DROP_MS=7000`) | **DISPROVED** — with 13s setting, `selectSolo` fired at ~13.0s. System 1's `startDrop()` is not the live auto-select bug on current PHASE2. |
+| Body class cleared by System 1's `renderSolo` (~line 832) | **CONFIRMED PARTIALLY** — body class goes empty then returns, but the active writer is the render path around line ~3939, not exclusively line ~832. Both paths clear `document.body.className`. |
+| Font flicker caused by `bionic()` vs `bionicHTML351()` (two writers) | **CONFIRMED BUT INCOMPLETE** — browser trace showed **three** writes to `#soloQuestion`: (1) plain from `applyPromptText`/render, (2) bionic from `rerenderVisibleBionic351()`, (3) repeated plain rewrites from `installBionicQuestionPatch352()` at ~line 7438. A guard in `rerenderVisibleBionic351` alone would not stop the third writer. |
+
+### Confirmed Root Causes (Browser-Verified)
+
+**FQ-RENDER-1: Dual active drop engines firing `selectSolo` twice per card**
+Both System 2 (`--soloDropY`, `raf175164`) and System 3 (`--soloDropY351`, `soloStableRaf351`) run simultaneously. Both CSS variables were observed moving during a single card drop. `selectSolo` fired **twice within 42ms** at timer expiry.
+
+Critical consequence: the 700ms debounce (installed at layer 11, innermost of 11 `selectSolo` wrappers) suppresses the inner double-selection. But the **outer 10 wrappers still execute twice per card answer**:
+- Undo snapshot (`__cozyUndoStack372`) writes twice → explains phantom undo depth / stale snapshots
+- Rating rectifier (`__cozyRatingPath20260603`) calls `rateCard`/`pendingFor` twice → potential double FSRS write
+- Energy tracker (`__energyTrack352`) records twice
+
+Root fix: at the top of `startStableSoloDrop351` (~line 6948), call `clearSoloDrop()` to cancel System 2's `raf175164` before System 3 starts its timer. One engine. One `selectSolo` per card.
+
+**FQ-RENDER-2: Body class cleared in multiple active render paths**
+The active writer clearing `document.body.className` is around line ~3939, not only line ~832. Both must be fixed with the same save/restore pattern used in the base `renderSolo` at line ~404 (preserves `cozyGameShellActive371`, `cozyDrawerOpen351`, `na-*` classes).
+
+**FQ-RENDER-3: Triple prompt writer causes font flicker**
+Three independent functions write to `#soloQuestion.innerHTML` in rapid succession:
+1. `renderSolo`/`applyPromptText` — plain text (no bionic markup)
+2. `rerenderVisibleBionic351()` via `setTimeout(0)` — `bionicHTML351()` format
+3. `installBionicQuestionPatch352()` (~line 7438) — plain text again, called repeatedly
+
+The third writer (`installBionicQuestionPatch352`) is the primary culprit for the persistent "font flickers back and forth." It runs after the bionic pass and repeatedly re-writes plain text. Fix target: **add no-op guard in `installBionicQuestionPatch352`**: if `soloQuestion.innerHTML` already contains `<b>` tags (bionic applied), skip the re-write.
+
+**FQ-RENDER-4: Debounce is at layer 11 (wrong position)**
+The 700ms debounce is inside the outer wrapper chain, not around it. Outer wrappers (undo, rating, energy) execute regardless of debounce. Debounce should guard the entire chain, not just the innermost call. This is an architectural position error, not a logic error.
+
+### Alternative Probable Causes (Not Yet Browser-Confirmed)
+
+| ID | Hypothesis | Evidence | Priority |
+|---|---|---|---|
+| P-A | `installBionicQuestionPatch352` lacks no-op guard — writes plain text even when bionic is on | Trace shows repeated plain writes post bionic pass | High |
+| P-B | Double undo snapshot per answer → stale/ghost undo after few cards | Outer undo wrapper runs twice per selectSolo (FQ-RENDER-1) | High |
+| P-C | Double `rateCard` call → FSRS stability calculated twice same card+answer | Rating rectifier outer wrapper runs twice before debounce fires | High |
+| P-D | `loopDomain` / KE mode same dual-engine pattern as Solo — untested | Same static code pattern observed | Medium |
+| P-E | `setInterval(installBuriedPoolFilter, 120)` — still active? Re-wraps `cardPool` every 120ms | E7 added guard flags but the interval itself was never cleared | Medium |
+| P-F | `applyPromptText` ignores `bionicOn` state — always plain first write | First write is always plain regardless of setting | Low |
+
+### Revised Fix Targets (Source Edits, No New Wrappers)
+
+Per senior dev audit recommendation (Section 0): fix at source. Do not add wrapper patch #12.
+
+| Fix | Target | Change |
+|---|---|---|
+| FQ-RENDER-1 | `startStableSoloDrop351` (~line 6948) | Add `clearSoloDrop()` call at top to cancel System 2's RAF before System 3 starts |
+| FQ-RENDER-2 | Line ~3939 `document.body.className=''` | Save active `cozy*`/`na-*`/Drawer classes; restore after clear |
+| FQ-RENDER-3 | `installBionicQuestionPatch352` (~line 7438) | Guard: if `soloQuestion.innerHTML` contains `<b>`, skip re-write |
+| FQ-RENDER-4 | Debounce layer position | Move 700ms debounce to wrap at outermost position, AFTER undo/rating/energy wrappers |
+
+### Validation Tests (Browser)
+
+```javascript
+// FQ-RENDER-1: confirm single selectSolo per card
+let calls=0; const _orig=window.selectSolo;
+window.selectSolo=function(i){ calls++; console.log('selectSolo call #'+calls+' at '+Date.now()); return _orig.apply(this,arguments); };
+// Start Solo, wait for card to auto-select. Expected: calls===1 per card, not 2.
+
+// FQ-RENDER-2: confirm body class preserved through card advance
+const _body=document.body.className;
+window.advance('solo');
+setTimeout(()=>console.assert(document.body.classList.contains('cozyGameShellActive371'),'body class lost'),100);
+
+// FQ-RENDER-3: count soloQuestion writes per card
+let writes=0; const _el=document.getElementById('soloQuestion');
+const _obs=new MutationObserver(()=>writes++); _obs.observe(_el,{childList:true,subtree:true,characterData:true});
+// Start Solo, let one card load. Expected: writes===1 (bionic, final). If writes>1: FQ-RENDER-3 active.
+```
+
+FSRS 17/17 + smoke 6/6 required after any fix before proceeding.
+
+---
+
+## Section 20 — 2026-06-15 FSRS Rating Path Overwrite: Root Cause + Fix Audit
+
+**Commit:** 048d073 "Fix explicit ratings and again requeue" | **SW:** cozy-arcade-PHASE2-v18
+
+### The Bug (FQ-ALGO-1)
+
+**User observation:** Cards appearing with Good/Easy interval too soon. Explicit "Again" button appeared ignored.
+
+**Root cause in base `selectSolo` (~line 408):**
+```javascript
+// BEFORE (broken):
+setTimeout(()=>{ if(!session.seenThisSession.has(id)){ rateCard(id, ok?'good':'again'); }}, 8000);
+// ↑ Anonymous timer. No handle. Cannot be cancelled by any subsequent explicit rating.
+
+// AFTER (fixed):
+window.__cozyAutoRateHandle20260603 = setTimeout(()=>{ ... }, 8000);
+// ↑ Handle stored. clearTimeout() can cancel it.
+```
+
+**Attack chain that caused "Good/Easy too soon":**
+1. User answers CORRECTLY (ok=true) → anonymous 8s timer starts (will fire `good`)
+2. User reads reveal, decides they guessed → clicks Again
+3. `rate(card,'again')` → `rateCard(id,'again')` → stage=relearning, next_due_at=now+10min ✅
+4. 8.2 seconds after step 1: anonymous timer fires → `rateCard(id,'good')` → **overwrites to 3-day review** ❌
+5. Card appears in 3 days. User never sees the 10-minute relearning loop.
+
+**Why the prior rectifier couldn't stop this:** `cozy-rating-path-rectifier-2026-06-03` cleared `__cozyAutoRateHandle20260603` on explicit ratings. But base `selectSolo` was spawning its own anonymous timer — the stored handle was the RECTIFIER's timer, not the base timer. Two timers, one cancelled, one still fired.
+
+### Fix Architecture — `cozy-explicit-rating-stabilizer-2026-06-11`
+
+| Function | Role |
+|---|---|
+| `clearDeferredAutoRate()` | Cancel `__cozyAutoRateHandle20260603` + null both pending globals |
+| `wrapRate()` | On explicit `rate(card,rating)` — cancel deferred timer, call original, call `requeueAgainCard()` |
+| `wrapRateCard()` | On explicit `rateCard(id,rating)` — cancel deferred timer |
+| `requeueAgainCard(card,rating)` | For 'again': future `next_due_at` → clear poolKey + return; else → remove from seenThisSession |
+
+**`requeueAgainCard` actual behavior (current file, NOT splice):**
+- future `next_due_at` → `poolKey=''` (force rebuild next request), early return, card stays seenThisSession for this session
+- due now / null → `seenThisSession.delete(id)`, card eligible for next pool rebuild only
+- Does NOT splice into current session pool → see FQ-ALGO-4 gap below
+
+### Probe Results (2026-06-15)
+
+Again→relearning/10m ✅ | Hard→1d ✅ | Good→3d ✅ | Easy→15d ✅ | FSRS 17/17 ✅ | smoke 6/6 ✅
+
+Note: Probe called `window.rate()` directly. Button→rate() binding was not independently headless-verified (sandbox timing). Manual browser verification recommended for button path.
+
+### Remaining Risks After Patch (ordered by probability of causing user-visible issue)
+
+**1. FQ-ALGO-2 — repair_point + E7G pool (by design, may need tuning)**
+`record()` (line ~12080): `repair_point = ok===false ? true : (_cur.repair_point||false)`. E7G makes repair_point cards always immediately due in Review Deck. Result: wrong-answer cards surface immediately in next Review Deck session even before 10-min next_due_at. Correct by design; may FEEL like "too soon."
+
+**2. FQ-ALGO-3 — 18 null-due review rows in export data**
+`isDue(p)` when `next_due_at=null` and `seen_count>0` → returns `true`. These 18 cards are always "due," always at the top of the queue, making every session look like short-interval review. Fix: data repair (replay through `rateCard()` or set valid `next_due_at`).
+
+**3. FQ-RENDER-1 cascade — outer rating wrappers still fire twice per card (dual drop)**
+selectSolo fires twice ~42ms apart per card. Explicit stabilizer + rectifier wrappers run for BOTH fires. `clearDeferredAutoRate()` on the second fire clears the handle set by the first fire's deferred timer, so auto-rate never commits. This means: auto-rated cards (no explicit button) may NEVER get their `rateCard()` called if the second fire's `clearDeferredAutoRate()` in the wrapRate chain cancels the timer. Root fix: FQ-RENDER-1 (stop dual-fire).
+
+**4. FQ-ALGO-4 — "Again" cards don't come back in current session (Anki gap)**
+Anki: failed card returns to queue ~10 min in current session. Current app: failed card only returns next session. Fix: in `requeueAgainCard`, add `sess.pool.splice(at, 0, Object.assign({},card))` for the due/null path (when card is not future-due after rateCard runs). This is an edit inside the existing function, not a new wrapper.
+
+**5. FQ-ALGO-5 — Wrapper accumulation on `rate()` (architectural, not behavioral)**
+Both scripts reinstall at overlapping timeouts with different guard flags → can add 2 wrapper layers per firing pair. Over 6 pairs: ~12 layers. Functionally idempotent (all operations are cancel/delete). Fix: shared guard flag. Not a blocking risk but should be cleaned in next source pass.
+
+### Architecture Rule (Carry Forward)
+
+Do not add a 13th wrapper to `rate()` or `rateCard()`. Fix for FQ-ALGO-4 = edit inside `requeueAgainCard`. Fix for FQ-ALGO-5 = shared guard flag, not a new script.

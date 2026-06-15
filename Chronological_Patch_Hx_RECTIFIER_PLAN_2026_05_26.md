@@ -538,3 +538,96 @@ If fails (2+): Duplicate Continue buttons from multi-patch injection (Step 14 in
 | `window.runCozySmokeTests()` | ✅ 6/6 |
 
 **Next:** Step 3 — fix the `patchSettingsText()` 1200ms interval so it does not race settings state.
+
+---
+
+## 2026-06-15 — Render Glitch Root Cause Analysis (No Code Changes)
+
+**Session type:** Diagnosis + audit only. No index.html changes. FSRS 17/17 / smoke 6/6 confirmed pre-session.
+
+**Method:** Combined Claude static analysis of index.html (~14,500 lines) + Codex headless Chrome/CDP browser audit (6m 33s, port 8897, PHASE2). Instrumented: `selectSolo` call events + timestamps, CSS variable `--soloDropY` and `--soloDropY351` mutations, `document.body.className` changes, `soloQuestion.innerHTML` write events.
+
+### Findings
+
+**Claude pre-audit claims (static analysis):**
+- System 1 RAF (`DROP_MS=7000`) fires `selectSolo(0)` at 7s hardcoded → premature auto-select
+- Font flicker = two competing writers: `bionic()` vs `bionicHTML351()`
+- Primary body class clear = line ~832 (System 1 renderSolo)
+
+**Codex browser audit results — corrections to Claude's static analysis:**
+
+| Claim | Result |
+|---|---|
+| System 1 `DROP_MS=7000` causes premature auto-select | **DISPROVED** — with 13s setting, `selectSolo` fired at ~13.0s. System 3 (`soloStableRaf351`) is the live timer, not System 1. |
+| Font flicker = two writers | **INCOMPLETE** — Codex found THREE writers. `installBionicQuestionPatch352` (~line 7438) is a third writer that re-applies plain text AFTER bionic pass. |
+| Body class clear at line ~832 | **INCOMPLETE** — active clear is at ~line 3939 (System 2 render path), not only line ~832. |
+
+**New confirmed root causes:**
+
+| ID | Root Cause | Browser Evidence |
+|---|---|---|
+| FQ-RENDER-1 | System 2 + System 3 drop engines both run simultaneously; `selectSolo` fires twice ~42ms apart per card; all 10 outer selectSolo wrappers execute twice (undo, rating, energy) | Both `--soloDropY` and `--soloDropY351` CSS vars animated; two `selectSolo` events 42ms apart |
+| FQ-RENDER-2 | `document.body.className=''` at ~line 3939 is the live active clear (System 2 path), drops layout classes | Body className observed going empty and returning on each card advance |
+| FQ-RENDER-3 | `installBionicQuestionPatch352` (~line 7438) re-writes `soloQuestion.innerHTML` as plain text after `rerenderVisibleBionic351` has written bionic HTML | Three `innerHTML` write events per card; last write = plain text, strips `<b>` |
+| FQ-RENDER-4 | 700ms debounce at layer 11 (last of 11 selectSolo wrappers) — outer 10 wrappers bypass it per dual-fire | Static analysis confirmed; undo + rating outer layers always fire twice |
+
+### Fix Targets (Pending — Next Codex Code Task)
+
+| Fix | Location | Change |
+|---|---|---|
+| FQ-RENDER-1 | `startStableSoloDrop351` (~line 6948) | `clearSoloDrop()` at top — cancel System 2 RAF before System 3 starts |
+| FQ-RENDER-2 | ~line 3939 | Save/restore `cozy*`/`na-*`/Drawer classes around `document.body.className=''` |
+| FQ-RENDER-3 | `installBionicQuestionPatch352` (~line 7438) | Guard: skip write if `soloQuestion.innerHTML` contains `<b>` |
+| FQ-RENDER-4 | debounce layer | Structural — move to outermost call site; defer until FQ-RENDER-1–3 stable |
+
+All fixes = **inline source edits in existing code**. No new `<script>` blocks. No new wrappers.
+Validation gate: `runFSRSValidation()` 17/17 + `runCozySmokeTests()` 6/6 after each fix.
+
+---
+
+## 2026-06-15 (session 2) — FSRS Rating Path Overwrite Fix — commit 048d073
+
+**Symptom reported:** Cards showing as Good/Easy too soon after being rated "Again." Explicit Again button appeared to be ignored.
+
+**Root cause confirmed (browser probe):** The base `selectSolo` function (line ~408) fired an anonymous `setTimeout(rateCard(id, ok?'good':'again'), 8000)`. Because the timer was anonymous, no handle was stored and it could NOT be cancelled. When a user correctly answered a card (ok=true) and clicked "Again" explicitly, the explicit `rateCard(id,'again')` ran correctly (10m relearning), but 8 seconds later the anonymous timer fired `rateCard(id,'good')` — overwriting the schedule to 3 days. This is the "Good/Easy too soon" bug.
+
+**Secondary risk from `pendingFor()` (rating path rectifier, line 14341):** The rectifier also sets `window.__cozyAutoRateHandle20260603` at 8200ms in `pendingFor()`. Before this patch, both the base selectSolo timer and the rectifier's timer competed, making explicit cancellation impossible.
+
+**Changes — commit 048d073:**
+
+| Location | Change |
+|---|---|
+| `selectSolo` base (~line 408) | Changed anonymous `setTimeout` → `window.__cozyAutoRateHandle20260603=setTimeout(...)` — handle now stored, cancellable |
+| New script `cozy-explicit-rating-stabilizer-2026-06-11` | Added after existing rectifier script |
+| `pool351` calc (~line 7280) | Added `selectedOrder` fallback guard before `sessionPool()` call |
+
+**New script details (`cozy-explicit-rating-stabilizer-2026-06-11`):**
+- `clearDeferredAutoRate()` — clears `__cozyAutoRateHandle20260603` + `__cozyPendingRating20260603`
+- `requeueAgainCard(card, rating)` — for 'again': if card has future `next_due_at`, clears `poolKey` (forces next pool rebuild) and returns; if due/null, deletes from `seenThisSession` only. Does NOT splice card back into current session pool.
+- `wrapRate()` — wraps `rate(card, rating)`, calls `clearDeferredAutoRate()` on any explicit rating, then `requeueAgainCard()`
+- `wrapRateCard()` — wraps `rateCard(cardId, rating)`, calls `clearDeferredAutoRate()` on any explicit rating
+- Installs at page load + 700/1600/3200/5200/8000ms
+
+**Probe validation results:**
+
+| Scenario | Result |
+|---|---|
+| Again → stage/interval | relearning / 10m ✅ |
+| Hard → interval | 1d ✅ |
+| Good → interval | 3d ✅ |
+| Easy → interval | 15d ✅ |
+| `runFSRSValidation()` | 17/17 ✅ |
+| `runCozySmokeTests()` | 6/6 ✅ |
+
+**SW version bumped:** `cozy-arcade-PHASE2-v18`
+
+**Remaining open risks after this patch:**
+
+| Risk | Detail |
+|---|---|
+| `repair_point=true` on wrong answers + E7G pool | `record()` sets `repair_point=true` when ok===false. E7G makes repair_point cards always immediately due in Review Deck. So "again" cards appear in next Review Deck session before their 10-minute due time. By design but may feel "too soon." |
+| 18 review-stage rows with `next_due_at=null` in data | `isDue()` returns true when next_due_at=null and seen_count>0 → these cards are always "due" → appear in every session, creating illusion of accelerated review |
+| 56 ghost-seen rows in export | Cards with seen/reviewed counts but null rating/stability — behave unpredictably in pool |
+| Wrapper accumulation on `rate()` | Both `installRatingPathHooks20260603` and explicit stabilizer reinstall at overlapping timeouts; each pair can add layers to the chain; functionally idempotent but architecturally messy |
+| "Again" not in current session pool | `requeueAgainCard` removes from seenThisSession but does NOT splice into current pool → true Anki learning-step behavior (failed card back in ~10 min in same session) is not implemented |
+| FQ-RENDER-1 dual-fire still present | selectSolo still fires twice per card via dual drop engines; outer rating wrappers may double-write FSRS (these are the render bugs, separate issue) |

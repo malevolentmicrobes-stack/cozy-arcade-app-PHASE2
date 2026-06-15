@@ -107,3 +107,5 @@
 
 **Target:** Validate and monitor Undo HUD/public FQ-AUTO-2/Again reshuffle in production after deploy.
 **Validation gates:** FSRS 17/17 + Smoke 6/6 + undo button visible + Again card reappears within session
+
+2026-06-15 Codex update: SRS answer selection now stages a pending rating instead of committing binary Good/Again before the reveal; explicit Again/Hard/Good/Easy is authoritative, Review Deck respects future `next_due_at` for non-pinned relearning/repair cards, Again no longer splices a 10-minute relearning card back into the current pool early, and PHASE2 SW cache bumped to v18.

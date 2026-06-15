@@ -1,16 +1,16 @@
-# Graph Report - cozy-arcade-app-PHASE2  (2026-06-11)
+# Graph Report - cozy-arcade-app-PHASE2  (2026-06-15)
 
 ## Corpus Check
-- 42 files · ~1,323,736 words
+- 42 files · ~1,326,905 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2318 nodes · 2331 edges · 149 communities (141 shown, 8 thin omitted)
+- 2346 nodes · 2359 edges · 154 communities (149 shown, 5 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `02c57c22`
+- Built from commit: `048d0733`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -162,6 +162,11 @@
 - [[_COMMUNITY_Community 145|Community 145]]
 - [[_COMMUNITY_Community 146|Community 146]]
 - [[_COMMUNITY_Community 147|Community 147]]
+- [[_COMMUNITY_Community 148|Community 148]]
+- [[_COMMUNITY_Community 149|Community 149]]
+- [[_COMMUNITY_Community 150|Community 150]]
+- [[_COMMUNITY_Community 151|Community 151]]
+- [[_COMMUNITY_Community 152|Community 152]]
 - [[_COMMUNITY_Community 154|Community 154]]
 
 ## God Nodes (most connected - your core abstractions)
@@ -179,7 +184,7 @@
 ## Surprising Connections (you probably didn't know these)
 - None detected - all connections are within the same source files.
 
-## Communities (149 total, 8 thin omitted)
+## Communities (154 total, 5 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.04
@@ -198,8 +203,8 @@ Cohesion: 0.22
 Nodes (8): cards, meta, description, optional_fields, required_fields, schema, total, version
 
 ### Community 4 - "Community 4"
-Cohesion: 0.04
-Nodes (46): code:bash ($(cat graphify-out/.graphify_python) -c "), code:block11 ([Agent tool call 1: files 1-15, subagent_type="general-purpo), code:bash (PROJECT_ROOT=$(cat graphify-out/.graphify_root)), code:block13 (You are a graphify extraction subagent. Read the files liste), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c ") (+38 more)
+Cohesion: 0.10
+Nodes (21): code:bash (mkdir -p graphify-out), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash (graphify export svg), code:bash (graphify export graphml), code:bash (graphify benchmark), code:bash ($(cat graphify-out/.graphify_python) -c "), code:block31 (Graph complete. Outputs in PATH_TO_DIR/graphify-out/), code:bash (# Detect the correct Python interpreter (handles uv tool, pi) (+13 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.05
@@ -237,9 +242,13 @@ Nodes (15): Active: Task A — Atlas / Deck Hydration Fix, code:bash (curl -s "h
 Cohesion: 0.20
 Nodes (9): Based on direct analysis of: `index.html` (10,604 lines, 654KB), `ABIM_DATABASE_first_10_cards_in_order.json`, `ABIM_DATABASE_random_20_cards_seed_20260521_PRETTY.json`, code:block12 (You are implementing Phase 1 of a refactor of a single-file ), code:block13 (TEST 1: Import first_10_cards_in_order.json), CODEX HANDOFF PROMPT, COZY ARCADE BOARD PREP MEDICINE, NON-NEGOTIABLES, Senior Developer Refactor Plan — v1.0, Smoke Tests (run after every phase) (+1 more)
 
+### Community 15 - "Community 15"
+Cohesion: 0.22
+Nodes (8): Browser Verification Snippets, code:javascript (// FQ-RENDER-1: confirm single selectSolo per card advance), Codex Agent Instructions — 2026-06-15, Context Before Starting Any Code Task, graphify, Hard Constraints (Never Violate), Next Render Glitch Codex Task, selectSolo Chain Reference (11 layers — do not add a 12th)
+
 ### Community 16 - "Community 16"
-Cohesion: 0.04
-Nodes (44): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+36 more)
+Cohesion: 0.08
+Nodes (24): buried, card_id, correct, correct_count, created_at, ease_factor, interval_days, lapses (+16 more)
 
 ### Community 17 - "Community 17"
 Cohesion: 0.08
@@ -491,7 +500,7 @@ Nodes (5): 1A. CSS Consolidation, 1B. JS Consolidation, code:css (/* === 1. CSS 
 
 ### Community 83 - "Community 83"
 Cohesion: 0.05
-Nodes (39): #1 — `selectSolo` is overridden 13 times; stale timer handles cause double-advance, 2026-06-10 Patch History Entry, #2 — `bindRatings` accumulates duplicate click handlers across the 12-deep reveal chain, #3 — Timer setting in Settings has no effect (Apply never writes `cozyQuestionSeconds351`), #4 — `bionicOn` default regression + 3-key split-brain persistence, #5 — `makeChoices()` return value used as array assignment in `startCard()`, A. Bionic Reading Initialization, A. File 2 vs File 3 (Old Prior vs Earlier Prior) (+31 more)
+Nodes (42): #1 — `selectSolo` is overridden 13 times; stale timer handles cause double-advance, 2026-06-10 Patch History Entry, 2026-06-15 — Render Glitch Root Cause Analysis (No Code Changes), #2 — `bindRatings` accumulates duplicate click handlers across the 12-deep reveal chain, #3 — Timer setting in Settings has no effect (Apply never writes `cozyQuestionSeconds351`), #4 — `bionicOn` default regression + 3-key split-brain persistence, #5 — `makeChoices()` return value used as array assignment in `startCard()`, A. Bionic Reading Initialization (+34 more)
 
 ### Community 84 - "Community 84"
 Cohesion: 0.22
@@ -514,12 +523,12 @@ Cohesion: 0.17
 Nodes (12): A — Bionic Toggle Never Hydrated (FIXED `45a26b6`), B — Bionic Visual Effect Invisible (FIXED `v175374`), B — Bionic Visual Effect Invisible (FIXED `v175374-...` style), C — Font Size / Timer Overlap (FIXED `bc333a9`), C — Font Size / Timer Overlap (REVISED `v175374` — fit-to-screen, not larger), D — Settings Auto-Close on Apply (FIXED `26153a4`), E — Export Alias Pollution (FIXED `698ebe9`, `35cd2b4`), F — `one_thing` Missing from Progress Export (FIXED `92b9be8`) (+4 more)
 
 ### Community 89 - "Community 89"
-Cohesion: 0.12
-Nodes (16): code:javascript (window.runFSRSValidation()   // 17/17), Cozy Arcade Board Prep — Ultimate Goals, Guiding Principles (User-Stated), Priority 1 — Active Rectifier (Complete), Priority 1 — Active Rectifier (Must Complete), Priority 2 — Display & Layout, Priority 2 — Display & Layout (Complete), Priority 2b — Export / Undo (Active) (+8 more)
+Cohesion: 0.10
+Nodes (20): code:javascript (window.runFSRSValidation()   // 17/17), Cozy Arcade Board Prep — Ultimate Goals, Diagnosis Correction (Claude Static Analysis Was Wrong On), Guiding Principles (User-Stated), New Root Causes Confirmed, Priority 1 — Active Rectifier (Complete), Priority 1 — Active Rectifier (Must Complete), Priority 2 — Display & Layout (+12 more)
 
 ### Community 90 - "Community 90"
-Cohesion: 0.14
-Nodes (14): code:bash (mkdir -p graphify-out), code:bash (graphify export obsidian), code:bash (graphify export html  # auto-aggregates to community view if), code:bash (graphify export svg), code:bash (graphify export graphml), code:bash (# Detect the correct Python interpreter (handles uv tool, pi), code:bash (GRAPHIFY_WHISPER_MODEL=base  # or whatever --whisper-model t), Step 1 - Ensure graphify is installed (+6 more)
+Cohesion: 0.08
+Nodes (24): code:bash (graphify export wiki), Step 6b - Wiki (only if --wiki flag), code:bash (mkdir -p graphify-out), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash (graphify export obsidian), code:bash (graphify export html  # auto-aggregates to community view if), code:bash (graphify export wiki), code:bash (graphify export svg) (+16 more)
 
 ### Community 91 - "Community 91"
 Cohesion: 0.05
@@ -546,8 +555,8 @@ Cohesion: 0.14
 Nodes (13): Bionic Reading CSS (confirmed working), code:block1 (┌─────────────────────────────────────────────────────┐ ← to), code:block2 (┌─────────────────────────────────────────────────────┐), code:block3 (┌──────────────────────┐), code:block4 (┌─────────────────────────────────────────────────────┐), Domain / Knowledge Expansion Mode (`#domain`), Global Chrome, Home Screen (`#home`) (+5 more)
 
 ### Community 97 - "Community 97"
-Cohesion: 0.14
-Nodes (13): Claude Code Terminal Session, code:js (// Paste into browser console after loading the app with the), code:block14 (□ window.runFSRSValidation()     → ✅ 17/17 passed), code:block15 (Rating  stability  difficulty  interval  stage), code:block16 (S: 3.1262 → 6.9371   D: 5.3146 → 5.195   interval: 7d), COZY ARCADE — MASTER FIX PROMPT, Generated: 2026-05-30 | Based on: index.html + 3 progress exports, IRON RULES (violating any = reject entire change) (+5 more)
+Cohesion: 0.18
+Nodes (10): Claude Code Terminal Session, code:js (// Paste into browser console after loading the app with the), code:block14 (□ window.runFSRSValidation()     → ✅ 17/17 passed), COZY ARCADE — MASTER FIX PROMPT, Generated: 2026-05-30 | Based on: index.html + 3 progress exports, IRON RULES (violating any = reject entire change), PHASE 6 — DATA REPAIR: Fix SM2-era cards and ghosts, PHASE 7 — VERIFICATION CHECKLIST (+2 more)
 
 ### Community 98 - "Community 98"
 Cohesion: 0.20
@@ -634,8 +643,8 @@ Cohesion: 0.67
 Nodes (4): For native CLAUDE.md integration, code:bash (graphify claude install), code:bash (graphify claude uninstall  # remove the section), For native CLAUDE.md integration
 
 ### Community 119 - "Community 119"
-Cohesion: 0.25
-Nodes (8): code:bash ($(cat graphify-out/.graphify_python) -c "), code:block11 ([Agent tool call 1: files 1-15, subagent_type="general-purpo), code:bash (PROJECT_ROOT=$(cat graphify-out/.graphify_root)), code:block13 (You are a graphify extraction subagent. Read the files liste), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c "), Part B - Semantic extraction (parallel subagents)
+Cohesion: 0.15
+Nodes (13): code:bash ($(cat graphify-out/.graphify_python) -c "), code:block11 ([Agent tool call 1: files 1-15, subagent_type="general-purpo), code:bash (PROJECT_ROOT=$(cat graphify-out/.graphify_root)), code:block13 (You are a graphify extraction subagent. Read the files liste), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c ") (+5 more)
 
 ### Community 120 - "Community 120"
 Cohesion: 0.67
@@ -726,40 +735,68 @@ Cohesion: 0.33
 Nodes (6): Browser Test After Each Fix, Codex Prompt Contracts (2026-06-10), New Glitches Identified, Rectifier Rules — Carry Forward (unchanged), Session Addendum — 2026-06-10 Glitch Re-emergence + User Extension Features, Updated Fix Queue (2026-06-10)
 
 ### Community 143 - "Community 143"
-Cohesion: 0.40
-Nodes (5): code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c "), Part A - Structural extraction for code files, Part C - Merge AST + semantic into final extraction, Step 3 - Extract entities and relationships
+Cohesion: 0.14
+Nodes (14): buried, card_id, correct_count, last_rating, last_seen_at, next_due_at, pinned, repair_point (+6 more)
 
 ### Community 144 - "Community 144"
-Cohesion: 0.67
-Nodes (3): code:bash ($(cat graphify-out/.graphify_python) -c "), code:block31 (Graph complete. Outputs in PATH_TO_DIR/graphify-out/), Step 9 - Save manifest, update cost tracker, clean up, and report
+Cohesion: 0.15
+Nodes (13): code:bash ($(cat graphify-out/.graphify_python) -c "), code:block11 ([Agent tool call 1: files 1-15, subagent_type="general-purpo), code:bash (PROJECT_ROOT=$(cat graphify-out/.graphify_root)), code:block13 (You are a graphify extraction subagent. Read the files liste), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c "), code:bash ($(cat graphify-out/.graphify_python) -c ") (+5 more)
+
+### Community 145 - "Community 145"
+Cohesion: 0.29
+Nodes (7): 2026-06-15 Session Addendum — Card Render Glitch Root Cause Corrections, Codex Prompt Target for Next Pass, Dual-Fire Cascade (FQ-RENDER-1 Detail), Fix Plan (Source Edits Only — No New Wrappers), New Bug Identifiers, Probable But Not Yet Browser-Confirmed, What Codex Browser Audit Corrected
 
 ### Community 146 - "Community 146"
 Cohesion: 0.50
 Nodes (4): 18. Number Key Selection + Full Card Close — 2026-06-10 Addendum, code:javascript (// During gameplay, press 1 rapidly after answering:), Full Card Modal ("^" Close), Number Key Selection (1–4)
+
+### Community 147 - "Community 147"
+Cohesion: 0.29
+Nodes (7): Alternative Probable Causes (Not Yet Browser-Confirmed), code:javascript (// FQ-RENDER-1: confirm single selectSolo per card), Confirmed Root Causes (Browser-Verified), Revised Fix Targets (Source Edits, No New Wrappers), Section 19 — 2026-06-15 Codex Browser Audit: Card Render Glitch Diagnosis, Validation Tests (Browser), What Claude's Static Analysis Claimed vs. What Browser Confirmed
+
+### Community 148 - "Community 148"
+Cohesion: 0.29
+Nodes (6): metadata, deck_fingerprint, exported_at, schema_version, type, progress
+
+### Community 149 - "Community 149"
+Cohesion: 0.67
+Nodes (3): code:bash (graphify export obsidian), code:bash (graphify export html  # auto-aggregates to community view if), Step 6 - Generate Obsidian vault (opt-in) + HTML
+
+### Community 150 - "Community 150"
+Cohesion: 0.67
+Nodes (3): code:bash (graphify export neo4j), code:bash (graphify export neo4j --push bolt://localhost:7687 --user ne), Step 7 - Neo4j export (only if --neo4j or --neo4j-push flag)
+
+### Community 151 - "Community 151"
+Cohesion: 0.67
+Nodes (3): code:bash (python3 -m graphify.serve graphify-out/graph.json), code:json ({), Step 7d - MCP server (only if --mcp flag)
+
+### Community 152 - "Community 152"
+Cohesion: 0.67
+Nodes (3): code:block15 (Rating  stability  difficulty  interval  stage), code:block16 (S: 3.1262 → 6.9371   D: 5.3146 → 5.195   interval: 7d), REFERENCE: FSRS v5 First-Review Expected Values
 
 ### Community 154 - "Community 154"
 Cohesion: 0.67
 Nodes (3): code:bash (graphify query "QUESTION"), code:bash ($(cat graphify-out/.graphify_python) -m graphify save-result), For /graphify query
 
 ## Knowledge Gaps
-- **1771 isolated node(s):** `schema`, `version`, `description`, `total`, `required_fields` (+1766 more)
+- **1792 isolated node(s):** `schema`, `version`, `description`, `total`, `required_fields` (+1787 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **8 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **5 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `progress` connect `Community 16` to `Community 17`, `Community 18`, `Community 19`, `Community 20`, `Community 21`, `Community 22`, `Community 23`, `Community 24`, `Community 25`, `Community 26`, `Community 27`, `Community 28`, `Community 29`, `Community 30`, `Community 31`, `Community 32`, `Community 33`, `Community 34`, `Community 35`?**
+- **Why does `progress` connect `Community 148` to `Community 143`, `Community 16`, `Community 17`, `Community 18`, `Community 19`, `Community 20`, `Community 21`, `Community 22`, `Community 23`, `Community 24`, `Community 25`, `Community 26`, `Community 27`, `Community 28`, `Community 29`, `Community 30`, `Community 31`, `Community 32`, `Community 33`, `Community 34`, `Community 35`?**
   _High betweenness centrality (0.051) - this node is a cross-community bridge._
 - **Why does `progress` connect `Community 107` to `Community 54`, `Community 55`, `Community 56`, `Community 57`, `Community 58`, `Community 59`, `Community 60`, `Community 61`, `Community 62`, `Community 63`, `Community 64`, `Community 65`, `Community 66`, `Community 67`, `Community 68`, `Community 69`, `Community 70`, `Community 71`, `Community 72`, `Community 73`, `Community 101`?**
   _High betweenness centrality (0.047) - this node is a cross-community bridge._
-- **Why does `card-0002` connect `Community 29` to `Community 16`?**
+- **Why does `card-0002` connect `Community 29` to `Community 148`?**
   _High betweenness centrality (0.011) - this node is a cross-community bridge._
 - **What connects `schema`, `version`, `description` to the rest of the system?**
-  _1771 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1792 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.0425531914893617 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.05272895467160037 - nodes in this community are weakly interconnected._
 - **Should `Community 4` be split into smaller, more focused modules?**
-  _Cohesion score 0.043478260869565216 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09523809523809523 - nodes in this community are weakly interconnected._

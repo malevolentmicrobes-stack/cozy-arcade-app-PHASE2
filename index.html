@@ -384,8 +384,8 @@ let cards=(DATA.cards||[]), state=loadState(), deckMode='sequential', promptFiel
 document.documentElement.dataset.cozyBionic=bionicOn?'1':'0';
 let mode=null, current=null, choices=[], selected=0, timer=0, timerMax=9, ticker=null, index=0, score=0, streak=0, hp=100, gate=1, paused=false, domainRound=1, orbData=[], cursor={x:innerWidth/2,y:innerHeight/2};
 const $=id=>document.getElementById(id), screens=['home','solo','domain','review','settings'];
-function loadState(){try{return JSON.parse(localStorage.getItem('soloStudyingState_v1757')||'{}')}catch(e){return {}}}
-function saveState(){localStorage.setItem('soloStudyingState_v1757',JSON.stringify(state))}
+function loadState(){try{const s=JSON.parse(localStorage.getItem('cozy_arcade_state_v3')||'{}');return s.progress||s||{}}catch(e){return {}}}
+function saveState(){/* no-op: aliased to savePhase3State by Phase 3 init */}
 function show(id){screens.forEach(s=>$(s)?.classList.add('hidden'));$(id)?.classList.remove('hidden');mode=id;}
 function toast(t){$('toast').textContent=t;$('toast').classList.remove('hidden');setTimeout(()=>$('toast').classList.add('hidden'),1600)}
 function clean(t){return String(t||'').replace(/NOT SPECIFIED IN SOURCE/g,'').replace(/\s+/g,' ').trim()}
@@ -508,7 +508,7 @@ function applySettingsFromUI(){
   autoSelect=!!$('autoSelect')?.checked;
   bionicOn=!!$('bionicToggle')?.checked;
   spacedOn=!!$('spacedToggle')?.checked;
-  localStorage.setItem('soloStudying_spacedOn_v1759', spacedOn ? '1':'0');
+  localStorage.setItem('soloStudying_spacedOn_v175153', spacedOn ? '1':'0');
   toast('Applied');
 }
 
@@ -1508,7 +1508,7 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
     const cb=q('spacedToggle');
     const val=!!(cb && cb.checked);
     window.spacedOn = val;
-    try{localStorage.setItem('soloStudying_spacedOn_v175157', val?'1':'0'); localStorage.setItem('soloStudying_spacedOn_v175153', val?'1':'0');}catch(e){}
+    try{localStorage.setItem('soloStudying_spacedOn_v175153', val?'1':'0');}catch(e){}
     return val;
   }
   function hydrateSpacedToggle(){
@@ -5874,7 +5874,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   }
   function setPersona(id){
     selectedPersonaId=id;
-    try{localStorage.setItem(PERSONA_KEY351,id); localStorage.setItem('cozy_persona',id);}catch(e){}
+    try{localStorage.setItem(PERSONA_KEY351,id);}catch(e){}
     window.homeFilters=window.homeFilters||{scope:'all',system:'all',tag:'all'};
     window.homeFilters.scope=PERSONA_SCOPE351[id]||'all';
     const scopeSel=$('browseScope351')||$('homeScope175155');
@@ -6948,6 +6948,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   function startStableSoloDrop351(){
     const row=$('choiceRow');
     if(!row || (typeof mode!=='undefined' && mode!=='solo')) return;
+    try{clearSoloDrop();}catch(e){}
     try{clearInterval(ticker);}catch(e){}
     clearTimeout(soloStableRaf351);
     soloStablePausedAt351=0;
@@ -7443,7 +7444,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
         if(!card) return;
         let prompt = '';
         try{ prompt = typeof getPrompt === 'function' ? getPrompt(card) : (card.prompt || card.presentation || card.quick_recall || ''); }catch(_){}
-        if(prompt) el.innerHTML = patched(prompt);
+        if(prompt && !(el.innerHTML.includes('<b>') && _b)) el.innerHTML = patched(prompt);
       });
     }catch(_){}
   }
@@ -10104,7 +10105,11 @@ function fixOneThingEditorOverflow351() {
 	    else if (scope === 'review' || scope === 'wrong') {
 	      arr = arr.filter(isReviewCandidateHot);
     } else if (scope === 'due') {
-      arr = [...arr].sort((a, b) => dueScoreHot(b) - dueScoreHot(a));
+      const dueFilt = arr.filter(card => {
+        const p = typeof getProgress === 'function' ? getProgress(canonicalCardId(card)) : stateForCard(card);
+        return isDue(p) || (p && p.pinned);
+      });
+      arr = (dueFilt.length ? dueFilt : arr).sort((a, b) => dueScoreHot(b) - dueScoreHot(a));
     } else if (scope === 'tagged') {
       arr = tag && tag !== 'all' ? arr.filter(card => tagsOf(card).includes(tag)) : arr.filter(card => tagsOf(card).length);
     }
@@ -11005,7 +11010,6 @@ function fixStableOneThingDropdown351() {
 	    phase3State.deck_fingerprint = deckFingerprint();
 	    const exportedProgress = exportProgressMap();
 	    try { localStorage.setItem(STATE_KEY, JSON.stringify(Object.assign({}, phase3State, { progress: exportedProgress }))); } catch (_) {}
-	    LEGACY_STATE_KEYS.forEach(key => { try { localStorage.setItem(key, JSON.stringify(exportedProgress)); } catch (_) {} });
 	    try { localStorage.setItem('cozy_arcade_progress_v1', JSON.stringify({ metadata: { type: 'progress', deck_fingerprint: deckFingerprint(), exported_at: nowIso(), schema_version: '3.0' }, progress: exportedProgress })); } catch (_) {}
 	    try { state = phase3State.progress; } catch (_) {}
 	    window.cozyPhase3State = phase3State;
@@ -11465,7 +11469,7 @@ function fixStableOneThingDropdown351() {
 	    } else if (selected === 'review_deck') {
 	      arr = applyStudyFiltersPhase3(normalizeDeckIdentities()).filter(c => { const p=progressForCard(c); return !p.suspended && !p.buried && p.rating!=='bury' && p.last_rating!=='bury'; }).filter(c => {
 	        const p = progressForCard(c);
-	        return isReviewCandidate(c) && (isImmediateReviewCandidate(p) || !hasFutureDue(p) || isDue(p));
+	        return isReviewCandidate(c) && (p.pinned || isDue(p) || !hasFutureDue(p));
 	      }).sort((a, b) => {
 	        const pa = progress(a), pb = progress(b);
 	        const score = p => (p.pinned ? 0 : p.repair_point ? 1 : 2);
@@ -11524,7 +11528,7 @@ function fixStableOneThingDropdown351() {
       if (selected === 'review_deck') {
         return applyStudyFiltersPhase3(normalizeDeckIdentities()).filter(c => { const p=progressForCard(c); return !p.suspended && !p.buried && p.rating!=='bury' && p.last_rating!=='bury'; }).filter(c => {
           const p = progressForCard(c);
-	          return isReviewCandidate(c) && (isImmediateReviewCandidate(p) || !hasFutureDue(p) || isDue(p));
+	          return isReviewCandidate(c) && (p.pinned || isDue(p) || !hasFutureDue(p));
         });
       }
     }
@@ -13671,7 +13675,7 @@ var naQ=function(id){return document.getElementById('na-'+id);};
 function parseTags(c){var t=c&&c.tags;if(!t)return[];if(Array.isArray(t))return t.map(function(s){return String(s).trim();}).filter(Boolean);return String(t).split(/[,;]+/).map(function(s){return s.trim();}).filter(Boolean);}
 
 // ── SECTION A: DATA LAYER ─────────────────────────────────────────────────
-var STATE_KEYS=['cozy_arcade_state_v3','cozy_arcade_progress_v1','soloStudyingState_v1757','cazy_v3'];
+var STATE_KEYS=['cozy_arcade_state_v3','cozy_arcade_progress_v1'];
 var DECK_STORAGE_KEY='cozy_arcade_limitless_cards_v1';
 var PROGRESS_STORAGE_KEY='cozy_arcade_progress_v1';
 var MAIN_STATE_KEY='cozy_arcade_state_v3';
@@ -14360,11 +14364,7 @@ if(typeof priorSelect==='function' && !priorSelect.__cozyRatingPath20260603){
     var out=priorSelect.apply(this,arguments);
     try{
       if(rating && typeof spacedOn!=='undefined' && spacedOn!==false){
-        if(!rateOnce(card,rating)) pendingFor(card,rating);
-        else {
-          clearTimeout(window.__cozyAutoRateHandle20260603);
-          window.__cozyPendingRating20260603=null;
-        }
+        pendingFor(card,rating);
       }
     }catch(_){}
     return out;
@@ -14435,13 +14435,13 @@ function requeueAgainCard(card,rating){
   try{
     var sess=window.cozyPhase3Session;
     if(!sess || !Array.isArray(sess.pool)) return;
-    var ids=[cardIdFor(card),card.id,card.qid,card.qid_unique,card.card_id].filter(Boolean);
-    ids.forEach(function(id){ try{ sess.seenThisSession && sess.seenThisSession.delete(id); }catch(_){} });
-    var idx=(typeof index==='number') ? index : (typeof sess.poolIdx==='number' ? sess.poolIdx : 0);
-    var exhausted=sess.pool.length<=idx;
-    var at=Math.min(sess.pool.length,Math.max(0,idx)+3);
-    sess.pool.splice(at,0,Object.assign({},card));
-    if(exhausted && typeof index==='number') index=0;
+    var id=cardIdFor(card);
+    var p=id && typeof getProgress==='function' ? getProgress(id) : null;
+    if(p && p.next_due_at && Date.parse(p.next_due_at)>Date.now()){
+      sess.poolKey='';
+      return;
+    }
+    if(id){ try{ sess.seenThisSession && sess.seenThisSession.delete(id); }catch(_){} }
   }catch(_){}
 }
 function wrapRate(){

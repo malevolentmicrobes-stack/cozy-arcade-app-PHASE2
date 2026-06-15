@@ -162,6 +162,10 @@ Run in order — do not proceed to P7 until all pass:
 | DATA | 🔴 CRITICAL | Backup had 42 `stability:null` review cards and 10 ghost-seen records | ✅ Repaired 2026-06-06: stability-null records replayed via `rateCard()`, ghost-seen records reset to new defaults, repair export `cozy_arcade_progress_2026-06-06_codex_stability_ghost_repair.json` created. |
 | A10 | 🟡 MEDIUM | Atlas card detail needed pin/bury toggles writing to canonical progress | ✅ Fixed: card detail toggles update `phase3State.progress` and persist after Atlas close. |
 | A11 | 🟡 MEDIUM | Atlas card detail needed inline `one_thing` edit writing as `user_one_thing` | ✅ Fixed: inline edit writes `window.phase3State.progress[id].user_one_thing` and reflects immediately in card detail/export. |
+| FQ-RENDER-1 | 🔴 CRITICAL | Dual drop engines (System 2 `raf175164` + System 3 `soloStableRaf351`) fire simultaneously → `selectSolo` fires twice ~42ms apart per card. Outer wrappers (undo snapshot layer 10, rating rectifier layer 3, energy tracker layer 9) all execute twice, causing double FSRS writes and double undo snapshots. Browser-confirmed 2026-06-15. Fix: `clearSoloDrop()` at top of `startStableSoloDrop351` (~line 6948). | 🔴 Open |
+| FQ-RENDER-2 | 🟠 HIGH | `document.body.className=''` in active System 2 render path (~line 3939) drops `cozyGameShellActive371`, Drawer, and `na-*` classes on every card advance — causes CSS layout snap. Fix: save/restore active classes around the clear. Browser-confirmed 2026-06-15. | 🔴 Open |
+| FQ-RENDER-3 | 🟠 HIGH | Triple prompt writer causes "back and forth" font flicker: (1) plain write from renderSolo, (2) bionic from `rerenderVisibleBionic351`, (3) plain re-write from `installBionicQuestionPatch352` (~line 7438) that strips bionic back to plain text. Fix: add no-op guard in `installBionicQuestionPatch352` — skip if `soloQuestion.innerHTML` already contains `<b>`. Browser-confirmed 2026-06-15. | 🔴 Open |
+| FQ-RENDER-4 | 🟡 MEDIUM | 700ms debounce at wrong layer (layer 11 of 11 in selectSolo chain) — outer 10 wrappers bypass it. Should wrap the full chain, not the inner call. Static analysis confirmed 2026-06-15. | 🔴 Open |
 
 ## Next Code Tasks (after validation)
 
@@ -218,3 +222,4 @@ Run in order — do not proceed to P7 until all pass:
 | 2026-05-27 | Prompt AI v3 schema update | ✅ `65f1074` — all three locations |
 | 2026-05-28 | How to Play drawer + ArrowDown glitch fix | ✅ `a4712f1`, `7d809ef` |
 | 2026-05-28 | Advanced Merge dropdown → status chips (3 repos) | ✅ `e7e6ccf` |
+| 2026-06-15 | Render glitch root-cause audit (Codex browser verified) | 🔍 Analysis only — FQ-RENDER-1–4 identified, no code changes |
