@@ -1,6 +1,6 @@
 # Cozy Arcade — Project Status, Test Suite & Next Steps
 **Date:** 2026-06-15 | **Active branch:** PHASE2 main → origin/public (production)
-**SW version:** cozy-arcade-PHASE2-**v20** | **PHASE1 SW:** v55 | Last commits: PHASE2 `477b25e`, PHASE1 `b0defd5`
+**SW version:** cozy-arcade-PHASE2-**v21** | **PHASE1 SW:** v56 | Last commits: PHASE2 `e2df453`, PHASE1 `78bf6cb`
 
 ---
 
@@ -490,7 +490,9 @@ localStorage.setItem('cozy_arcade_progress_v1', ...)   // semi-redundant ← kee
 | PHASE2 | `dfb2ecc` | v19 | Debulk 7 dead state writes + FQ-DUE-1/RENDER-1/RENDER-3 |
 | PHASE2 | `477b25e` | v20 | Fix test A (auto-correct), FQ-DUE-1 cardPool fallback, wrappedRate lastRatedId clear |
 | PHASE1 | `b0defd5` | v55 | Remove LEGACY_STATE_KEYS dead write (soloStudyingState_v1757) |
-| PHASE2/PHASE1 | pending | v21/v56 | FQ-POOL-1/2 session-blocked pool + Shadow Dungeon queue skip; correct `record()` clears repair_point |
+| PHASE2 | `83079db` | v21 | FQ-POOL-1/2 isSessionBlockedCard + Shadow Dungeon queue skip; record(ok=true) clears repair_point |
+| PHASE1 | `c67de3e` | v56 | Port of 83079db |
+| PHASE2 | `e2df453` | v21 | Add CODEX_DAY_PLAN_2026-06-16.md (no code change) |
 
 ### Codex Browser Audit Results (run before commit 477b25e)
 | Test | Result | Note |
@@ -596,16 +598,50 @@ localStorage.setItem('cozy_arcade_progress_v1', ...)   // semi-redundant ← kee
 
 ---
 
+## SESSION 3 — 2026-06-16
+
+### Commits
+| Repo | Commit | SW | What |
+|------|--------|-----|------|
+| PHASE2 | `e2df453` | v21 | CODEX_DAY_PLAN_2026-06-16.md (no code change) |
+
+### Codex P4 Attempt — BLOCKED
+Codex confirmed target lines exist (clearSoloDrop in startStableSoloDrop351; bionic writes at ~838/3943).
+Blocked on safaridriver: "Allow Remote Automation" not enabled. No files changed.
+
+**Anti-pattern added:** Never gate Codex on `safaridriver` without user pre-enabling it in
+Safari → Develop → Allow Remote Automation. Use Node static check + console commands instead.
+
+### Pre-mortem: FQ-RENDER-1 + FQ-RENDER-3 Fixes
+| Risk | Mitigation |
+|------|-----------|
+| stopAllDropTimers not defined when clearSoloDrop fires early | `window.stopAllDropTimers&&` guard handles undefined |
+| window.bionic null at first renderSolo call | `(window.bionic\|\|bionic)` fallback — installBionicQuestionPatch352 runs at init before user clicks |
+| Prior dfb2ecc bionic guard conflicts with new fix | No conflict — guard in installBionicQuestionPatch352 is defense-in-depth; new fix prevents first write from being plain text |
+| stopAllDropTimers cancels System 0 raf during pause/resume | stopAllDropTimers called only from startStableSoloDrop351 (renderSolo path) — safe |
+
+### Root Cause Summary (confirmed from source, not assumptions)
+| Bug | System | Line | Root |
+|-----|--------|------|------|
+| FQ-RENDER-1: SS#2 10ms after SS#1 | System 0 | 756 | `let raf=null` not cancelled by `clearSoloDrop()`; `window.stopAllDropTimers` (line 880) calls `safeClear()` which does |
+| FQ-RENDER-3: plain text first write | System 0 | 838 | closure-captured `bionic` is pre-patch version; `window.bionic` is post-patch |
+
+### Next Codex Run: P4 Path B (no safaridriver)
+See CODEX_DAY_PLAN_2026-06-16.md for full prompt. Uses Node static verification + manual console commands.
+
+---
+
 ## NEXT CODEX TASK
 
-See `CODEX_PROMPT_3_POOL_RECIRCULATION.md` for full copy-paste prompt.
+**Codex P4** — `CODEX_DAY_PLAN_2026-06-16.md` → copy "CODEX P4" block. Path B (no safaridriver).
+
+**After P4:** Codex P5 (18 null next_due_at repair) → P6 (again requeue)
 
 **Priority order:**
-1. Validate FQ-RENDER-1 + FQ-RENDER-3 (render fixes applied unvalidated)
-2. Fix FQ-POOL-1 (pinned cards in pool every pass)
-3. Fix FQ-POOL-2 (Shadow Dungeon seenThisSession/buriedToday filter)
-4. Fix FQ-DATA-1 (repair_point not cleared on correct answer)
-5. Port to PHASE1 after PHASE2 validates all P1 items
+1. ❌ FQ-RENDER-1: stopAllDropTimers before clearSoloDrop in startStableSoloDrop351 (~line 6951)
+2. ❌ FQ-RENDER-3: (window.bionic||bionic) in System 0 (~838) and System 2 (~3943)
+3. ❌ FQ-ALGO-3: 18 null next_due_at — data repair
+4. ❌ FQ-ALGO-4: again not requeued mid-session
 
 ---
 

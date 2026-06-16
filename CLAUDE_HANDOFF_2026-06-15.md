@@ -251,9 +251,22 @@ Read that section, confirm you understand the 9-test rating matrix and the two i
 | Combined multiple fixes in one commit | When it failed, unknown which change caused it | One fix → validate → commit → next fix |
 | Did not bump SW cache | Users got stale HTML after deploy | Always bump `sw.js` CACHE in same commit |
 | Wrote validation script that didn't wait for deferred timers | FQ-ALGO-1 probe gave false pass | Wait 10+ seconds for 8.2s deferred timer to settle |
+| Gated Codex on safaridriver without pre-enabling | Codex blocked, no edits made, wasted run | Use Node static check + manual console commands; safaridriver needs Safari → Develop → Allow Remote Automation enabled by user first |
+| Assumed clearSoloDrop() stops all timers | System 0 raf (line 756) not cancelled — SS#2 still fired | Use window.stopAllDropTimers() (line 880) to cancel System 0; clearSoloDrop() only kills System 2 raf175164 |
+| Fixed bionic guard in installBionicQuestionPatch352 but not the first write | System 0 renderSolo wrote plain text first; guard only prevented re-write | Fix System 0/2 renderSolo to use (window.bionic\|\|bionic) so first write is already correct |
 
 ---
 
-*This handoff was generated 2026-06-15. For prior session history see `Chronological_Patch_Hx_RECTIFIER_PLAN_2026_05_26.md`.*
+## CURRENT OPEN P1 (as of 2026-06-16)
+| ID | Fix | Lines |
+|---|---|---|
+| FQ-RENDER-1 | `window.stopAllDropTimers&&window.stopAllDropTimers()` before `clearSoloDrop()` in `startStableSoloDrop351` | ~6951 |
+| FQ-RENDER-3 | `(window.bionic\|\|bionic)(getPrompt(current))` in System 0 renderSolo + System 2 renderSolo | ~838, ~3943 |
+
+Next Codex prompt: CODEX_DAY_PLAN_2026-06-16.md → "CODEX P4" block (Path B, no safaridriver).
+
+---
+
+*This handoff was generated 2026-06-15, updated 2026-06-16. For prior session history see `Chronological_Patch_Hx_RECTIFIER_PLAN_2026_05_26.md`.*
 *Full root cause log: `ULTIMATE_GOALS.md` RC-1 through RC-12.*
 *Architecture audit: `SENIOR_DEV_AUDIT_2026_06_07.md` Sections 1–20.*
