@@ -401,7 +401,7 @@ function notify(body,cb){$('notifyBody').textContent=body;$('notify').classList.
 function startSolo(){notify('Gate opening.',()=>{show('solo'); resetRun(); renderSolo(); loopSolo();})}
 function startDomain(){notify('Domain opening.',()=>{show('domain'); resetRun(); renderDomain(); loopDomain();})}
 function resetRun(){score=0;streak=0;hp=100;gate=1;domainRound=1;paused=false;index=0;nextCard();}
-function renderSolo(){const _savedShell=document.body.classList.contains('cozyGameShellActive371');document.body.className='';if(_savedShell)document.body.classList.add('cozyGameShellActive371');$('soloScore').textContent=score;$('soloStreak').textContent=streak;$('soloGate').textContent=gate;$('hpFill').style.width=hp+'%';$('soloSystem').textContent=current.system||current.sys||'';$('soloQuestion').innerHTML=bionic(getPrompt(current));$('soloReveal').classList.add('hidden'); let row=$('choiceRow'); row.innerHTML=''; choices.forEach((ch,i)=>{let d=document.createElement('button');d.className='choice '+(i===selected?'selected':'');d.innerHTML=`<span class="letter">${'ABCD'[i]}</span>${escHTML(ch)}`;d.onclick=()=>selectSolo(i);row.appendChild(d)});moveHunter();timerMax=parseInt(localStorage.getItem('cozyQuestionSeconds351')||$('soloTimerInput')?.value||7)||7;timer=timerMax;}
+function renderSolo(){const _savedShell=document.body.classList.contains('cozyGameShellActive371');document.body.className='';if(_savedShell)document.body.classList.add('cozyGameShellActive371');$('soloScore').textContent=score;$('soloStreak').textContent=streak;$('soloGate').textContent=gate;$('hpFill').style.width=hp+'%';$('soloSystem').textContent=current.system||current.sys||'';$('soloQuestion').innerHTML=(window.bionic||bionic)(getPrompt(current));$('soloReveal').classList.add('hidden'); let row=$('choiceRow'); row.innerHTML=''; choices.forEach((ch,i)=>{let d=document.createElement('button');d.className='choice '+(i===selected?'selected':'');d.innerHTML=`<span class="letter">${'ABCD'[i]}</span>${escHTML(ch)}`;d.onclick=()=>selectSolo(i);row.appendChild(d)});moveHunter();timerMax=parseInt(localStorage.getItem('cozyQuestionSeconds351')||$('soloTimerInput')?.value||7)||7;timer=timerMax;}
 function updateSoloVisuals(){[...document.querySelectorAll('#choiceRow .choice')].forEach((d,i)=>d.classList.toggle('selected',i===selected));moveHunter();$('soloTimerFill').style.width=Math.max(0,timer/timerMax*100)+'%';}
 function moveHunter(){let pct=[12.5,37.5,62.5,87.5][selected]||50;let r=$('runner');r.style.left=pct+'%';r.classList.remove('lane0','lane1','lane2','lane3');r.classList.add('lane'+selected);$('groundGlow').style.left=pct+'%'}
 function loopSolo(){clearInterval(ticker);ticker=setInterval(()=>{if(mode!=='solo'||paused)return;timer-=.08;updateSoloVisuals();if(timer<=0&&autoSelect)selectSolo(selected)},80)}
@@ -835,7 +835,7 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
     q('soloGate').textContent=gate;
     try{q('hpFill').style.width=hp+'%';}catch(e){}
     q('soloSystem').textContent=current.system||current.sys||'';
-    q('soloQuestion').innerHTML=bionic(getPrompt(current));
+    q('soloQuestion').innerHTML=(window.bionic||bionic)(getPrompt(current));
     q('soloReveal').classList.add('hidden');
     let row=q('choiceRow');
     row.innerHTML='';
@@ -3940,7 +3940,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     q('soloScore').textContent=score; q('soloStreak').textContent=streak; q('soloGate').textContent=gate;
     try{q('hpFill').style.width=hp+'%';}catch(e){}
     q('soloSystem').textContent=current.system||current.sys||'';
-    q('soloQuestion').innerHTML=bionic(getPrompt(current));
+    q('soloQuestion').innerHTML=(window.bionic||bionic)(getPrompt(current));
     q('soloReveal').classList.add('hidden');
     if(!choices || !choices.length) try{makeChoices();}catch(e){}
     const row=q('choiceRow'); row.innerHTML=''; row.className='choiceRow v175151-drop';
@@ -6948,7 +6948,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   function startStableSoloDrop351(){
     const row=$('choiceRow');
     if(!row || (typeof mode!=='undefined' && mode!=='solo')) return;
-    try{clearSoloDrop();}catch(e){}
+    try{window.stopAllDropTimers&&window.stopAllDropTimers();}catch(e){} try{clearSoloDrop();}catch(e){}
     try{clearInterval(ticker);}catch(e){}
     clearTimeout(soloStableRaf351);
     soloStablePausedAt351=0;
