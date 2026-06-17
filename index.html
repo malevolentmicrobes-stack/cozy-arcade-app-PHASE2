@@ -7021,6 +7021,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
         timer=0;
         try{clearInterval(ticker);}catch(e){}
         ticker=null;
+        if(typeof autoSelect==='undefined'||autoSelect){try{let _n=0,_b=1e9;orbData.forEach((o,i)=>{const _d=(o.x-cursor.x)**2+(o.y-cursor.y)**2;if(_d<_b){_b=_d;_n=i;}});selectDomain(_n);}catch(_){}}
       }
     },80);
   };
@@ -7551,6 +7552,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     ];
     let node;
     while((node = walker.nextNode())){
+      try{if(node.parentElement?.closest('#soloQuestion,#soloReveal,#domainQuestion,#domainReveal,#fullCard,[data-card-content]'))continue;}catch(_){}
       let text = node.nodeValue;
       let next = text;
       for(const [from,to] of changes) next = next.replace(from,to);
@@ -10958,6 +10960,7 @@ function fixStableOneThingDropdown351() {
   }
 
   let phase3State = loadPhase3State(normalizeDeckIdentities());
+  if(!window.__cozyNullDueRepaired){window.__cozyNullDueRepaired=true;let _rc=0;const _now=new Date().toISOString();Object.values(phase3State?.progress||{}).forEach(p=>{if(p.stage==='review'&&!p.next_due_at){p.next_due_at=_now;p.interval_days=p.interval_days||1;_rc++;}});if(_rc>0)try{savePhase3State();}catch(_){}}
   const session = {
     buriedToday: new Set(),
     seenThisSession: new Set(),
@@ -11287,6 +11290,7 @@ function fixStableOneThingDropdown351() {
       updated_at: now.toISOString()
     });
     if (rating === 'again') console.log('[SRS] again fired for', cardId, next);
+    if(rating==='again'){session.seenThisSession.delete(cardId);try{if(Array.isArray(session.pool)){const _i=session.pool.findIndex(c=>canonicalCardId(c)===cardId);if(_i>0){const[_c]=session.pool.splice(_i,1);session.pool.unshift(_c);}else if(_i===-1&&window.cards){const _c=window.cards.find(c=>canonicalCardId(c)===cardId);if(_c)session.pool.unshift(_c);}}}catch(_){}}
   }
 
   function shuffleCards(arr) {
