@@ -59,34 +59,22 @@ Rules:
 
 ---
 
-### Current Task: Validate 948abe7, Then P5
+### Current Task: Domain Smoke + P5
 
-**Validation (browser, no safaridriver needed):**
+**FQ-RENDER-1 CONFIRMED** (Codex browser audit 2026-06-17):
+- SS#1 once from System3 (PHASE2 line 6985 / PHASE1 line 7017) ✅
+- System2 silent at expiry (PHASE2 line 3924 / PHASE1 line 3936) ✅
+- FSRS 17/17, smoke 6/6 both repos ✅
+- `String(window.renderSolo).includes('startStableSoloDrop351')` = false — this check is UNRELIABLE, do not use as gate
 
-Node static check first (run in each repo dir):
-```
-node -e "const s=require('fs').readFileSync('index.html','utf8');
-  const f1=s.includes('soloStableDrop351');
-  const f2=(s.match(/\(window\.bionic\|\|bionic\)\(getPrompt/g)||[]).length;
-  console.log('F1 stable guard:',f1,'F2/3 bionic writes:',f2);"
-```
-Expect: F1 true, F2 3 (base + System0 + System2 renderSolo)
+**Before P5 — Domain smoke (one browser interaction):**
+Play one Knowledge Expansion (domain mode) round. Confirm:
+- Domain timer fires once (orbs animate normally)
+- No JS errors in console
+- `runFSRSValidation()` 17/17 + `runCozySmokeTests()` 6/6 after
 
-Browser instrumentation (start Solo, then in console):
-```javascript
-let n=0,o=window.selectSolo;
-window.selectSolo=function(){n++;console.log('SS#'+n,new Error().stack.split('\n')[1]);return o.apply(this,arguments)};
-// Wait 8s — expect SS#1 once from System3 (line ~6985 PHASE2 / ~7017 PHASE1)
-// FAIL if SS#2 appears within 500ms
-```
-
-If SS#2 still fires: check that `choiceRow` actually has `soloStableDrop351` class at card start.
-```javascript
-const r=document.getElementById('choiceRow'); console.log(r&&r.className);
-// Must contain 'soloStableDrop351'
-```
-
-If class is absent: stable mode never started — root cause is elsewhere (SS351 not being called).
+Domain regression risk is LOW (uses `renderDomain`/`loopDomain`/`orbArena`, no `soloStableDrop351`).
+If domain passes, proceed directly to P5.
 
 ---
 

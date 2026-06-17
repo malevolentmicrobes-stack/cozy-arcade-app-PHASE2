@@ -26,7 +26,7 @@
 | isSessionBlockedCard() in all pool scopes | FQ-POOL-1/2 | ✅ | 83079db |
 | record(ok=true) clears repair_point | FQ-DATA-1 | ✅ | 83079db |
 | All soloQuestion bionic writes use (window.bionic\|\|bionic) | FQ-RENDER-3 | ✅ applied | 8a22e66 — needs browser re-validate |
-| System2 tick guards against stable mode via .soloStableDrop351 | FQ-RENDER-1 | ⚠️ applied | 948abe7 — **awaiting Codex browser validate** |
+| System2 tick guards against stable mode via .soloStableDrop351 | FQ-RENDER-1 | ✅ browser-confirmed | 948abe7 — SS#1 once from System3, System2 silent |
 | 18 null next_due_at review rows | FQ-ALGO-3 | ❌ open | P5 next |
 | Again cards not requeued same session | FQ-ALGO-4 | ❌ open | P6 next |
 | wrong_count bloat | FQ-DATA-2 | ❌ open | — |
@@ -84,9 +84,11 @@ Root cause: System 2 and System 3 always start together (~same duration), expire
 
 ## NEXT CODEX TASK
 
-**Before P5:** Codex must browser-validate FQ-RENDER-1 (948abe7). Expect SS#1 once from System 3. If System 2 still fires, check that `.soloStableDrop351` class is actually being added to choiceRow at card start.
+**FQ-RENDER-1 ✅ CONFIRMED** (Codex browser audit 2026-06-17): SS#1 once from System 3 (line 6985). System 2 silent at line 3924. FSRS 17/17, smoke 6/6 both repos.
 
-**P5 — FQ-ALGO-3:** 18 null next_due_at rows. See CODEX_DAY_PLAN_2026-06-16.md for prompt (SW versions in prompt are now stale: use v24/v59 as the CURRENT versions before P5).
+**Before P5 (one remaining check):** Domain-mode smoke test. Domain not exercised in audit. Source suggests low risk (uses `renderDomain`/`loopDomain`/`orbArena` — no `soloStableDrop351` dependency). Run one domain round to confirm no regression.
+
+**P5 — FQ-ALGO-3:** 18 null next_due_at rows. Prompt in AGENTS.md with current SW versions.
 
 **P6 — FQ-ALGO-4:** Again requeue. See CODEX_DAY_PLAN_2026-06-16.md.
 

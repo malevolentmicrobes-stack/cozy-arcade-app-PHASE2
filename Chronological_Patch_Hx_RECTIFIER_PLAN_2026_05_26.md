@@ -675,3 +675,21 @@ if(elapsed>=ms){ raf175164=null; try{const _r=q('choiceRow');if((!_r||!_r.classL
 ### SW versions after this session
 - PHASE2: `cozy-arcade-PHASE2-v24`
 - PHASE1: `cozy-arcade-v59`
+
+### Browser Validation — 2026-06-17 (Codex audit)
+
+**Result: FQ-RENDER-1 CONFIRMED FIXED**
+
+| Metric | PHASE2 | PHASE1 |
+|--------|--------|--------|
+| selectSolo fires | 1 (System3 line 6985) | 1 (System3 line 7017) |
+| System2 at expiry | silent (line 3924) | silent (line 3936) |
+| runFSRSValidation() | 17/17 ✅ | 17/17 ✅ |
+| runCozySmokeTests() | 6/6 ✅ | 6/6 ✅ |
+| Final bionic HTML | <b> present ✅ | <b> present ✅ |
+| soloQuestion mutations | 3 (churn present but not blocking) | 3 |
+
+Notes from audit:
+- `String(window.renderSolo).includes('startStableSoloDrop351')` = false — later wrappers hide inner stable ref; this check is UNRELIABLE, removed from validation gates
+- Domain mode not exercised — one domain smoke recommended before P5; source analysis suggests low regression risk
+- Minor 404 (app-shell asset/favicon noise) — non-blocking
