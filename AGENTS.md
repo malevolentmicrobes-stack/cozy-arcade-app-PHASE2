@@ -15,7 +15,7 @@ Rules:
 
 ## Codex Agent Instructions — 2026-06-17 (updated end-of-day)
 
-**Current SW:** PHASE2 `cozy-arcade-PHASE2-v28` (commit 98b5254) | PHASE1 `cozy-arcade-v63` (commit df8c503)
+**Current SW:** PHASE2 `cozy-arcade-PHASE2-v29` (commit 22260dc) | PHASE1 `cozy-arcade-v64` (commit 3a921fc)
 **Next task:** `CODEX_PROMPT_5_WRONG_COUNT_AND_STABILITY.md` — FQ-DATA-2 wrong_count migration guard + FQ-ALGO-5 wrapper audit
 
 ---
@@ -85,7 +85,7 @@ Rules:
 | FQ-RENDER-1 System2 DOM class guard | ✅ browser-confirmed | 948abe7 |
 | DOMAIN-AUTO-SELECT loopDomain wrapper | ✅ fixed | 0d12676 |
 | FQ-ALGO-3 null next_due_at repair | ✅ applied (needs browser validate) | 0d12676 |
-| FQ-ALGO-4 again requeue to pool front | ✅ applied (needs browser validate) | 0d12676 |
+| FQ-ALGO-4 again requeue via pool rebuild | ✅ fixed (pool-rebuild replaces broken splice) | 22260dc |
 | PATCH-LANG-MEDICAL \b word boundaries | ✅ browser-confirmed | ca70006 |
 | PATCH-LANG-WALKER DOM skip content nodes | ✅ source-confirmed (LIVE-NO-DECK prevented runtime test) | 0d12676 |
 | DOMAIN-BIONIC (window.bionic\|\|bionic) in domain render | ✅ source-confirmed | f345dda |

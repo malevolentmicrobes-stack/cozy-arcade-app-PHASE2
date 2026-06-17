@@ -12,13 +12,13 @@
 AUDIT + FIX: FQ-DATA-2 wrong_count migration bloat + FQ-ALGO-5 wrapper audit.
 REPOS: PHASE2=/Users/rebekahbetar/Documents/GitHub/cozy-arcade-app-PHASE2
        PHASE1=/Users/rebekahbetar/Documents/GitHub/cozy-arcade-app
-SW NOW: PHASE2 v28 (98b5254) | PHASE1 v63 (df8c503)
+SW NOW: PHASE2 v29 (22260dc) | PHASE1 v64 (3a921fc)
 RULES: No cardPool/nextCard wrappers. No <script> blocks. No cross-push.
        cd /repo && git add in ONE bash call. Under 80 lines.
 
 ──── STEP 0: DEPLOYMENT GATE ────
 curl -s https://malevolentmicrobes-stack.github.io/cozy-arcade-app-PHASE2/sw.js | head -2
-→ must contain: cozy-arcade-PHASE2-v28. STOP if not.
+→ must contain: cozy-arcade-PHASE2-v29. STOP if not.
 curl -s https://malevolentmicrobes-stack.github.io/cozy-arcade-app-PHASE2/ | grep -c 'atlas_sysmap_v1'
 → must return ≥1 (confirms STATE-B fix is live). STOP if 0.
 
