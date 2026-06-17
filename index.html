@@ -10829,7 +10829,7 @@ function fixStableOneThingDropdown351() {
 
   function normalizeDeckIdentities() {
     const normalized = appCards().map(normalizeCardIdentity);
-    setAppCards(normalized);
+    if(normalized.length > 0) setAppCards(normalized);
     return normalized;
   }
 
@@ -11908,8 +11908,8 @@ function fixStableOneThingDropdown351() {
               },
               cards: sysMap
             });
-            try{ localStorage.removeItem('cozy_arcade_limitless_cards_v1'); }catch(_){}
-            localStorage.setItem('cozy_arcade_limitless_cards_v1', payload);
+            try{ localStorage.removeItem('cozy_arcade_atlas_sysmap_v1'); }catch(_){}
+            localStorage.setItem('cozy_arcade_atlas_sysmap_v1', payload);
           }
         }catch(qe){ console.warn('[Atlas] localStorage quota or write error:', qe); }
         window.showAtlasScreen();
@@ -13838,7 +13838,7 @@ window.showAtlasScreen=function(){
     var _ac=typeof appCards==='function'?appCards():[];
     if(_ac&&_ac.length){
       var sysMapData=_ac.map(function(c){var id=c&&(c.qid_unique||c.qid||c.card_id||c.id);return id?{qid_unique:id,sys:(c&&(c.sys||c.system))||'—'}:null;}).filter(Boolean);
-      try{localStorage.setItem('cozy_arcade_limitless_cards_v1',JSON.stringify({metadata:{atlas_cache_mode:'sys-map only',stored_at:new Date().toISOString()},cards:sysMapData}));}catch(_){}
+      try{localStorage.setItem('cozy_arcade_atlas_sysmap_v1',JSON.stringify({metadata:{atlas_cache_mode:'sys-map only',stored_at:new Date().toISOString()},cards:sysMapData}));}catch(_){}
     }
   }catch(_){}
   if(typeof show==='function')show('atlas');
