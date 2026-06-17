@@ -3921,7 +3921,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     }
     try{q('soloTimerFill').style.width=Math.max(0,(1-p)*100)+'%';}catch(e){}
     syncSelected();
-    if(elapsed>=ms){ raf175164=null; if(typeof autoSelect==='undefined'||autoSelect) selectSolo(selectedIdx()); return; }
+    if(elapsed>=ms){ raf175164=null; try{const _r=q('choiceRow');if((!_r||!_r.classList.contains('soloStableDrop351'))&&(typeof autoSelect==='undefined'||autoSelect)) selectSolo(selectedIdx());}catch(e){} return; }
     raf175164=requestAnimationFrame(tick);
   }
   function startDrop(){
