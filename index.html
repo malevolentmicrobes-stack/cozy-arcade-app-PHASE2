@@ -11290,7 +11290,7 @@ function fixStableOneThingDropdown351() {
       updated_at: now.toISOString()
     });
     if (rating === 'again') console.log('[SRS] again fired for', cardId, next);
-    if(rating==='again'){session.seenThisSession.delete(cardId);try{if(Array.isArray(session.pool)){const _i=session.pool.findIndex(c=>canonicalCardId(c)===cardId);if(_i>0){const[_c]=session.pool.splice(_i,1);session.pool.unshift(_c);}else if(_i===-1&&window.cards){const _c=window.cards.find(c=>canonicalCardId(c)===cardId);if(_c)session.pool.unshift(_c);}}}catch(_){}}
+    if(rating==='again'){session.seenThisSession.delete(cardId);session.poolKey='';session.pool=[];}
   }
 
   function shuffleCards(arr) {
