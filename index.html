@@ -7545,9 +7545,9 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       [/Signal strength = how stable is this recall\?/g, ''],
       [/This is a resonance style, not a diagnosis\.\s*/g, ''],
       [/Weak Signal/g, 'Again'],
-      [/Moderate/g, 'Hard'],
-      [/Strong/g, 'Good'],
-      [/Anchored/g, 'EASY']
+      [/\bModerate\b/g, 'Hard'],
+      [/\bStrong\b/g, 'Good'],
+      [/\bAnchored\b/g, 'EASY']
     ];
     let node;
     while((node = walker.nextNode())){
