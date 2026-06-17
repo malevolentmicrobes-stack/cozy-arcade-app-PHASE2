@@ -1,6 +1,6 @@
 # Open Differentials — Cozy Arcade Browser Test Log
 **Format:** Never delete rows. Close items by changing status + adding commit. Append new rows as Codex finds them.
-**Last updated:** 2026-06-17 | SW PHASE2 v24 | SW PHASE1 v59
+**Last updated:** 2026-06-17 | SW PHASE2 v26 | SW PHASE1 v61
 
 ---
 
@@ -28,7 +28,7 @@
 | DOM-GUARD-FRAG | 🔍 monitoring | 2026-06-17 audit | Not reproduced, theoretical | DOM class guard depends on `choiceRow.soloStableDrop351` being present before System2 expires (~7s). If a future render clears `choiceRow.className` after stable start, System2 could fire again | No fix needed now. If recurs: expose System2 cancel handle on `window` or use explicit ownership flag |
 | SILENT-CATCH | 🔍 monitoring | 2026-06-17 audit | Not reproduced | System2 guard wraps in `try/catch(e){}` — if `q`, `choiceRow`, or classList logic breaks, code silently returns without selecting (card stuck) | Long-term: replace with explicit ownership flag (`window.__cozyStableOwnsTimer=true`) instead of DOM class check |
 | DOMAIN-TIMER | 🔍 monitoring | 2026-06-17 audit | Source-only, not browser-tested | Domain mode (`renderDomain`/`loopDomain`/`orbArena`) not exercised in any browser audit. DOM class guard only affects `choiceRow` which is solo-only. Lower risk. | Run one domain round before P5 to confirm no regression |
-| DOMAIN-AUTO-SELECT | ❌ OPEN | 2026-06-17 audit | Browser-confirmed: orbs animate, timer reaches 0%, no `selectDomain` call, round never completes | Later `loopDomain` wrapper at PHASE2 line ~7009 overwrites base `loopDomain` (line 413). Base has `if(timer<=0&&autoSelect){...selectDomain(nearest)}`. Wrapper clears ticker at 0 but omits auto-select. **Pre-existing, not caused by our fix.** Manual orb click still works. | Wrapper at ~7009 needs `if(timer<=0&&(typeof autoSelect==='undefined'\|\|autoSelect)){...selectDomain(nearest)}` added. Separate fix, do not bundle with P5. |
+| DOMAIN-AUTO-SELECT | ✅ 0d12676 | 2026-06-17 audit | Browser-confirmed: orbs animate, timer reaches 0%, no `selectDomain` call, round never completes | Later `loopDomain` wrapper at PHASE2 line ~7009 overwrites base `loopDomain` (line 413). Base has `if(timer<=0&&autoSelect){...selectDomain(nearest)}`. Wrapper clears ticker at 0 but omits auto-select. **Pre-existing, not caused by our fix.** Manual orb click still works. | loopDomain wrapper now calls `selectDomain(nearest)` at timer≤0 (nearest orb to cursor). PHASE2 0d12676 / PHASE1 65ddcdf |
 
 ---
 
@@ -51,8 +51,8 @@
 |----|--------|------------|-----------------|-------------|-----|
 | FQ-ALGO-1 | ✅ 048d073 | 2026-06-15 | Again→10m ✅, Hard→1d ✅, Good→3d ✅, Easy→15d ✅ | Anonymous `setTimeout(rateCard(id,'good'), 8000)` in base selectSolo overwrote explicit Again at 8.2s | Timer stored as `window.__cozyAutoRateHandle20260603`; `cozy-explicit-rating-stabilizer-2026-06-11` wraps rate/rateCard to cancel on explicit rating |
 | FQ-ALGO-2 | ⬛ BY DESIGN | 2026-06-15 | — | `repair_point=true` on wrong answers + E7G immediate-due pool → again cards appear in Review Deck before 10-min due time | Intentional. May need configuring if user finds it jarring. |
-| FQ-ALGO-3 | ❌ OPEN | 2026-06-15 | `isDue()=true` always for these 18 cards; every session feels accelerated. Clean browser context showed 0 null rows — bug exists only in user's persisted localStorage, not reproducible with seeded test deck. | 18 review-stage rows with `next_due_at=null`; always due | P5 — one-time repair block. **Must use local `phase3State.progress` (not `window.phase3State?.progress`); set `interval_days` not `interval`; save only if changed>0.** |
-| FQ-ALGO-4 | ❌ OPEN | 2026-06-15 | — | "Again" cards not requeued in current session; sessionPool built at session start; no splice | P6 — splice again card to front of pool in rateCard() again branch |
+| FQ-ALGO-3 | ✅ 0d12676 | 2026-06-15 | `isDue()=true` always for these 18 cards; every session feels accelerated. Clean browser context showed 0 null rows — bug exists only in user's persisted localStorage, not reproducible with seeded test deck. | 18 review-stage rows with `next_due_at=null`; always due | One-time repair block after `loadPhase3State()`: sets `next_due_at=now`, `interval_days||=1` for review-stage null-due cards; saves only if changed>0. Uses local `phase3State.progress`. PHASE2 0d12676 / PHASE1 65ddcdf |
+| FQ-ALGO-4 | ✅ 0d12676 | 2026-06-15 | — | "Again" cards not requeued in current session; sessionPool built at session start; no splice | rateCard() again branch: removes cardId from `session.seenThisSession`, splices card to front of `session.pool` (fallback: prepend from `window.cards` if not found in pool). PHASE2 0d12676 / PHASE1 65ddcdf |
 | FQ-ALGO-5 | 🔍 open | 2026-06-15 | — | Wrapper accumulation: rating-path-rectifier + explicit-stabilizer both reinstall `rate()` at overlapping timeouts; layered chains on rate() | Functionally idempotent; architectural risk only. Monitor. |
 | FQ-ALGO-6 / K | ❌ OPEN | 2026-06-15 | — | `wrong_count` conflates lane accuracy + self-rating (explicit Again) — inflated wrong counts | Deferred |
 
@@ -89,7 +89,7 @@
 | ID | Status | First Found | Browser Evidence | Description | Fix |
 |----|--------|------------|-----------------|-------------|-----|
 | PATCH-LANG-MEDICAL | ✅ ca70006 | 2026-06-17 Codex audit | Browser probe: JSON has "Strongyloides", DOM showed "Goodyloides" after reveal/rating. current.diagnosis = Strongyloides in memory; display layer corrupted. | `patchVisibleLanguage()` TreeWalker walks ALL document.body text nodes. `[/Strong/g,'Good']` matched "Strongyloides"→"Goodyloides". Same risk: `/Moderate/g`→"Hard", `/Anchored/g`→"EASY". | Added `\b` word boundaries: `\bStrong\b`, `\bModerate\b`, `\bAnchored\b`. Matches standalone rating labels but not medical compound terms. SW PHASE2 v24→v25 / PHASE1 v59→v60. |
-| PATCH-LANG-WALKER | 🔍 monitoring | 2026-06-17 | Not yet browser-tested | TreeWalker still walks all body text. Word boundaries fix compound-term collision, but standalone medical words (e.g., "Moderate" severity in card text) could still be rewritten. Secondary: older normalizer at ~line 5412 sets `c.answer = educational_objective`, corrupting answer alias for wrappers that treat answer as diagnosis. | Longer fix: scope walker to skip card content containers (#soloQuestion, #soloReveal, etc.). Deferred — word boundary fix handles the immediate P0 case. |
+| PATCH-LANG-WALKER | ✅ 0d12676 | 2026-06-17 | Not yet browser-tested | TreeWalker still walks all body text. Word boundaries fix compound-term collision, but standalone medical words (e.g., "Moderate" severity in card text) could still be rewritten. Secondary: older normalizer at ~line 5412 sets `c.answer = educational_objective`, corrupting answer alias for wrappers that treat answer as diagnosis. | Walker loop now skips text nodes whose ancestor matches `#soloQuestion,#soloReveal,#domainQuestion,#domainReveal,#fullCard,[data-card-content]`. Secondary normalizer alias risk still open. PHASE2 0d12676 / PHASE1 65ddcdf |
 | BOARD-TRIGGER-TRUNC | ⬛ BY DESIGN | 2026-06-17 | JSON source: board_trigger already ends at "Treatment involves ivermectin or" in source JSON | board_trigger truncation is source data quality, not a browser/render bug. educational_objective has the complete sentence. | Not a code fix. Data quality issue in user's JSON. |
 
 ---
