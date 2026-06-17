@@ -1,5 +1,5 @@
 # Claude Handoff — Cozy Arcade PHASE2
-**Date:** 2026-06-15 | For: Claude (new session) or any AI agent
+**Date:** 2026-06-15, updated 2026-06-17 | For: Claude (new session) or any AI agent
 **Rule #1: Do not write a single line of code until you have completed Steps 1–4 below.**
 
 ---
@@ -257,13 +257,25 @@ Read that section, confirm you understand the 9-test rating matrix and the two i
 
 ---
 
-## CURRENT OPEN P1 (as of 2026-06-16)
-| ID | Fix | Lines |
-|---|---|---|
-| FQ-RENDER-1 | `window.stopAllDropTimers&&window.stopAllDropTimers()` before `clearSoloDrop()` in `startStableSoloDrop351` | ~6951 |
-| FQ-RENDER-3 | `(window.bionic\|\|bionic)(getPrompt(current))` in System 0 renderSolo + System 2 renderSolo | ~838, ~3943 |
+## CURRENT STATE (2026-06-17)
+**SW:** PHASE2 v24 (948abe7) | PHASE1 v59 (2e04efd)
 
-Next Codex prompt: CODEX_DAY_PLAN_2026-06-16.md → "CODEX P4" block (Path B, no safaridriver).
+| ID | Status | Notes |
+|---|---|---|
+| FQ-RENDER-1 | ⚠️ Applied, awaiting browser validate | System2 tick DOM class guard (948abe7). 3 prior attempts failed — see below. |
+| FQ-RENDER-3 | ✅ Applied | `(window.bionic\|\|bionic)` on all soloQuestion writes (8a22e66). Bionic present in browser. |
+| FQ-ALGO-3 | ❌ Open | 18 null next_due_at — P5 prompt in AGENTS.md |
+| FQ-ALGO-4 | ❌ Open | Again requeue — P6 prompt in AGENTS.md |
+
+## CRITICAL LESSON: clearSoloDrop() IS IIFE-SCOPED
+`clearSoloDrop()` lives inside System 2's IIFE. Calling it from outside (including stable mode's IIFE)
+always throws ReferenceError, silently caught by try/catch. Three fix attempts failed because of this:
+1. dfb2ecc — added clearSoloDrop() to SS351 start → ReferenceError silent
+2. 8a22e66 — added stopAllDropTimers before clearSoloDrop → same
+3. ebeef5e — loopSolo reassignment → System2 renderSolo calls startDrop() directly, bypasses loopSolo
+Current fix (948abe7): System2 tick checks `choiceRow.classList.contains('soloStableDrop351')` — DOM signal, no cross-IIFE dependency.
+
+Next: AGENTS.md → validate 948abe7 → P5 → P6.
 
 ---
 

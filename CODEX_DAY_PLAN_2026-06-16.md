@@ -1,5 +1,5 @@
 # Cozy Arcade — Dev Day Plan 2026-06-16
-PHASE2 SW v21 | PHASE1 SW v56 | Repo: cozy-arcade-app-PHASE2
+PHASE2 SW v24 (948abe7) | PHASE1 SW v59 (2e04efd) | Repo: cozy-arcade-app-PHASE2 | Updated: 2026-06-17
 
 ---
 
@@ -210,10 +210,14 @@ git push origin main && git push origin HEAD:public --force
 ---
 
 ## CURRENT SW TRACKER
-| Repo | After P4 | After P5 | After P6 |
+| Repo | Current (P4 done) | After P5 | After P6 |
 |---|---|---|---|
-| PHASE2 | v22 | v23 | v24 |
-| PHASE1 | v57 | v58 | v59 |
+| PHASE2 | **v24** (948abe7) | v25 | v26 |
+| PHASE1 | **v59** (2e04efd) | v60 | v61 |
+
+Note: P4 took 3 attempts (see COZY_ARCADE_PROJECT_STATUS_2026-06-17.md for error log).
+FQ-RENDER-1 fix is System2 DOM class guard (948abe7) — still awaiting browser validation.
+P5/P6 prompts in AGENTS.md are current with corrected SW versions.
 
 ---
 

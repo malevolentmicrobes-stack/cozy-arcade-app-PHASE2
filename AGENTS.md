@@ -13,33 +13,37 @@ Rules:
 
 ---
 
-## Codex Agent Instructions — 2026-06-16 (UPDATED)
+## Codex Agent Instructions — 2026-06-17
 
-**IMPORTANT — read before any render work:**
+**Current SW:** PHASE2 `cozy-arcade-PHASE2-v24` (commit 948abe7) | PHASE1 `cozy-arcade-v59` (commit 2e04efd)
 
-Fixes 1–3 from the 2026-06-15 version of this file were applied in commit `dfb2ecc`
-(clearSoloDrop guard in startStableSoloDrop351; bionic guard in installBionicQuestionPatch352).
-Browser validation on 2026-06-16 confirmed BOTH still fail: SS#2 fires 10ms after SS#1;
-soloQuestion gets 8 MutationObserver callbacks. The dfb2ecc fixes are insufficient.
+---
 
-**Current diagnosis (see CODEX_DAY_PLAN_2026-06-16.md for full analysis):**
+### STOP — Read Before Any Render Work
 
-FQ-RENDER-1: Three concurrent drop engines exist (System 0 line 756 `let raf`, System 2
-line 3887 `raf175164`, System 3 line 6918 `soloStableRaf351`). clearSoloDrop() cancels
-System 2 only. window.stopAllDropTimers (line 880) calls safeClear() which cancels System 0.
-Whether System 0 or a loopSolo()-restarted System 2 is the live second firer is not yet
-confirmed by browser stack trace — the stopAllDropTimers addition is defensive cancellation
-of all engines, not an overclaim of root cause.
+**Patch history for FQ-RENDER-1 (do not repeat these mistakes):**
 
-FQ-RENDER-3: System 0 renderSolo (line 838) and System 2 renderSolo (line 3943) use
-closure-captured bionic() from their IIFE scope. installBionicQuestionPatch352 (called at
-init, lines 8143/8291) sets window.bionic to bionicQuestionHTML352 AFTER those IIFEs run.
-By the time the user clicks startSolo, window.bionic is the patched version. Fixing the
-two renderSolo writes to use (window.bionic||bionic) ensures the first write is already
-correct. The <b> guard in installBionicQuestionPatch352 remains as defense-in-depth.
+| Attempt | What was tried | Why it failed |
+|---------|---------------|---------------|
+| dfb2ecc | `clearSoloDrop()` at top of startStableSoloDrop351 | `clearSoloDrop()` is IIFE-scoped inside System 2; silently throws ReferenceError from stable mode's IIFE |
+| 8a22e66 | `window.stopAllDropTimers()` before `clearSoloDrop()` | stopAllDropTimers cancels System 0 raf only; clearSoloDrop still failed silently |
+| ebeef5e | `window.loopSolo=function(){startStableSoloDrop351();}` at end of SS351 | System 2 renderSolo calls `startDrop()` directly, not via loopSolo; reassignment had no effect |
+| **948abe7** | DOM class guard in System 2 tick expiry | **Current fix — awaiting browser validation** |
 
-FQ-RENDER-3 SCOPE LIMIT: This fix covers soloQuestion only. domainQuestion at line 410
-still uses closure bionic — separate issue, separate fix later.
+**The invariant Codex must never violate:**
+`clearSoloDrop()` cannot be called from outside System 2's IIFE. Any attempt will throw ReferenceError silently.
+
+---
+
+### Three Drop Engines (memorize this)
+
+| System | Handle | Lines (PHASE2 / PHASE1) | cancel fn | selectSolo at |
+|--------|--------|------------------------|-----------|---------------|
+| 0 | `raf` | 756 / 756 | `safeClear()` via `window.stopAllDropTimers` | 809 / 809 |
+| 2 | `raf175164` | 3887 IIFE / same | `clearSoloDrop()` — **IIFE-scoped only** | 3924 / 3936 |
+| 3 | `soloStableRaf351` | 6948 / 6981 | `clearTimeout(soloStableRaf351)` inside SS351 | 6985 / 7017 |
+
+---
 
 ### Hard Constraints (Never Violate)
 
@@ -47,47 +51,109 @@ still uses closure bionic — separate issue, separate fix later.
 - Do NOT add `cardPool` or `nextCard` wrappers
 - Do NOT cross-push between PHASE1 and PHASE2 — separate repos, separate commits
 - Bump `sw.js` CACHE version after any code change
-- Apply fix to BOTH repos in same Codex prompt (PHASE2 primary, PHASE1 port)
-- Prompts under 80 lines; no CDP infra; no safaridriver (requires user pre-enable)
+- Apply fix to BOTH repos in same Codex session (PHASE2 primary, PHASE1 port)
+- Prompts under 80 lines; no CDP infra; no safaridriver gate (requires user Safari pre-enable)
 - Validate `runFSRSValidation()` 17/17 + `runCozySmokeTests()` 6/6 after every change
+- `cd /path/to/repo && git add ...` in single command — shell has no directory persistence between calls
+- selectSolo chain = 11 layers — do NOT add layer 12
 
-### Current Render Task (Codex P4 Path B)
+---
 
-3 edits, both repos. See CODEX_DAY_PLAN_2026-06-16.md for prompt.
+### Current Task: Validate 948abe7, Then P5
 
-Fix 1 — line ~6951 startStableSoloDrop351:
-  BEFORE clearSoloDrop(), add: window.stopAllDropTimers&&window.stopAllDropTimers();
+**Validation (browser, no safaridriver needed):**
 
-Fix 2 — line ~838 System0 renderSolo:
-  bionic(getPrompt(current)) → (window.bionic||bionic)(getPrompt(current))
+Node static check first (run in each repo dir):
+```
+node -e "const s=require('fs').readFileSync('index.html','utf8');
+  const f1=s.includes('soloStableDrop351');
+  const f2=(s.match(/\(window\.bionic\|\|bionic\)\(getPrompt/g)||[]).length;
+  console.log('F1 stable guard:',f1,'F2/3 bionic writes:',f2);"
+```
+Expect: F1 true, F2 3 (base + System0 + System2 renderSolo)
 
-Fix 3 — line ~3943 System2 renderSolo:
-  bionic(getPrompt(current)) → (window.bionic||bionic)(getPrompt(current))
+Browser instrumentation (start Solo, then in console):
+```javascript
+let n=0,o=window.selectSolo;
+window.selectSolo=function(){n++;console.log('SS#'+n,new Error().stack.split('\n')[1]);return o.apply(this,arguments)};
+// Wait 8s — expect SS#1 once from System3 (line ~6985 PHASE2 / ~7017 PHASE1)
+// FAIL if SS#2 appears within 500ms
+```
 
-### Validation (no safaridriver)
+If SS#2 still fires: check that `choiceRow` actually has `soloStableDrop351` class at card start.
+```javascript
+const r=document.getElementById('choiceRow'); console.log(r&&r.className);
+// Must contain 'soloStableDrop351'
+```
 
-Node static (run in each repo dir):
-  node -e "const s=require('fs').readFileSync('index.html','utf8');
-    console.log('F1:',s.includes('stopAllDropTimers&&window.stopAllDropTimers'));
-    console.log('F23:',(s.match(/\(window\.bionic\|\|bionic\)\(getPrompt/g)||[]).length);"
-  Expect: F1:true F23:2
+If class is absent: stable mode never started — root cause is elsewhere (SS351 not being called).
 
-Browser console (manual, after starting Solo):
-  // Confirm System 3 wrapper is active renderSolo:
-  String(window.renderSolo).includes('startStableSoloDrop351')  // expect true
+---
 
-  // FQ-RENDER-1 timer probe (enable bionic first):
-  localStorage.setItem('bionicOn_v1751523','1'); location.reload();
-  // Then: let n=0,o=window.selectSolo;window.selectSolo=function(){n++;console.log('SS#'+n);return o.apply(this,arguments)};
-  // Wait for timer. Expect: SS#1 once. FAIL if SS#2 within 500ms.
+### P5 — FQ-ALGO-3: 18 null next_due_at (run after FQ-RENDER-1 confirmed)
 
-  // FQ-RENDER-3 first-write check:
-  document.getElementById('soloQuestion').innerHTML.includes('<b>')  // expect true on first load
+```
+DATA REPAIR — 18 null next_due_at. PHASE2+PHASE1.
+REPOS: PHASE2=/Users/rebekahbetar/Documents/GitHub/cozy-arcade-app-PHASE2
+       PHASE1=/Users/rebekahbetar/Documents/GitHub/cozy-arcade-app
+GATES: runFSRSValidation()17/17 runCozySmokeTests()6/6 first.
+
+FIND null rows:
+  const nullDue=Object.entries(window.phase3State?.progress||{})
+    .filter(([k,v])=>v.stage==='review'&&!v.next_due_at);
+  console.log('count:',nullDue.length);
+
+ADD one-time auto-repair block in Phase3 init (after phase3State loads, before pool builds):
+  if(!window.__cozyNullDueRepaired){
+    window.__cozyNullDueRepaired=true;
+    const now=new Date().toISOString();
+    Object.values(window.phase3State?.progress||{}).forEach(p=>{
+      if(p.stage==='review'&&!p.next_due_at){ p.next_due_at=now; p.interval=p.interval||1; }
+    });
+    try{savePhase3State();}catch(_){}
+  }
+
+Validate: rerun null count → expect 0.
+→ runFSRSValidation()17/17 + runCozySmokeTests()6/6
+Port to PHASE1. Bump PHASE2 sw v24→v25, PHASE1 sw v59→v60. Commit both repos separately.
+```
+
+---
+
+### P6 — FQ-ALGO-4: Again Requeue (run after P5)
+
+```
+AGAIN REQUEUE — FQ-ALGO-4. PHASE2+PHASE1.
+GATES: runFSRSValidation()17/17 runCozySmokeTests()6/6 first.
+
+In rateCard() again branch, after FSRS update and session.buriedToday.delete(cardId):
+  try{
+    const pool=window.cozyPhase3Session?.pool;
+    if(Array.isArray(pool)){
+      const idx=pool.findIndex(c=>window.canonicalCardId(c)===cardId);
+      if(idx>0){ const [card]=pool.splice(idx,1); pool.unshift(card); }
+      else if(idx===-1&&window.cards){
+        const card=window.cards.find(c=>window.canonicalCardId(c)===cardId);
+        if(card) pool.unshift(card);
+      }
+    }
+  }catch(_){}
+
+Validate:
+  delete window.phase3State.progress['requeue-test'];
+  window.rateCard('requeue-test','again');
+  const pool=window.cozyPhase3Session?.pool||[];
+  console.log('first:',window.canonicalCardId(pool[0]),'expect: requeue-test');
+
+Port to PHASE1. Bump PHASE2 sw v25→v26, PHASE1 sw v60→v61. Commit both repos separately.
+```
+
+---
 
 ### selectSolo Chain (11 layers — do not add layer 12)
 
-| Layer | Line | Purpose |
-|---|---|---|
+| Layer | Line (PHASE2) | Purpose |
+|-------|--------------|---------|
 | 1 | ~408 | Base game selectSolo |
 | 2 | ~860 | Knowledge Pulse / shadow queue advance |
 | 3 | ~2431 | Rating-path rectifier |
@@ -99,21 +165,3 @@ Browser console (manual, after starting Solo):
 | 9 | ~7752 | Energy tracker |
 | 10 | ~13303 | Undo snapshot |
 | 11 | ~14199 | 700ms debounce guard |
-
-### selectSolo Chain Reference (11 layers — do not add a 12th)
-
-| Layer | Line | Purpose |
-|---|---|---|
-| 1 | ~408 | Base game selectSolo |
-| 2 | ~860 | Knowledge Pulse / shadow queue advance |
-| 3 | ~2431 | Rating-path rectifier (`__cozyRatingPath20260603`) |
-| 4 | ~2741 | Bionic/stable-random wrapper |
-| 5 | ~3958 | Shadow dungeon queue advance v2 |
-| 6 | ~4071 | Unlisted wrapper |
-| 7 | ~4227 | Unlisted wrapper |
-| 8 | ~6893 | Energy scope wrapper |
-| 9 | ~7752 | Energy tracker (`__energyTrack352`) |
-| 10 | ~13303 | Undo snapshot (`__rectifierUndo372`) |
-| 11 | ~14199 | 700ms debounce guard |
-
-Do NOT add layer 12. If a fix requires new selectSolo behavior, edit an existing layer in-place.

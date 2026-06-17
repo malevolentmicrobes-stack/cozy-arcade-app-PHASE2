@@ -631,3 +631,47 @@ Validation gate: `runFSRSValidation()` 17/17 + `runCozySmokeTests()` 6/6 after e
 | Wrapper accumulation on `rate()` | Both `installRatingPathHooks20260603` and explicit stabilizer reinstall at overlapping timeouts; each pair can add layers to the chain; functionally idempotent but architecturally messy |
 | "Again" not in current session pool | `requeueAgainCard` removes from seenThisSession but does NOT splice into current pool → true Anki learning-step behavior (failed card back in ~10 min in same session) is not implemented |
 | FQ-RENDER-1 dual-fire still present | selectSolo still fires twice per card via dual drop engines; outer rating wrappers may double-write FSRS (these are the render bugs, separate issue) |
+
+---
+
+## 2026-06-16/17 — FQ-RENDER-1 Root Cause Confirmed + DOM Guard Fix
+
+**Session type:** Active bug fixing. 3 failed attempts before correct fix.
+**FSRS validation:** 17/17 pre-session ✅ | smoke 6/6 pre-session ✅
+
+### Root Cause (confirmed by Codex browser stack traces)
+
+System 2 (`raf175164`) and System 3 (`soloStableRaf351`) run simultaneously for every card. Both expire at ~7s, System 2 fires `selectSolo` first (line 3924), System 3 fires 40ms later (line 6985). Prior fix attempts could not cancel System 2 because `clearSoloDrop()` is IIFE-scoped inside System 2's block — calling it from System 3's IIFE throws a silent ReferenceError.
+
+### Attempt 1 — INSUFFICIENT (commit 8a22e66 PHASE2 / 243f182 PHASE1)
+Prepended `window.stopAllDropTimers&&window.stopAllDropTimers()` before `try{clearSoloDrop();}catch(e){}` in `startStableSoloDrop351`. Also fixed FQ-RENDER-3: all soloQuestion bionic writes now use `(window.bionic||bionic)()`. Added `<b>` guard to PHASE1 `installBionicQuestionPatch352` (already in PHASE2 from dfb2ecc). SW PHASE2 v21→v22 / PHASE1 v56→v57. **Codex browser re-test: selectSolo still fired twice. clearSoloDrop() was a ReferenceError in System 3's scope.**
+
+### Attempt 2 — INSUFFICIENT (commit ebeef5e PHASE2 / 767b0f1 PHASE1)
+Added `window.loopSolo=loopSolo=function(){startStableSoloDrop351();}` at end of `startStableSoloDrop351` so `loopSolo()` calls restart stable mode instead of System 2. SW PHASE2 v22→v23 / PHASE1 v57→v58. **Codex browser re-test: still two fires. System 2's renderSolo wrapper calls `startDrop()` directly — bypasses loopSolo entirely.**
+
+### Fix Applied — DOM class guard (commit 948abe7 PHASE2 / 2e04efd PHASE1)
+
+In System 2's tick expiry (PHASE2 line 3924 / PHASE1 line 3936), replaced:
+```
+if(elapsed>=ms){ raf175164=null; if(typeof autoSelect==='undefined'||autoSelect) selectSolo(selectedIdx()); return; }
+```
+With:
+```
+if(elapsed>=ms){ raf175164=null; try{const _r=q('choiceRow');if((!_r||!_r.classList.contains('soloStableDrop351'))&&(typeof autoSelect==='undefined'||autoSelect)) selectSolo(selectedIdx());}catch(e){} return; }
+```
+
+`startStableSoloDrop351` adds `.soloStableDrop351` to choiceRow at card start. This class is present for the full ~7s duration. System 2's tick now checks this DOM signal before calling selectSolo — no cross-IIFE variable access, no scoping dependency. If stable mode is absent (class not on row), System 2 fires as fallback. SW PHASE2 v23→v24 / PHASE1 v58→v59.
+
+**Status: Awaiting Codex browser validation (expect SS#1 once from System 3).**
+
+### FQ-RENDER-3 Status
+`(window.bionic||bionic)(getPrompt(current))` confirmed in browser: final soloQuestion HTML contains `<b>` tags. Write count still 3 (multi-writer churn ongoing), but bionic final state is correct. Deeper write-sequence fix deferred.
+
+### What NOT to try again
+- `clearSoloDrop()` from outside System 2's IIFE → always ReferenceError, always silent
+- loopSolo reassignment alone → doesn't prevent direct `startDrop()` calls
+- Static analysis to confirm cross-IIFE behavior → must use browser
+
+### SW versions after this session
+- PHASE2: `cozy-arcade-PHASE2-v24`
+- PHASE1: `cozy-arcade-v59`
