@@ -13,13 +13,13 @@
 AUDIT + FIX: DOMAIN-WRITER-ORDER + synthetic domain smoke test.
 REPOS: PHASE2=/Users/rebekahbetar/Documents/GitHub/cozy-arcade-app-PHASE2
        PHASE1=/Users/rebekahbetar/Documents/GitHub/cozy-arcade-app
-SW NOW: PHASE2 v28+ (post-P5/P6) | PHASE1 v63+ (post-P5/P6)
+SW NOW: PHASE2 v30 (3104391) | PHASE1 v65 (63c1407)
 RULES: No cardPool/nextCard wrappers. No <script> blocks. No cross-push.
        cd /repo && git add in ONE bash call. Under 80 lines.
 
 ──── STEP 0: DEPLOYMENT GATE ────
 curl -s https://malevolentmicrobes-stack.github.io/cozy-arcade-app-PHASE2/sw.js | head -2
-→ must contain current version. STOP if stale.
+→ must contain: cozy-arcade-PHASE2-v30. STOP if not.
 
 ──── STEP 1: AUDIT domain question write order ────
 In PHASE2/index.html, find all writes to domainQuestion:

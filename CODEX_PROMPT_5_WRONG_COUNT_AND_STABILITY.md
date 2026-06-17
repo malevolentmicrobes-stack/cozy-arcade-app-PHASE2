@@ -51,7 +51,7 @@ If legacyToProgress runs every load with no schema guard:
     if(p?.schema_version==='fsrs5' && p?.stability) return p;
   where p is the existing progress object being coerced.
   This skips re-coercion for cards already migrated to FSRS5.
-Port to PHASE1. Bump PHASE2 sw v28→v29, PHASE1 v63→v64.
+Port to PHASE1. Bump PHASE2 sw v29→v30, PHASE1 v64→v65.
 Commit PHASE2 then PHASE1 separately.
 git push origin main && git push origin main:public --force
 

@@ -1,6 +1,6 @@
 # Open Differentials — Cozy Arcade Browser Test Log
 **Format:** Never delete rows. Close items by changing status + adding commit. Append new rows as Codex finds them.
-**Last updated:** 2026-06-17 | SW PHASE2 v28 | SW PHASE1 v63
+**Last updated:** 2026-06-17 | SW PHASE2 v30 | SW PHASE1 v65
 
 ---
 
@@ -53,7 +53,7 @@
 | FQ-ALGO-1 | ✅ 048d073 | 2026-06-15 | Again→10m ✅, Hard→1d ✅, Good→3d ✅, Easy→15d ✅ | Anonymous `setTimeout(rateCard(id,'good'), 8000)` in base selectSolo overwrote explicit Again at 8.2s | Timer stored as `window.__cozyAutoRateHandle20260603`; `cozy-explicit-rating-stabilizer-2026-06-11` wraps rate/rateCard to cancel on explicit rating |
 | FQ-ALGO-2 | ⬛ BY DESIGN | 2026-06-15 | — | `repair_point=true` on wrong answers + E7G immediate-due pool → again cards appear in Review Deck before 10-min due time | Intentional. May need configuring if user finds it jarring. |
 | FQ-ALGO-3 | ✅ 0d12676 | 2026-06-15 | `isDue()=true` always for these 18 cards; every session feels accelerated. Clean browser context showed 0 null rows — bug exists only in user's persisted localStorage, not reproducible with seeded test deck. | 18 review-stage rows with `next_due_at=null`; always due | One-time repair block after `loadPhase3State()`: sets `next_due_at=now`, `interval_days||=1` for review-stage null-due cards; saves only if changed>0. Uses local `phase3State.progress`. PHASE2 0d12676 / PHASE1 65ddcdf |
-| FQ-ALGO-4 | ✅ 0d12676 | 2026-06-15 | — | "Again" cards not requeued in current session; sessionPool built at session start; no splice | rateCard() again branch: removes cardId from `session.seenThisSession`, splices card to front of `session.pool` (fallback: prepend from `window.cards` if not found in pool). PHASE2 0d12676 / PHASE1 65ddcdf |
+| FQ-ALGO-4 | ✅ 22260dc | 2026-06-15 | — | "Again" cards: old splice to pool[0] was ineffective — nextCard uses pool[index%length], never picks pool[0] until index wraps all 104 cards | Pool-rebuild fix: rateCard('again') sets session.poolKey=''; session.pool=[] → sessionPool() rebuilds with repair_point=1 sort + index=0 reset → again card picked next. isDue() returns true for repair_point (line 11135) so review_deck includes card despite next_due_at=+10min. PHASE2 22260dc / PHASE1 3a921fc |
 | FQ-ALGO-5 | 🔍 open | 2026-06-15 | — | Wrapper accumulation: rating-path-rectifier + explicit-stabilizer both reinstall `rate()` at overlapping timeouts; layered chains on rate() | Functionally idempotent; architectural risk only. Monitor. |
 | FQ-ALGO-6 / K | ❌ OPEN | 2026-06-15 | — | `wrong_count` conflates lane accuracy + self-rating (explicit Again) — inflated wrong counts | Deferred |
 
@@ -65,7 +65,7 @@
 |----|--------|------------|-----------------|-------------|-----|
 | FQ-POOL-1/2 | ✅ 83079db | 2026-06-15 | — | Pinned cards passed `isDue\|\|pinned` every pool pass with no `buriedToday` protection; Shadow Dungeon scopes didn't filter seen/buried | `isSessionBlockedCard()` added; filters applied to all pool scopes + Shadow Dungeon |
 | FQ-DATA-1 | ✅ 83079db | 2026-06-15 | — | `repair_point=true` never cleared when answer was correct | `record(ok=true)` now clears `repair_point:false` |
-| FQ-DATA-2 | ❌ OPEN | 2026-06-15 | — | `wrong_count` bloat from legacy counter (incremented by multiple paths) | Deferred |
+| FQ-DATA-2 | ✅ 3104391 | 2026-06-15 | — | `wrong_count` bloat: `legacyToProgress()` ran every load with no schema guard, re-inflating wrong_count for already-migrated FSRS5 cards | Guard added: `if(p?.schema_version==='fsrs5' && p?.stability) return p;` at PHASE2 line 10862 / PHASE1 line 10889. rateCard() increments verified intentional (once per call, again+hard only). PHASE2 3104391 / PHASE1 63c1407 |
 | D8 | ❌ OPEN | 2026-06-16 | Source only | 18 null `next_due_at` rows invisible in source; `isDue()=true` always | Same as FQ-ALGO-3; P5 |
 
 ---
@@ -76,7 +76,7 @@
 |----|--------|------------|-----------------|-------------|-----|
 | D9-CHAIN | 🔍 monitoring | 2026-06-16 | — | selectSolo chain = 11 layers; each has own cancel logic; not all cross-cancel; adding layer 12 could reintroduce dual-fire | Hard constraint: do NOT add layer 12 |
 | D10 | ✅ 948abe7 | 2026-06-16 | — | Both drop engines called `record()` on same card when selectSolo fired twice → double FSRS write | Resolved by FQ-RENDER-1 single-fire fix |
-| D6 | ❌ OPEN | 2026-06-16 | — | sessionPool stale: pool built at session start; again cards don't splice back in same session | FQ-ALGO-4 / P6 |
+| D6 | ✅ 22260dc | 2026-06-16 | — | sessionPool stale: pool built at session start; again cards don't splice back in same session | Resolved by FQ-ALGO-4 pool-rebuild fix (22260dc) |
 | D7 | ⚠️ mitigated | 2026-06-16 | — | `seenThisSession` Set grows all session; new session needed to reset | Mitigated by `isSessionBlockedCard()` (83079db) |
 | INSTALL-BURIED | 🔍 monitoring | 2026-06-15 | Static only | `installBuriedPoolFilter` setInterval(120ms) still running after E7 guard flags — may re-wrap pool over time | Not confirmed in browser. Watch for pool behavior regressions. |
 | LOOP-DOMAIN | 🔍 monitoring | 2026-06-15 | Static only | Knowledge Expansion (domain) mode has same dual-engine timer pattern as solo — untested in browser | Run domain smoke before P5 |
