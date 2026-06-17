@@ -1,67 +1,65 @@
-# CODEX PROMPT 5 — FQ-DATA-2 wrong_count + FQ-ALGO-5 FSRS write audit
-**Paste block below into Codex. ~70 lines.**
+# CODEX PROMPT 5 — FQ-DATA-2 wrong_count (migration bloat) + FQ-ALGO-5 verify
+**Paste block below into Codex. ~65 lines.**
+
+**Pre-mortem findings (do not re-investigate):**
+- FQ-ALGO-5 (stability/difficulty): rateCard() already computes newS/newD for all 4 ratings and passes them to setProgress(). NOT a bug. Verify wrapper order only.
+- wrong_count bloat source: `legacyToProgress()` at line ~10873 adds `wrong_count: wrong + (rating==='again'?1:0)` on every coercion. If migration runs multiple times, wrong_count inflates. rateCard() also increments for both again+hard. Runtime double-click is NOT the primary cause.
+- STATE-B (0 cards): FIXED in 98b5254 — do not re-investigate.
 
 ---
 
 ```
-AUDIT + FIX: FQ-DATA-2 wrong_count bloat + FQ-ALGO-5 FSRS stability/difficulty write.
+AUDIT + FIX: FQ-DATA-2 wrong_count migration bloat + FQ-ALGO-5 wrapper audit.
 REPOS: PHASE2=/Users/rebekahbetar/Documents/GitHub/cozy-arcade-app-PHASE2
        PHASE1=/Users/rebekahbetar/Documents/GitHub/cozy-arcade-app
-SW NOW: PHASE2 v27 (f345dda) | PHASE1 v62 (3dcbe0a)
+SW NOW: PHASE2 v28 (98b5254) | PHASE1 v63 (df8c503)
 RULES: No cardPool/nextCard wrappers. No <script> blocks. No cross-push.
        cd /repo && git add in ONE bash call. Under 80 lines.
 
-──── STEP 0: DEPLOYMENT GATE (curl, no browser eval) ────
+──── STEP 0: DEPLOYMENT GATE ────
 curl -s https://malevolentmicrobes-stack.github.io/cozy-arcade-app-PHASE2/sw.js | head -2
-→ must contain: cozy-arcade-PHASE2-v27. STOP if not.
-curl -s https://malevolentmicrobes-stack.github.io/cozy-arcade-app-PHASE2/ | grep -c 'runFSRSValidation'
-→ must return ≥1. STOP if 0.
+→ must contain: cozy-arcade-PHASE2-v28. STOP if not.
+curl -s https://malevolentmicrobes-stack.github.io/cozy-arcade-app-PHASE2/ | grep -c 'atlas_sysmap_v1'
+→ must return ≥1 (confirms STATE-B fix is live). STOP if 0.
 
-──── STEP 1: AUDIT wrong_count write paths ────
-In PHASE2/index.html:
-  grep -n "wrong_count" index.html
-List every line. Categorize each as READ or WRITE (increment/assign).
-We expect at most ONE write per card appearance.
-Identify any path where wrong_count increments twice for one wrong answer
-(e.g., auto-select fires first, then explicit Again rating increments again).
-If ≤1 write path: report "no bloat found" and skip FIX-A.
+──── STEP 1: AUDIT legacyToProgress migration guard ────
+grep -n "legacyToProgress\|wrong_count.*wrong\|wrong.*rating.*again" index.html | head -20
+Find legacyToProgress(). Check:
+  A. Does it have a guard to run only ONCE (e.g., checking existing progress.schema_version)?
+  B. Is it called on every page load, or only when legacy data is detected?
+  C. Can it be called multiple times for the same card across reloads?
+If called every load with no guard: adding `if(p.schema_version==='fsrs5') return p;`
+before the coercion would prevent re-inflation. Report finding.
 
-──── STEP 2: AUDIT FSRS stability/difficulty writes ────
-In PHASE2/index.html, find rateCard() function:
-  grep -n "function rateCard\|newS\|newD\|stability\|difficulty" index.html | head -40
-For the good/hard/easy branches in rateCard():
-  - Does each branch compute newS (new stability)?
-  - Does each branch compute newD (new difficulty)?
-  - Does setProgress() receive stability and difficulty fields?
-Check setProgress() signature:
-  grep -n "function setProgress\|setProgress(" index.html | head -10
-Report: are stability/difficulty correctly written for all 4 ratings (again/hard/good/easy)?
+──── STEP 2: AUDIT rateCard wrong_count ────
+grep -n "wrong_count" index.html | head -20
+Confirm rateCard() increments wrong_count for: again? hard? both?
+If BOTH again and hard increment wrong_count, that is intentional — hard cards
+are wrong answers too. Do NOT remove hard from wrong_count.
+Only flag if wrong_count is incremented MORE THAN ONCE per rateCard call.
 
-──── STEP 3: FIX (only what's broken from STEP 1 + STEP 2) ────
-FIX-A wrong_count (if double-increment confirmed):
-  Add a per-session guard: before incrementing wrong_count, check
-  window.__cozyLastWrongCardId !== cardId. If same card, skip increment.
-  Set window.__cozyLastWrongCardId = cardId after incrementing.
-  Reset window.__cozyLastWrongCardId = null on card advance (new card load).
-  Minimal change only — if >6 lines, report candidate to Claude instead.
+──── STEP 3: AUDIT FQ-ALGO-5 rate() wrapper chain ────
+grep -n "window\.rate\s*=\|window\.rateCard\s*=" index.html | head -20
+List all wrapper reassignments in order. Note if any wrapper:
+  - Calls the previous rate/rateCard without passing through rating
+  - Bypasses the FSRS write in rateCard()
+Do NOT patch — report findings to Claude if any wrapper breaks the chain.
 
-FIX-B FSRS fields (if stability/difficulty missing from good/hard/easy setProgress):
-  In each missing branch, ensure setProgress receives: stability: newS, difficulty: newD.
-  Do NOT change FSRS math — only ensure existing computed values are passed through.
-  If rateCard is >200 lines and risky, report the exact missing lines to Claude instead.
-
-──── STEP 4: VALIDATE + COMMIT ────
-Source-check after any edits:
-  grep -c 'runFSRSValidation' index.html  → expect ≥1 (confirms function still defined)
-  grep -c 'runCozySmokeTests' index.html  → expect ≥1
-Bump PHASE2 sw v27→v28, PHASE1 v62→v63.
-Commit PHASE2 (cd PHASE2 && git add index.html sw.js), then PHASE1 separately.
+──── STEP 4: FIX (only migration guard if STEP 1 confirms no guard) ────
+If legacyToProgress runs every load with no schema guard:
+  At start of legacyToProgress, add:
+    if(p?.schema_version==='fsrs5' && p?.stability) return p;
+  where p is the existing progress object being coerced.
+  This skips re-coercion for cards already migrated to FSRS5.
+Port to PHASE1. Bump PHASE2 sw v28→v29, PHASE1 v63→v64.
+Commit PHASE2 then PHASE1 separately.
 git push origin main && git push origin main:public --force
 
 ──── STEP 5: REPORT ────
 SW after: PHASE2 v[N] ([commit]) | PHASE1 v[N] ([commit])
-STEP 1 wrong_count write sites: [list with line numbers and category]
-STEP 2 FSRS stability/difficulty: [present/missing per rating branch]
-STEP 3 fixes applied: [FIX-A at line X / FIX-B at lines Y,Z / deferred: reason]
-New differentials not in OPEN_DIFFERENTIALS.md: [list or "none"]
+STEP 1 migration guard: [present / missing — coercion runs every load]
+STEP 2 wrong_count paths: [list + intentional/bloat verdict]
+STEP 3 wrapper chain: [intact / broken at wrapper X line Y]
+STEP 4 fix: [applied at line X / "guard already present, no fix needed"]
+New differentials: [list or "none"]
 ```

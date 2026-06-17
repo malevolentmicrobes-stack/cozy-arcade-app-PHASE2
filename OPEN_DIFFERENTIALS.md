@@ -1,6 +1,6 @@
 # Open Differentials — Cozy Arcade Browser Test Log
 **Format:** Never delete rows. Close items by changing status + adding commit. Append new rows as Codex finds them.
-**Last updated:** 2026-06-17 | SW PHASE2 v27 | SW PHASE1 v62
+**Last updated:** 2026-06-17 | SW PHASE2 v28 | SW PHASE1 v63
 
 ---
 
@@ -81,7 +81,7 @@
 | INSTALL-BURIED | 🔍 monitoring | 2026-06-15 | Static only | `installBuriedPoolFilter` setInterval(120ms) still running after E7 guard flags — may re-wrap pool over time | Not confirmed in browser. Watch for pool behavior regressions. |
 | LOOP-DOMAIN | 🔍 monitoring | 2026-06-15 | Static only | Knowledge Expansion (domain) mode has same dual-engine timer pattern as solo — untested in browser | Run domain smoke before P5 |
 | APPLY-PROMPT | 🔍 monitoring | 2026-06-15 | Static only | `applyPromptText` always writes plain text first regardless of `bionicOn` state | Not yet browser-confirmed as user-visible |
-| STATE-B | ❌ OPEN | 2026-06-15 | — | Deck restore after hard reload: "Cards 0 / Reviewed 93 / Pinned 41" — deck/progress desync | `cozy_arcade_limitless_cards_v1` parse + `normalizeDeckIdentities()` must succeed; deferred |
+| STATE-B | ✅ 98b5254 | 2026-06-15 | Screenshot: 0 cards / 151 reviewed / 58 pinned after Atlas/Progress visit + hard reload | Progress button onclick and `showAtlasScreen()` both wrote `{cards: sysMapData}` (stub objects with only qid_unique+sys) to `cozy_arcade_limitless_cards_v1`. On next reload, stubs displaced real cards. Progress key (`cozy_arcade_progress_v1`) was separate and survived. | 3 fixes: (1) Progress handler + showAtlasScreen now write to `cozy_arcade_atlas_sysmap_v1`; (2) `normalizeDeckIdentities()` guards `setAppCards` with `normalized.length>0`. PHASE2 98b5254 / PHASE1 df8c503 |
 
 ---
 

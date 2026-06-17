@@ -15,8 +15,8 @@ Rules:
 
 ## Codex Agent Instructions — 2026-06-17 (updated end-of-day)
 
-**Current SW:** PHASE2 `cozy-arcade-PHASE2-v27` (commit f345dda) | PHASE1 `cozy-arcade-v62` (commit 3dcbe0a)
-**Next task:** `CODEX_PROMPT_5_WRONG_COUNT_AND_STABILITY.md` — FQ-DATA-2 wrong_count + FQ-ALGO-5 FSRS write audit
+**Current SW:** PHASE2 `cozy-arcade-PHASE2-v28` (commit 98b5254) | PHASE1 `cozy-arcade-v63` (commit df8c503)
+**Next task:** `CODEX_PROMPT_5_WRONG_COUNT_AND_STABILITY.md` — FQ-DATA-2 wrong_count migration guard + FQ-ALGO-5 wrapper audit
 
 ---
 
@@ -89,6 +89,7 @@ Rules:
 | PATCH-LANG-MEDICAL \b word boundaries | ✅ browser-confirmed | ca70006 |
 | PATCH-LANG-WALKER DOM skip content nodes | ✅ source-confirmed (LIVE-NO-DECK prevented runtime test) | 0d12676 |
 | DOMAIN-BIONIC (window.bionic\|\|bionic) in domain render | ✅ source-confirmed | f345dda |
+| STATE-B deck restore (atlas sysmap → canonical deck key) | ✅ fixed | 98b5254 |
 
 ### Current Task: CODEX_PROMPT_5 — FQ-DATA-2 wrong_count + FQ-ALGO-5 FSRS write audit
 
