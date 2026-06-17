@@ -13,9 +13,10 @@ Rules:
 
 ---
 
-## Codex Agent Instructions — 2026-06-17
+## Codex Agent Instructions — 2026-06-17 (updated end-of-day)
 
-**Current SW:** PHASE2 `cozy-arcade-PHASE2-v24` (commit 948abe7) | PHASE1 `cozy-arcade-v59` (commit 2e04efd)
+**Current SW:** PHASE2 `cozy-arcade-PHASE2-v26` (commit 0d12676) | PHASE1 `cozy-arcade-v61` (commit 65ddcdf)
+**Next task:** `CODEX_PROMPT_4_VALIDATE_AND_DOMAIN.md` — validate v26 fixes + DOMAIN-BIONIC fix
 
 ---
 
@@ -45,6 +46,23 @@ Rules:
 
 ---
 
+### Browser Testing — Isolated World Warning
+
+**CRITICAL:** Browser automation (Playwright, CDP, WebDriver evaluate()) runs in an **isolated world**.
+`window.runFSRSValidation` and `window.runCozySmokeTests` appear "missing" there even though they exist.
+
+**Solutions (in order of preference):**
+1. `osascript` (macOS built-in, main-world access — requires Safari > Develop > Allow JavaScript from Apple Events):
+   ```bash
+   osascript -e 'tell application "Safari" to do JavaScript "JSON.stringify(window.runFSRSValidation())" in current tab of window 1'
+   ```
+2. Local HTTP server + manual console: `python3 -m http.server 8897` → open in browser → paste probe in DevTools console
+3. Playwright `page.evaluate()` with `{ world: 'main' }` option (Playwright v1.39+)
+
+**Always test LOCAL (127.0.0.1:8897), NOT GitHub Pages — CDN cache can lag 5–15 min behind push.**
+
+---
+
 ### Hard Constraints (Never Violate)
 
 - All edits inline in `index.html` — no new `<script>` blocks, no new files
@@ -55,24 +73,33 @@ Rules:
 - Prompts under 80 lines; no CDP infra; no safaridriver gate (requires user Safari pre-enable)
 - Validate `runFSRSValidation()` 17/17 + `runCozySmokeTests()` 6/6 after every change
 - `cd /path/to/repo && git add ...` in single command — shell has no directory persistence between calls
+- PHASE2 public deploy: `git push origin main:public --force` — "public" is a branch on `origin`, NOT a remote named "public"
 - selectSolo chain = 11 layers — do NOT add layer 12
 
 ---
 
-### Current Task: Domain Smoke + P5
+### Completed This Session (2026-06-17)
 
-**FQ-RENDER-1 CONFIRMED** (Codex browser audit 2026-06-17):
-- SS#1 once from System3 (PHASE2 line 6985 / PHASE1 line 7017) ✅
-- System2 silent at expiry (PHASE2 line 3924 / PHASE1 line 3936) ✅
-- FSRS 17/17, smoke 6/6 both repos ✅
-- `String(window.renderSolo).includes('startStableSoloDrop351')` = false — this check is UNRELIABLE, do not use as gate
+| Task | Status | Commit |
+|------|--------|--------|
+| FQ-RENDER-1 System2 DOM class guard | ✅ browser-confirmed | 948abe7 |
+| DOMAIN-AUTO-SELECT loopDomain wrapper | ✅ fixed | 0d12676 |
+| FQ-ALGO-3 null next_due_at repair | ✅ applied (needs browser validate) | 0d12676 |
+| FQ-ALGO-4 again requeue to pool front | ✅ applied (needs browser validate) | 0d12676 |
+| PATCH-LANG-MEDICAL \b word boundaries | ✅ applied (needs browser validate) | ca70006 |
+| PATCH-LANG-WALKER DOM skip content nodes | ✅ applied (needs browser validate) | 0d12676 |
 
-**Domain smoke result (2026-06-17 Codex audit):**
-- Orbs render + animate ✅
-- Manual orb click → reveal opens ✅ (manual selection works)
-- No JS errors ✅
-- Domain timer auto-completion ❌ PRE-EXISTING — loopDomain wrapper at ~line 7009 clears ticker at 0 but omits `selectDomain` call. Base loopDomain (line 413) has it; later wrapper lost it. NOT our regression. Tracked as DOMAIN-AUTO-SELECT in OPEN_DIFFERENTIALS.md.
-- **Domain smoke gate: PASS** — manual selection works; auto-timer was already broken before our changes.
+### Current Task: CODEX_PROMPT_4 — Validate v26 + DOMAIN-BIONIC
+
+**Prompt file:** `CODEX_PROMPT_4_VALIDATE_AND_DOMAIN.md` — copy the block inside it directly to Codex.
+
+**What CODEX_PROMPT_4 does:**
+1. Differential list (browser-only failure modes from v26 commits) → feeds OPEN_DIFFERENTIALS
+2. Browser validate: FQ-ALGO-3, FQ-ALGO-4, DOMAIN-AUTO-SELECT, PATCH-LANG A+B
+3. Fix DOMAIN-BIONIC (closure bionic() → (window.bionic||bionic)() in domain render)
+4. Report format for Claude to auto-update all files
+
+**After CODEX_PROMPT_4:** FQ-DATA-2 wrong_count cleanup, then STATE-B, then iOS1/M2.
 
 ---
 
