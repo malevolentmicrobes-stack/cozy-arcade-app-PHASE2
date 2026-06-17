@@ -67,18 +67,21 @@ Rules:
 - FSRS 17/17, smoke 6/6 both repos ✅
 - `String(window.renderSolo).includes('startStableSoloDrop351')` = false — this check is UNRELIABLE, do not use as gate
 
-**Before P5 — Domain smoke (one browser interaction):**
-Play one Knowledge Expansion (domain mode) round. Confirm:
-- Domain timer fires once (orbs animate normally)
-- No JS errors in console
-- `runFSRSValidation()` 17/17 + `runCozySmokeTests()` 6/6 after
-
-Domain regression risk is LOW (uses `renderDomain`/`loopDomain`/`orbArena`, no `soloStableDrop351`).
-If domain passes, proceed directly to P5.
+**Domain smoke result (2026-06-17 Codex audit):**
+- Orbs render + animate ✅
+- Manual orb click → reveal opens ✅ (manual selection works)
+- No JS errors ✅
+- Domain timer auto-completion ❌ PRE-EXISTING — loopDomain wrapper at ~line 7009 clears ticker at 0 but omits `selectDomain` call. Base loopDomain (line 413) has it; later wrapper lost it. NOT our regression. Tracked as DOMAIN-AUTO-SELECT in OPEN_DIFFERENTIALS.md.
+- **Domain smoke gate: PASS** — manual selection works; auto-timer was already broken before our changes.
 
 ---
 
 ### P5 — FQ-ALGO-3: 18 null next_due_at (run after FQ-RENDER-1 confirmed)
+
+**Known bugs in prior prompt version — all fixed below:**
+- Used `window.phase3State?.progress` — window.phase3State not yet assigned at init; use local `phase3State`
+- Used `p.interval` — wrong field; canonical is `p.interval_days`
+- Called `savePhase3State()` unconditionally — must only save if rows changed
 
 ```
 DATA REPAIR — 18 null next_due_at. PHASE2+PHASE1.
@@ -86,23 +89,32 @@ REPOS: PHASE2=/Users/rebekahbetar/Documents/GitHub/cozy-arcade-app-PHASE2
        PHASE1=/Users/rebekahbetar/Documents/GitHub/cozy-arcade-app
 GATES: runFSRSValidation()17/17 runCozySmokeTests()6/6 first.
 
-FIND null rows:
+NOTE: null rows exist in user's persisted localStorage, not in clean seeded deck.
+Run null count check AFTER real app loads (with actual stored progress):
   const nullDue=Object.entries(window.phase3State?.progress||{})
     .filter(([k,v])=>v.stage==='review'&&!v.next_due_at);
-  console.log('count:',nullDue.length);
+  console.log('null count:',nullDue.length);
 
-ADD one-time auto-repair block in Phase3 init (after phase3State loads, before pool builds):
+ADD one-time auto-repair block in index.html, in Phase3 init, immediately AFTER the line
+where phase3State is assigned from loadPhase3State() (local variable, not window):
   if(!window.__cozyNullDueRepaired){
     window.__cozyNullDueRepaired=true;
-    const now=new Date().toISOString();
-    Object.values(window.phase3State?.progress||{}).forEach(p=>{
-      if(p.stage==='review'&&!p.next_due_at){ p.next_due_at=now; p.interval=p.interval||1; }
+    let _repairCount=0;
+    const _now=new Date().toISOString();
+    Object.values(phase3State?.progress||{}).forEach(p=>{
+      if(p.stage==='review'&&!p.next_due_at){
+        p.next_due_at=_now;
+        p.interval_days=p.interval_days||1;
+        _repairCount++;
+      }
     });
-    try{savePhase3State();}catch(_){}
+    if(_repairCount>0) try{savePhase3State();}catch(_){}
   }
 
-Validate: rerun null count → expect 0.
-→ runFSRSValidation()17/17 + runCozySmokeTests()6/6
+Validate:
+  → runFSRSValidation()17/17 + runCozySmokeTests()6/6
+  → Reload page. Rerun null count → expect 0 (repair persisted)
+  → Confirm _repairCount logged > 0 (if user's real data has the 18 rows)
 Port to PHASE1. Bump PHASE2 sw v24→v25, PHASE1 sw v59→v60. Commit both repos separately.
 ```
 
