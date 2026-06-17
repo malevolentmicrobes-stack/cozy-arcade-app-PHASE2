@@ -1,6 +1,6 @@
 # Open Differentials — Cozy Arcade Browser Test Log
 **Format:** Never delete rows. Close items by changing status + adding commit. Append new rows as Codex finds them.
-**Last updated:** 2026-06-17 | SW PHASE2 v26 | SW PHASE1 v61
+**Last updated:** 2026-06-17 | SW PHASE2 v27 | SW PHASE1 v62
 
 ---
 
@@ -41,7 +41,8 @@
 | D4-MUTATION | ⚠️ open | 2026-06-15 audit | 8 MutationObserver callbacks per card (not 8 distinct writes); write count still 3 in 2026-06-17 audit | MutationObserver inflation: 1 innerHTML swap → N callbacks (one per child node). 3 writes confirmed per card despite fixes. Final state correct but first-frame flicker possible | Not blocking. Future: count writes explicitly in validation, not just check final `<b>` |
 | RENDER-STR-INVALID | ✗ DISPROVED | 2026-06-17 audit | `renderSoloStringHasStable:false` in browser | `String(window.renderSolo).includes('startStableSoloDrop351')` used as validation gate | **REMOVED from all validation gates.** Later wrappers hide inner stable reference. Always false at runtime. |
 | FQ-RENDER-2 | ✅ line 3939 | 2026-06-15 audit | Body className observed going empty and returning on each card advance | `document.body.className=''` at System 2 render path (~line 3939) dropped layout classes | Save/restore `cozy*`/`na-*`/Drawer classes around the clear |
-| DOMAIN-BIONIC | 🔍 open | 2026-06-15 audit | Static only | `domainQuestion` bionic writes (lines 410/445 PHASE2) still use closure `bionic()`. FQ-RENDER-3 scope was solo only. | Separate fix, not blocking. Do not mix with solo bionic fix. |
+| DOMAIN-BIONIC | ✅ f345dda | 2026-06-15 audit | Static only | `domainQuestion` bionic writes (lines 410/445 PHASE2) still use closure `bionic()`. FQ-RENDER-3 scope was solo only. | Applied `(window.bionic\|\|bionic)()` at PHASE2 lines 410, 445 / PHASE1 lines 409, 444. SW v27/v62. PHASE2 f345dda / PHASE1 3dcbe0a |
+| DOMAIN-WRITER-ORDER | 🔍 monitoring | 2026-06-17 Codex STEP1 | Static only — Codex differential | Later domain prompt writers could overwrite bionic output after the fixed base render path. `grep misses timing/order`. Same root cause as FQ-RENDER-3 was for solo. | Audit domain render write order: find all writes to `domainQuestion.innerHTML` and verify no plain-text write follows `(window.bionic\|\|bionic)()` write. |
 
 ---
 
@@ -100,6 +101,17 @@
 |----|--------|------------|-------------|
 | 404-ASSET | 🔍 monitoring | 2026-06-17 audit | Both repos log one 404 resource error per load (app-shell asset or favicon). Non-blocking. Confirm it's not a missing icon that affects PWA install. |
 | D5-SW | ✅ ongoing | 2026-06-16 | SW cache stale if CACHE string not bumped. Managed: bump on every code-change commit. |
+
+---
+
+## TESTING INFRASTRUCTURE GAPS
+
+| ID | Status | First Found | Description |
+|----|--------|------------|-------------|
+| LIVE-NO-DECK | 🔍 monitoring | 2026-06-17 Codex STEP1 | Public GitHub Pages URL has 0 cards — any test requiring card flow (FQ-ALGO-3/4, domain timer with orbs) is unverifiable from public blank build. Runtime path exists in source (curl-confirmed) but execution path untested. Needs: seeded deck or user-loaded deck for interactive validation. |
+| SW-CLIENT-STALE | 🔍 monitoring | 2026-06-17 Codex STEP1 | Open browser tabs stay on old cached SW shell until hard reload. curl passes while a tab remains on prior version. Mitigation: always hard-reload before validating. Not a code bug. |
+| CONSOLE-GLOBAL-HARNESS | 🔍 monitoring | 2026-06-17 Codex STEP1 | Codex browser eval runs in isolated world — `window.runFSRSValidation` / `window.runCozySmokeTests` appear undefined even when defined in page. Mitigation: curl source-marker gate (current approach). osascript alternative available (requires Safari Develop > Allow JS from Apple Events). |
+| NULL-DUE-REPAIR-CONTEXT | 🔍 monitoring | 2026-06-17 Codex STEP1 | FQ-ALGO-3 null-due repair only fires on dirty persisted localStorage. Clean public blank state cannot prove mutation. User must validate on their own session (with real deck + prior progress data). |
 
 ---
 

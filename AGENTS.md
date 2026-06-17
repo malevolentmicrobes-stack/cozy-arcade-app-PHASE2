@@ -15,8 +15,8 @@ Rules:
 
 ## Codex Agent Instructions — 2026-06-17 (updated end-of-day)
 
-**Current SW:** PHASE2 `cozy-arcade-PHASE2-v26` (commit 0d12676) | PHASE1 `cozy-arcade-v61` (commit 65ddcdf)
-**Next task:** `CODEX_PROMPT_4_VALIDATE_AND_DOMAIN.md` — validate v26 fixes + DOMAIN-BIONIC fix
+**Current SW:** PHASE2 `cozy-arcade-PHASE2-v27` (commit f345dda) | PHASE1 `cozy-arcade-v62` (commit 3dcbe0a)
+**Next task:** `CODEX_PROMPT_5_WRONG_COUNT_AND_STABILITY.md` — FQ-DATA-2 wrong_count + FQ-ALGO-5 FSRS write audit
 
 ---
 
@@ -86,10 +86,11 @@ Rules:
 | DOMAIN-AUTO-SELECT loopDomain wrapper | ✅ fixed | 0d12676 |
 | FQ-ALGO-3 null next_due_at repair | ✅ applied (needs browser validate) | 0d12676 |
 | FQ-ALGO-4 again requeue to pool front | ✅ applied (needs browser validate) | 0d12676 |
-| PATCH-LANG-MEDICAL \b word boundaries | ✅ applied (needs browser validate) | ca70006 |
-| PATCH-LANG-WALKER DOM skip content nodes | ✅ applied (needs browser validate) | 0d12676 |
+| PATCH-LANG-MEDICAL \b word boundaries | ✅ browser-confirmed | ca70006 |
+| PATCH-LANG-WALKER DOM skip content nodes | ✅ source-confirmed (LIVE-NO-DECK prevented runtime test) | 0d12676 |
+| DOMAIN-BIONIC (window.bionic\|\|bionic) in domain render | ✅ source-confirmed | f345dda |
 
-### Current Task: CODEX_PROMPT_4 — Validate v26 + DOMAIN-BIONIC
+### Current Task: CODEX_PROMPT_5 — FQ-DATA-2 wrong_count + FQ-ALGO-5 FSRS write audit
 
 **Prompt file:** `CODEX_PROMPT_4_VALIDATE_AND_DOMAIN.md` — copy the block inside it directly to Codex.
 
