@@ -84,6 +84,16 @@
 
 ---
 
+## CONTENT CORRUPTION
+
+| ID | Status | First Found | Browser Evidence | Description | Fix |
+|----|--------|------------|-----------------|-------------|-----|
+| PATCH-LANG-MEDICAL | ✅ ca70006 | 2026-06-17 Codex audit | Browser probe: JSON has "Strongyloides", DOM showed "Goodyloides" after reveal/rating. current.diagnosis = Strongyloides in memory; display layer corrupted. | `patchVisibleLanguage()` TreeWalker walks ALL document.body text nodes. `[/Strong/g,'Good']` matched "Strongyloides"→"Goodyloides". Same risk: `/Moderate/g`→"Hard", `/Anchored/g`→"EASY". | Added `\b` word boundaries: `\bStrong\b`, `\bModerate\b`, `\bAnchored\b`. Matches standalone rating labels but not medical compound terms. SW PHASE2 v24→v25 / PHASE1 v59→v60. |
+| PATCH-LANG-WALKER | 🔍 monitoring | 2026-06-17 | Not yet browser-tested | TreeWalker still walks all body text. Word boundaries fix compound-term collision, but standalone medical words (e.g., "Moderate" severity in card text) could still be rewritten. Secondary: older normalizer at ~line 5412 sets `c.answer = educational_objective`, corrupting answer alias for wrappers that treat answer as diagnosis. | Longer fix: scope walker to skip card content containers (#soloQuestion, #soloReveal, etc.). Deferred — word boundary fix handles the immediate P0 case. |
+| BOARD-TRIGGER-TRUNC | ⬛ BY DESIGN | 2026-06-17 | JSON source: board_trigger already ends at "Treatment involves ivermectin or" in source JSON | board_trigger truncation is source data quality, not a browser/render bug. educational_objective has the complete sentence. | Not a code fix. Data quality issue in user's JSON. |
+
+---
+
 ## NON-BLOCKING NOISE
 
 | ID | Status | First Found | Description |
