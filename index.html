@@ -10858,6 +10858,8 @@ function fixStableOneThingDropdown351() {
   }
 
   function legacyToProgress(cardId, legacy) {
+    const p = legacy;
+    if (p?.schema_version === 'fsrs5' && p?.stability) return p;
     const base = defaultProgress(cardId);
     const reviewed = Number(legacy?.reviewed || legacy?.reviewed_count || 0) || 0;
     const correct = Number(legacy?.correct || legacy?.correct_count || 0) || 0;
