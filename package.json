@@ -1,0 +1,11 @@
+{
+  "name": "cozy-arcade-phase2",
+  "version": "1.0.0",
+  "description": "ABIM board prep PWA",
+  "private": true,
+  "dependencies": {
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/ios": "^6.0.0",
+    "@capacitor/cli": "^6.0.0"
+  }
+}

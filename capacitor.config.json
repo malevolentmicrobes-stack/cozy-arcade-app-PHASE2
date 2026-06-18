@@ -1,0 +1,14 @@
+{
+  "appId": "com.cozyarcade.boardprep",
+  "appName": "Cozy Arcade Board Prep",
+  "webDir": ".",
+  "bundledWebRuntime": false,
+  "server": {
+    "hostname": "malevolentmicrobes-stack.github.io",
+    "androidScheme": "https"
+  },
+  "ios": {
+    "scheme": "CozyArcade",
+    "contentInset": "automatic"
+  }
+}
