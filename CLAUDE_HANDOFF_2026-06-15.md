@@ -279,6 +279,174 @@ Next: AGENTS.md → validate 948abe7 → P5 → P6.
 
 ---
 
-*This handoff was generated 2026-06-15, updated 2026-06-16. For prior session history see `Chronological_Patch_Hx_RECTIFIER_PLAN_2026_05_26.md`.*
+*This handoff was generated 2026-06-15, updated 2026-06-17. For prior session history see `Chronological_Patch_Hx_RECTIFIER_PLAN_2026_05_26.md`.*
 *Full root cause log: `ULTIMATE_GOALS.md` RC-1 through RC-12.*
 *Architecture audit: `SENIOR_DEV_AUDIT_2026_06_07.md` Sections 1–20.*
+
+---
+
+## ADDENDUM 2026-06-17 — AUTONOMOUS SESSION PROTOCOL
+
+**The user must never manually copy-paste handoff content. Claude owns all file updates.**
+
+### CORRECTED SW STATE (as of 2026-06-17 end-of-day)
+| Repo | SW | Last commit | P5 FQ-ALGO-3 | P6 FQ-ALGO-4 |
+|------|----|---------|----|---|
+| PHASE2 | **v26** | 0d12676 | ✅ fixed | ✅ fixed |
+| PHASE1 | **v61** | 65ddcdf | ✅ fixed | ✅ fixed |
+
+The CURRENT STATE block above showing v24 is stale. v26/v61 is correct.
+OPEN_DIFFERENTIALS.md is always the authoritative source of truth for bug status.
+
+---
+
+### CANONICAL FILE ROLES (Claude reads these in order at session start)
+
+| File | Role | Update frequency |
+|------|------|-----------------|
+| `OPEN_DIFFERENTIALS.md` | Living browser bug log — source of truth | Every Codex session |
+| `COZY_ARCADE_PROJECT_STATUS_YYYY-MM-DD.md` | Session summary + production state table | Every session |
+| `AGENTS.md` | Codex task queue — SW version header + copy-paste prompts | Every session |
+| `CLAUDE_HANDOFF_YYYY-MM-DD.md` | Session constraints + anti-patterns for new Claude | When constraints change |
+| `CODEX_PROMPT_N_*.md` | Ready-to-paste Codex prompt for current task | Created when task is defined |
+
+**If files contradict each other: OPEN_DIFFERENTIALS wins for bug status; AGENTS.md wins for SW version.**
+
+---
+
+### CLAUDE SESSION-END CHECKLIST (run before every response that ends a session)
+
+Claude runs these updates autonomously. Never ask the user to do this.
+
+```
+1. OPEN_DIFFERENTIALS.md
+   - Add new ❌ rows for any bugs confirmed this session
+   - Update ✅ rows for anything fixed (add commit hash)
+   - Add 🔍 rows for new differentials from Codex STEP 1 output
+   - Never delete rows — change status only
+
+2. COZY_ARCADE_PROJECT_STATUS_YYYY-MM-DD.md
+   - Update SW version line at top
+   - Update PRODUCTION STATE table (✅/❌ per fix)
+   - Add new session block with commit log + errors made
+
+3. AGENTS.md
+   - Update "Current SW" header line (PHASE2 vN / PHASE1 vN)
+   - Mark completed tasks — remove or archive their prompt blocks
+   - Set "Current Task" to next Codex prompt filename
+
+4. CLAUDE_HANDOFF (this file)
+   - Update CORRECTED SW STATE table in this addendum
+   - Add new ANTI-PATTERNS if session revealed new failure modes
+
+5. CODEX_PROMPT_N+1_*.md
+   - Create next Codex prompt file if the current one is done
+   - Under 80 lines, differential-first structure (see CODEX_PROMPT_4 as template)
+```
+
+---
+
+### DIFFERENTIAL-FIRST MANDATE (applies to ALL Codex prompts)
+
+Every Codex prompt MUST include a STEP 1 differential block BEFORE any fix:
+
+```
+STEP 1 — DIFFERENTIAL: List top 5 probable browser-only runtime failures
+ranked HIGH/MED/LOW from the commits/changes being validated.
+Format: [PROB:HIGH] ID — symptom — why grep misses it
+Do NOT fix yet. Send list to Claude for OPEN_DIFFERENTIALS premortem log.
+```
+
+**Why this prevents glitches:** Static HTML analysis misses closure capture order,
+IIFE scoping, RAF timing, MutationObserver inflation, and SW cache staleness.
+Listing differentials first forces Codex to think before acting and surfaces
+the failure mode that 3 prior FQ-RENDER-1 attempts missed.
+
+---
+
+### TOKEN EFFICIENCY RULES
+
+| Rule | Saves |
+|------|-------|
+| Codex prompts under 80 lines with exact line numbers | ~40% — eliminates exploration loops |
+| STEP 0 gates before any fix | ~15% — stops wasted fix work if app is broken |
+| Differential list before fix | ~20% — prevents wrong-direction fixes (saved 3 FQ-RENDER-1 attempts) |
+| No safaridriver gate in prompt | ~10% — safaridriver needs user pre-enable; use CDP/console probes instead |
+| One fix → validate → commit (no batching) | prevents rollback cost |
+| Port both repos in same Codex session | halves handoff overhead |
+| Claude auto-updates all files at session end | eliminates user copy-paste overhead entirely |
+
+---
+
+### OPEN_DIFFERENTIALS QUICK REFERENCE
+
+File: `OPEN_DIFFERENTIALS.md`
+
+| Status | Meaning |
+|--------|---------|
+| ✅ CONFIRMED FIXED | Browser-validated with commit hash |
+| ⚠️ MITIGATED | Partially addressed, residual risk noted |
+| ❌ OPEN | Confirmed in browser, not yet fixed |
+| 🔍 MONITORING | Not yet browser-confirmed, worth watching |
+| ⬛ BY DESIGN | Intentional, not a bug |
+| ✗ DISPROVED | Static analysis claim proven wrong by browser |
+
+**Claude adds rows from Codex STEP 1 output as 🔍 MONITORING.**
+**Codex updates rows to ✅ or ❌ after browser tests in STEP 2.**
+**Never delete rows — stale disproved items prevent future AI agents from repeating failed approaches.**
+
+---
+
+### NEXT CODEX TASK — re-listed 2026-06-19 (end of day)
+
+**CODEX_PROMPT_4 through CODEX_PROMPT_12 are complete.** Four real bugs found and closed in the 2026-06-18/19 window:
+
+| Bug | Fixed by | Commits |
+|---|---|---|
+| FQ-ALGO-7 (Again-card pool reshuffle regression) | Claude, no Codex credits that session; later browser-confirmed correct via PROMPT_11 | PHASE2 `c2807ac` / PHASE1 `b9168f5` |
+| FQ-RENDER-5 ("AUTO-SELECT IN" warning ghosting, 4th patch attempt at this symptom) | Codex, PROMPT_10, validated 3 consecutive cycles before push | PHASE2 `fb09afa` / PHASE1 `2c8f4ce` |
+| DOMAIN-AGAIN-DUPE (card 4x-duplicated in Domain pool) | Codex diagnosed (PROMPT_12), Claude fixed (stale PHASE1-only `requeueAgainCard`) | PHASE1 `2b84281` (PHASE2 needed no change) |
+| FQ-DATA-2 (wrong_count inflation — **the 2026-06-17 "fix" was dead code, never actually worked**, user caught it via their own progress export) | Claude | PHASE2 `88af09e` / PHASE1 `0b4482a` |
+
+**Two diagnostics queued now, run independently, in either order — both intentionally diagnostic-only, neither patched blind:**
+1. `CODEX_PROMPT_13_FQ_ALGO_8_WRONG_RATED_GOOD_DIAGNOSTIC.md` — user observed a timer-expired wrong auto-select get rated 'good'. Suspect: `advance()`'s 7-layer wrapper chain (table in AGENTS.md) defaults to 'good' when no pending rating matches; the guard meant to prevent this looks correct in isolation, so the real trigger isn't confirmed.
+2. `CODEX_PROMPT_14_D4_MUTATION_FLASH_DIAGNOSTIC.md` — user reported "card glitch/flashing" on a zero-cache fresh browser during JSON import (screen recording + 5 screenshots). Claude reviewed the visual evidence directly first (no ffmpeg in this environment to sample video motion) and found no content corruption in stills, but couldn't confirm or rule out a real flicker from that alone. Reopened the existing D4-MUTATION differential (deprioritized since 2026-06-15) as the likely match, not yet confirmed as the same mechanism.
+
+**Decision rule established today, apply going forward:** deterministic, provable bugs (pure data transforms, array logic — FQ-ALGO-7, FQ-DATA-2) get diagnosed and fixed directly by Claude, verified via JXA simulation (`osascript -l JavaScript`) against real data when no node/Playwright is available, then pushed. Anything involving event timing, multiple competing wrapper layers, or visual motion (FQ-RENDER-5, DOMAIN-AGAIN-DUPE, FQ-ALGO-8, D4-MUTATION) gets a live diagnostic first — no exceptions, regardless of how confident the source-level suspect looks.
+
+Remaining non-Codex work:
+- iOS1 finish: user runs `npx cap add ios` → `npx cap sync` → opens `ios/` in Xcode
+- M2 Stripe: **PAUSED by user 2026-06-18** ("too many glitches") — do not resume without explicit request
+- DOMAIN-RECORD-ZERO (OPEN_DIFFERENTIALS.md): still needs user intent decision — this is a product-intent question, not a technical one, so it stays a stop-and-ask item under the protocol below
+
+---
+
+## ADDENDUM 2026-06-18 — AUTONOMY PROTOCOL v2
+
+**User directive verbatim:** "be more autonomous, I don't have time for this back and forth... reduce bulk no quick patches — review prior patch log first + rectifier plan."
+
+This extends the 2026-06-17 autonomous session protocol above. That protocol covered *file updates*. This covers *decisions* — when Claude proceeds without asking, and when it must still stop.
+
+### Claude decides alone (no round-trip to the user):
+
+- **Revert vs. fix-forward**, whenever one option is strictly smaller/safer. Default to revert unless fixing forward is clearly low-risk. Document the decision and reasoning inline in OPEN_DIFFERENTIALS.md and AGENTS.md — the user reads the log, not a chat message, to see what was decided.
+- **Root-cause diagnosis depth.** Before writing any Codex prompt for a render/timer/pool bug, Claude must first read the existing patch-history table (AGENTS.md "STOP — Read Before Any Render Work") and OPEN_DIFFERENTIALS.md for the same subsystem, and check: *has this exact symptom been patched before and failed?* If yes, the new prompt must explain why this attempt differs from the failed ones — not just retry the same shape of fix. (This is what FQ-RENDER-5 required: three prior attempts at the same symptom had each fixed a narrower slice than the real loop.)
+- **Drafting and queuing Codex prompts** — Claude writes ready-to-paste `CODEX_PROMPT_N_*.md` files and updates AGENTS.md's "Next task" without waiting for approval, as long as the fix follows existing hard constraints (no new wrapper layers, single-fix-per-prompt, both repos, gates first).
+- **All four tracking-doc updates** at session end (already established 2026-06-17).
+
+### Claude still stops and asks:
+
+- **Product-intent questions with no technically-correct answer** — e.g. DOMAIN-RECORD-ZERO ("should an unrated wrong answer leave an FSRS trace?"). These are the user's call, not an engineering tradeoff.
+- **Anything irreversible or affecting money/external systems** — force-pushes beyond the established `main:public` deploy pattern, Stripe/payment changes, deleting data.
+- **A genuine architecture fork** — e.g. if fixing something properly would require breaking one of the hard constraints (adding a wrapper layer, touching the 11-layer selectSolo chain, renaming a localStorage key). Flag it, don't just do it.
+
+### Codex decides alone within a prompt's scope:
+
+- Exact variable/flag names, minor implementation shape, which of the prescribed validation steps to run first.
+- Whether System0 is live or dead code in practice (STEP 1 differential calls for Codex to determine this and report it, not ask Claude mid-session).
+
+### Codex still stops and reports back without finishing:
+
+- If STEP 1's differential reveals the root cause is **not** what the prompt assumed.
+- If a fix would require touching index.html in a repo other than the one specified, or adding a new `<script>` block / new cardPool/nextCard wrapper.
+- If a validation step fails after the fix is applied — report STEP 1-3 findings, do not retry blindly or paper over with a second patch in the same session.

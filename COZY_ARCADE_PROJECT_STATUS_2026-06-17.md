@@ -1,7 +1,87 @@
 # Cozy Arcade — Project Status
 **Date:** 2026-06-17 | **Active branch:** PHASE2 main → origin/public (production)
-**SW:** PHASE2 `cozy-arcade-PHASE2-v24` | PHASE1 `cozy-arcade-v59`
-**Last commits:** PHASE2 `948abe7` | PHASE1 `2e04efd`
+**SW:** PHASE2 `cozy-arcade-PHASE2-v33` | PHASE1 `cozy-arcade-v69`
+**Last commits:** PHASE2 `88af09e` (pushed origin/main+public) | PHASE1 `0b4482a` (pushed origin/main)
+**Next tasks:** CODEX_PROMPT_13 (FQ-ALGO-8 diagnostic — wrong auto-select rated 'good') and CODEX_PROMPT_14 (D4-MUTATION reopened — card glitch/flashing on zero-cache import), both diagnostic-only, independent of each other. FQ-ALGO-7, FQ-RENDER-5, DOMAIN-AGAIN-DUPE, FQ-DATA-2 closed today. M2 paused by user. iOS1 finish is user-run. DOMAIN-RECORD-ZERO awaits a product-intent answer from the user.
+
+## SESSION 12 — "card glitch/flashing" reported, zero-cache repro (2026-06-19, same day)
+
+User provided a screen recording (`claude_small_screen_recording_2026-06-19.mp4`) and 5 screenshots (`claude_screenshots_low_jpeg/`), reproduced on a complete new browser/computer with zero cache during JSON import, and asked Claude to try diagnosing/fixing directly first to save Codex credits.
+
+Claude reviewed all 5 screenshots plus one frame extracted via macOS QuickLook (`qlmanage -t`, since no ffmpeg is available in this environment to sample the video at multiple timestamps). Findings:
+- All captured frames show the same reveal card (Sarcoidosis/Löfgren syndrome) with consistent, correct content — no text corruption, duplication, or wrong-card content in any still.
+- The visible difference between the two screenshot groups (narrower vs. wider layout) correlates with browser toolbar/zoom-badge differences, consistent with a window resize between captures rather than an app-level bug — but this doesn't rule out a true rapid flicker that's only visible in motion.
+- Session was at Gate 12, not the first card post-import, so if this is real it isn't strictly first-import-only.
+
+**Could not confirm a root cause from static evidence, so did not patch blind.** Reopened the existing D4-MUTATION differential (MutationObserver write-churn causing possible first-frame flicker, known since 2026-06-15, previously deprioritized as "not blocking") as the most likely match — not confirmed as the same mechanism. CODEX_PROMPT_14 queued: live diagnostic under a genuinely cold browser profile, matching the user's exact repro condition, instrumenting MutationObserver/className timing rather than guessing at a fix.
+
+---
+
+## SESSION 11 — re-test found a 5th bug: wrong auto-select rated 'good' (2026-06-19, same day)
+
+User re-tested PHASE2 in a fresh browser after the FQ-DATA-2 fix. Reported directly: "a couple autoselect, space or arrow continue, one wrong autoselected but good." Provided two new exports (`cozy_arcade_deck_with_progress_backup(3).json`, `cozy_arcade_progress_2026-06-19(1).json`) — the export data itself doesn't capture enough forensic detail to prove which specific card was affected (no log of "displayed answer vs. committed rating"), so this rests on the user's direct observation, which is trusted.
+
+Source audit found the live suspect: the final `advance()` (7th layer in a never-before-mapped wrapper chain, now documented in AGENTS.md) defaults to rating 'good' if no matching "pending" rating is found for the current card. The guard meant to prevent this from clobbering an already-correct rating (`alreadyRated`/`markRated`, a global single-value check) looks correct in isolation -- so the real trigger is either a gap in that guard under specific conditions, or one of at least 6 competing keydown listeners (Space/Enter/ArrowRight at the reveal screen, also never mapped before today) firing a different, non-rating-aware path instead.
+
+**Not patched blind.** This is event-timing/race territory, the same category as FQ-RENDER-5 and DOMAIN-AGAIN-DUPE, both of which needed live instrumentation before a correct fix was possible. CODEX_PROMPT_13 instruments the full path and reproduces the exact reported sequence live, several times, before any fix is proposed.
+
+---
+
+## SESSION 10 — FQ-DATA-2 was never actually fixed; user caught it via their own progress export (2026-06-19)
+
+User exported progress to `/Downloads/cozy_arcade_progress_2026-06-19.json` and noticed a few cards (incl. Primary Biliary Cholangitis) with absurd `wrong_count`. Claude investigated the export directly rather than guessing:
+
+- The two PBC entries turned out to be two genuinely different cards (not a duplication bug) — ruled that out first.
+- Found the real issue: the 3104391 commit's guard (`schema_version==='fsrs5'`) was dead code. Grepped the entire file — that value is never written to any per-card progress object. The guard could never fire, so `wrong_count` kept inflating by +1 on every page load for any card still sitting in 'again'/relearning state.
+- Quantified against the real export: 27 of 99 reviewed cards (27%) affected. Worst: two cards at `wrong_count=136` (true value 1).
+- `wrong_count` is genuinely user-visible (Neural Atlas card detail "Wrong" stat, plus an aggregate dashboard sum) — this wasn't cosmetic.
+- Fixed the guard for real (checks actual phase3-native fields now) and added a one-time repair block that corrects already-corrupted values using the invariant `wrong_count = reviewed_count - correct_count` (provably exact, since those two fields don't have this bug). Verified against real corrupted data points from the export via JXA simulation before applying. PHASE2 `88af09e` / PHASE1 `0b4482a`, pushed.
+
+**Process note for future sessions:** a "fix" that passes code review can still be completely inert if the guard condition checks for something no other code ever produces. Verify guard fixes against real persisted data shape, not just the diff.
+
+---
+
+## SESSION 9 — FQ-RENDER-5 fixed, DOMAIN-AGAIN-DUPE diagnosed and fixed (2026-06-19, same day as Session 8)
+
+Codex ran PROMPT_10 (fix) and PROMPT_12 (diagnostic) back to back, with real credits this time.
+
+| Item | Result |
+|---|---|
+| FQ-RENDER-5 | ✅ Fixed. Ownership flag stops System2's tick/startDrop loop entirely (not just its final action), claimed at the earliest synchronous point Codex found — better than the original prompt spec, eliminates a race the prompt only mitigated. Validated 3 consecutive Solo cycles, 0 warning mutations, both repos, before push. PHASE2 `fb09afa` / PHASE1 `2c8f4ce`. |
+| DOMAIN-AGAIN-DUPE | ✅ Diagnosed correctly, then fixed. Codex's instrumented diagnostic (no source edits) found the `selectDomain`/`rate()` chain fires 5-6x per click but is *harmless* by itself — PHASE2 builds the pool correctly under that same repeated firing. The real bug: PHASE1 had kept an older, additive `requeueAgainCard()` that PHASE2 had already replaced. Claude verified the divergence directly, ported PHASE2's exact (already browser-proven) function into PHASE1, validated via 5x-repeat JXA simulation, committed `2b84281`. First confirmed PHASE1/PHASE2 source divergence found this project — worth a one-time full diff audit eventually, not urgent. |
+| FQ-ALGO-5 | Upgraded from theoretical to measured: the rate()/rateCard() wrapper-reinstall schedule causes 5-6 stacked calls per single rating click. Currently harmless everywhere now. Logged, not actioned. |
+
+App should be materially more stable now than at the start of today's session — three real, confirmed bugs closed in one day, all with either live browser validation (PROMPT_10) or careful source verification + simulation (PROMPT_9, DOMAIN-AGAIN-DUPE port).
+
+---
+
+## SESSION 8 — LIVE BROWSER AUDIT (PROMPT_11), one bug closed, one new found (2026-06-19)
+
+Codex ran PROMPT_11 with real Playwright against the deployed GitHub Pages URLs (not local seeds) for both repos.
+
+| Finding | Result |
+|---|---|
+| FQ-ALGO-7 (Again pool reshuffle) | ✅ Browser-confirmed fixed. `[1,2,3,4]→Again(3)→[3,1,2,4]` in both repos. **Closed.** |
+| FQ-RENDER-5 (AUTO-SELECT warning ghost) | ✅ Re-confirmed still live in both repos. `choiceRow` showed `v175151-drop warning soloStableDrop351` simultaneously. Run CODEX_PROMPT_10 next. |
+| DOMAIN-AGAIN-DUPE (new) | ❌ Confirmed: same card appeared 4x in `session.pool` after a Domain Again rating. Claude's source audit found `selectDomain` has ≥13 wrapper layers, never mapped before today (now documented in AGENTS.md). Mechanism not yet pinned down — needs live instrumentation (CODEX_PROMPT_12), not a guessed fix. |
+| RENDER-STALE-REVEAL (new, low priority) | 🔍 Reveal text possibly mixing previous/next card content after `advance()`. Not confirmed user-visible. Revisit after the two above are fixed. |
+
+No console/page errors in either repo during the audit.
+
+---
+
+## SESSION 7 — FQ-ALGO-7 REVERT, applied without Codex (2026-06-18)
+
+Codex had no credits available. Claude pre-mortemed (verified the revert was byte-exact to pre-22260dc code, checked no later code depends on the full-reset behavior, traced 4 pool scenarios via macOS JXA) and applied the revert directly to both repos.
+
+| Repo | Commit | SW | Pushed? |
+|------|--------|----|---------|
+| PHASE2 | `c2807ac` | v30→v31 | No — local only |
+| PHASE1 | `b9168f5` | v65→v66 | No — local only |
+
+Not browser-validated (no Playwright/node in Claude's environment). Recommend a manual spot-check next time the app is open: miss one card, confirm the rest of the queue doesn't visibly reshuffle.
+
+---
 
 ---
 
@@ -25,15 +105,54 @@
 | Pinned-only fallback in cardPool('due') | FQ-DUE-1b | ✅ | 477b25e |
 | isSessionBlockedCard() in all pool scopes | FQ-POOL-1/2 | ✅ | 83079db |
 | record(ok=true) clears repair_point | FQ-DATA-1 | ✅ | 83079db |
-| All soloQuestion bionic writes use (window.bionic\|\|bionic) | FQ-RENDER-3 | ✅ applied | 8a22e66 — needs browser re-validate |
+| All soloQuestion bionic writes use (window.bionic\|\|bionic) | FQ-RENDER-3 | ✅ applied | 8a22e66 — browser-confirmed |
 | System2 tick guards against stable mode via .soloStableDrop351 | FQ-RENDER-1 | ✅ browser-confirmed | 948abe7 — SS#1 once from System3, System2 silent |
-| 18 null next_due_at review rows | FQ-ALGO-3 | ❌ open | P5 next |
-| Again cards not requeued same session | FQ-ALGO-4 | ❌ open | P6 next |
-| wrong_count bloat | FQ-DATA-2 | ❌ open | — |
-| stability/difficulty not written good/hard/easy | FQ-ALGO-5 | ❌ open | — |
-| Deck restore after hard reload | State-B | ❌ open | — |
-| iOS Capacitor scaffold | iOS1 | ❌ open | — |
-| Stripe | M2 | ❌ open | — |
+| 18 null next_due_at review rows | FQ-ALGO-3 | ✅ applied | 0d12676 — needs browser validate |
+| Again cards not requeued same session | FQ-ALGO-4 | ✅ applied | 0d12676 — needs browser validate |
+| Domain timer auto-select (loopDomain wrapper) | DOMAIN-AUTO-SELECT | ✅ applied | 0d12676 — needs browser validate |
+| patchVisibleLanguage \b word boundaries (medical term corruption) | PATCH-LANG-MEDICAL | ✅ applied | ca70006 — needs browser validate |
+| TreeWalker skips content nodes (#soloQuestion etc) | PATCH-LANG-WALKER | ✅ applied | 0d12676 — needs browser validate |
+| Domain bionic writes closure capture | DOMAIN-BIONIC | ✅ applied | f345dda — source-confirmed |
+| wrong_count bloat | FQ-DATA-2 | ✅ fixed | 3104391 |
+| stability/difficulty not written good/hard/easy | FQ-ALGO-5 | 🔍 monitoring (architectural risk only) | — |
+| Deck restore after hard reload | State-B | ✅ fixed | 98b5254 |
+| iOS Capacitor scaffold | iOS1 | ✅ scaffold done (capacitor.config.json + package.json + icon-512.png) | 918ef92 |
+| Stripe | M2 | ❌ open — blocked on user's real Stripe Payment Link | — |
+
+---
+
+## SESSION 6 — iOS1 CAPACITOR SCAFFOLD (2026-06-18)
+
+PHASE2 only — Capacitor scaffold per CODEX_PROMPT_8. `manifest.json` had empty `icons: []`; Claude generated `icon-512.png` (512x512, upscaled from the existing DNA-helix sigil art) and added it to manifest before handing the prompt to Codex.
+
+| Step | Result |
+|------|--------|
+| STEP 0 deployment gate | passed at PHASE2 v30 |
+| STEP 1 audit | manifest.json had required fields; sw.js present; package.json absent |
+| STEP 2 | created `capacitor.config.json` |
+| STEP 3 | created `package.json` (Capacitor v6 deps only, no `npm install` run) |
+| STEP 4 | icon-512.png validated as real 512x512 PNG, referenced in manifest |
+| STEP 5 commit/push | `918ef92` — staged only capacitor.config.json, package.json, manifest.json, icon-512.png; pushed `origin/main` and `origin/public` (force) |
+
+index.html and sw.js untouched — SW version stays v30. No PHASE1 changes (iOS1 is PHASE2-only).
+
+**Remaining for iOS1:** user runs `npx cap add ios` → `npx cap sync` → opens `ios/` in Xcode (manual, not a Codex task).
+
+---
+
+## SESSION 5 — v25/v26 DATA + LANG FIXES (2026-06-17 end-of-day)
+
+### Commit log
+
+| Commit | Repo | SW | Change |
+|--------|------|----|--------|
+| ca70006 | PHASE2 | v24→v25 | patchVisibleLanguage: add \b word boundaries to prevent Strongyloides→Goodyloides corruption |
+| [PHASE1 port] | PHASE1 | v59→v60 | Port same lang fix |
+| 0d12676 | PHASE2 | v25→v26 | FQ-ALGO-3 null-due repair block; FQ-ALGO-4 again requeue; DOMAIN-AUTO-SELECT loopDomain fix; PATCH-LANG-WALKER DOM skip |
+| 65ddcdf | PHASE1 | v60→v61 | Port all above |
+
+### Status: applied but NOT browser-validated yet
+Run `CODEX_PROMPT_4_VALIDATE_AND_DOMAIN.md` to browser-confirm all v26 fixes.
 
 ---
 
