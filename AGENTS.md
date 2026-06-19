@@ -15,8 +15,18 @@ Rules:
 
 ## Codex Agent Instructions — 2026-06-17 (updated end-of-day)
 
-**Current SW:** PHASE2 `cozy-arcade-PHASE2-v30` (commit 3104391) | PHASE1 `cozy-arcade-v65` (commit 63c1407)
-**Next task:** `CODEX_PROMPT_7_DOMAIN_SMOKE_AND_WRITER_ORDER.md` — DOMAIN-WRITER-ORDER audit + window.runDomainSmokeTest()
+**File convention (added 2026-06-19):** active/queued `CODEX_PROMPT_N_*.md` files live at repo root — there should only ever be a small, current set. Once a prompt's fix lands (commit) or its diagnostic report is received and acted on, move it to `docs/archive/codex_prompts/` (`git mv` if tracked, `mv` if not yet committed). Don't leave completed prompts at root — that's how this got to 12 files needing a cleanup pass today.
+
+**Current SW:** PHASE2 `cozy-arcade-PHASE2-v30` (commit 918ef92, scaffold-only — SW version unchanged, index.html/sw.js untouched) | PHASE1 `cozy-arcade-v65` (commit 63c1407)
+**Next tasks, two queued, independent of each other (2026-06-19, still going):**
+1. `CODEX_PROMPT_13_FQ_ALGO_8_WRONG_RATED_GOOD_DIAGNOSTIC.md` — diagnostic only. Wrong timer-auto-selected answer got rated 'good'. Suspect found (7-layer `advance()` chain's 'good' fallback, ≥6 competing keydown listeners) but the guard meant to prevent it looks correct on paper — needs live instrumentation.
+2. `CODEX_PROMPT_14_D4_MUTATION_FLASH_DIAGNOSTIC.md` — diagnostic only. User reported "card glitch/flashing" on a zero-cache fresh browser during JSON import (screen recording + screenshots provided). Claude reviewed the static evidence directly and found no content-corruption in stills, but has no tooling to inspect video motion — could not confirm or rule out. Reopened the existing D4-MUTATION differential (deprioritized since 2026-06-15) as the most likely match, not confirmed as the same mechanism.
+
+FQ-ALGO-7, FQ-RENDER-5, DOMAIN-AGAIN-DUPE, FQ-DATA-2 (genuinely this time) are all closed. M2 Stripe stays paused. iOS1 finish is user-run.
+
+PROMPT_10 (FQ-RENDER-5) and PROMPT_12 (DOMAIN-AGAIN-DUPE diagnostic) both ran 2026-06-19 with Codex. PROMPT_12's diagnostic correctly found the real mechanism was a stale PHASE1-only `requeueAgainCard()` (not the `selectDomain` chain itself, which fires repeatedly but harmlessly) — Claude applied that fix directly since Codex's session had ended. See OPEN_DIFFERENTIALS.md DOMAIN-AGAIN-DUPE row for the full writeup.
+**M2 Stripe: PAUSED by user decision 2026-06-18** ("too many glitches") — do not resume without explicit request, regardless of Stripe link availability.
+iOS1 scaffold is done — remaining iOS steps (`npx cap add ios` → `npx cap sync` → open in Xcode) are user-run, not Codex tasks.
 
 ---
 
@@ -26,13 +36,17 @@ Rules:
 
 | Attempt | What was tried | Why it failed |
 |---------|---------------|---------------|
+| d5a470b (2026-05-30) | "dedup dropdown injection + kill dual-drop animation jitter" | Same symptom family, predates the FQ-RENDER-1 name; did not stop System2's loop either |
 | dfb2ecc | `clearSoloDrop()` at top of startStableSoloDrop351 | `clearSoloDrop()` is IIFE-scoped inside System 2; silently throws ReferenceError from stable mode's IIFE |
 | 8a22e66 | `window.stopAllDropTimers()` before `clearSoloDrop()` | stopAllDropTimers cancels System 0 raf only; clearSoloDrop still failed silently |
 | ebeef5e | `window.loopSolo=function(){startStableSoloDrop351();}` at end of SS351 | System 2 renderSolo calls `startDrop()` directly, not via loopSolo; reassignment had no effect |
-| **948abe7** | DOM class guard in System 2 tick expiry | **Current fix — awaiting browser validation** |
+| 948abe7 | DOM class guard in System 2 tick expiry — but only guards the final `selectSolo()` call | Partial — fixed double auto-select, but every earlier line in tick() (warning text/class toggle, drop position, timerFill) still ran unconditionally. This was FQ-RENDER-5. |
+| **fb09afa / 2c8f4ce (2026-06-19)** | Explicit `window.__cozyStableOwnsSoloTimer351` flag checked at the TOP of tick()/startDrop() (not just gating the final action), claimed at the earliest synchronous point (`oldRenderSolo351` wrapper, before the setTimeout(0) deferral), reset every card | **Fixed — validated: 3 consecutive Solo cycles, 0 AUTO-SELECT mutations, FSRS 17/17, smoke 6/6, both repos, before push.** |
 
 **The invariant Codex must never violate:**
 `clearSoloDrop()` cannot be called from outside System 2's IIFE. Any attempt will throw ReferenceError silently.
+
+**New lesson from FQ-RENDER-5 (4th attempt at this exact symptom family):** Guarding only the final action at the end of a loop does not stop the loop's other side effects. `stopAllDropTimers()` and the `clearSoloDrop()` call inside `startStableSoloDrop351()` have never actually cancelled System2's `raf175164` loop — three prior commits (d5a470b, 948abe7, and the ebeef5e loopSolo reassignment) all assumed one of these worked. Before declaring a drop-engine fix done: (1) verify the *entire* loop body is suppressed, not just its terminal call, (2) instrument the actual DOM node with a MutationObserver, not just confirm "selectSolo fired once."
 
 ---
 
@@ -87,22 +101,29 @@ Rules:
 | FQ-ALGO-3 null next_due_at repair | ✅ applied (needs browser validate) | 0d12676 |
 | FQ-ALGO-4 again requeue via pool rebuild | ✅ fixed (pool-rebuild replaces broken splice) | 22260dc |
 | FQ-DATA-2 migration guard (legacyToProgress schema check) | ✅ fixed | 3104391 |
+| PROMPT_7 domain audit | ✅ browser-confirmed (no code commit) — DOMAIN-WRITER-ORDER disproved; DOMAIN-AUTO-SELECT confirmed working; new differential DOMAIN-RECORD-ZERO added | — |
+| PROMPT_8 iOS1 Capacitor scaffold | ✅ done (2026-06-18) — capacitor.config.json + package.json created, manifest.json icon-512.png (512x512) added, index.html/sw.js untouched, PHASE2 only | 918ef92 |
+| PROMPT_9 revert FQ-ALGO-7 | ✅ done (2026-06-18), pushed + browser-confirmed correct 2026-06-19 via PROMPT_11 | PHASE2 c2807ac / PHASE1 b9168f5 |
+| PROMPT_11 browser specifics audit | ✅ done (2026-06-19) — live Playwright against deployed URLs, both repos. Closed FQ-ALGO-7. Re-confirmed FQ-RENDER-5 live. Found new: DOMAIN-AGAIN-DUPE (card 4x-duplicated in pool after Domain Again), RENDER-STALE-REVEAL (low priority, not confirmed user-visible). | — (diagnostic, no commit) |
+| PROMPT_10 fix FQ-RENDER-5 | ✅ done (2026-06-19) — ownership flag, validated 3 consecutive Solo cycles both repos before push, 0 warning mutations | PHASE2 fb09afa / PHASE1 2c8f4ce |
+| PROMPT_12 DOMAIN-AGAIN-DUPE diagnostic | ✅ done (2026-06-19) — instrumented selectDomain chain + rating path live, found the real cause was PHASE1's stale additive `requeueAgainCard()`, not the chain itself. Fix applied separately by Claude (Codex session had ended). | PHASE1 2b84281 (PHASE2 needed no change) |
 | PATCH-LANG-MEDICAL \b word boundaries | ✅ browser-confirmed | ca70006 |
 | PATCH-LANG-WALKER DOM skip content nodes | ✅ source-confirmed (LIVE-NO-DECK prevented runtime test) | 0d12676 |
 | DOMAIN-BIONIC (window.bionic\|\|bionic) in domain render | ✅ source-confirmed | f345dda |
 | STATE-B deck restore (atlas sysmap → canonical deck key) | ✅ fixed | 98b5254 |
 
-### Current Task: CODEX_PROMPT_5 — FQ-DATA-2 wrong_count + FQ-ALGO-5 FSRS write audit
+### Current Task: CODEX_PROMPT_13 and CODEX_PROMPT_14, both diagnostic-only (2026-06-19, still going)
 
-**Prompt file:** `CODEX_PROMPT_4_VALIDATE_AND_DOMAIN.md` — copy the block inside it directly to Codex.
+CODEX_PROMPT_4 through CODEX_PROMPT_12 are complete; four real bugs closed today (FQ-ALGO-7, FQ-RENDER-5, DOMAIN-AGAIN-DUPE, FQ-DATA-2). Two more reports came in same day, both still unconfirmed mechanism, both diagnostic-first:
+- PROMPT_13: timer-expired wrong auto-select got rated 'good'. Instruments the `advance()` chain (≥7 layers) + ≥6 competing keydown listeners + `rateOnce`/`alreadyRated`/`pendingFor`.
+- PROMPT_14: "card glitch/flashing" reported on a zero-cache fresh browser during JSON import. Claude reviewed the user's screen recording + screenshots directly first (no ffmpeg available to inspect video motion frame-by-frame) — found no content corruption in stills, couldn't confirm or rule out a real flicker. Reopened D4-MUTATION (deprioritized since 2026-06-15) as the likely match. Instruments MutationObserver/className timing under a genuinely cold profile, matching the user's exact repro condition.
 
-**What CODEX_PROMPT_4 does:**
-1. Differential list (browser-only failure modes from v26 commits) → feeds OPEN_DIFFERENTIALS
-2. Browser validate: FQ-ALGO-3, FQ-ALGO-4, DOMAIN-AUTO-SELECT, PATCH-LANG A+B
-3. Fix DOMAIN-BIONIC (closure bionic() → (window.bionic||bionic)() in domain render)
-4. Report format for Claude to auto-update all files
+Both intentionally diagnostic-only — neither got patched blind. Run them independently, in either order.
 
-**After CODEX_PROMPT_4:** FQ-DATA-2 wrong_count cleanup, then STATE-B, then iOS1/M2.
+Remaining Priority 4 work:
+- iOS1 finish: user runs `npx cap add ios` → `npx cap sync` → opens `ios/` in Xcode (not a Codex task)
+- M2 Stripe: **PAUSED by user 2026-06-18** — not blocked, paused. Do not resume.
+- DOMAIN-RECORD-ZERO (OPEN_DIFFERENTIALS.md): needs user intent decision before any fix is scoped — this is the one remaining stop-and-ask item
 
 ---
 
@@ -195,3 +216,46 @@ Port to PHASE1. Bump PHASE2 sw v25→v26, PHASE1 sw v60→v61. Commit both repos
 | 9 | ~7752 | Energy tracker |
 | 10 | ~13303 | Undo snapshot |
 | 11 | ~14199 | 700ms debounce guard |
+
+---
+
+### selectDomain Chain (≥13 layers — found 2026-06-19, never documented before now — do NOT add layer 14)
+
+**This existed the whole time and was never mapped.** Domain mode's wrapper chain is deeper than Solo's and had zero guardrails until DOMAIN-AGAIN-DUPE surfaced it. Treat with the same caution as selectSolo above.
+
+| Layer | Line (PHASE2) | Note |
+|-------|--------------|------|
+| 1 | ~414 | Base game selectDomain |
+| 2 | ~2441 | Unmapped wrapper |
+| 3 | ~2747 | Unmapped wrapper |
+| 4 | ~3199 | Adds 650ms select-lock (`domainSelectLockUntil`) |
+| 5 | ~3442 | Unmapped wrapper |
+| 6 | ~4085 | Unmapped wrapper |
+| 7 | ~4358 | Gates on `canDomainSelect()` |
+| 8 | ~4413 | Records `answeredCard17521`/`answeredMode17521` |
+| 9 | ~5497 | Unmapped wrapper |
+| 10 | ~6873 | Unmapped wrapper |
+| 11 | ~7778 | Energy-tracker wrapper (`__energyTrack352`, mirrors selectSolo layer 8/9) |
+| 12 | ~13391 | Unmapped wrapper |
+
+Layers marked "Unmapped wrapper" have not been read in full — only located by grep. Before any fix to Domain's rating/select path, read each one; do not assume layer order matches call order without checking `oldSelectDomain`/`priorSelectDomain` chaining at each site.
+
+**Related, not yet mapped:** `bindRatings()` is also redefined at least 3 times (~419, ~7060, ~7794) and calls BOTH `rate()` (wrapped to also call `requeueAgainCard`) AND `rateCard()` for a single rating click — two independent pool-touching paths per press. See DOMAIN-AGAIN-DUPE in OPEN_DIFFERENTIALS.md.
+
+---
+
+### advance() Chain (≥7 layers — found 2026-06-19, never documented before now)
+
+Found while investigating FQ-ALGO-8 (wrong auto-select rated 'good'). Same "deep undocumented chain" pattern as selectDomain above.
+
+| Layer | Line (PHASE2) | Note |
+|-------|--------------|------|
+| 1 | ~418 | Base: `nextCard()` + render/loop, no rating call |
+| 2 | ~884 | Unmapped wrapper |
+| 3 | ~2450 | Unmapped wrapper |
+| 4 | ~2753 | Unmapped wrapper |
+| 5 | ~12175 | Unmapped wrapper |
+| 6 | ~14279 | Unmapped wrapper |
+| 7 (final, live) | ~14422 (`wrappedAdvance`) | Part of `cozy-rating-path-rectifier-2026-06-03`. If reveal is open and no matching pending rating exists for the current card, **defaults to rating 'good'**, gated by a global single-value `alreadyRated`/`markRated(id)` check. |
+
+**Also found:** at least 6 independent `keydown` listeners bound to Space/Enter/ArrowRight at the reveal screen (lines 432, 682, 1180, 1288-1289, 1695-1696, 3184), calling 3 different function names (`advance`, `continueReveal` — itself redefined 3x at 1278/3277/6809, `advanceReveal`). Only the line-3184 listener uses capture phase + `stopImmediatePropagation()`. See FQ-ALGO-8 in OPEN_DIFFERENTIALS.md — not yet confirmed which path actually misfires.

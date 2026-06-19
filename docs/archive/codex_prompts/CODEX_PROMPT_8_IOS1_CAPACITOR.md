@@ -63,14 +63,15 @@ Do NOT run npm install — just write the file.
 
 ──── STEP 4: VALIDATE manifest.json ────
 Confirm manifest.json has icons array with at least one 512x512 entry.
+icon-512.png already added at repo root and referenced in manifest.json icons[0].src.
 If missing 512x512 icon: report "MANIFEST-ICON-MISSING — need 512x512 PNG before npx cap add ios"
 to Claude. Do NOT create placeholder icons.
 
 ──── STEP 5: COMMIT ────
-Stage ONLY: capacitor.config.json, package.json (or package.json change), manifest.json (if updated).
+Stage ONLY: capacitor.config.json, package.json (or package.json change), manifest.json (if updated), icon-512.png.
 Do NOT stage index.html, sw.js, or docs.
-cd /path/PHASE2 && git add capacitor.config.json package.json manifest.json
-git commit -m "iOS1: Capacitor scaffold (capacitor.config.json + package.json)"
+cd /path/PHASE2 && git add capacitor.config.json package.json manifest.json icon-512.png
+git commit -m "iOS1: Capacitor scaffold (capacitor.config.json + package.json + icon)"
 git push origin main && git push origin main:public --force
 
 ──── STEP 6: REPORT ────
