@@ -10876,7 +10876,7 @@ function fixStableOneThingDropdown351() {
 
   function legacyToProgress(cardId, legacy) {
     const p = legacy;
-    if (p?.schema_version === 'fsrs5' && p?.stability) return p;
+    if (p && typeof p.seen_count === 'number' && typeof p.wrong_count === 'number' && typeof p.reviewed_count === 'number' && p.stage) return p;
     const base = defaultProgress(cardId);
     const reviewed = Number(legacy?.reviewed || legacy?.reviewed_count || 0) || 0;
     const correct = Number(legacy?.correct || legacy?.correct_count || 0) || 0;
@@ -10980,6 +10980,7 @@ function fixStableOneThingDropdown351() {
 
   let phase3State = loadPhase3State(normalizeDeckIdentities());
   if(!window.__cozyNullDueRepaired){window.__cozyNullDueRepaired=true;let _rc=0;const _now=new Date().toISOString();Object.values(phase3State?.progress||{}).forEach(p=>{if(p.stage==='review'&&!p.next_due_at){p.next_due_at=_now;p.interval_days=p.interval_days||1;_rc++;}});if(_rc>0)try{savePhase3State();}catch(_){}}
+  if(!window.__cozyWrongCountRepaired){window.__cozyWrongCountRepaired=true;let _wc=0;Object.values(phase3State?.progress||{}).forEach(p=>{if(p.reviewed_count>0){const trueWrong=Math.max(0,(p.reviewed_count||0)-(p.correct_count||0));if(p.wrong_count!==trueWrong){p.wrong_count=trueWrong;_wc++;}}});if(_wc>0)try{savePhase3State();}catch(_){}}
   const session = {
     buriedToday: new Set(),
     seenThisSession: new Set(),
