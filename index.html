@@ -3885,6 +3885,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 
   /* Dynamic Solo drop mirrors the existing final Solo renderer and uses the shared game timing. */
   let raf175164=null, dropStart175164=0, currentY175164=0, dropDistance175164=360, startTop175164=255;
+  window.__cozyStableOwnsSoloTimer351 = false;
   function dropMs(){ return (Number(window.__cozyQuestionMs351)||((Math.max(3,Math.min(15,Number(localStorage.getItem('cozyQuestionSeconds351')||5)||5)))*1000)); }
   function revealOpen(){ const r=q('soloReveal'); return r && !r.classList.contains('hidden'); }
   function clearSoloDrop(){ try{clearInterval(ticker);}catch(e){} if(raf175164) cancelAnimationFrame(raf175164); raf175164=null; }
@@ -3904,6 +3905,11 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     try{moveHunter();}catch(e){}
   }
   function tick(now){
+    if(window.__cozyStableOwnsSoloTimer351){
+      raf175164=null;
+      const warn=q('soloDropWarn175151'); if(warn){ warn.classList.remove('on'); warn.textContent=''; }
+      return;
+    }
     if(mode!=='solo' || revealOpen()){ raf175164=null; return; }
     if(paused){ raf175164=requestAnimationFrame(tick); return; }
     if(!dropStart175164) dropStart175164=now;
@@ -3925,6 +3931,11 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     raf175164=requestAnimationFrame(tick);
   }
   function startDrop(){
+    if(window.__cozyStableOwnsSoloTimer351){
+      raf175164=null;
+      const warn=q('soloDropWarn175151'); if(warn){ warn.classList.remove('on'); warn.textContent=''; }
+      return;
+    }
     clearSoloDrop(); calcGeometry(); dropStart175164=0; setDropY(0);
     const row=q('choiceRow');
     if(row){ row.classList.remove('v17514-live-drop','v17515-css-drop','v17515-warning','danger','warning'); row.classList.add('v175151-drop'); }
@@ -3936,6 +3947,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   }
 
   window.renderSolo = renderSolo = function(){
+    window.__cozyStableOwnsSoloTimer351=false;
     var _savedBodyClasses=document.body.className.split(' ').filter(function(c){return c&&/^cozy|^na-|Drawer/.test(c);});document.body.className='';_savedBodyClasses.forEach(function(c){document.body.classList.add(c);});
     q('soloScore').textContent=score; q('soloStreak').textContent=streak; q('soloGate').textContent=gate;
     try{q('hpFill').style.width=hp+'%';}catch(e){}
@@ -6907,6 +6919,8 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   if(typeof oldRenderSolo351==='function'){
     window.renderSolo=renderSolo=function(){
       const r=oldRenderSolo351.apply(this,arguments);
+      window.__cozyStableOwnsSoloTimer351=true;
+      const _warn=document.getElementById('soloDropWarn175151'); if(_warn){_warn.classList.remove('on');_warn.textContent='';}
       const _row=document.getElementById('choiceRow');
       if(_row) _row.classList.remove('v175151-drop');
       setTimeout(startStableSoloDrop351,0);
@@ -6954,6 +6968,9 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     soloStablePausedAt351=0;
     soloStableStarted351=performance.now();
     row.classList.add('soloStableDrop351');
+    row.classList.remove('v175151-drop','warning');
+    window.__cozyStableOwnsSoloTimer351=true;
+    const warn=document.getElementById('soloDropWarn175151'); if(warn){warn.classList.remove('on');warn.textContent='';}
     const runner=$('runner');
     if(runner) runner.classList.add('soloStableRunner351');
     const duration=soloDropDurationMs351();
