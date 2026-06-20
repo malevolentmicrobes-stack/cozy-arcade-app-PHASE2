@@ -117,7 +117,13 @@ iOS1 scaffold is done — remaining iOS steps (`npx cap add ios` → `npx cap sy
 | DOMAIN-BIONIC (window.bionic\|\|bionic) in domain render | ✅ source-confirmed | f345dda |
 | STATE-B deck restore (atlas sysmap → canonical deck key) | ✅ fixed | 98b5254 |
 
-### Current Task: none queued (2026-06-20) — FQ-ALGO-9 closed, live-validated
+### Current Task: none queued (2026-06-20) — cloze-markup-leak fix applied, not yet live-validated
+
+User supplied 4 real Cloze-converted decks to cross-check an earlier Codex report. One (`UPDATED_2024_UWORLD_ABIM_FIRST100_CLOZE_cozy.json`) had literal `{{c1::answer}}` Anki markup leaking into displayed fields on 100/100 cards — the app had zero existing handling for this (`cloze_source_text`/`cloze_enabled` were metadata-only, never sanitized out of rendered fields). Fixed (PHASE2 `a1b9295` / PHASE1 `c8e743a`): `window.stripClozeCardFields351`, a pure/idempotent helper, wired into the 3 confirmed array-assignment convergence points (`setAppCards` ×2, `setCards`) rather than the ~5-7 competing import-pipeline entry functions upstream — same strategy as DATA-EO-ALIAS. JXA-verified (6 scenarios), **not live-browser-validated** — re-import the 100/100 file in a real browser and confirm zero `{{c` strings render anywhere before calling this fully closed.
+
+**Separately found, explicitly NOT a code bug — do not "fix" this in index.html if it resurfaces:** the SAME cross-check also confirmed (`DECK-FIELD-DUPE-TEST106` in OPEN_DIFFERENTIALS.md) that `educational_objective`/`board_trigger`/`quick_recall` showing near-identical text is, for the specific decks checked, genuinely present in the source JSON — even the user's "FIXED" 1249-card reference database has this in 46-68% of cards. The app is correctly rendering bad/duplicate upstream data. This is a deck-generation/prompt-pipeline problem, not something `index.html` can fix.
+
+### Prior Task: FQ-ALGO-9 closed, live-validated (2026-06-20)
 
 `CODEX_PROMPT_15` found the root cause and Claude's fix; Codex then re-ran the exact 5-cycle Space-at-reveal reproduction against the live fix in both repos: `postAdvanceNewCardSelectCount: 0` every cycle, FSRS 17/17, smoke 6/6. **FQ-ALGO-9 is closed for the reproduced symptom.**
 

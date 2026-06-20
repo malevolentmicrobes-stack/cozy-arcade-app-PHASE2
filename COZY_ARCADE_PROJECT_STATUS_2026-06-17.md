@@ -1,8 +1,22 @@
 # Cozy Arcade — Project Status
 **Date:** 2026-06-17 | **Active branch:** PHASE2 main → origin/public (production)
-**SW:** PHASE2 `cozy-arcade-PHASE2-v37` | PHASE1 `cozy-arcade-v73`
-**Last commits (2026-06-20):** PHASE2 `a5906a7` (pushed origin/main+public) | PHASE1 `4ea0a13` (pushed origin/main)
-**Next tasks:** None queued — FQ-ALGO-9 is closed and live-validated (see Session 21). M2 paused by user. iOS1 finish is user-run. DOMAIN-RECORD-ZERO awaits a product-intent answer.
+**SW:** PHASE2 `cozy-arcade-PHASE2-v38` | PHASE1 `cozy-arcade-v74`
+**Last commits (2026-06-20):** PHASE2 `a1b9295` (pushed origin/main+public) | PHASE1 `c8e743a` (pushed origin/main)
+**Next tasks:** Live-browser-validate the cloze-markup fix (see Session 22). M2 paused by user. iOS1 finish is user-run. DOMAIN-RECORD-ZERO awaits a product-intent answer.
+
+## SESSION 22 — User reframes the project goal, supplies real conversion files, one real code bug found and fixed (2026-06-20)
+
+User clarified the actual goal: build something OTHERS can use, not just a personal study tool — AI-assisted card creation from any note format, without sacrificing medical accuracy or simple gameplay, now compensating for prior coding edits/glitches. Reviewed Codex's broader glitch report (duplicate Educational Objective/Board Trigger text) against this goal rather than assuming it was an app bug.
+
+Cross-validated against the actual source JSON (`TEST_106.json`) and the user's "FIXED" 1249-card reference database: the duplication is genuinely present in the source data (45-68% of cards across both files), not introduced by `index.html`. Corrected the user's own presumption that the "FIXED" database "should function as is" — it doesn't, confirmed by direct inspection. Logged as `DECK-FIELD-DUPE-TEST106` (not actioned, by design — a content-pipeline problem, not a code fix).
+
+User then supplied 4 real Cloze-converted decks and the original "Prompt AI" conversion prompt, explaining the format's history (simple presentation→answer → later over-specified 6-field schema → Cloze/.apkg notes translate poorly into it). Checking those 4 files surfaced a genuinely different, narrower, real code gap: `UPDATED_2024_UWORLD_ABIM_FIRST100_CLOZE_cozy.json` had literal unconverted `{{c1::answer}}` Anki markup in 100/100 cards, and the app had zero code anywhere to strip or resolve it.
+
+**Fixed (PHASE2 `a1b9295` / PHASE1 `c8e743a`):** added `window.stripClozeCardFields351`, applied at the 3 confirmed deck-array convergence points (`setAppCards` ×2, `setCards`). Verified via 6-scenario JXA simulation. Not live-validated yet. SW PHASE2 v37→v38, PHASE1 v73→v74.
+
+Explicitly did NOT fix the data-duplication finding in code — flagged it as a separate, future content-pipeline/prompt decision for the user, distinguishing it clearly from the markup-leak bug that was actually fixed.
+
+---
 
 ## SESSION 21 — FQ-ALGO-9 live-validated: 5/5 cycles, both repos, fix holds (2026-06-20)
 
