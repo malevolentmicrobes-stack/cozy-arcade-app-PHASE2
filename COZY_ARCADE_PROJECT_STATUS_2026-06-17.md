@@ -1,8 +1,18 @@
 # Cozy Arcade — Project Status
 **Date:** 2026-06-17 | **Active branch:** PHASE2 main → origin/public (production)
-**SW:** PHASE2 `cozy-arcade-PHASE2-v36` | PHASE1 `cozy-arcade-v72`
-**Last commits (2026-06-19, ~6:30pm):** PHASE2 `34697f4` (pushed origin/main+public) | PHASE1 `02e4d23` (pushed origin/main)
-**Next tasks:** Run `CODEX_PROMPT_15` (FQ-ALGO-9 diagnostic, see Session 19 below). M2 paused by user. iOS1 finish is user-run. DOMAIN-RECORD-ZERO awaits a product-intent answer.
+**SW:** PHASE2 `cozy-arcade-PHASE2-v37` | PHASE1 `cozy-arcade-v73`
+**Last commits (2026-06-20):** PHASE2 `a5906a7` (pushed origin/main+public) | PHASE1 `4ea0a13` (pushed origin/main)
+**Next tasks:** Re-test the FQ-ALGO-9 fix (not yet live-validated). Fix the Continue-button disambiguation test properly (see Session 20). M2 paused by user. iOS1 finish is user-run. DOMAIN-RECORD-ZERO awaits a product-intent answer.
+
+## SESSION 20 — FQ-ALGO-9 fixed: Codex found the exact mechanism, Claude fixed the consumer not the shim (2026-06-20)
+
+`CODEX_PROMPT_15` came back with a confirmed root cause, reproduced deterministically 5/5 cycles in both repos: `Event.prototype.stopImmediatePropagation` is overridden to silently no-op for Enter/Space while a reveal is open. A handler correctly detects reveal-open and calls `advance()`, then tries to stop further propagation — the shim neuters that specific call, so the base bubble-phase keydown handler (fires dead last) still runs for the same event, now sees the *new* card's closed reveal, and fires `selectSolo` on it.
+
+Deliberately did not touch the shim — it's a global override affecting an unknown number of the file's 20+ keydown listeners, with two other conditions (domain-mode arrow keys, Escape handling) that have no comment explaining their purpose. Fixed the actual unguarded consumer instead: `wrappedAdvance` (the single point every `advance()` call funnels through, regardless of which listener triggered it) now stamps a timestamp at its start; the base handler's ambiguous branch skips `selectSolo` if an advance happened within the last 50ms. PHASE2 `a5906a7` / PHASE1 `4ea0a13`. Verified via 5-case JXA simulation. **Not live-browser-validated yet.**
+
+Also found: Codex's own "fixed" Continue-button test was itself flawed — the forced-wrong selection had already committed a rating via select-time logic before Continue was even clicked, so its result didn't actually test what it claimed to. The flag question from FQ-ALGO-8 remains genuinely open; needs clearing `__cozyPendingRating20260603`/`__cozyLastRatedId` AFTER the wrong reveal settles, before clicking Continue.
+
+---
 
 ## SESSION 19 — Codex live-tested the FQ-ALGO-8 fix, found something more severe (2026-06-20)
 
