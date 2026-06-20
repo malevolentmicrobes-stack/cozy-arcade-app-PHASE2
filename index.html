@@ -8885,8 +8885,15 @@ Rules:
     const dx=which==='domain'?document.getElementById('domainDx'):document.getElementById('soloRevealDx');
     const trigger=which==='domain'?document.getElementById('domainObj'):document.getElementById('soloTrigger');
     if(!root||!trigger) return;
-    if(dx) dx.textContent=sourceAnswer(card);
-    trigger.innerHTML=(typeof safeBionic==='function'?safeBionic(card.educational_objective):esc(card.educational_objective));
+    const answerText=sourceAnswer(card);
+    const eduRaw=card.educational_objective;
+    const eduObj=(eduRaw&&eduRaw!==card.diagnosis)?eduRaw:(card.board_trigger||card.quick_recall||eduRaw||'');
+    const revealSig=String(answerText)+'|'+String(eduObj);
+    if(trigger.dataset.revealSectionsSig!==revealSig){
+      trigger.dataset.revealSectionsSig=revealSig;
+      if(dx) dx.textContent=answerText;
+      trigger.innerHTML=(typeof safeBionic==='function'?safeBionic(eduObj):esc(eduObj));
+    }
     let board=root.querySelector('.boardTrigger350'); if(!board){board=document.createElement('div'); board.className='boardTrigger350'; trigger.insertAdjacentElement('afterend',board);}
     board.innerHTML=(typeof safeBionic==='function'?safeBionic(card.board_trigger):esc(card.board_trigger)); board.style.display=clean(card.board_trigger)?'block':'none';
     let one=root.querySelector('.oneThing350'); if(!one){one=document.createElement('div'); one.className='oneThing350'; board.insertAdjacentElement('afterend',one);}
