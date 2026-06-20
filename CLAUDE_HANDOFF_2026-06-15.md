@@ -397,9 +397,9 @@ File: `OPEN_DIFFERENTIALS.md`
 
 ---
 
-### NEXT CODEX TASK — re-listed 2026-06-19 (end of day)
+### NEXT CODEX TASK — re-listed 2026-06-19, ~5:00pm
 
-**CODEX_PROMPT_4 through CODEX_PROMPT_12 are complete.** Four real bugs found and closed in the 2026-06-18/19 window:
+**CODEX_PROMPT_4 through CODEX_PROMPT_12 are complete.** Five real bugs found and closed in the 2026-06-18/19 window:
 
 | Bug | Fixed by | Commits |
 |---|---|---|
@@ -407,17 +407,21 @@ File: `OPEN_DIFFERENTIALS.md`
 | FQ-RENDER-5 ("AUTO-SELECT IN" warning ghosting, 4th patch attempt at this symptom) | Codex, PROMPT_10, validated 3 consecutive cycles before push | PHASE2 `fb09afa` / PHASE1 `2c8f4ce` |
 | DOMAIN-AGAIN-DUPE (card 4x-duplicated in Domain pool) | Codex diagnosed (PROMPT_12), Claude fixed (stale PHASE1-only `requeueAgainCard`) | PHASE1 `2b84281` (PHASE2 needed no change) |
 | FQ-DATA-2 (wrong_count inflation — **the 2026-06-17 "fix" was dead code, never actually worked**, user caught it via their own progress export) | Claude | PHASE2 `88af09e` / PHASE1 `0b4482a` |
+| REVEAL-TRIGGER-CHURN / DATA-EO-ALIAS (reveal-panel flash + diagnosis duplicated into Educational Objective box) — see below, **mitigated not fully consolidated** | Claude + Codex, independently converged | PHASE2 `7bf4273` / PHASE1 `b91cf8f` |
 
-**Two diagnostics queued now, run independently, in either order — both intentionally diagnostic-only, neither patched blind:**
+**Reveal-panel fix detail:** user reported "card glitch/flashing." Claude's deep-think source analysis found `renderRevealSections()` (the deferred, final writer in `reveal()`'s 17-layer chain) had no fallback when `educational_objective` was empty. Codex independently ran a live-browser pre-mortem (`CODEX_PREMORTEM_REVEAL_GLITCH_2026-06-19.md`), confirmed 55-57 DOM mutations per reveal, and found something deeper: `educational_objective` can get contaminated to literally equal `diagnosis` (traced to `canonicalizeCard()` aliasing `answer`). Claude verified Codex's finding directly and discovered the same anti-pattern recurs in **8 places**, not 1 — and the specific function Codex's test exercised is dead code in normal play (only reachable via a mode never used live). Applied one targeted fix at `renderRevealSections`: fallback to `board_trigger||quick_recall` when `educational_objective` is empty-or-contaminated, plus an idempotency guard (mirrors the One Thing box's existing, proven pattern) so unchanged content doesn't get rewritten. Did NOT touch the other 7 sites, the 900ms reveal-refresh interval, or attempt Codex's recommended full chain consolidation — logged as deliberate future work, not forgotten.
+
+**Two diagnostics still queued, independent of the above:**
 1. `CODEX_PROMPT_13_FQ_ALGO_8_WRONG_RATED_GOOD_DIAGNOSTIC.md` — user observed a timer-expired wrong auto-select get rated 'good'. Suspect: `advance()`'s 7-layer wrapper chain (table in AGENTS.md) defaults to 'good' when no pending rating matches; the guard meant to prevent this looks correct in isolation, so the real trigger isn't confirmed.
-2. `CODEX_PROMPT_14_D4_MUTATION_FLASH_DIAGNOSTIC.md` — user reported "card glitch/flashing" on a zero-cache fresh browser during JSON import (screen recording + 5 screenshots). Claude reviewed the visual evidence directly first (no ffmpeg in this environment to sample video motion) and found no content corruption in stills, but couldn't confirm or rule out a real flicker from that alone. Reopened the existing D4-MUTATION differential (deprioritized since 2026-06-15) as the likely match, not yet confirmed as the same mechanism.
+2. `CODEX_PROMPT_14_D4_MUTATION_FLASH_DIAGNOSTIC.md` — largely superseded by the reveal-panel fix above; left open pending re-test rather than closed on assumption.
 
-**Decision rule established today, apply going forward:** deterministic, provable bugs (pure data transforms, array logic — FQ-ALGO-7, FQ-DATA-2) get diagnosed and fixed directly by Claude, verified via JXA simulation (`osascript -l JavaScript`) against real data when no node/Playwright is available, then pushed. Anything involving event timing, multiple competing wrapper layers, or visual motion (FQ-RENDER-5, DOMAIN-AGAIN-DUPE, FQ-ALGO-8, D4-MUTATION) gets a live diagnostic first — no exceptions, regardless of how confident the source-level suspect looks.
+**Decision rule established today, now applied five times:** deterministic, provable bugs (pure data transforms, array logic, field-fallback corrections — FQ-ALGO-7, FQ-DATA-2, the reveal-panel fix) get diagnosed and fixed directly by Claude, verified via JXA simulation (`osascript -l JavaScript`) against real data when no node/Playwright is available, then pushed — but scoped to the smallest verifiable correction, even when a larger related problem is found along the way. Anything involving event timing, multiple competing wrapper layers, or visual motion as the *primary* mechanism (FQ-RENDER-5, DOMAIN-AGAIN-DUPE, FQ-ALGO-8) gets a live diagnostic first — no exceptions, regardless of how confident the source-level suspect looks.
 
 Remaining non-Codex work:
 - iOS1 finish: user runs `npx cap add ios` → `npx cap sync` → opens `ios/` in Xcode
 - M2 Stripe: **PAUSED by user 2026-06-18** ("too many glitches") — do not resume without explicit request
 - DOMAIN-RECORD-ZERO (OPEN_DIFFERENTIALS.md): still needs user intent decision — this is a product-intent question, not a technical one, so it stays a stop-and-ask item under the protocol below
+- REVEAL-TRIGGER-CHURN/DATA-EO-ALIAS full consolidation (the other 7 contamination sites, the 900ms interval, the 17-layer chain) — real, documented, deliberately not urgent
 
 ---
 

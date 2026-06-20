@@ -1,8 +1,37 @@
 # Cozy Arcade — Project Status
 **Date:** 2026-06-17 | **Active branch:** PHASE2 main → origin/public (production)
-**SW:** PHASE2 `cozy-arcade-PHASE2-v33` | PHASE1 `cozy-arcade-v69`
-**Last commits:** PHASE2 `88af09e` (pushed origin/main+public) | PHASE1 `0b4482a` (pushed origin/main)
-**Next tasks:** CODEX_PROMPT_13 (FQ-ALGO-8 diagnostic — wrong auto-select rated 'good') and CODEX_PROMPT_14 (D4-MUTATION reopened — card glitch/flashing on zero-cache import), both diagnostic-only, independent of each other. FQ-ALGO-7, FQ-RENDER-5, DOMAIN-AGAIN-DUPE, FQ-DATA-2 closed today. M2 paused by user. iOS1 finish is user-run. DOMAIN-RECORD-ZERO awaits a product-intent answer from the user.
+**SW:** PHASE2 `cozy-arcade-PHASE2-v34` | PHASE1 `cozy-arcade-v70`
+**Last commits (2026-06-19, ~5:00pm):** PHASE2 `7bf4273` (pushed origin/main+public) | PHASE1 `b91cf8f` (pushed origin/main)
+**Next tasks:** Re-test the reveal-panel fix below. CODEX_PROMPT_13 (FQ-ALGO-8 diagnostic — wrong auto-select rated 'good') still queued, unrelated. CODEX_PROMPT_14 (D4-MUTATION) largely superseded by the reveal fix, left open pending re-test. M2 paused by user. iOS1 finish is user-run. DOMAIN-RECORD-ZERO awaits a product-intent answer.
+
+## SESSION 14 — reveal-panel fix applied: flash + diagnosis-contamination, both addressed at the display layer (2026-06-19, ~5:00pm)
+
+User asked Claude to push the most probable 1-2 fixes directly (save Codex credits) without removing anything that already works (explicit concern: don't backtrack on the working FSRS/rating algorithm, named "SM-2" in the request).
+
+**What Claude verified before touching anything:**
+- Re-confirmed Codex's 55/57-mutation finding by reading the actual `renderRevealSections()` code (the deferred, `setTimeout(0)`, final writer in `reveal()`'s 17-layer chain) — no idempotency guard on its `dx`/`trigger` writes, unlike the One Thing box, which already has one (`oneThingStableRenderSig`) and was therefore NOT part of the problem.
+- Independently verified Codex's `educational_objective`-contamination finding by reading `canonicalizeCard()` directly — then found it's actually **worse than either of us first reported**: the exact "prefer `answer`/diagnosis-like text over `board_trigger`" anti-pattern recurs in **8 separate places** in the file (lines 1615, 4002-4003, 5413, 6752, 7140, 7648, 7652, plus `canonicalizeCard` itself at 11645/11676) — and `canonicalizeCard`'s specific contaminating branch is actually dead code in normal play (only called in `mode:'export'`; Codex's repro must have called it directly, bypassing the live app flow). The real contamination users see comes from one of the other 7 reachable sites — not individually identified which.
+
+**Decision:** fixing all 8 sites, or doing Codex's recommended full reveal-chain consolidation, in one pass would be exactly the "bulk, no quick patches" risk this session has repeatedly warned itself about. Instead: one targeted guard at the final display point (`renderRevealSections`), which fixes the user-visible symptom regardless of which upstream site caused it for any given card.
+
+**Fix applied (PHASE2 `7bf4273` / PHASE1 `b91cf8f`):** `renderRevealSections()` now (1) falls back to `board_trigger||quick_recall` whenever `educational_objective` is empty OR equal to `diagnosis` (the exact contaminated-symptom signature), and (2) skips the `dx`/`trigger` DOM write entirely when computed content is unchanged since the last paint — same proven pattern as the existing One Thing guard, not a new mechanism. Board Trigger and One Thing sections were left untouched; they already update correctly every call.
+
+**Verification:** 5-scenario JXA simulation (`osascript -l JavaScript`, no node/Playwright in this environment) before applying — normal card, Codex's exact contaminated-card repro, empty-objective-with-quick_recall fallback, repeated same-card render (must skip), different card immediately after (must still update). All 5 passed. **Not live-browser-validated.**
+
+**Explicitly not touched:** `selectSolo`, `advance()`, `rateCard()`, any FSRS/SM-2 scheduling code, the other 7 contamination sites, the 900ms reveal-refresh interval, or the broader 17-layer chain consolidation Codex recommended. All documented in OPEN_DIFFERENTIALS.md (REVEAL-TRIGGER-CHURN, DATA-EO-ALIAS, both now ⚠️ MITIGATED not ✅ FIXED) as real, deliberate, future work — not silently dropped.
+
+---
+
+## SESSION 13 — Codex reveal-glitch pre-mortem and top-5 test matrix (2026-06-19, later same day)
+
+User asked for no shortcuts: review patch history/logs first, list plausible browser-surfaced sources, test the top five, and avoid backtracking on the working SM-2/rating algorithm. Codex created `CODEX_PREMORTEM_REVEAL_GLITCH_2026-06-19.md`.
+
+Test results:
+- Confirmed top mechanism: reveal answer-panel writer churn. Localhost browser harness with `MutationObserver` on `#soloReveal` measured 55 mutations for a normal reveal and 57 for a board-trigger-only reveal. `.boardTrigger350` and `.oneThing350` are inserted after reveal begins, so layout movement is deterministic.
+- Confirmed second mechanism: field alias contamination. A board-trigger-only card normalized to `educational_objective = "Aortic dissection"`, duplicating diagnosis into the Educational Objective box. Source trace points to `canonicalizeCard()` assigning `educational_objective = c.educational_objective || c.answer || ...` and then `c.answer = educational_objective`.
+- Confirmed lower-priority contributors: Google Fonts cold-cache swap (`display=swap`, not app-shell precached), multiple keydown/advance listeners, and global/body `MutationObserver` churn.
+
+Fix direction recorded, not applied in this session: consolidate reveal rendering into one idempotent owner and fix canonical field aliasing. Do not add another reveal wrapper; do not touch SM-2/FSRS unless a separate FQ-ALGO-8 test implicates it.
 
 ## SESSION 12 — "card glitch/flashing" reported, zero-cache repro (2026-06-19, same day)
 

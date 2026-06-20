@@ -17,12 +17,15 @@ Rules:
 
 **File convention (added 2026-06-19):** active/queued `CODEX_PROMPT_N_*.md` files live at repo root — there should only ever be a small, current set. Once a prompt's fix lands (commit) or its diagnostic report is received and acted on, move it to `docs/archive/codex_prompts/` (`git mv` if tracked, `mv` if not yet committed). Don't leave completed prompts at root — that's how this got to 12 files needing a cleanup pass today.
 
-**Current SW:** PHASE2 `cozy-arcade-PHASE2-v30` (commit 918ef92, scaffold-only — SW version unchanged, index.html/sw.js untouched) | PHASE1 `cozy-arcade-v65` (commit 63c1407)
-**Next tasks, two queued, independent of each other (2026-06-19, still going):**
+**Current SW (2026-06-19, ~5:00pm):** PHASE2 `cozy-arcade-PHASE2-v34` (commit `7bf4273`) | PHASE1 `cozy-arcade-v70` (commit `b91cf8f`)
+**Next tasks (2026-06-19, ~5:00pm):**
 1. `CODEX_PROMPT_13_FQ_ALGO_8_WRONG_RATED_GOOD_DIAGNOSTIC.md` — diagnostic only. Wrong timer-auto-selected answer got rated 'good'. Suspect found (7-layer `advance()` chain's 'good' fallback, ≥6 competing keydown listeners) but the guard meant to prevent it looks correct on paper — needs live instrumentation.
-2. `CODEX_PROMPT_14_D4_MUTATION_FLASH_DIAGNOSTIC.md` — diagnostic only. User reported "card glitch/flashing" on a zero-cache fresh browser during JSON import (screen recording + screenshots provided). Claude reviewed the static evidence directly and found no content-corruption in stills, but has no tooling to inspect video motion — could not confirm or rule out. Reopened the existing D4-MUTATION differential (deprioritized since 2026-06-15) as the most likely match, not confirmed as the same mechanism.
+2. `CODEX_PROMPT_14_D4_MUTATION_FLASH_DIAGNOSTIC.md` — diagnostic only, largely superseded by today's reveal-panel fix (see below) but left open in case residual flicker remains after re-testing.
+3. **REVEAL-TRIGGER-CHURN / DATA-EO-ALIAS — mitigated, not consolidated.** The worst symptom (flash + diagnosis-duplicated-into-Educational-Objective) is fixed at the display layer. The root architecture (17-layer `reveal()` chain, 900ms reveal interval, 8 separate occurrences of the answer/board_trigger aliasing anti-pattern) is documented but NOT consolidated — that's a deliberate, larger future task, not today's scope. Re-test before considering this fully closed.
 
-FQ-ALGO-7, FQ-RENDER-5, DOMAIN-AGAIN-DUPE, FQ-DATA-2 (genuinely this time) are all closed. M2 Stripe stays paused. iOS1 finish is user-run.
+FQ-ALGO-7, FQ-RENDER-5, DOMAIN-AGAIN-DUPE, FQ-DATA-2 (genuinely this time) are closed from earlier today. M2 Stripe stays paused. iOS1 finish is user-run.
+
+**Reveal-panel fix (2026-06-19, ~5:00pm):** `renderRevealSections()` now falls back to `board_trigger||quick_recall` when `educational_objective` is empty or contaminated-equal-to-`diagnosis`, and skips its `dx`/`trigger` DOM write when content is unchanged from last paint (same pattern as the existing `oneThingStableRenderSig` guard). PHASE2 `7bf4273` / PHASE1 `b91cf8f`. Verified via 5-scenario JXA simulation against Codex's exact repro case before applying. Did not touch selectSolo/advance/rateCard/FSRS. Did not attempt the other 7 occurrences of the aliasing anti-pattern, or the broader chain consolidation — see OPEN_DIFFERENTIALS.md REVEAL-TRIGGER-CHURN/DATA-EO-ALIAS for the full scope of what's deliberately left undone.
 
 PROMPT_10 (FQ-RENDER-5) and PROMPT_12 (DOMAIN-AGAIN-DUPE diagnostic) both ran 2026-06-19 with Codex. PROMPT_12's diagnostic correctly found the real mechanism was a stale PHASE1-only `requeueAgainCard()` (not the `selectDomain` chain itself, which fires repeatedly but harmlessly) — Claude applied that fix directly since Codex's session had ended. See OPEN_DIFFERENTIALS.md DOMAIN-AGAIN-DUPE row for the full writeup.
 **M2 Stripe: PAUSED by user decision 2026-06-18** ("too many glitches") — do not resume without explicit request, regardless of Stripe link availability.
@@ -112,13 +115,13 @@ iOS1 scaffold is done — remaining iOS steps (`npx cap add ios` → `npx cap sy
 | DOMAIN-BIONIC (window.bionic\|\|bionic) in domain render | ✅ source-confirmed | f345dda |
 | STATE-B deck restore (atlas sysmap → canonical deck key) | ✅ fixed | 98b5254 |
 
-### Current Task: CODEX_PROMPT_13 and CODEX_PROMPT_14, both diagnostic-only (2026-06-19, still going)
+### Current Task: re-test reveal fix, then CODEX_PROMPT_13 (2026-06-19, ~5:00pm)
 
-CODEX_PROMPT_4 through CODEX_PROMPT_12 are complete; four real bugs closed today (FQ-ALGO-7, FQ-RENDER-5, DOMAIN-AGAIN-DUPE, FQ-DATA-2). Two more reports came in same day, both still unconfirmed mechanism, both diagnostic-first:
-- PROMPT_13: timer-expired wrong auto-select got rated 'good'. Instruments the `advance()` chain (≥7 layers) + ≥6 competing keydown listeners + `rateOnce`/`alreadyRated`/`pendingFor`.
-- PROMPT_14: "card glitch/flashing" reported on a zero-cache fresh browser during JSON import. Claude reviewed the user's screen recording + screenshots directly first (no ffmpeg available to inspect video motion frame-by-frame) — found no content corruption in stills, couldn't confirm or rule out a real flicker. Reopened D4-MUTATION (deprioritized since 2026-06-15) as the likely match. Instruments MutationObserver/className timing under a genuinely cold profile, matching the user's exact repro condition.
+Timeline today: PROMPT_9 (revert ALGO-7) → PROMPT_11 (live audit, closed ALGO-7, found DOMAIN-AGAIN-DUPE) → PROMPT_10 (fixed RENDER-5) → PROMPT_12 (diagnosed + Claude fixed DOMAIN-AGAIN-DUPE) → user caught FQ-DATA-2 was never really fixed, Claude fixed it for real → user reported "card glitch/flashing," Claude reviewed evidence directly, reopened D4-MUTATION, queued PROMPT_14 → user asked for deep-think analysis; Claude found `renderRevealSections()`'s missing fallback + 17-layer `reveal()` chain → Codex independently ran a pre-mortem with a live browser harness (`CODEX_PREMORTEM_REVEAL_GLITCH_2026-06-19.md`), confirmed 55-57 DOM mutations per reveal AND found a second, deeper bug Claude had missed: `educational_objective` getting contaminated to equal `diagnosis` → Claude verified Codex's finding directly, discovered the same anti-pattern recurs in 8 places (not 1), and applied a single targeted fix at the display layer (`renderRevealSections`) that resolves the user-visible symptom for both findings without touching the other 7 occurrences or attempting the full chain consolidation Codex recommended. PHASE2 `7bf4273` / PHASE1 `b91cf8f`.
 
-Both intentionally diagnostic-only — neither got patched blind. Run them independently, in either order.
+**Not done, by design:** the other 7 contamination sites, the 900ms reveal interval, and full reveal-chain consolidation into one idempotent owner. These are real, documented (OPEN_DIFFERENTIALS.md), and deliberately deferred — see RECTIFIER_PLAN's running rule against bulk/unconsolidated patching.
+
+PROMPT_13 (FQ-ALGO-8, wrong auto-select rated 'good') is still queued, unrelated to today's reveal fix — instruments the `advance()` chain + ≥6 competing keydown listeners + `rateOnce`/`alreadyRated`/`pendingFor`. PROMPT_14 is largely superseded by the reveal fix but left open pending re-test.
 
 Remaining Priority 4 work:
 - iOS1 finish: user runs `npx cap add ios` → `npx cap sync` → opens `ios/` in Xcode (not a Codex task)
