@@ -412,7 +412,7 @@ function makeOrbs(){orbData=[];let cx=innerWidth/2, cy=innerHeight*.63, r=60;cho
 function positionOrbs(p){let cx=innerWidth/2, cy=innerHeight*.65; let maxR=Math.min(innerWidth,innerHeight)*.48;orbData.forEach((o,i)=>{let r=80+p*maxR;let wob=Math.sin(Date.now()/600+i)*8;o.x=cx+(r+wob)*Math.cos(o.ang);o.y=cy+(r+wob)*Math.sin(o.ang);o.el.style.left=o.x+'px';o.el.style.top=o.y+'px';o.el.style.transform='translate(-50%,-50%) scale('+(1+p*.08)+')';})}
 function loopDomain(){clearInterval(ticker);ticker=setInterval(()=>{if(mode!=='domain'||paused)return;timer-=.08;let p=1-Math.max(0,timer/timerMax);positionOrbs(p); if(timer<=0&&autoSelect){let nearest=0,best=1e9;orbData.forEach((o,i)=>{let d=(o.x-cursor.x)**2+(o.y-cursor.y)**2;if(d<best){best=d;nearest=i}});selectDomain(nearest)}},80)}
 function selectDomain(i){if($('domainReveal').classList.contains('hidden')===false)return;clearInterval(ticker);let ok=choices[i]===clean(current.diagnosis);orbData.forEach((o,j)=>{if(choices[j]===clean(current.diagnosis))o.el.classList.add('correct');else if(j===i)o.el.classList.add('wrong')});if(ok){score+=900+streak*175;streak++;fireworks(cursor.x,cursor.y,'cyan')}else{streak=0;fireworks(cursor.x,cursor.y,'red')}record(current,ok);setTimeout(()=>reveal('domain',ok),650)}
-function reveal(which,ok){let dx=clean(current.diagnosis), obj=clean(current.educational_objective||current.board_trigger||current.quick_recall); if(which==='solo'){$('soloRevealTitle').textContent=ok?'Gate Completed':'Learning Moment';$('soloRevealDx').textContent=dx;$('soloTrigger').textContent=obj;$('soloRevealRatings').innerHTML=ratingsHTML();$('soloReveal').classList.remove('hidden');$('soloScore').textContent=score;$('soloStreak').textContent=streak;$('hpFill').style.width=hp+'%'}else{$('domainRevealTitle').textContent=ok?'Correct':'Learning Moment';$('domainDx').textContent=dx;$('domainObj').textContent=obj;$('domainRevealRatings').innerHTML=ratingsHTML();$('domainReveal').classList.remove('hidden');$('domainScore').textContent=score;$('domainStreak').textContent=streak} bindRatings(which);}
+function reveal(which,ok){let dx=clean(current.diagnosis);const eduRaw0=current.educational_objective;let obj=clean((eduRaw0&&eduRaw0!==current.diagnosis)?eduRaw0:(current.board_trigger||current.quick_recall||eduRaw0)); if(which==='solo'){$('soloRevealTitle').textContent=ok?'Gate Completed':'Learning Moment';$('soloRevealDx').textContent=dx;$('soloTrigger').textContent=obj;$('soloRevealRatings').innerHTML=ratingsHTML();$('soloReveal').classList.remove('hidden');$('soloScore').textContent=score;$('soloStreak').textContent=streak;$('hpFill').style.width=hp+'%'}else{$('domainRevealTitle').textContent=ok?'Correct':'Learning Moment';$('domainDx').textContent=dx;$('domainObj').textContent=obj;$('domainRevealRatings').innerHTML=ratingsHTML();$('domainReveal').classList.remove('hidden');$('domainScore').textContent=score;$('domainStreak').textContent=streak} bindRatings(which);}
 function ratingsHTML(){return `<div class="ratingBar"><button class="btn" data-rate="pin">Pin</button><button class="btn buryBtn352" data-rate="bury">Bury</button><button class="btn againBtn352" data-rate="again">Again</button><button class="btn" data-rate="hard">Hard</button><button class="btn" data-rate="good">Good</button><button class="btn primary" data-rate="easy">EASY</button><button class="btn primary" data-rate="continue">Continue</button></div>`}
 function bindRatings(which){document.querySelectorAll('[data-rate]').forEach(b=>b.onclick=()=>{let r=b.dataset.rate;if(r==='continue'){try{if(current&&typeof rateCard==='function')rateCard(canonicalCardId(current),'good');}catch(e){}advance(which);return}rate(current,r);try{if(current&&r!=='pin'&&typeof rateCard==='function')rateCard(canonicalCardId(current),r);}catch(e){} if(r==='pin')toast('Pinned'); else advance(which)})}
 function advance(which){if(hp<=0&&which==='solo')return endRun('Game Completed');nextCard(); if(which==='solo'){gate++;renderSolo();loopSolo()}else{domainRound++;renderDomain();loopDomain()}}
@@ -1265,7 +1265,8 @@ document.addEventListener('DOMContentLoaded',()=>{initSpacedToggle();wire();upda
   window.reveal=reveal=function(which,ok){
     clearTimeout(answerAuto); loadSpacing();
     baseReveal(which,ok);
-    const obj=clean((current&& (current.answer||current.educational_objective||current.level_2_three_second_exposure||current.quick_recall))||'');
+    const eduRaw1265=current&&current.educational_objective;
+    const obj=clean((eduRaw1265&&eduRaw1265!==(current&&current.diagnosis))?eduRaw1265:((current&&(current.board_trigger||current.quick_recall||current.level_2_three_second_exposure||current.answer))||eduRaw1265||''));
     const box=q(which==='solo'?'soloTrigger':'domainObj'); if(box) box.textContent=obj;
     const ratings=q(which==='solo'?'soloRevealRatings':'domainRevealRatings');
     if(!window.spacedOn){
@@ -7137,7 +7138,8 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     }
     dx.textContent=answer(card);
     trigger.dataset.v350Key=cardKey(card);
-    trigger.innerHTML=safeBionic(card.educational_objective||card.quick_recall||card.answer||'');
+    const eduRaw7141=card.educational_objective;
+    trigger.innerHTML=safeBionic((eduRaw7141&&eduRaw7141!==card.diagnosis)?eduRaw7141:(card.board_trigger||card.quick_recall||card.answer||eduRaw7141||''));
     let board=root.querySelector('.boardTrigger350');
     if(!board){board=document.createElement('div'); board.className='boardTrigger350'; trigger.insertAdjacentElement('afterend',board);}
     board.innerHTML=safeBionic(card.board_trigger||'');
