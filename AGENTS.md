@@ -17,11 +17,13 @@ Rules:
 
 **File convention (added 2026-06-19):** active/queued `CODEX_PROMPT_N_*.md` files live at repo root — there should only ever be a small, current set. Once a prompt's fix lands (commit) or its diagnostic report is received and acted on, move it to `docs/archive/codex_prompts/` (`git mv` if tracked, `mv` if not yet committed). Don't leave completed prompts at root — that's how this got to 12 files needing a cleanup pass today.
 
-**Current SW (2026-06-19, ~5:00pm):** PHASE2 `cozy-arcade-PHASE2-v34` (commit `7bf4273`) | PHASE1 `cozy-arcade-v70` (commit `b91cf8f`)
-**Next tasks (2026-06-19, ~5:00pm):**
-1. `CODEX_PROMPT_13_FQ_ALGO_8_WRONG_RATED_GOOD_DIAGNOSTIC.md` — diagnostic only. Wrong timer-auto-selected answer got rated 'good'. Suspect found (7-layer `advance()` chain's 'good' fallback, ≥6 competing keydown listeners) but the guard meant to prevent it looks correct on paper — needs live instrumentation.
-2. `CODEX_PROMPT_14_D4_MUTATION_FLASH_DIAGNOSTIC.md` — diagnostic only, largely superseded by today's reveal-panel fix (see below) but left open in case residual flicker remains after re-testing.
-3. **REVEAL-TRIGGER-CHURN / DATA-EO-ALIAS — mitigated, not consolidated.** The worst symptom (flash + diagnosis-duplicated-into-Educational-Objective) is fixed at the display layer. The root architecture (17-layer `reveal()` chain, 900ms reveal interval, 8 separate occurrences of the answer/board_trigger aliasing anti-pattern) is documented but NOT consolidated — that's a deliberate, larger future task, not today's scope. Re-test before considering this fully closed.
+**Current SW (2026-06-19, ~6:30pm):** PHASE2 `cozy-arcade-PHASE2-v36` (commit `34697f4`) | PHASE1 `cozy-arcade-v72` (commit `02e4d23`)
+**Next tasks (2026-06-19, ~6:30pm):**
+1. **Re-test FQ-ALGO-8** (wrong auto-select rated 'good') — fix applied (see below), but the underlying race trigger was never pinned down, so this is a safety-net fix, not a proven root-cause fix. `CODEX_PROMPT_13` is now mostly superseded but worth running once more specifically to try reproducing the original sequence against the fix.
+2. `CODEX_PROMPT_14_D4_MUTATION_FLASH_DIAGNOSTIC.md` — diagnostic only, largely superseded by today's reveal-panel fixes but left open in case residual flicker remains after re-testing.
+3. **REVEAL-TRIGGER-CHURN / DATA-EO-ALIAS — mitigated, not consolidated.** Both the settled-state and first-frame flash symptoms are fixed at the display layer. The root architecture (most of `reveal()`'s 17 reassignments are dead code, 900ms reveal interval, 8 separate occurrences of the answer/board_trigger aliasing anti-pattern) is documented but NOT consolidated — deliberate, larger future task.
+
+**FQ-ALGO-8 fix detail (2026-06-19, ~6:30pm, PHASE2 `34697f4` / PHASE1 `02e4d23`):** re-traced the full `advance()` chain and ruled out a stale-closure `selectSolo` theory — found no deterministic logic bug, meaning the trigger is most likely a genuine intermittent race. Rather than guess at it, hardened `wrappedAdvance`'s fallback: it used to default to rating 'good' whenever no pending rating existed. That's correct ONLY for the literal Continue button (confirmed: the live `installRatings()` Continue handler has no rating logic of its own, relies entirely on this fallback). Added `window.__cozyExplicitContinueClick351`, set only by that button, so the fallback now distinguishes "explicit Continue click" (stays 'good') from "Space/Arrow dismissed the reveal" (now computes the real rating via `ratingForSelection`). Verified via JXA simulation, not yet live-browser-validated.
 
 FQ-ALGO-7, FQ-RENDER-5, DOMAIN-AGAIN-DUPE, FQ-DATA-2 (genuinely this time) are closed from earlier today. M2 Stripe stays paused. iOS1 finish is user-run.
 
@@ -115,7 +117,9 @@ iOS1 scaffold is done — remaining iOS steps (`npx cap add ios` → `npx cap sy
 | DOMAIN-BIONIC (window.bionic\|\|bionic) in domain render | ✅ source-confirmed | f345dda |
 | STATE-B deck restore (atlas sysmap → canonical deck key) | ✅ fixed | 98b5254 |
 
-### Current Task: re-test first-frame flash fix, then CODEX_PROMPT_13 (2026-06-19, ~6:00pm)
+### Current Task: re-test both fixes from today's session (2026-06-19, ~6:30pm)
+
+All confirmed bugs from today are now fixed: FQ-ALGO-7, FQ-RENDER-5, DOMAIN-AGAIN-DUPE, FQ-DATA-2, REVEAL-TRIGGER-CHURN/DATA-EO-ALIAS (settled state + first-frame), and FQ-ALGO-8 (hardened fallback, exact race trigger not pinned down). The last two (reveal first-frame, FQ-ALGO-8) are not live-browser-validated — recommend a re-test pass on both before considering the session's open items closed.
 
 Timeline today: PROMPT_9 (revert ALGO-7) → PROMPT_11 (live audit, closed ALGO-7, found DOMAIN-AGAIN-DUPE) → PROMPT_10 (fixed RENDER-5) → PROMPT_12 (diagnosed + Claude fixed DOMAIN-AGAIN-DUPE) → user caught FQ-DATA-2 was never really fixed, Claude fixed it for real → user reported "card glitch/flashing," Claude reviewed evidence directly, reopened D4-MUTATION, queued PROMPT_14 → user asked for deep-think analysis; Claude found `renderRevealSections()`'s missing fallback + 17-layer `reveal()` chain → Codex independently ran a pre-mortem with a live browser harness, confirmed 55-57 DOM mutations per reveal AND found a second, deeper bug: `educational_objective` getting contaminated to equal `diagnosis` → Claude verified directly, found the anti-pattern recurs in 8 places (not 1), applied one targeted fix at the display layer. PHASE2 `7bf4273` / PHASE1 `b91cf8f` → **Codex validated the live fix and found it real but partial:** the settled state is correct (~20ms), but the *first frame* still flashes the uncorrected content, because base `reveal()` (the earliest writer) runs before `renderRevealSections` (the last writer, where Claude's fix lives) and isn't corrected. Codex also flagged `runSRSValidation()` at 11/17 as a possible regression risk.
 

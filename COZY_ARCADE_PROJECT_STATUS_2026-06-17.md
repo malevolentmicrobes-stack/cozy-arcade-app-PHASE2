@@ -1,8 +1,18 @@
 # Cozy Arcade — Project Status
 **Date:** 2026-06-17 | **Active branch:** PHASE2 main → origin/public (production)
-**SW:** PHASE2 `cozy-arcade-PHASE2-v35` | PHASE1 `cozy-arcade-v71`
-**Last commits (2026-06-19, ~6:00pm):** PHASE2 `57a8f0e` (pushed origin/main+public) | PHASE1 `b69fa21` (pushed origin/main)
-**Next tasks:** Re-test the first-frame flash fix below (not yet live-browser-validated). CODEX_PROMPT_13 (FQ-ALGO-8) still queued, unrelated. M2 paused by user. iOS1 finish is user-run. DOMAIN-RECORD-ZERO awaits a product-intent answer.
+**SW:** PHASE2 `cozy-arcade-PHASE2-v36` | PHASE1 `cozy-arcade-v72`
+**Last commits (2026-06-19, ~6:30pm):** PHASE2 `34697f4` (pushed origin/main+public) | PHASE1 `02e4d23` (pushed origin/main)
+**Next tasks:** Re-test both the reveal first-frame fix and the FQ-ALGO-8 fix below — neither is live-browser-validated yet. M2 paused by user. iOS1 finish is user-run. DOMAIN-RECORD-ZERO awaits a product-intent answer.
+
+## SESSION 18 — FQ-ALGO-8 fixed: a pre-mortem that ruled out the obvious suspects, then hardened the actual fallback (2026-06-19, ~6:30pm)
+
+User asked for a full re-review of logged edits/rectifier plans/non-negotiables, then a pre-mortem, then the fix. Re-traced `advance()`'s full 7-layer chain with fresh line numbers (today's earlier edits had shifted everything) — confirmed, unlike `reveal()`, none of the 7 are hard-replacements, so the whole chain is genuinely live. Found a previously-undocumented layer (~12184, "E2 fix") with its own independent rating-good call, but tracing showed it correctly no-ops when select-time rating already succeeded — same as the final layer's own guard. Ruled out a stale-closure `selectSolo` theory by checking the actual enclosing `<script>` block for a shadowing local declaration (found none).
+
+**Could not find a deterministic bug after this tracing.** Every guarded path looks correct in isolation — consistent with a genuine intermittent race, matching the user's own report ("one" wrong rating out of "a couple" autoselects, not every time).
+
+Rather than guess at the race, hardened the fallback that produces the wrong symptom regardless of why it's reached: `wrappedAdvance` used to default to rating 'good' whenever no pending rating existed for the current card. Found that the live "Continue" button implementation has no rating logic of its own and relies entirely on this fallback — meaning the fallback can't simply be changed to "always compute the real rating" without breaking the Continue button's existing, intentional "always good" behavior. Added one flag, set only by that button's click handler, so the fallback now distinguishes an explicit Continue click (stays 'good') from Space/Arrow dismissing a reveal without one (now computes the actual rating via `ratingForSelection`). PHASE2 `34697f4` / PHASE1 `02e4d23`. Verified via 5-scenario JXA simulation. **Not live-browser-validated** — this is a safety-net fix for the observed symptom, not a proven fix for whatever race causes select-time rating to occasionally not register.
+
+---
 
 ## SESSION 17 — first-frame flash fixed at the actual live root (2026-06-19, ~6:00pm)
 
