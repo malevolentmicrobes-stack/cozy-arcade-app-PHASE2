@@ -115,13 +115,13 @@ iOS1 scaffold is done — remaining iOS steps (`npx cap add ios` → `npx cap sy
 | DOMAIN-BIONIC (window.bionic\|\|bionic) in domain render | ✅ source-confirmed | f345dda |
 | STATE-B deck restore (atlas sysmap → canonical deck key) | ✅ fixed | 98b5254 |
 
-### Current Task: fix first-frame flash at the earliest reveal writer, then CODEX_PROMPT_13 (2026-06-19, ~5:30pm)
+### Current Task: re-test first-frame flash fix, then CODEX_PROMPT_13 (2026-06-19, ~6:00pm)
 
 Timeline today: PROMPT_9 (revert ALGO-7) → PROMPT_11 (live audit, closed ALGO-7, found DOMAIN-AGAIN-DUPE) → PROMPT_10 (fixed RENDER-5) → PROMPT_12 (diagnosed + Claude fixed DOMAIN-AGAIN-DUPE) → user caught FQ-DATA-2 was never really fixed, Claude fixed it for real → user reported "card glitch/flashing," Claude reviewed evidence directly, reopened D4-MUTATION, queued PROMPT_14 → user asked for deep-think analysis; Claude found `renderRevealSections()`'s missing fallback + 17-layer `reveal()` chain → Codex independently ran a pre-mortem with a live browser harness, confirmed 55-57 DOM mutations per reveal AND found a second, deeper bug: `educational_objective` getting contaminated to equal `diagnosis` → Claude verified directly, found the anti-pattern recurs in 8 places (not 1), applied one targeted fix at the display layer. PHASE2 `7bf4273` / PHASE1 `b91cf8f` → **Codex validated the live fix and found it real but partial:** the settled state is correct (~20ms), but the *first frame* still flashes the uncorrected content, because base `reveal()` (the earliest writer) runs before `renderRevealSections` (the last writer, where Claude's fix lives) and isn't corrected. Codex also flagged `runSRSValidation()` at 11/17 as a possible regression risk.
 
 **Claude verified the SRS-validation flag and it was a false alarm — important, read before reacting to any future "X/17" report:** `runSRSValidation` is a different, obsolete function (added 2026-05-25, commit message "13 SM-2 assertions") testing the pre-FSRS algorithm, not the project's real gate. The real gate, `runFSRSValidation`, was extracted and *actually executed* via JXA against the current source: **17/17, empirically confirmed.** Marked ✗ DISPROVED in OPEN_DIFFERENTIALS. Do not treat `runSRSValidation` results as meaningful — it is unrelated to anything in this project's current scheduling algorithm.
 
-**Real next step:** apply the same `educational_objective`-contamination fallback to base `reveal()` (the earliest writer, not just `renderRevealSections`) to close the first-frame flash. Mirrors the FQ-RENDER-5 lesson: fix ownership at the earliest synchronous point, not just the end of the chain.
+**"Earliest writer" turned out to require finding the actual live one — applied 2026-06-19 ~6:00pm (PHASE2 `57a8f0e` / PHASE1 `b69fa21`):** tracing the chain found most of it is dead code. `reveal175158` (~1878) and the function at ~7125 are both hard-replacements with no call to any prior — meaning only the LAST one of those two (line ~7125, confirmed by checking nothing after it does the same thing) is actually live, feeding into 8913→9380→9718. Applied the contamination guard there. Full table now in "reveal() Chain" below. **Re-test needed before calling the first-frame flash fully closed** — same as the original fix, this needs a live check, not just static confidence.
 
 **Not done, by design:** the other 7 contamination sites, the 900ms reveal interval, and full reveal-chain consolidation into one idempotent owner. These are real, documented (OPEN_DIFFERENTIALS.md), and deliberately deferred — see RECTIFIER_PLAN's running rule against bulk/unconsolidated patching.
 
@@ -266,3 +266,21 @@ Found while investigating FQ-ALGO-8 (wrong auto-select rated 'good'). Same "deep
 | 7 (final, live) | ~14422 (`wrappedAdvance`) | Part of `cozy-rating-path-rectifier-2026-06-03`. If reveal is open and no matching pending rating exists for the current card, **defaults to rating 'good'**, gated by a global single-value `alreadyRated`/`markRated(id)` check. |
 
 **Also found:** at least 6 independent `keydown` listeners bound to Space/Enter/ArrowRight at the reveal screen (lines 432, 682, 1180, 1288-1289, 1695-1696, 3184), calling 3 different function names (`advance`, `continueReveal` — itself redefined 3x at 1278/3277/6809, `advanceReveal`). Only the line-3184 listener uses capture phase + `stopImmediatePropagation()`. See FQ-ALGO-8 in OPEN_DIFFERENTIALS.md — not yet confirmed which path actually misfires.
+
+---
+
+### reveal() Chain (17 reassignments — found 2026-06-19 — most are DEAD CODE, only the last 4 are live)
+
+Found while fixing the reveal-panel first-frame flash. **Unlike every other chain documented above, most of this one is unreachable.** A chain of wrapper layers assumes each one calls the prior; this one has TWO unconditional hard-replacements partway through that discard everything before them.
+
+| Reassignment | Line (PHASE2) | Live? |
+|---|---|---|
+| 1-9 | ~412, 521, 1157, 1265, 1612 | **DEAD** — all run before the first hard-replace below |
+| 10 | ~1878 (`reveal175158`) | **DEAD** — hard replace, no call to any prior `reveal` |
+| 11-13 | ~2483, 2761, 3032, 3182, 4059, 4429, 5479 | **DEAD** — run after `reveal175158` but before the second hard-replace below |
+| 14 (true root) | ~7125 | **LIVE.** Hard replace, no prior call. Computes `dx`/`trigger` content directly from `current`. This is where the user's actual first-frame content comes from. Fixed 2026-06-19 (`57a8f0e`/`b69fa21`): added the same `educational_objective`-vs-`diagnosis` contamination guard already proven at `renderRevealSections`. |
+| 15 | ~8913 | **LIVE.** `previousReveal.apply()` then `setTimeout(()=>renderRevealSections(which),0)` — this is where the OTHER fix (commit `7bf4273`) lives, correcting the *settled* state ~20ms later. |
+| 16 | ~9380 | **LIVE.** Adds deferred `syncOneThing351`/`updateDrawer351` (80ms/120ms). |
+| 17 | ~9718 | **LIVE.** Adds `addXP()`/sprite level update on correct answer. |
+
+**Before touching this chain again:** confirm which assignment is currently the last hard-replace before assuming a fix anywhere in layers 1-13 will ever execute — re-grep for `window.reveal=function` (no `reveal=` before `function`, no `prior`/`previousReveal`/`_prior` call inside) every time, don't assume the structure is stable across sessions.

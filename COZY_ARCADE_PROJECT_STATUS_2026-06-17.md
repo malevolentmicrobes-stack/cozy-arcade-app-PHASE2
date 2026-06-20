@@ -1,8 +1,18 @@
 # Cozy Arcade — Project Status
 **Date:** 2026-06-17 | **Active branch:** PHASE2 main → origin/public (production)
-**SW:** PHASE2 `cozy-arcade-PHASE2-v34` | PHASE1 `cozy-arcade-v70`
-**Last commits (2026-06-19, ~5:00pm):** PHASE2 `7bf4273` (pushed origin/main+public) | PHASE1 `b91cf8f` (pushed origin/main)
-**Next tasks:** Apply the same contamination fix to the *earliest* reveal writer (base `reveal()`), not just the last one, to remove the residual first-frame flash Codex found. CODEX_PROMPT_13 (FQ-ALGO-8) still queued, unrelated. M2 paused by user. iOS1 finish is user-run. DOMAIN-RECORD-ZERO awaits a product-intent answer.
+**SW:** PHASE2 `cozy-arcade-PHASE2-v35` | PHASE1 `cozy-arcade-v71`
+**Last commits (2026-06-19, ~6:00pm):** PHASE2 `57a8f0e` (pushed origin/main+public) | PHASE1 `b69fa21` (pushed origin/main)
+**Next tasks:** Re-test the first-frame flash fix below (not yet live-browser-validated). CODEX_PROMPT_13 (FQ-ALGO-8) still queued, unrelated. M2 paused by user. iOS1 finish is user-run. DOMAIN-RECORD-ZERO awaits a product-intent answer.
+
+## SESSION 17 — first-frame flash fixed at the actual live root (2026-06-19, ~6:00pm)
+
+"Apply the fix to the earliest writer" turned out to need real investigation: the `reveal()` chain has 17 reassignments, but most are dead code. `reveal175158` (~line 1878) is a hard replacement with no call to any prior `reveal` — and it's itself superseded by another hard replacement at ~line 7125 (also no prior call). Confirmed line ~7125 is the actual live root by checking that nothing else after it does the same thing — the only reassignments following it (8913, 9380, 9718) all properly chain via `prior.apply()`.
+
+Hit one dead end during the trace: `dx.textContent=answer(card)` at line ~7139 appeared to call an undefined function (no `function answer(` anywhere in the file via several grep attempts), which would mean this entire branch throws on every call — directly contradicted by Codex's own validation showing the settled state working. Resolved: `answer` is a properly-scoped arrow function at line ~5843 (`const answer=c=>{...}`); an earlier broad grep search of mine had a `sort -u` step that deduplicated identical matched substrings across different lines, hiding this one. Worth remembering: dedup by matched text, not by line number, can silently drop real hits.
+
+Applied the same `educational_objective`-vs-`diagnosis` contamination guard (proven at `renderRevealSections`, commit `7bf4273`) to the real root at line ~7141. Also applied to base `reveal()` (~412) and the ~1265 wrapper for consistency, despite confirming neither is reachable — harmless, not worth reverting. PHASE2 `57a8f0e` / PHASE1 `b69fa21`. Verified via JXA simulation against the line's specific fallback order before applying. **Not yet live-browser-validated** — recommend a re-test before considering REVEAL-TRIGGER-CHURN fully resolved.
+
+Full `reveal()` chain table (live vs. dead, line by line) now in AGENTS.md.
 
 ## SESSION 16 — Claude verified Codex's SRS-validation alarm was a false alarm: wrong test, not a regression (2026-06-19, ~5:30pm)
 
