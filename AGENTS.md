@@ -117,9 +117,16 @@ iOS1 scaffold is done — remaining iOS steps (`npx cap add ios` → `npx cap sy
 | DOMAIN-BIONIC (window.bionic\|\|bionic) in domain render | ✅ source-confirmed | f345dda |
 | STATE-B deck restore (atlas sysmap → canonical deck key) | ✅ fixed | 98b5254 |
 
-### Current Task: re-test both fixes from today's session (2026-06-19, ~6:30pm)
+### Current Task: CODEX_PROMPT_15 — FQ-ALGO-9, a possibly more severe finding (2026-06-20)
 
-All confirmed bugs from today are now fixed: FQ-ALGO-7, FQ-RENDER-5, DOMAIN-AGAIN-DUPE, FQ-DATA-2, REVEAL-TRIGGER-CHURN/DATA-EO-ALIAS (settled state + first-frame), and FQ-ALGO-8 (hardened fallback, exact race trigger not pinned down). The last two (reveal first-frame, FQ-ALGO-8) are not live-browser-validated — recommend a re-test pass on both before considering the session's open items closed.
+Codex live-browser-tested FQ-ALGO-8's fix (PHASE2 `7dee2cd`, local Chrome, seeded deck). Gates passed (`runFSRSValidation` 17/17, `runCozySmokeTests` 6/6). Two things came back:
+
+1. **FQ-ALGO-8 itself looked correct in this run** — wrong auto-select correctly wrote `last_rating:"again"`.
+2. **New, more severe finding (FQ-ALGO-9):** pressing Space at the reveal screen fired `advance('solo')` AND `selectSolo(0)` on the resulting *next* card, from what looked like the same keypress — i.e. potentially auto-answering a card the user never saw, not just mis-rating one. Claude found a plausible mechanism (19 keydown listeners total, not 6 as previously documented; mixed capture/bubble phase; a bubble-phase listener at ~line 432 unconditionally calls `selectSolo` when reveal is closed) but did NOT confirm it's the actual cause — this needs live listener-order instrumentation, not another guess. `CODEX_PROMPT_15` is queued for that.
+
+Also unresolved: Codex's Continue-button test showed the flag reading `false`, but the flag self-clears immediately after use by design — that test can't actually distinguish "flag worked, then cleared" from "fallback computed good coincidentally." `CODEX_PROMPT_15` includes a redesigned test (force a wrong selection, then click Continue) to settle this for real.
+
+**Do not attempt a fix for FQ-ALGO-9 before PROMPT_15's report comes back** — with 19 listeners involved, guessing which one to change risks exactly the kind of regression already caught once during FQ-ALGO-8's design.
 
 Timeline today: PROMPT_9 (revert ALGO-7) → PROMPT_11 (live audit, closed ALGO-7, found DOMAIN-AGAIN-DUPE) → PROMPT_10 (fixed RENDER-5) → PROMPT_12 (diagnosed + Claude fixed DOMAIN-AGAIN-DUPE) → user caught FQ-DATA-2 was never really fixed, Claude fixed it for real → user reported "card glitch/flashing," Claude reviewed evidence directly, reopened D4-MUTATION, queued PROMPT_14 → user asked for deep-think analysis; Claude found `renderRevealSections()`'s missing fallback + 17-layer `reveal()` chain → Codex independently ran a pre-mortem with a live browser harness, confirmed 55-57 DOM mutations per reveal AND found a second, deeper bug: `educational_objective` getting contaminated to equal `diagnosis` → Claude verified directly, found the anti-pattern recurs in 8 places (not 1), applied one targeted fix at the display layer. PHASE2 `7bf4273` / PHASE1 `b91cf8f` → **Codex validated the live fix and found it real but partial:** the settled state is correct (~20ms), but the *first frame* still flashes the uncorrected content, because base `reveal()` (the earliest writer) runs before `renderRevealSections` (the last writer, where Claude's fix lives) and isn't corrected. Codex also flagged `runSRSValidation()` at 11/17 as a possible regression risk.
 

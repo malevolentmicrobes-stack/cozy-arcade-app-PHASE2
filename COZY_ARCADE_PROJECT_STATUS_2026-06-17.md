@@ -2,7 +2,17 @@
 **Date:** 2026-06-17 | **Active branch:** PHASE2 main → origin/public (production)
 **SW:** PHASE2 `cozy-arcade-PHASE2-v36` | PHASE1 `cozy-arcade-v72`
 **Last commits (2026-06-19, ~6:30pm):** PHASE2 `34697f4` (pushed origin/main+public) | PHASE1 `02e4d23` (pushed origin/main)
-**Next tasks:** Re-test both the reveal first-frame fix and the FQ-ALGO-8 fix below — neither is live-browser-validated yet. M2 paused by user. iOS1 finish is user-run. DOMAIN-RECORD-ZERO awaits a product-intent answer.
+**Next tasks:** Run `CODEX_PROMPT_15` (FQ-ALGO-9 diagnostic, see Session 19 below). M2 paused by user. iOS1 finish is user-run. DOMAIN-RECORD-ZERO awaits a product-intent answer.
+
+## SESSION 19 — Codex live-tested the FQ-ALGO-8 fix, found something more severe (2026-06-20)
+
+Codex ran a real local-Chrome browser probe against PHASE2 `7dee2cd` with a seeded deck. Gates passed (FSRS 17/17, smoke 6/6). FQ-ALGO-8's fix looked correct in this run (wrong auto-select → correctly wrote `last_rating:"again"`).
+
+**New, more severe finding (FQ-ALGO-9):** pressing Space at the reveal screen fired `advance('solo')` AND `selectSolo(0)` on the *next* card — potentially auto-answering a card the user never even saw, not just mis-rating one they did see. Claude found a plausible mechanism: the file has 19 separate `keydown` listeners (previous docs only tracked 6), split across `window`/`document` targets and capture/bubble phases. A bubble-phase listener (fires dead last) unconditionally calls `selectSolo` when reveal is closed — if whatever advances the card during capture phase doesn't call `stopImmediatePropagation` for this exact path, the event keeps propagating and that bubble listener fires on the just-rendered next card. **Not confirmed as the actual cause** — this needs live listener-order instrumentation. `CODEX_PROMPT_15` queued.
+
+Also unresolved: Codex's Continue-button test isn't conclusive. Claude's flag self-clears immediately after use by design, so checking it after `advance()` completes will always read `false` regardless of whether it worked. `CODEX_PROMPT_15` includes a redesigned test (force a wrong selection, then click Continue) to settle this properly.
+
+---
 
 ## SESSION 18 — FQ-ALGO-8 fixed: a pre-mortem that ruled out the obvious suspects, then hardened the actual fallback (2026-06-19, ~6:30pm)
 
