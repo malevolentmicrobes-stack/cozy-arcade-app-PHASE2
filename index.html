@@ -8372,7 +8372,17 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   const cardId=c=>c&&(c['Card ID*']||c['Card ID']||c.card_id||c.cardId||c.json_id||c.id||c.qid_unique||c.qid||c.original_qid||c.legacy_id);
   function appData(){ try{return DATA;}catch(e){return window.DATA||null;} }
   function appCards(){ try{return Array['isArray'](cards)?cards:[];}catch(e){return Array.isArray(window.cards)?window.cards:[];} }
+  window.stripClozeCardFields351 = window.stripClozeCardFields351 || function(card){
+    if(!card||typeof card!=='object') return card;
+    var FIELDS=['presentation','presentation_CLEAN','prompt','diagnosis','answer','educational_objective','educational_obj','board_trigger','quick_recall','level_3_recall','level_3_quick_recall','one_thing','explanation','why_not_others','treatment','next_step','clinical_vignette','clinical_vignette_summary'];
+    FIELDS.forEach(function(k){
+      var v=card[k];
+      if(typeof v==='string' && v.indexOf('{{c')!==-1) card[k]=v.replace(/\{\{c\d+::([\s\S]*?)(?:::[\s\S]*?)?\}\}/g,'$1');
+    });
+    return card;
+  };
   function setAppCards(nextCards){
+    try{ if(Array.isArray(nextCards)) nextCards=nextCards.map(window.stripClozeCardFields351); }catch(e){}
     try{ cards=nextCards; }catch(e){ window.cards=nextCards; }
     try{ window.cards=nextCards; }catch(e){}
     const data=appData();
@@ -8661,7 +8671,7 @@ Rules:
 	  }
 	  function appData(){try{return DATA;}catch(e){return window.DATA||null;}}
   function appCards(){try{return Array['isArray'](cards)?cards:[];}catch(e){return Array.isArray(window.cards)?window.cards:[];}}
-  function setCards(next){try{cards=next;}catch(e){window.cards=next;} try{window.cards=next;}catch(e){} const d=appData(); if(d){try{d.cards=next; window.DATA=d;}catch(e){}}}
+  function setCards(next){try{ if(Array.isArray(next)&&window.stripClozeCardFields351) next=next.map(window.stripClozeCardFields351); }catch(e){} try{cards=next;}catch(e){window.cards=next;} try{window.cards=next;}catch(e){} const d=appData(); if(d){try{d.cards=next; window.DATA=d;}catch(e){}}}
   function formattedId(raw,i){let v=clean(raw); if(!v) v=String((Number(i)||0)+1); if(/^\d+$/.test(v)) v='card-'+v.padStart(4,'0'); return v;}
   function cardSourceId(c,i){return formattedId(first(c['Card ID*'],c['Card ID'],c.card_id,c.cardId,c.json_id,c.id,c.qid_unique,c.qid,c.original_qid,c.legacy_id),i);}
   function userOneThing(card){
@@ -10835,6 +10845,7 @@ function fixStableOneThingDropdown351() {
   }
 
   function setAppCards(nextCards) {
+    try { if (Array.isArray(nextCards) && window.stripClozeCardFields351) nextCards = nextCards.map(window.stripClozeCardFields351); } catch (_) {}
     try { cards = nextCards; } catch (_) { window.cards = nextCards; }
     window.cards = nextCards;
     try { if (window.DATA) window.DATA.cards = nextCards; } catch (_) {}
