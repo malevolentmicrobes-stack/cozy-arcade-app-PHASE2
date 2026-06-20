@@ -2,7 +2,17 @@
 **Date:** 2026-06-17 | **Active branch:** PHASE2 main → origin/public (production)
 **SW:** PHASE2 `cozy-arcade-PHASE2-v37` | PHASE1 `cozy-arcade-v73`
 **Last commits (2026-06-20):** PHASE2 `a5906a7` (pushed origin/main+public) | PHASE1 `4ea0a13` (pushed origin/main)
-**Next tasks:** Re-test the FQ-ALGO-9 fix (not yet live-validated). Fix the Continue-button disambiguation test properly (see Session 20). M2 paused by user. iOS1 finish is user-run. DOMAIN-RECORD-ZERO awaits a product-intent answer.
+**Next tasks:** None queued — FQ-ALGO-9 is closed and live-validated (see Session 21). M2 paused by user. iOS1 finish is user-run. DOMAIN-RECORD-ZERO awaits a product-intent answer.
+
+## SESSION 21 — FQ-ALGO-9 live-validated: 5/5 cycles, both repos, fix holds (2026-06-20)
+
+Codex re-ran the exact Space-at-reveal reproduction from `CODEX_PROMPT_15` against the live fix (PHASE2 `a5906a7` / PHASE1 `4ea0a13`): `postAdvanceNewCardSelectCount: 0` every cycle, in both repos. FSRS 17/17, smoke 6/6. The observed timing gap between the advance and the now-blocked stale `selectSolo` call was ~3-4ms, well inside the 50ms guard's margin.
+
+**Closed for the reproduced symptom. Explicitly not closed:** the underlying `stopImmediatePropagation` shim is unchanged (Codex's own framing, agreed with in full) — it remains the real architectural instability, this fix guards the one consumer that was confirmed broken, not the mechanism that lets future consumers break the same way. Logged as an accepted, deliberate trade-off, not an oversight.
+
+Continue-button flag question (FQ-ALGO-8): Codex's latest test is consistent with the flag working ('good' result with pending/lastRated cleared) but still not a clean proof (the forced setup double-rated the card). Left open, low priority.
+
+---
 
 ## SESSION 20 — FQ-ALGO-9 fixed: Codex found the exact mechanism, Claude fixed the consumer not the shim (2026-06-20)
 
