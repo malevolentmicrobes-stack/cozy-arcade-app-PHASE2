@@ -7817,6 +7817,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
           btn.onclick = () => {
             const r = btn.dataset.rate;
             if(r === 'continue'){
+              try{ window.__cozyExplicitContinueClick351 = true; }catch(_){}
               if(typeof advance === 'function') advance(which);
               return;
             }
@@ -14435,7 +14436,15 @@ if(typeof priorAdvance==='function' && !priorAdvance.__cozyRatingPath20260603){
     var id=cardIdFor(card);
     var pending=window.__cozyPendingRating20260603;
     if((pending && pending.id===id) || revealOpen){
-      var rating=(pending && pending.id===id && pending.rating) || 'good';
+      var rating=(pending && pending.id===id && pending.rating);
+      if(!rating){
+        if(window.__cozyExplicitContinueClick351){
+          rating='good';
+        } else {
+          try{ rating=(card && typeof ratingForSelection==='function')?ratingForSelection(card, typeof selected==='number'?selected:0):'good'; }catch(_){ rating='good'; }
+        }
+      }
+      window.__cozyExplicitContinueClick351=false;
       try{ if(typeof spacedOn==='undefined' || spacedOn!==false) rateOnce(card,rating); }catch(_){}
     }
     return priorAdvance.apply(this,arguments);
