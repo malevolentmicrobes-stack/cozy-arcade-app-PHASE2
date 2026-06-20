@@ -2,7 +2,30 @@
 **Date:** 2026-06-17 | **Active branch:** PHASE2 main → origin/public (production)
 **SW:** PHASE2 `cozy-arcade-PHASE2-v34` | PHASE1 `cozy-arcade-v70`
 **Last commits (2026-06-19, ~5:00pm):** PHASE2 `7bf4273` (pushed origin/main+public) | PHASE1 `b91cf8f` (pushed origin/main)
-**Next tasks:** Re-test the reveal-panel fix below. CODEX_PROMPT_13 (FQ-ALGO-8 diagnostic — wrong auto-select rated 'good') still queued, unrelated. CODEX_PROMPT_14 (D4-MUTATION) largely superseded by the reveal fix, left open pending re-test. M2 paused by user. iOS1 finish is user-run. DOMAIN-RECORD-ZERO awaits a product-intent answer.
+**Next tasks:** Apply the same contamination fix to the *earliest* reveal writer (base `reveal()`), not just the last one, to remove the residual first-frame flash Codex found. CODEX_PROMPT_13 (FQ-ALGO-8) still queued, unrelated. M2 paused by user. iOS1 finish is user-run. DOMAIN-RECORD-ZERO awaits a product-intent answer.
+
+## SESSION 16 — Claude verified Codex's SRS-validation alarm was a false alarm: wrong test, not a regression (2026-06-19, ~5:30pm)
+
+Codex's Session 15 report flagged `runSRSValidation()` returning 11/17 as a possible scheduler issue. **This was a false alarm — `runSRSValidation()` is not the project's real validation gate.** Claude verified directly:
+- `git log -L` on the function: added in commit `79b75e5` (2026-05-25), commit message literally **"implement window.runSRSValidation — 13 SM-2 assertions"** — written to test the pre-FSRS algorithm, a month before today, unrelated to anything done this session.
+- Its assertions expect ease-factor-multiplication intervals and a dynamic `ease_factor` — neither matches current FSRS behavior (`fsrsNextInterval` is stability-based; `rateCard()` hardcodes `ease_factor: 2.5`). It fails because the algorithm intentionally changed long ago, not because anything broke.
+- The project's actual gate, `runFSRSValidation()`, was extracted and **actually executed** by Claude (macOS JXA, exact current source) — **17/17, empirically confirmed**, not inferred from a diff.
+
+**Your FSRS/scheduling algorithm is fully intact.** Nothing today touched any `fsrs*` function. `OPEN_DIFFERENTIALS.md` SRS-VALIDATION-MISMATCH marked ✗ DISPROVED.
+
+**The other half of Codex's report was real and is the actual next task:** the reveal-panel fix (Session 14) corrects the *settled* state but not the *first frame* — base `reveal()` (the earliest synchronous writer) still paints the uncorrected/contaminated content before `renderRevealSections` corrects it ~20ms later. Mutation count only dropped slightly (55→53 / 57→55) since the other ~16 chain layers are untouched. Not fixed yet — same fallback logic needs applying at the earliest writer, mirroring the lesson from FQ-RENDER-5 (fix ownership at the earliest point, not the last).
+
+## SESSION 15 — Codex post-Claude reveal-fix validation (2026-06-19, later same evening)
+
+Codex reviewed Claude's PHASE2 `7bf4273` / log `c4db2e6` and re-ran the same browser harness against the patched current file. Full report: `CODEX_POST_CLAUDE_REVEAL_FIX_VALIDATION_2026-06-19.md`.
+
+Results:
+- Normal card reveal mutations: 55 before -> 53 after. Content stayed correct.
+- Board-trigger-only contaminated card: stable/readable state is fixed by ~20ms (`board_trigger` displays instead of diagnosis), but the immediate reveal frame still shows the contaminated diagnosis before the deferred writer corrects it. Mutation count: 57 before -> 55 after.
+- `runCozySmokeTests()` passed 6/6.
+- `runSRSValidation()` returned 11/17 — **see Session 16 above: this was a false alarm, wrong function, not a regression.**
+
+Updated differential order after validation: (1) residual first-frame reveal contamination, (2) remaining reveal DOM churn/900ms interval, (3) upstream field alias contamination, (4) cold-cache font swap.
 
 ## SESSION 14 — reveal-panel fix applied: flash + diagnosis-contamination, both addressed at the display layer (2026-06-19, ~5:00pm)
 
