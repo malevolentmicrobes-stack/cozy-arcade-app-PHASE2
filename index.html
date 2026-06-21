@@ -8719,9 +8719,12 @@ Rules:
   function sourceAnswer(c){return first(c&&c.diagnosis,c&&c.answer_choice,c&&c.dx,c&&c.title,c&&c.topic,c&&c.answer,'Unknown');}
   function sourceFull(c){
     c=normalizeSourceCard(c||{},0);
+    const expl=c.explanation, wno=c.why_not_others;
+    const explSplit=clean(wno) && clean(wno)!==clean(expl);
     return [
       ['QID',c.qid_unique||c.qid],
       ['SYSTEM',c.sys||c.system],
+      ['TEST',c.test],
       ['PRESENTATION',sourcePrompt(c)],
       ['EDUCATIONAL OBJECTIVE',c.educational_objective],
       ['BOARD TRIGGER',c.board_trigger],
@@ -8729,9 +8732,11 @@ Rules:
       ['QUICK RECALL',c.quick_recall||c.level_3_recall],
       ['TREATMENT',c.treatment||c.level_3_treatment],
       ['NEXT STEP',c.next_step||c.level_3_next_step],
-      ['EXPLANATION / WHY NOT OTHERS',c.explanation||c.why_not_others],
+      explSplit?['EXPLANATION',expl]:['EXPLANATION / WHY NOT OTHERS',expl||wno],
+      explSplit?['WHY NOT OTHERS',wno]:null,
+      ['CLOZE SOURCE',(c.cloze_enabled&&c.cloze_source_text)?c.cloze_source_text:''],
       ['TAGS',c.tags]
-    ].filter(x=>clean(x[1])).map(x=>x[0]+':\n'+x[1]).join('\n\n');
+    ].filter(Boolean).filter(x=>clean(x[1])).map(x=>x[0]+':\n'+x[1]).join('\n\n');
   }
   function oneThingStableKey351(card, fallback){
     const key=clean(card&&(card.qid_unique||card.card_id||card.id||card.json_id||card.qid||card.diagnosis||card.answer));
