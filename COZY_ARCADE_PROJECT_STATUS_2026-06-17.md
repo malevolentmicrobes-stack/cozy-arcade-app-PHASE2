@@ -1,8 +1,18 @@
 # Cozy Arcade — Project Status
 **Date:** 2026-06-17 | **Active branch:** PHASE2 main → origin/public (production)
-**SW:** PHASE2 `cozy-arcade-PHASE2-v39` | PHASE1 `cozy-arcade-v75`
-**Last commits (2026-06-20):** PHASE2 `a146e46` (pushed origin/main+public) | PHASE1 `32a0f13` (pushed origin/main)
-**Next tasks:** Live-browser-validate the cloze-markup fix and the Full Card completeness fix (see Session 23). Decide whether to backport PHASE2's LEVEL 1/LEVEL 2 removal to PHASE1, or leave the divergence. M2 paused by user. iOS1 finish is user-run. DOMAIN-RECORD-ZERO awaits a product-intent answer.
+**SW:** PHASE2 `cozy-arcade-PHASE2-v40` | PHASE1 `cozy-arcade-v76`
+**Last commits (2026-06-20):** PHASE2 `e5e6f6d` (pushed origin/main+public) | PHASE1 `0ee3bf8` (pushed origin/main)
+**Next tasks:** Live-browser-validate the sparse-card-pollution fix (Session 24), the cloze-markup fix, and the Full Card completeness fix (Session 23) — none confirmed beyond JXA simulation yet. Decide whether to backport PHASE2's LEVEL 1/LEVEL 2 removal to PHASE1. M2 paused by user. iOS1 finish is user-run. DOMAIN-RECORD-ZERO awaits a product-intent answer.
+
+## SESSION 24 — Claude's "the upload path is clean" conclusion was incomplete; Codex's real-browser re-test proved a second live path, fixed (2026-06-20)
+
+Claude had concluded the live JSON-upload path (`importObjectPhase3` → `normalizeCardIdentity` → `setAppCards`) never pollutes sparse cards, based on a full static trace. Codex didn't accept that and retested through the actual Upload button + browser file chooser (not a direct function call) — and found real contamination: a sparse card came back with `educational_objective`/`quick_recall`/`explanation`/`level_4_full_card` all set to the diagnosis text.
+
+Both conclusions turned out to be correct about what they each tested, and incomplete about the whole picture: `importObjectPhase3`'s path genuinely is clean, but a SEPARATE, older `wire()` (~line 8565) independently owns the same 5 upload input IDs and unconditionally calls `normalizeDeck()`→`normalizeLimitlessCard()` on every invocation — and THAT function's `reveal` fallback chain bottoms out at diagnosis. Depending on exact event-listener-ownership timing between the two competing systems (the same class of race as FQ-ALGO-9, now for `change` events instead of `keydown`), either path can be the one that actually handles a real upload.
+
+**Fixed (PHASE2 `e5e6f6d` / PHASE1 `0ee3bf8`):** did not touch the listener race itself — that needs live event-order instrumentation before any fix, same discipline FQ-ALGO-9 required, not a guess. Fixed the data-fabrication bug at its confirmed source instead: added `revealSoft` (the same fallback chain, minus the diagnosis fallback specifically) and re-pointed `educational_objective`/`quick_recall`/`explanation`/`level_4_full`/`level_4_full_card` at it. JXA-verified, 10 scenarios, zero regression on fully-populated cards. Traced 6 more occurrences of the same anti-pattern elsewhere in the file and confirmed none are live for JSON uploads (CSV-only, dead code, or export-only) — left alone. Not live-validated yet.
+
+---
 
 ## SESSION 23 — Codex proposed suppression, user redirected to completeness; caught a self-introduced glitch before shipping it (2026-06-20)
 
