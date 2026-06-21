@@ -1,8 +1,24 @@
 # Cozy Arcade — Project Status
 **Date:** 2026-06-17 | **Active branch:** PHASE2 main → origin/public (production)
-**SW:** PHASE2 `cozy-arcade-PHASE2-v38` | PHASE1 `cozy-arcade-v74`
-**Last commits (2026-06-20):** PHASE2 `a1b9295` (pushed origin/main+public) | PHASE1 `c8e743a` (pushed origin/main)
-**Next tasks:** Live-browser-validate the cloze-markup fix (see Session 22). M2 paused by user. iOS1 finish is user-run. DOMAIN-RECORD-ZERO awaits a product-intent answer.
+**SW:** PHASE2 `cozy-arcade-PHASE2-v39` | PHASE1 `cozy-arcade-v75`
+**Last commits (2026-06-20):** PHASE2 `a146e46` (pushed origin/main+public) | PHASE1 `32a0f13` (pushed origin/main)
+**Next tasks:** Live-browser-validate the cloze-markup fix and the Full Card completeness fix (see Session 23). Decide whether to backport PHASE2's LEVEL 1/LEVEL 2 removal to PHASE1, or leave the divergence. M2 paused by user. iOS1 finish is user-run. DOMAIN-RECORD-ZERO awaits a product-intent answer.
+
+## SESSION 23 — Codex proposed suppression, user redirected to completeness; caught a self-introduced glitch before shipping it (2026-06-20)
+
+Codex live-CDP-re-tested the field-duplication symptom (confirmed real, matches Session 22's finding) and proposed a fix: hide a field when it's "high-overlap" with one already shown. Before implementing anything, flagged a real design risk in that approach — `explanation` often *contains* `educational_objective` verbatim while having far more unique content, so a symmetric similarity check would have hidden genuinely unique case material, not just redundant text. Offered the user several display options (hide / merge / de-emphasize / collapse); user rejected the whole frame and asked instead for a plan that keeps the display similar to today but shows the FULL uploaded JSON, no hiding, no glitches.
+
+Re-grounded in `ULTIMATE_GOALS.md` (the 14-field `canonicalizeCard` allowlist already treats `educational_objective`/`board_trigger`/`explanation`/`why_not_others` as distinct fields) and `GOAL.md` (E8: Full Card's established pattern is a whitelist formatter, not heuristics) before designing anything — confirmed completeness, not suppression, was the right frame.
+
+Verified the actual render target before touching code: `ensureFull()`'s dropdown calls `(window.full||full)(...)`; grepped for every assignment to `window.full` and found exactly one, to `sourceFull` — confirmed this is the real, non-competing live path.
+
+Found `sourceFull()` silently dropped `why_not_others` whenever `explanation` was also present (OR-collapsed into one line). Before adding a "show both" fix, traced `normalizeSourceCard` and found `why_not_others = first(c.why_not_others, explanation)` — meaning a card with only `explanation` in source gets `why_not_others` silently copied from it. A naive "show both when both are non-empty" patch would have printed the same paragraph twice under two headings on every such card — manufacturing a brand-new version of the exact bug this whole session has been about. Added an `explSplit` check instead: only split into two lines when they're genuinely different text.
+
+**Fixed (PHASE2 `a146e46` / PHASE1 `32a0f13`):** `sourceFull()` now shows `TEST`, splits `EXPLANATION`/`WHY NOT OTHERS` only when genuinely distinct, and adds `CLOZE SOURCE` for cloze cards. Reveal screen untouched. JXA-verified across 8 scenarios including the trap case. Not live-validated yet.
+
+**Found and preserved, not silently resolved, while porting to PHASE1:** PHASE1's `sourceFull()` already has `LEVEL 1`/`LEVEL 2` lines PHASE2 doesn't — `GOAL.md`'s E8 fix apparently removed them from PHASE2 only, never ported back to PHASE1. Left them in PHASE1 exactly as they were; flagged the divergence in the commit rather than acting on it either direction.
+
+---
 
 ## SESSION 22 — User reframes the project goal, supplies real conversion files, one real code bug found and fixed (2026-06-20)
 
