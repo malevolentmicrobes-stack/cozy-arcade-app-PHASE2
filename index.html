@@ -8907,7 +8907,11 @@ Rules:
       trigger.innerHTML=(typeof safeBionic==='function'?safeBionic(eduObj):esc(eduObj));
     }
     let board=root.querySelector('.boardTrigger350'); if(!board){board=document.createElement('div'); board.className='boardTrigger350'; trigger.insertAdjacentElement('afterend',board);}
-    board.innerHTML=(typeof safeBionic==='function'?safeBionic(card.board_trigger):esc(card.board_trigger)); board.style.display=clean(card.board_trigger)?'block':'none';
+    const boardSig=String(card.board_trigger||'');
+    if(board.dataset.boardSig!==boardSig){
+      board.dataset.boardSig=boardSig;
+      board.innerHTML=(typeof safeBionic==='function'?safeBionic(card.board_trigger):esc(card.board_trigger)); board.style.display=clean(card.board_trigger)?'block':'none';
+    }
     let one=root.querySelector('.oneThing350'); if(!one){one=document.createElement('div'); one.className='oneThing350'; board.insertAdjacentElement('afterend',one);}
     if(one.querySelector('textarea,.oneThingEdit351')) one.style.display='block';
     else renderOneThingStable351(one,card,false);
