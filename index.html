@@ -5407,11 +5407,11 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 
   function promptFor(c){
     c=c||{};
-    return clean(c.presentation || c.level_1_presentation || c.clinical_vignette_summary || c.prompt || c.front || c.question || c.quick_recall || c.educational_objective || '');
+    return clean(c.presentation || c.clinical_vignette_summary || c.prompt || c.front || c.question || c.quick_recall || c.educational_objective || '');
   }
   function revealFor(c){
     c=c||{};
-    return clean(c.educational_objective || c.answer || c.level_2_three_second_exposure || c.quick_recall || c.explanation || c.board_trigger || c.presentation || '');
+    return clean(c.educational_objective || c.answer || c.quick_recall || c.explanation || c.board_trigger || c.presentation || '');
   }
   function choiceFor(c){
     c=c||{};
@@ -5421,8 +5421,8 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     c=Object.assign({},c||{});
     const p=promptFor(c), a=revealFor(c), d=choiceFor(c) || ('Imported card '+(i+1));
     c.id=c.id || (i+1); c.qid=c.qid || c.original_qid || String(c.id);
-    c.presentation=p; c.prompt=p; c.clinical_vignette_summary=c.clinical_vignette_summary || p; c.level_1_presentation=c.level_1_presentation || p;
-    c.educational_objective=a; c.answer=a; c.level_2_three_second_exposure=c.level_2_three_second_exposure || a; c.quick_recall=c.quick_recall || a;
+    c.presentation=p; c.prompt=p; c.clinical_vignette_summary=c.clinical_vignette_summary || p;
+    c.educational_objective=a; c.answer=a; c.quick_recall=c.quick_recall || a;
     c.diagnosis=d; c.system=c.system || c.sys || c.subject || ''; c.sys=c.sys || c.system;
     if(!Array['isArray'](c.tags)){c.tags=c.tags?String(c.tags).split(/[|;,]/).map(clean).filter(Boolean):[c.system,c.test,d].filter(Boolean);}
     return c;
