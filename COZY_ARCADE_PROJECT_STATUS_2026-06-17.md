@@ -1,8 +1,16 @@
 # Cozy Arcade — Project Status
 **Date:** 2026-06-17 | **Active branch:** PHASE2 main → origin/public (production)
-**SW:** PHASE2 `cozy-arcade-PHASE2-v40` | PHASE1 `cozy-arcade-v76`
-**Last commits (2026-06-20):** PHASE2 `e5e6f6d` (pushed origin/main+public) | PHASE1 `0ee3bf8` (pushed origin/main)
-**Next tasks:** Live-browser-validate the sparse-card-pollution fix (Session 24), the cloze-markup fix, and the Full Card completeness fix (Session 23) — none confirmed beyond JXA simulation yet. Decide whether to backport PHASE2's LEVEL 1/LEVEL 2 removal to PHASE1. M2 paused by user. iOS1 finish is user-run. DOMAIN-RECORD-ZERO awaits a product-intent answer.
+**SW:** PHASE2 `cozy-arcade-PHASE2-v41` (live-confirmed) | PHASE1 `cozy-arcade-v77` (pushed, live deploy still stuck on old build — needs Settings→Pages re-save, same as PHASE2 needed)
+**Last commits (2026-06-22):** PHASE2 `ff98200` (Codex, live-validated v41) | PHASE1 `c054cab` (Claude port, JXA-verified, not yet live-deployed)
+**Next tasks:** Get PHASE1's GitHub Pages unstuck (Settings → Pages → re-save `main`/`/root` — `.nojekyll` + a real push weren't enough alone, same as PHASE2). Live-browser-validate PHASE1's ported fix once deployed. M2 paused by user. iOS1 finish is user-run. DOMAIN-RECORD-ZERO awaits a product-intent answer.
+
+## SESSION 25 — Codex found two real gaps in Claude's own "fixed" sparse-card pollution fix; both corrected, independently re-verified, ported to PHASE1 (2026-06-22)
+
+Codex retested `e5e6f6d` through the real Upload button and found the sparse-card pollution still present. Root cause, in two parts: (1) `normalizeCardFields352()` is a second live mutator (called via `cards.forEach(normalizeCardFields352)`, 3 call sites) that Claude had declared dead code based on a grep pattern (`name(`) that cannot match a bare function reference passed to `.forEach` — independently re-confirmed this was a real search-methodology error, not a disagreement. (2) Claude's own `revealSoft` fix removed the literal `,c.diagnosis` fallback but left `c.back`/`c.answer`/`c.output` in the same chain, and those are themselves diagnosis-equivalent by the time they're read (multiple normalizers default `answer=diagnosis` upstream) — removing the named symptom isn't the same as removing every path to the same value.
+
+Codex fixed both in PHASE2 (`ff98200`), live-browser-validated locally and against the deployed site (FSRS 17/17, smoke 6/6). Independently re-verified their diagnosis and fix directly against source (not just accepted) before porting the identical change to PHASE1 (`c054cab`), JXA-verified. PHASE1's own divergence (`one_thing`'s separate fallback chain) deliberately left untouched — not part of the confirmed bug.
+
+---
 
 ## SESSION 24 — Claude's "the upload path is clean" conclusion was incomplete; Codex's real-browser re-test proved a second live path, fixed (2026-06-20)
 
