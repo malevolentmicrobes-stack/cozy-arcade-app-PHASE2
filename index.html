@@ -7644,16 +7644,14 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       card.sys = fallback || 'UNSPECIFIED';
     }
     card.diagnosis = card.diagnosis || card.answer_choice || card.answer || card.dx || 'Unknown';
-    card.presentation = card.presentation || card.prompt || card.presentation_CLEAN || card.clinical_vignette || card.clinical_vignette_summary || card.level_1 || card.level_1_presentation || '';
+    card.presentation = card.presentation || card.prompt || card.presentation_CLEAN || card.clinical_vignette || card.clinical_vignette_summary || '';
     card.prompt = card.prompt || card.presentation;
     card.clinical_vignette_summary = card.clinical_vignette_summary || card.presentation;
     card.educational_objective = card.educational_objective || card.educational_obj || '';
     card.answer = card.answer || card.diagnosis;
-    card.quick_recall = card.quick_recall || card.level_3_recall || card.level_3_quick_recall || '';
-    card.level_1_presentation = card.level_1_presentation || card.level_1 || card.presentation;
-    card.level_2_three_second_exposure = card.level_2_three_second_exposure || card.level_2 || card.educational_objective || '';
-    card.treatment = card.treatment || card.level_3_treatment || '';
-    card.next_step = card.next_step || card.level_3_next_step || '';
+    card.quick_recall = card.quick_recall || '';
+    card.treatment = card.treatment || '';
+    card.next_step = card.next_step || '';
     return card;
   }
   function normalizeDeckFields352(){
@@ -8685,16 +8683,14 @@ Rules:
     const qid=clean(first(c.qid_unique,c.qid,c.original_qid,c['Card ID*'],c['Card ID'],c.json_id,c.id,id));
     const sys=clean(first(c.sys_norm,c.sys,c.system,c.subject,'Imported'));
     const diagnosis=first(c.diagnosis,c.answer_choice,c.dx,c.title,c.topic,c.answer,'Unknown');
-    const prompt=first(c.prompt,c.presentation_CLEAN,c.presentation_clean,c.presentation,c.front,c.question,c.clinical_vignette,c.clinical_vignette_summary,c.level_1_presentation,c.level_1,c.input);
+    const prompt=first(c.prompt,c.presentation_CLEAN,c.presentation_clean,c.presentation,c.front,c.question,c.clinical_vignette,c.clinical_vignette_summary,c.input);
     const educationalObjective=first(c.educational_objective,c.educational_obj,c.objective);
     const boardTrigger=first(c.board_trigger,c.boardTrigger);
     const oneThing=first(c.one_thing,c.oneThing,c.takeaway,c.personal_takeaway);
-    const explanation=first(c.explanation,c.why_not_others,c.level_4_full_card,c.level_4_full);
-    const level1=first(c.level_1,c.level_1_presentation,c.clinical_vignette_summary,c.clinical_vignette,prompt);
-    const level2=first(c.level_2,c.level_2_three_second_exposure,c.level_2_three_second);
-    const recall=first(c.level_3_recall,c.quick_recall,c.level_3_active_recall,c.level_3_quick_recall);
-    const treatment=first(c.level_3_treatment,c.treatment);
-    const nextStep=first(c.level_3_next_step,c.next_step);
+    const explanation=first(c.explanation,c.why_not_others);
+    const recall=first(c.quick_recall,'');
+    const treatment=first(c.treatment,'');
+    const nextStep=first(c.next_step,'');
     const tags=Array['isArray'](c.tags)?c.tags.join('; '):first(c.tags_export,c.tags,[sys,c.test,diagnosis].filter(Boolean).join('; '));
     Object.assign(c,{
       id, card_id:first(c.card_id,id), cardId:first(c.cardId,id), json_id:first(c.json_id,id),
@@ -8704,18 +8700,17 @@ Rules:
       sys, system:sys, subject:first(c.subject,sys),
       diagnosis, answer:first(c.answer,diagnosis),
       prompt, presentation:first(c.presentation,prompt), presentation_CLEAN:first(c.presentation_CLEAN,prompt),
-      clinical_vignette:first(c.clinical_vignette,c.clinical_vignette_summary,level1), clinical_vignette_summary:first(c.clinical_vignette_summary,level1),
+      clinical_vignette:first(c.clinical_vignette,c.clinical_vignette_summary,''), clinical_vignette_summary:first(c.clinical_vignette_summary,''),
       educational_objective:educationalObjective, educational_obj:educationalObjective,
       board_trigger:boardTrigger, one_thing:oneThing,
       explanation, why_not_others:first(c.why_not_others,explanation),
-      quick_recall:recall, level_3_recall:recall, level_3_quick_recall:first(c.level_3_quick_recall,recall),
-      treatment, level_3_treatment:treatment, next_step:nextStep, level_3_next_step:nextStep,
-      level_4_full:first(c.level_4_full,explanation), level_4_full_card:first(c.level_4_full_card,explanation),
+      quick_recall:recall,
+      treatment, next_step:nextStep,
       tags, image_url:first(c.image_url_export,c.image_url)
     });
     return c;
   }
-  function sourcePrompt(c){return first(c&&c.prompt,c&&c.presentation_CLEAN,c&&c.presentation,c&&c.front,c&&c.question,c&&c.clinical_vignette,c&&c.clinical_vignette_summary,c&&c.level_1_presentation,c&&c.level_1,c&&c.input,c&&c.quick_recall);}
+  function sourcePrompt(c){return first(c&&c.prompt,c&&c.presentation_CLEAN,c&&c.presentation,c&&c.front,c&&c.question,c&&c.clinical_vignette,c&&c.clinical_vignette_summary,c&&c.input,c&&c.quick_recall);}
   function sourceAnswer(c){return first(c&&c.diagnosis,c&&c.answer_choice,c&&c.dx,c&&c.title,c&&c.topic,c&&c.answer,'Unknown');}
   function sourceFull(c){
     c=normalizeSourceCard(c||{},0);
@@ -8729,9 +8724,9 @@ Rules:
       ['EDUCATIONAL OBJECTIVE',c.educational_objective],
       ['BOARD TRIGGER',c.board_trigger],
       ['ONE THING',first(userOneThing(c),c.one_thing)],
-      ['QUICK RECALL',c.quick_recall||c.level_3_recall],
-      ['TREATMENT',c.treatment||c.level_3_treatment],
-      ['NEXT STEP',c.next_step||c.level_3_next_step],
+      ['QUICK RECALL',c.quick_recall],
+      ['TREATMENT',c.treatment],
+      ['NEXT STEP',c.next_step],
       explSplit?['EXPLANATION',expl]:['EXPLANATION / WHY NOT OTHERS',expl||wno],
       explSplit?['WHY NOT OTHERS',wno]:null,
       ['CLOZE SOURCE',(c.cloze_enabled&&c.cloze_source_text)?c.cloze_source_text:''],
