@@ -8396,9 +8396,9 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     const sourceId=clean(first(cardId(c),i+1));
     const qid=clean(first(c.qid_unique,c.qid,c.original_qid,c['Card ID*'],c['Card ID'],c.json_id,c.card_id,c.cardId,sourceId));
     const system=clean(first(c.sys,c.system,c.subject,'Imported'));
-    const presentation=first(c.presentation,c.prompt,c.front,c.question,c.presentation_CLEAN,c.clinical_vignette,c.clinical_vignette_summary,c.level_1,c.level_1_presentation,c.input,'');
-    const clinical=first(c.clinical_vignette,c.clinical_vignette_summary,c.level_1_presentation,c.level_1,presentation,'');
-    const reveal=first(c.back,c.answer,c.educational_objective,c.educational_obj,c.level_2_three_second,c.level_2_three_second_exposure,c.level_3_quick_recall,c.quick_recall,c.board_trigger,c.output,c.diagnosis,'');
+    const presentation=first(c.presentation,c.prompt,c.front,c.question,c.presentation_CLEAN,c.clinical_vignette,c.clinical_vignette_summary,c.input,'');
+    const clinical=first(c.clinical_vignette,c.clinical_vignette_summary,presentation,'');
+    const reveal=first(c.back,c.answer,c.educational_objective,c.educational_obj,c.quick_recall,c.board_trigger,c.output,c.diagnosis,'');
     const quick=first(c.quick_recall,'');
     const tags=Array['isArray'](c.tags)?c.tags.join('; '):clean(first(c.tags,[system,c.test,c.diagnosis].filter(Boolean).join('; ')));
     const cardType=clean(first(c.card_type,c.cardType,c.type,'Imported'));
@@ -8412,12 +8412,11 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       diagnosis:first(c.diagnosis,c.title,c.topic,c.answer_choice,c.dx,reveal,'Unknown'),
       tags, prompt:first(c.prompt,c.front,presentation,''), one_thing:first(c.one_thing,c.oneThing,c.takeaway,c.personal_takeaway,''),
       presentation, clinical_vignette:clinical, clinical_vignette_summary:first(c.clinical_vignette_summary,clinical,''),
-      level_3_recall:first(c.level_3_recall,c.level_3_quick_recall,c.quick_recall,''), level_3_quick_recall:first(c.level_3_quick_recall,c.level_3_recall,c.quick_recall,''), quick_recall:quick,
-      level_3_treatment:first(c.level_3_treatment,c.treatment,''), treatment:first(c.treatment,c.level_3_treatment,''),
-      level_3_next_step:first(c.level_3_next_step,c.next_step,''), next_step:first(c.next_step,c.level_3_next_step,''),
-      level_4_full:first(c.level_4_full,c.level_4_full_card,c.explanation,''), level_4_full_card:first(c.level_4_full_card,c.level_4_full,c.explanation,''),
+      quick_recall:quick,
+      treatment:first(c.treatment,''),
+      next_step:first(c.next_step,''),
       educational_obj:first(c.educational_obj,c.educational_objective,''), educational_objective:first(c.educational_objective,c.educational_obj,''),
-      answer:first(c.answer,c.educational_objective,reveal,c.diagnosis,''), explanation:first(c.explanation,c.level_4_full_card,''),
+      answer:first(c.answer,c.educational_objective,reveal,c.diagnosis,''), explanation:first(c.explanation,''),
       cloze_source:first(c.cloze_source,c.cloze_source_text,''), cloze_source_text:first(c.cloze_source_text,c.cloze_source,'')
     });
     return c;
