@@ -118,7 +118,13 @@ iOS1 scaffold is done — remaining iOS steps (`npx cap add ios` → `npx cap sy
 | DOMAIN-BIONIC (window.bionic\|\|bionic) in domain render | ✅ source-confirmed | f345dda |
 | STATE-B deck restore (atlas sysmap → canonical deck key) | ✅ fixed | 98b5254 |
 
-### Current Task: none queued (2026-06-20) — sparse-card pollution fix applied, not yet live-validated
+### Current Task: REVEAL-TRIGGER-CHURN consolidation (2026-06-22) — not started, now top-ranked by live evidence
+
+level_N legacy-field removal is now complete and live-validated across all 3 confirmed-live normalizers (`normalizeCardFields352`, `normalizeSourceCard`, `normalizeLimitlessCard`) in both repos — PHASE2 `b76b782`, PHASE1 `6eaec1e`, live at PHASE2 v44. Export confirmed clean by Codex across multiple passes.
+
+Codex's live retest now ranks the reveal duplicate-trigger rendering/DOM churn as the top remaining visible glitch (54 mutations, board trigger shown twice on a board-trigger-only card) — this is the already-documented `REVEAL-TRIGGER-CHURN` from 2026-06-19 (`ensureBoard()` ~6746 and `renderRevealSections()` ~8896 both independently write to `.boardTrigger350`, different idempotency keys, no single owner). Not started tonight — deliberately deferred, same reasoning as the original 2026-06-19 deferral. Next session's natural starting point if the user wants to continue.
+
+### Prior Task: none queued (2026-06-20) — sparse-card pollution fix applied, not yet live-validated
 
 Codex retested the field-duplication finding through the ACTUAL Upload button + browser file chooser (not direct function injection) and proved Claude's prior "the JSON-upload path is clean" conclusion was incomplete: a sparse card (`diagnosis` only) came back with `educational_objective`/`quick_recall`/`explanation`/`level_4_full_card` all set to the diagnosis text. Claude's trace of `importObjectPhase3` → `normalizeCardIdentity` was correct as far as it went — that specific path genuinely never touches those fields — but a SEPARATE, older `wire()` (~line 8565) also owns the same 5 upload input IDs and unconditionally calls `normalizeDeck()` (~8445) → `normalizeLimitlessCard` (~8396) on every invocation, which DOES fall back to diagnosis. Depending on exact event-listener-ownership timing (same class of race as FQ-ALGO-9, now for `change` events), either path can be the one that actually processes a real upload.
 
