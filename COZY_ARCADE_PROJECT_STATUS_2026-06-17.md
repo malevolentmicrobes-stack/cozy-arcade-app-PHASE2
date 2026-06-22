@@ -366,3 +366,9 @@ Root cause: System 2 and System 3 always start together (~same duration), expire
 7. selectSolo chain = 11 layers — do NOT add layer 12
 8. Codex prompts: under 80 lines, no CDP infra, no safaridriver gate
 9. Always `cd /path/to/repo && git add` in single Bash call — shell has no directory persistence
+
+---
+
+## SESSION UPDATE — 2026-06-22
+
+Sparse-card diagnosis pollution was still present in live-browser real-upload testing after the prior `e5e6f6d` fix. Codex confirmed two live source mutators, not one: `normalizeLimitlessCard()` still used `back`/`answer`/`output` as soft learning-field fallbacks, and `normalizeCardFields352()` copied `answer` into `educational_objective`, `quick_recall`, and `level_2_three_second_exposure` after upload. PHASE2 now preserves optional learning fields only when explicitly supplied; diagnosis/answer/output remain valid answer fields. SW bumped to v41. Local real Upload button validation passed: sparse card optional fields stay empty, TEST_106 explicit fields remain present.
