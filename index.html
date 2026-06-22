@@ -7647,7 +7647,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     card.presentation = card.presentation || card.prompt || card.presentation_CLEAN || card.clinical_vignette || card.clinical_vignette_summary || card.level_1 || card.level_1_presentation || '';
     card.prompt = card.prompt || card.presentation;
     card.clinical_vignette_summary = card.clinical_vignette_summary || card.presentation;
-    card.educational_objective = card.educational_objective || card.educational_obj || card.reveal || card.level_2 || card.level_2_three_second_exposure || '';
+    card.educational_objective = card.educational_objective || card.educational_obj || '';
     card.answer = card.answer || card.diagnosis;
     card.quick_recall = card.quick_recall || card.level_3_recall || card.level_3_quick_recall || '';
     card.level_1_presentation = card.level_1_presentation || card.level_1 || card.presentation;
@@ -8401,7 +8401,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     const presentation=first(c.presentation,c.prompt,c.front,c.question,c.presentation_CLEAN,c.clinical_vignette,c.clinical_vignette_summary,c.level_1,c.level_1_presentation,c.input,'');
     const clinical=first(c.clinical_vignette,c.clinical_vignette_summary,c.level_1_presentation,c.level_1,presentation,'');
     const reveal=first(c.back,c.answer,c.educational_objective,c.educational_obj,c.level_2_three_second,c.level_2_three_second_exposure,c.level_3_quick_recall,c.quick_recall,c.board_trigger,c.output,c.diagnosis,'');
-    const quick=first(c.quick_recall,c.level_3_quick_recall,c.level_3_recall,'');
+    const quick=first(c.quick_recall,'');
     const tags=Array['isArray'](c.tags)?c.tags.join('; '):clean(first(c.tags,[system,c.test,c.diagnosis].filter(Boolean).join('; ')));
     const cardType=clean(first(c.card_type,c.cardType,c.type,'Imported'));
     const source=clean(first(c.source,c.source_file,c.source_sheet,c.bundle_namespace,'Imported deck'));
