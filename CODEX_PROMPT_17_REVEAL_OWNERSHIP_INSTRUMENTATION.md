@@ -37,6 +37,30 @@ right lines. Findings, to confirm or refute live:
    the file (~415, 527, 1620, 1858, 2769, 4064, 5484) — per the existing
    `AGENTS.md` "reveal() Chain" table, all but the last 4 (7125→8913→9380→9718)
    are believed dead. Re-confirm this is still true, don't assume.
+5. **`reveal('solo',ok)` is scheduled via `setTimeout(...,650)` from at least 3
+   separate call sites** (~407, ~873, ~4104), each inside a different historical
+   `selectSolo` wrapper layer, each computing its own `ok` independently at the
+   moment ITS layer ran. If more than one of these layers is actually live
+   (matching the documented 11-layer `selectSolo` chain) and they don't resolve
+   in lockstep, the later-firing `reveal()` call would overwrite the title with
+   whatever `ok` it computed — a direct hypothesis for the "Gate Completed" →
+   "Learning Moment" flip with no new user action. Verify how many of these 3
+   sites actually fire per click, and whether their `ok` values ever disagree.
+6. **Resolved without live testing:** the "duplicate board trigger" visible
+   text is explained by the existing, already-accepted `board_trigger` →
+   `educational_objective` fallback (`renderRevealSections` line ~8902: when
+   `educational_objective` is empty or equals `diagnosis`, the `#soloTrigger`
+   box — labeled "EDUCATIONAL OBJECTIVE" — shows `board_trigger`'s content too,
+   on top of `.boardTrigger350`'s own separate "BOARD TRIGGER" box showing the
+   same text). This is by design for decks with empty `educational_objective`,
+   not a new glitch — don't spend live-test time re-confirming this one.
+
+**Already fixed without live testing (low-risk, self-contained, JXA-verified):**
+added an idempotency guard to `renderRevealSections()`'s board-trigger write
+(PHASE2 `fee324a` / PHASE1 `ddf3d72`), mirroring the trigger/dx write's existing
+`revealSectionsSig` pattern — it was unconditionally rewriting `.boardTrigger350`
+every 900ms tick. This should reduce but not eliminate the measured mutation
+counts; re-measure rather than assume it's fully resolved.
 
 ## Live instrumentation (real browser, real UI controls)
 
