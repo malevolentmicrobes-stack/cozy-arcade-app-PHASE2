@@ -121,6 +121,7 @@
 |----|--------|------------|-------------|
 | 404-ASSET | ⬛ BY DESIGN | 2026-06-18 browser | 404 is only /favicon.ico — non-blocking, no PWA install impact. |
 | D5-SW | ✅ ongoing | 2026-06-16 | SW cache stale if CACHE string not bumped. Managed: bump on every code-change commit. |
+| PAGES-JEKYLL-PHASE2 | ✅ fixed 2026-06-22 | GitHub Actions screenshots + public API: PHASE2 built-in Pages runs #83-#93 failed at `Build with Jekyll`; live site stayed on SW v37 despite `main`/`public` containing v40+ fixes. | Root cause class: branch-based GitHub Pages was running Jekyll over a single-file static app repo with many markdown/source artifacts, including Liquid-looking medical/cloze text. Added root `.nojekyll` so Pages serves static files directly. Removed the unpushed custom Pages workflow from the final tree to avoid introducing a second deployment path while Pages is still configured for branch deploy. |
 
 ---
 
