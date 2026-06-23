@@ -1,8 +1,19 @@
 # Cozy Arcade — Project Status
 **Date:** 2026-06-17 | **Active branch:** PHASE2 main → origin/public (production)
-**SW:** PHASE2 `cozy-arcade-PHASE2-v41` (live-confirmed) | PHASE1 `cozy-arcade-v77` (pushed, live deploy still stuck on old build — needs Settings→Pages re-save, same as PHASE2 needed)
-**Last commits (2026-06-22):** PHASE2 `ff98200` (Codex, live-validated v41) | PHASE1 `c054cab` (Claude port, JXA-verified, not yet live-deployed)
-**Next tasks:** Get PHASE1's GitHub Pages unstuck (Settings → Pages → re-save `main`/`/root` — `.nojekyll` + a real push weren't enough alone, same as PHASE2). Live-browser-validate PHASE1's ported fix once deployed. M2 paused by user. iOS1 finish is user-run. DOMAIN-RECORD-ZERO awaits a product-intent answer.
+**SW:** PHASE2 `cozy-arcade-PHASE2-v47` (committed, partially pushed — see below) | PHASE1 `cozy-arcade-v83` (committed locally, push not yet attempted successfully)
+**Last commits (2026-06-23):** PHASE2 `12ef6fb` on `main` (pushed); `public` still at `1ac4cd4` (one commit behind, force-push failed) | PHASE1 `1b8e9f4` on `main` (local only, never successfully pushed)
+**BLOCKED on git auth right now** — push started failing mid-session ("Invalid username or token", then "could not read Username... Device not configured"). User is refreshing the credential. **Next action the moment it's fixed:** `git push origin main:public --force` in PHASE2, `git push origin main` in PHASE1, then verify both live via `curl .../sw.js | grep CACHE`.
+**Next tasks after deploy is unblocked:** Live-browser-validate today's two fixes (wrappedAdvance reveal-clear, homeTopBtn CSS kill-rule) against Codex's exact repro. Continue REVEAL-TRIGGER-CHURN consolidation per `CODEX_PROMPT_17`. M2 paused by user. iOS1 finish is user-run. DOMAIN-RECORD-ZERO awaits a product-intent answer.
+
+## SESSION 26 — Two narrow reveal/UI fixes from Codex's live feedback; git push broke mid-session (2026-06-23)
+
+Codex's live test (real Upload → Start Solo → answer → Space) confirmed a genuine correctness bug, not just DOM churn: after advancing, `#soloRevealDx` still showed the PREVIOUS card's diagnosis while `#soloTrigger`/`.boardTrigger350` had already updated to the new card. Pre-mortem before fixing, per Codex's own explicit instruction not to add another wrapper: the deeper recommended fix (reveal() capturing the answered-card identity explicitly) would require touching `selectSolo`'s own ~11-layer chain plus a brand-new cross-script global flag — exactly the anti-pattern just warned against, and 3 functions instead of 1. Didn't do it.
+
+Fixed the safer, self-contained option instead: `wrappedAdvance` (the confirmed single convergence point for every `advance()` call) now explicitly clears and hides the reveal panel — wiping `dx`/`trigger`/`.boardTrigger350` text and their idempotency-guard dataset keys — right after the rating logic captures the outgoing card's state and right before the next card renders. Makes stale cross-card content structurally impossible regardless of which upstream writer would otherwise leave it stale. Also fixed the homeTopBtn CSS cascade bug Codex's screenshot cross-check confirmed live (inline `style="display:none"`, computed `display:grid`, a real clickable 52x52 box) by adding one final, unambiguous kill-rule at the absolute end of the file rather than untangling the existing `!important` cascade conflict.
+
+Both fixes committed to both repos. Mid-push, git auth broke (PHASE2 `main` got out before it failed; `public` and all of PHASE1's push did not). Genuinely external — not a code issue, not something to work around by force; waiting on the user to refresh the credential.
+
+---
 
 ## SESSION 25 — Codex found two real gaps in Claude's own "fixed" sparse-card pollution fix; both corrected, independently re-verified, ported to PHASE1 (2026-06-22)
 

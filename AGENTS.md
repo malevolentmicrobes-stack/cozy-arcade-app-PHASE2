@@ -118,7 +118,18 @@ iOS1 scaffold is done — remaining iOS steps (`npx cap add ios` → `npx cap sy
 | DOMAIN-BIONIC (window.bionic\|\|bionic) in domain render | ✅ source-confirmed | f345dda |
 | STATE-B deck restore (atlas sysmap → canonical deck key) | ✅ fixed | 98b5254 |
 
-### Current Task: REVEAL-TRIGGER-CHURN consolidation (2026-06-22) — not started, now top-ranked by live evidence
+### Current Task: deploy blocked on git auth (2026-06-23) — code is fixed and committed, just not pushed everywhere yet
+
+**Git push is currently broken with an auth error** ("Invalid username or token" then "could not read Username... Device not configured") — confirmed by BOTH Claude's and Codex's independent push attempts (including Codex's "escalation" retry), all hitting the identical error. This rules out a sandbox-specific issue — the credential itself is genuinely invalid at the account level. User is refreshing it; do not keep retrying the push blindly in the meantime. Status as of right now:
+- PHASE2 `main`: 2 commits ahead of `origin/main` (`915df4d` docs, `1dc3983` Codex's CSS specificity correction).
+- PHASE2 `public` (what Pages actually serves): further behind, still at `1ac4cd4` — needs `git push origin main:public --force` once auth works.
+- PHASE1 `main`: 2 commits ahead of `origin/main` (`1b8e9f4`, `8465ee9`) — push never succeeded once.
+**Codex independently caught and corrected a real bug in Claude's first CSS fix** (the home-button kill-rule) — see `OPEN_DIFFERENTIALS.md` `HOME-BUTTON-CSS-CASCADE` for the full specificity explanation. Verified correct via direct specificity calculation before accepting it.
+**First thing once auth is restored:** `git push origin main` (PHASE2) → `git push origin main:public --force` (PHASE2) → `git push origin main` (PHASE1) → verify both live via the SW-version curl check before doing anything else.
+
+Two fixes landed today (committed, partially pushed — see above): (1) Codex's live test confirmed actual stale cross-card reveal content (not just churn) after Space-advance — `wrappedAdvance` now explicitly clears/hides the reveal panel (dx/trigger/board text + their idempotency dataset keys) right before the next card renders. Did NOT attempt Codex's other suggestion (reveal() capturing the answered-card identity explicitly) — that needs touching `selectSolo`'s own ~11-layer chain plus a new cross-script global, which is the exact "add another wrapper" anti-pattern Codex's feedback warned against; deferred to live instrumentation (`CODEX_PROMPT_17`). (2) Fixed the homeTopBtn CSS cascade bug Codex's screenshot cross-check confirmed live (inline `display:none`, computed `display:grid`, a real clickable box) — added one final, unambiguous `!important` kill-rule at the absolute end of the file rather than untangling the existing cascade conflict. Neither fix is live-browser-validated yet.
+
+### Prior Task: REVEAL-TRIGGER-CHURN consolidation (2026-06-22) — not started, now top-ranked by live evidence
 
 level_N legacy-field removal is complete across **4** confirmed-live sites now (not 3): `normalizeCardFields352`, `normalizeSourceCard`, `normalizeLimitlessCard`, and a 4th found by Codex's sparse-v3-fixture retest — the `v1751528-final-js` script block's `revealFor`/`promptFor`/`normalizeCard` trio (self-labeled "Authoritative mapping... LOCKED," overwrites `window.getPrompt`/`getRevealText`/`makeChoices`/`nextCard`). PHASE2 `ffdd76e`, PHASE1 `2cc1a35`. JXA-verified against board-trigger-only/empty/full fixtures. **Do not say "fully gone" without "for the fixtures tested" — Codex correctly challenged that framing once already; assume there could be a 5th site until proven otherwise by a fresh fixture sweep, not by re-asserting confidence.**
 
