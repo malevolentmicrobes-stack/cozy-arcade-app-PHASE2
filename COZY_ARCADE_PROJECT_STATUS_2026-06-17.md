@@ -2,6 +2,7 @@
 **Date:** 2026-06-17 | **Active branch:** PHASE2 main → origin/public (production)
 **SW:** PHASE2 `cozy-arcade-PHASE2-v47` (committed, partially pushed — see below) | PHASE1 `cozy-arcade-v83` (committed locally, push not yet attempted successfully)
 **Last commits (2026-06-23):** PHASE2 `12ef6fb` on `main` (pushed); `public` still at `1ac4cd4` (one commit behind, force-push failed) | PHASE1 `1b8e9f4` on `main` (local only, never successfully pushed)
+**PUSH FIX FOUND 2026-06-23: use GitHub Desktop "Push origin" button, not CLI.** CLI git push broken (bad token, account-level, confirmed by 2 separate agents). GitHub Desktop screenshots show its OWN working auth + "2 commits waiting" + push button. Click it, both repos. Do NOT touch bare /Users/rebekahbetar/Documents/GitHub/cozy-arcade dir (different repo, user said stop).
 **BLOCKED on git auth right now** — push started failing mid-session ("Invalid username or token", then "could not read Username... Device not configured"). User is refreshing the credential. **Next action the moment it's fixed:** `git push origin main:public --force` in PHASE2, `git push origin main` in PHASE1, then verify both live via `curl .../sw.js | grep CACHE`.
 **Next tasks after deploy is unblocked:** Live-browser-validate today's two fixes (wrappedAdvance reveal-clear, homeTopBtn CSS kill-rule) against Codex's exact repro. Continue REVEAL-TRIGGER-CHURN consolidation per `CODEX_PROMPT_17`. M2 paused by user. iOS1 finish is user-run. DOMAIN-RECORD-ZERO awaits a product-intent answer.
 
