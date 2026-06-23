@@ -120,11 +120,12 @@ iOS1 scaffold is done — remaining iOS steps (`npx cap add ios` → `npx cap sy
 
 ### Current Task: deploy blocked on git auth (2026-06-23) — code is fixed and committed, just not pushed everywhere yet
 
-**Git push is currently broken with an auth error** ("Invalid username or token" then "could not read Username... Device not configured") — looks like a token/keychain credential expired mid-session. User is refreshing it. Status as of right now:
-- PHASE2 `main`: pushed, has commit `12ef6fb` (today's two fixes below).
-- PHASE2 `public` (what Pages actually serves): STILL ONE COMMIT BEHIND at `1ac4cd4` — the force-push failed, needs a retry the moment auth is back.
-- PHASE1 `main`: commit `1b8e9f4` exists LOCALLY only, push never attempted successfully — needs a fresh push once auth works.
-**First thing next session/after auth is restored: `git push origin main:public --force` in PHASE2, then `git push origin main` in PHASE1, then verify both live via the SW-version curl check before doing anything else.**
+**Git push is currently broken with an auth error** ("Invalid username or token" then "could not read Username... Device not configured") — confirmed by BOTH Claude's and Codex's independent push attempts (including Codex's "escalation" retry), all hitting the identical error. This rules out a sandbox-specific issue — the credential itself is genuinely invalid at the account level. User is refreshing it; do not keep retrying the push blindly in the meantime. Status as of right now:
+- PHASE2 `main`: 2 commits ahead of `origin/main` (`915df4d` docs, `1dc3983` Codex's CSS specificity correction).
+- PHASE2 `public` (what Pages actually serves): further behind, still at `1ac4cd4` — needs `git push origin main:public --force` once auth works.
+- PHASE1 `main`: 2 commits ahead of `origin/main` (`1b8e9f4`, `8465ee9`) — push never succeeded once.
+**Codex independently caught and corrected a real bug in Claude's first CSS fix** (the home-button kill-rule) — see `OPEN_DIFFERENTIALS.md` `HOME-BUTTON-CSS-CASCADE` for the full specificity explanation. Verified correct via direct specificity calculation before accepting it.
+**First thing once auth is restored:** `git push origin main` (PHASE2) → `git push origin main:public --force` (PHASE2) → `git push origin main` (PHASE1) → verify both live via the SW-version curl check before doing anything else.
 
 Two fixes landed today (committed, partially pushed — see above): (1) Codex's live test confirmed actual stale cross-card reveal content (not just churn) after Space-advance — `wrappedAdvance` now explicitly clears/hides the reveal panel (dx/trigger/board text + their idempotency dataset keys) right before the next card renders. Did NOT attempt Codex's other suggestion (reveal() capturing the answered-card identity explicitly) — that needs touching `selectSolo`'s own ~11-layer chain plus a new cross-script global, which is the exact "add another wrapper" anti-pattern Codex's feedback warned against; deferred to live instrumentation (`CODEX_PROMPT_17`). (2) Fixed the homeTopBtn CSS cascade bug Codex's screenshot cross-check confirmed live (inline `display:none`, computed `display:grid`, a real clickable box) — added one final, unambiguous `!important` kill-rule at the absolute end of the file rather than untangling the existing cascade conflict. Neither fix is live-browser-validated yet.
 
