@@ -120,7 +120,11 @@ iOS1 scaffold is done — remaining iOS steps (`npx cap add ios` → `npx cap sy
 | DOMAIN-BIONIC (window.bionic\|\|bionic) in domain render | ✅ source-confirmed | f345dda |
 | STATE-B deck restore (atlas sysmap → canonical deck key) | ✅ fixed | 98b5254 |
 
-### Current Task: HUD-ICON-BLANK / OLD-SETTINGS-LEAK (a)+(b) fixed in both repos, browser-validated by user (2026-06-24)
+### Current Task: card flashing reconfirmed after HUD fix — ruled out as related, live instrumentation is next (2026-06-24)
+
+User reconfirmed visible card flashing after the HUD-ICON-BLANK/OLD-SETTINGS-LEAK fix below landed. That fix touched only `.hudIconButton371::before` and `#gearBtn` CSS — confirmed unrelated, do not credit it with fixing flashing. This belongs to the existing D4-MUTATION/REVEAL-TRIGGER-CHURN/REVEAL-FIRST-FRAME family (still open/mitigated, never fully consolidated — see `OPEN_DIFFERENTIALS.md`). Per the project's own rule (matching outcome depends on runtime event order across multiple independently-installed writers → needs live instrumentation, no static guess), expanded `CODEX_PROMPT_17` same day: its `MutationObserver` now also watches `#soloQuestion`/`#choiceRow`/`.promptBox` (the live question card, not just `#soloReveal`) and logs target selector + old/new text + call stack per mutation, run against a real uploaded deck on an iPhone-size viewport. **Not yet run.** Goal: find the first writer that mutates content after paint, then consolidate to one idempotent owner or suppress post-settle writes — no new wrapper layer.
+
+### Prior Task: HUD-ICON-BLANK / OLD-SETTINGS-LEAK (a)+(b) fixed in both repos, browser-validated by user (2026-06-24)
 
 Added unconditional (outside any media query) versions of the icon-paint rule and the in-game `#gearBtn` hide rule, in both repos. PHASE2 `b571eb3`, PHASE1 `80cf287` (sw v49→v50, v85→v86). User browser-validated desktop, short-landscape, and iPhone breakpoints in both repos: icons paint, exactly one settings control visible. One combined commit per repo, not split — user's explicit call, since both rules were validated together as one HUD-ownership fix, not two independent ones. **Not touched, still open:** PHASE2's HUD settings button still renders offscreen on iPhone (`rect x=-27, w=34`, re-confirmed in this same retest); PHASE1's unconditional `vHUD-polish-2` home-button-hide block. Full status in `OPEN_DIFFERENTIALS.md`'s row.
 

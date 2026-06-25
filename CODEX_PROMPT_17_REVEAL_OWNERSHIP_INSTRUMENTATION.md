@@ -3,6 +3,18 @@
 **Diagnostic only. Do not fix anything until the report comes back. Fix only the
 first confirmed writer conflict — do not patch all reveal functions blindly.**
 
+**Update 2026-06-24 (later same day) — user reconfirmed visible card flashing
+AFTER today's unrelated HUD fix (`b571eb3`/`80cf287`, icon-paint + gearBtn-hide
+only). That fix is confirmed NOT the cause — this is the same
+REVEAL-TRIGGER-CHURN/D4-MUTATION family, still open. Per the user's direct
+ask, the observer below now also watches `#soloQuestion`/`#choiceRow`/
+`.promptBox` (the live question card, not just the reveal panel) since the
+flashing symptom was never confirmed to be reveal-panel-only, and now logs
+target selector + old/new text + call stack per mutation, not just a count.
+Goal unchanged: find the first writer that mutates content after paint, then
+consolidate to one idempotent owner or suppress post-settle writes. Do not
+add another wrapper layer to do this.**
+
 **Update 2026-06-24 (full retest against `main` 2ff95d2/v49, supersedes the older
 v46/`fee324a` framing below):** duplicate board-trigger rendering and the "Gate
 Completed"→"Learning Moment" title flip did NOT reproduce on a normal card this
@@ -102,8 +114,18 @@ Inject before any user action:
       return orig.apply(this, args);
     };
   });
-new MutationObserver(muts => console.log('[MUT]', performance.now(), muts.length))
-  .observe(document.getElementById('soloReveal'), {childList:true, subtree:true, characterData:true});
+['#soloReveal','#soloQuestion','#choiceRow','.promptBox','.boardTrigger350','.oneThing350']
+  .forEach(sel => {
+    const el = document.querySelector(sel);
+    if (!el) return;
+    new MutationObserver(muts => muts.forEach(m => console.log('[MUT]', performance.now(), sel, {
+      type: m.type,
+      target: m.target.nodeName + (m.target.className ? '.' + m.target.className : ''),
+      oldText: (m.oldValue || '').slice(0, 60),
+      newText: (m.target.textContent || '').slice(0, 60),
+      stack: new Error().stack.split('\n').slice(1, 4).join(' | ')
+    }))).observe(el, {childList: true, subtree: true, characterData: true, characterDataOldValue: true});
+  });
 ```
 
 Then run exactly this flow once, logging every `[INSTR]`/`[MUT]` line with
@@ -123,3 +145,12 @@ function still wrote new dx/trigger/board/oneThing/ratings text (proves the
 hidden-but-still-mutating finding from 2026-06-24), and any entry where
 `currentDefined` is false (proves `window.current` is absent rather than just
 disagreeing).
+
+**Run the flow on an iPhone-size viewport with a real uploaded deck** (matches
+the user's exact repro conditions for the flashing report). State explicitly:
+the first `[MUT]` entry that fires after the user's last input with no
+further input in between (the candidate root cause of visible flashing), and
+whether it targets the reveal panel, the live question card, or both. End
+with one of: (a) one specific writer to make idempotent or remove, or (b) "no
+single writer found, needs another pass" — do not guess past what the log
+shows.
