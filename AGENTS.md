@@ -120,7 +120,19 @@ iOS1 scaffold is done — remaining iOS steps (`npx cap add ios` → `npx cap sy
 | DOMAIN-BIONIC (window.bionic\|\|bionic) in domain render | ✅ source-confirmed | f345dda |
 | STATE-B deck restore (atlas sysmap → canonical deck key) | ✅ fixed | 98b5254 |
 
-### Current Task: PHASE2 browser retest at v49 (`main` 2ff95d2) confirms most prior fixes live; reveal ownership instrumentation is next (2026-06-24)
+### Current Task: HUD-ICON-BLANK / OLD-SETTINGS-LEAK found and source-verified, fix not yet applied (2026-06-24)
+
+User reviewed the prior retest writeup and gave explicit sign-off + a new finding. **Accepted, don't reopen without new evidence:** runner click interception, PHASE2 homeTopBtn CSS cascade, Space-advance stale-visible-reveal — all closed in `OPEN_DIFFERENTIALS.md`. **Confirmed correct priority call:** REVEAL-TRIGGER-CHURN stays top priority as a real bug, not cosmetic.
+
+**New item, explicitly NOT to be bundled under the closed homeTopBtn task** (same HUD-shell breakpoint neighborhood, different root cause): `HUD-ICON-BLANK` (in-game icon buttons render blank — screenshot "Undo" text is the native title-attribute tooltip, not app text) + `OLD-SETTINGS-LEAK` (legacy `#gearBtn` floating circle can render alongside the newer in-HUD settings button). Claude source-verified every line number from the writeup before logging — all checked out or were corrected to the actual line:
+- `.hudIconButton371::before` (PHASE2 `:12500`, PHASE1 `:12486`) is the only icon-paint rule in either file, and it's confined inside `@media (max-width:900px), (orientation:landscape) and (max-height:560px)` — no base/unconditional rule exists. That's the actual reason the icon is blank outside that one breakpoint, not just "doesn't apply at this breakpoint" as originally phrased.
+- The `body.cozyGameShellActive371 #gearBtn` hide rule (PHASE2 `:12506-12508`, PHASE1 `:12492`) is gated inside the *same* media query — so on normal desktop-width portrait, `#gearBtn` never hides during gameplay, coexisting with the new HUD settings proxy (`:12989`).
+- `window.undoReview` (PHASE2 `:13403`, PHASE1 `:13300`) is unrelated to either bug — confirmed not implicated.
+Full writeup with both recommended fixes (icon rule needs to move/duplicate outside the media gate; settings ownership needs a product-intent pick between `#gearBtn` and the HUD proxy) is in `OPEN_DIFFERENTIALS.md`'s `HUD-ICON-BLANK / OLD-SETTINGS-LEAK` row. **Not yet fixed — analysis only.**
+
+**Pages deploy status (2026-06-24):** PHASE2 switched its Pages source from `public` to `main` (the `public` branch split had no privacy/curation purpose — confirmed both repos are public on GitHub regardless, and `public`'s file tree was just a lagging mirror of `main`). Confirmed live at v49. The `git push origin main:public --force` step is retired for PHASE2 — don't include it in future deploy instructions. **PHASE1 is still stuck on `cozy-arcade-v65`** (local `main` is at `v85`) despite `.nojekyll` being present and one Pages-settings re-save attempt — a same-value re-save (`main`→`main`) likely didn't register as a change. Next step: toggle source to "None" (or another branch), save, wait, switch back to `main`, save — a genuine value change, not yet tried.
+
+### Prior Task: PHASE2 browser retest at v49 (`main` 2ff95d2) confirms most prior fixes live; reveal ownership instrumentation is next (2026-06-24)
 
 Codex ran a full local Chrome retest (real Upload → Solo → reveal → Space advance, iPhone-sized viewport, Domain mode) against current `main`/v49 — **explicitly not the older v46/`fee324a` handoff below; the auth block described there resolved the same evening (two more commits, `43f6a93`/`2ff95d2`, landed after that entry was written).**
 
