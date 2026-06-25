@@ -8941,7 +8941,7 @@ Rules:
   setTimeout(wire,100);
   setTimeout(wire,600);
   setTimeout(wire,1600);
-  setInterval(()=>{cleanHero(); updateImportButtons(); patchPromptAi(); const active=(!document.getElementById('soloReveal')?.classList.contains('hidden'))?'solo':(!document.getElementById('domainReveal')?.classList.contains('hidden')?'domain':''); if(active) renderRevealSections(active);},900);
+  setInterval(()=>{cleanHero(); updateImportButtons(); patchPromptAi();},900);
 })();
 </script>
 <style id="cozy-public-v18-drawer-css">
@@ -10651,7 +10651,6 @@ function fixStableOneThingDropdown351() {
       if (key) store[key] = expanded ? '1' : '0';
       fixStableOneThingDropdown351();
     }, true);
-    if (document.body) new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true });
   }
 
   document.querySelectorAll('.oneThing350').forEach(el => {
@@ -14660,7 +14659,7 @@ document.addEventListener('keydown',function(ev){
 <style id="cozy-hometopbtn-final-kill-20260623">button#homeTopBtn.homeTopBtn,#homeTopBtn.homeTopBtn,button#homeTopBtn,#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important;pointer-events:none!important;opacity:0!important;width:0!important;height:0!important;min-width:0!important;min-height:0!important;overflow:hidden!important}</style>
 <style id="cozy-runner-tapblock-fix-20260623">#runner.hunter{pointer-events:none!important}</style>
 <style id="vReveal-mobile-budget-20260625">
-/* Mobile portrait: hide promptBox + soloTrack during reveal so ratingBar stays in viewport */
+/* Mobile portrait: hide promptBox + soloTrack during reveal */
 @media (max-width: 900px) {
   .gameMain371:has(#soloReveal:not(.hidden)) > .promptBox,
   .gameMain371:has(#soloReveal:not(.hidden)) > .soloTrack {
@@ -14671,8 +14670,18 @@ document.addEventListener('keydown',function(ev){
   .gameMain371:has(#domainReveal:not(.hidden)) > .orbArena {
     display: none !important;
   }
+  /* Rating bar always reachable — sticks to bottom of reveal scroll container */
+  #soloReveal:not(.hidden) .ratingBar,
+  #domainReveal:not(.hidden) .ratingBar {
+    position: sticky !important;
+    bottom: 0 !important;
+    background: rgba(3,8,20,.97) !important;
+    z-index: 2 !important;
+    padding: 8px 0 4px !important;
+    margin-top: 4px !important;
+  }
 }
-/* Short landscape: cap reveal height and allow internal scroll */
+/* Short landscape: hide gameplay elements + cap trigger height + sticky ratings */
 @media (orientation: landscape) and (max-height: 560px) {
   .gameMain371:has(.reveal:not(.hidden)) > .promptBox,
   .gameMain371:has(.reveal:not(.hidden)) > .soloTrack,
@@ -14680,11 +14689,19 @@ document.addEventListener('keydown',function(ev){
   .gameMain371:has(.reveal:not(.hidden)) > .domainTitle {
     display: none !important;
   }
-  #soloReveal:not(.hidden),
-  #domainReveal:not(.hidden) {
-    max-height: calc(100dvh - var(--hud-h, 52px) - var(--safe-top, 0px) - var(--safe-bottom, 0px));
-    overflow-y: auto;
-    overscroll-behavior: contain;
+  #soloReveal:not(.hidden) .trigger,
+  #domainReveal:not(.hidden) .trigger {
+    max-height: 80px !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+  }
+  #soloReveal:not(.hidden) .ratingBar,
+  #domainReveal:not(.hidden) .ratingBar {
+    position: sticky !important;
+    bottom: 0 !important;
+    background: rgba(3,8,20,.97) !important;
+    z-index: 2 !important;
+    padding: 4px 0 !important;
   }
 }
 </style>
