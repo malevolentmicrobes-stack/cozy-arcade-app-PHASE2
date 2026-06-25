@@ -9994,7 +9994,6 @@ function fixCozyV24SigilsAndOneThingOverflow() {
   else run();
   setTimeout(run, 250);
   setTimeout(run, 900);
-  new MutationObserver(run).observe(document.body, { childList: true, subtree: true });
 })();
 </script>
 <style id="cozy-v24-random-one-thing-hotfix-css">
@@ -10260,9 +10259,6 @@ function fixOneThingEditorOverflow351() {
   else run();
   setTimeout(run, 300);
   setTimeout(run, 1000);
-  new MutationObserver(() => {
-    fixOneThingEditorOverflow351();
-  }).observe(document.body, { childList: true, subtree: true });
 })();
 </script>
 <script id="cozy-canonical-display-title-js">
@@ -10656,7 +10652,6 @@ function fixStableOneThingDropdown351() {
       fixStableOneThingDropdown351();
     }, true);
     if (document.body) new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true });
-    setInterval(fixStableOneThingDropdown351, 500);
   }
 
   document.querySelectorAll('.oneThing350').forEach(el => {
@@ -12465,8 +12460,16 @@ body.cozyGameShellActive371 #gearBtn {
   }
 
   .hudActions371 {
-    grid-template-columns: minmax(70px, 1fr) 36px 36px 36px !important;
-    max-width: 260px !important;
+    flex: 0 0 auto !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 5px !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+  .hudActions371 button[data-home] {
+    display: none !important;
   }
 
   .gameHud .hudGroup:empty {
@@ -14656,4 +14659,33 @@ document.addEventListener('keydown',function(ev){
 </script>
 <style id="cozy-hometopbtn-final-kill-20260623">button#homeTopBtn.homeTopBtn,#homeTopBtn.homeTopBtn,button#homeTopBtn,#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important;pointer-events:none!important;opacity:0!important;width:0!important;height:0!important;min-width:0!important;min-height:0!important;overflow:hidden!important}</style>
 <style id="cozy-runner-tapblock-fix-20260623">#runner.hunter{pointer-events:none!important}</style>
+<style id="vReveal-mobile-budget-20260625">
+/* Mobile portrait: hide promptBox + soloTrack during reveal so ratingBar stays in viewport */
+@media (max-width: 900px) {
+  .gameMain371:has(#soloReveal:not(.hidden)) > .promptBox,
+  .gameMain371:has(#soloReveal:not(.hidden)) > .soloTrack {
+    display: none !important;
+  }
+  .gameMain371:has(#domainReveal:not(.hidden)) > .promptBox,
+  .gameMain371:has(#domainReveal:not(.hidden)) > .domainTitle,
+  .gameMain371:has(#domainReveal:not(.hidden)) > .orbArena {
+    display: none !important;
+  }
+}
+/* Short landscape: cap reveal height and allow internal scroll */
+@media (orientation: landscape) and (max-height: 560px) {
+  .gameMain371:has(.reveal:not(.hidden)) > .promptBox,
+  .gameMain371:has(.reveal:not(.hidden)) > .soloTrack,
+  .gameMain371:has(.reveal:not(.hidden)) > .orbArena,
+  .gameMain371:has(.reveal:not(.hidden)) > .domainTitle {
+    display: none !important;
+  }
+  #soloReveal:not(.hidden),
+  #domainReveal:not(.hidden) {
+    max-height: calc(100dvh - var(--hud-h, 52px) - var(--safe-top, 0px) - var(--safe-bottom, 0px));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+</style>
 </body></html>
