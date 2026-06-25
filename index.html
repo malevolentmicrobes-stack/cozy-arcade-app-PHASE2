@@ -14460,6 +14460,7 @@ if(typeof priorSelect==='function' && !priorSelect.__cozyRatingPath20260603){
 var priorAdvance=window.advance || (typeof advance!=='undefined'?advance:null);
 if(typeof priorAdvance==='function' && !priorAdvance.__cozyRatingPath20260603){
   var wrappedAdvance=function(which){
+    if(performance.now()-(window.__cozyLastAdvanceAt351||0)<350) return;
     try{ window.__cozyLastAdvanceAt351=performance.now(); }catch(_){}
     var revealOpen=visible(q(which==='domain'?'domainReveal':'soloReveal'));
     var card;
