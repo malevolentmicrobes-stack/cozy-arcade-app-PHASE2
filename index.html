@@ -12340,6 +12340,22 @@ function fixStableOneThingDropdown351() {
   display: none !important;
 }
 
+/* HUD-ICON-BLANK fix: icon glyph must paint at every breakpoint, not just inside
+   the media query below — buttons carry no text node, only data-hud-icon. */
+.hudIconButton371::before {
+  content: attr(data-hud-icon);
+  font-size: 17px;
+  line-height: 1;
+}
+
+/* OLD-SETTINGS-LEAK fix: HUD settings button is now the sole in-game settings
+   owner; legacy #gearBtn must stay hidden during gameplay at every breakpoint,
+   not just inside the media query below. Home/settings screens are unaffected
+   since cozyGameShellActive371 is only added during gameplay. */
+body.cozyGameShellActive371 #gearBtn {
+  display: none !important;
+}
+
 @media (max-width: 900px), (orientation: landscape) and (max-height: 560px) {
   #home.screen {
     padding: calc(14px + var(--safe-top)) 12px calc(18px + var(--safe-bottom)) !important;
