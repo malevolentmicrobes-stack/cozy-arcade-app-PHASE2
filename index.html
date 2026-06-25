@@ -8914,7 +8914,7 @@ Rules:
     }
     let one=root.querySelector('.oneThing350'); if(!one){one=document.createElement('div'); one.className='oneThing350'; board.insertAdjacentElement('afterend',one);}
     if(one.querySelector('textarea,.oneThingEdit351')) one.style.display='block';
-    else renderOneThingStable351(one,card,false);
+    else{renderOneThingStable351(one,card,false); requestAnimationFrame(()=>{if(typeof fixStableOneThingDropdown351==='function') fixStableOneThingDropdown351();});}
     const fullBox=root.querySelector('.fullDropdown350');
     // Never rewrite open fullDropdown350 — would reset scroll position and destroy UP TO CLOSE handler
   }
@@ -9963,11 +9963,12 @@ function fixCozyV24SigilsAndOneThingOverflow() {
     if (el.querySelector('textarea')) return;
     const text = el.querySelector('.oneThingText351');
     const signature = (text || el).textContent.trim();
+    if (el.classList.contains('oneThingDropdown351')) return;
     const isLong = el.scrollHeight > 90 || signature.length > 180;
     el.dataset.oneThingOverflowSignature = signature;
     el.dataset.oneThingMeasuredLong351 = isLong ? '1' : '0';
     el.classList.toggle('oneThingLong351', isLong);
-    if (el.classList.contains('oneThingDropdown351')) {
+    if (false) {
       el.querySelector('.oneThingFade351')?.remove();
       return;
     }
