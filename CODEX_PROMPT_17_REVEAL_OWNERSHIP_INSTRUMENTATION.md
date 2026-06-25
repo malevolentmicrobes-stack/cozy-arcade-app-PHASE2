@@ -3,6 +3,21 @@
 **Diagnostic only. Do not fix anything until the report comes back. Fix only the
 first confirmed writer conflict — do not patch all reveal functions blindly.**
 
+**Update 2026-06-24 (full retest against `main` 2ff95d2/v49, supersedes the older
+v46/`fee324a` framing below):** duplicate board-trigger rendering and the "Gate
+Completed"→"Learning Moment" title flip did NOT reproduce on a normal card this
+round, and stale-visible-dx-after-Space is now confirmed fixed. Don't treat
+"didn't reproduce" as "fixed for good" — re-check under the original 06-22
+repro conditions (board-trigger-only card, longer dwell) during this
+instrumentation pass, not just a fresh normal-card flow. Mutation count
+re-measured at **89** for one normal reveal — still high, still the reason this
+prompt exists. New, sharper finding to fold in: hidden reveal content still
+mutates to the next card's trigger/board text after Space while the panel is
+hidden — log writes even while `#soloReveal` is hidden, don't assume "hidden"
+means "inert." Also: `window.current` was observed null/absent (not just
+disagreeing) while rendered DOM was correct — log whether `window.current` is
+even defined at each `[INSTR]` point, don't only compare its value.
+
 ## Static groundwork already done (verify, don't re-derive)
 
 Read the source directly before this prompt so the instrumentation targets the
@@ -73,11 +88,15 @@ Inject before any user action:
     window[name] = function(...args) {
       console.log(`[INSTR] ${name}`, {
         t: performance.now(), args,
-        currentQid: window.current?.qid_unique || window.current?.qid,
+        currentDefined: 'current' in window, currentQid: window.current?.qid_unique || window.current?.qid,
         soloQuestionText: document.getElementById('soloQuestion')?.textContent?.slice(0,60),
         soloRevealTitle: document.getElementById('soloRevealTitle')?.textContent,
+        soloRevealDx: document.getElementById('soloRevealDx')?.textContent?.slice(0,60),
         soloTrigger: document.getElementById('soloTrigger')?.textContent?.slice(0,60),
         boardTrigger: document.querySelector('.boardTrigger350')?.textContent?.slice(0,60),
+        oneThing: document.querySelector('.oneThing350')?.textContent?.slice(0,60),
+        soloRevealRatings: document.getElementById('soloRevealRatings')?.textContent?.slice(0,60),
+        revealHidden: document.getElementById('soloReveal')?.hidden ?? document.getElementById('soloReveal')?.style.display === 'none',
         stack: new Error().stack.split('\n').slice(1,4).join(' | ')
       });
       return orig.apply(this, args);
@@ -99,4 +118,8 @@ what `current`/rendered-text state it saw, and whether the title/board content
 it wrote matches what was already on screen. Flag the exact moment (if any)
 `currentQid` stops matching `soloQuestionText`'s card, and the exact moment (if
 any) the title flips after the initial reveal with no logged user action in
-between.
+between. Also flag: any `[INSTR]` entry where `revealHidden` is true but the
+function still wrote new dx/trigger/board/oneThing/ratings text (proves the
+hidden-but-still-mutating finding from 2026-06-24), and any entry where
+`currentDefined` is false (proves `window.current` is absent rather than just
+disagreeing).

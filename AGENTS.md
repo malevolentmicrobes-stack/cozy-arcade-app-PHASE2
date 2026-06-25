@@ -17,7 +17,9 @@ Rules:
 
 **File convention (added 2026-06-19):** active/queued `CODEX_PROMPT_N_*.md` files live at repo root — there should only ever be a small, current set. Once a prompt's fix lands (commit) or its diagnostic report is received and acted on, move it to `docs/archive/codex_prompts/` (`git mv` if tracked, `mv` if not yet committed). Don't leave completed prompts at root — that's how this got to 12 files needing a cleanup pass today.
 
-**Current SW (2026-06-19, ~6:30pm):** PHASE2 `cozy-arcade-PHASE2-v36` (commit `34697f4`) | PHASE1 `cozy-arcade-v72` (commit `02e4d23`)
+**Current SW (2026-06-24, confirmed via direct git fetch + sw.js read, not just this doc):** PHASE2 `cozy-arcade-PHASE2-v49` (commit `43f6a93`, `main`==`public`) | PHASE1 `cozy-arcade-v85` (commit `450c084`). Both repos fully pushed, working trees clean. See "Current Task" below for the 2026-06-24 retest against this exact build.
+
+**Current SW (2026-06-19, ~6:30pm) — superseded, kept for history:** PHASE2 `cozy-arcade-PHASE2-v36` (commit `34697f4`) | PHASE1 `cozy-arcade-v72` (commit `02e4d23`)
 **2026-06-22 Codex correction:** PHASE2 sparse-card pollution was still live after `e5e6f6d`. Real Upload button/browser validation found two confirmed mutators: old `normalizeLimitlessCard()` still treated `back`/`answer`/`output` as soft learning-field fallbacks, and `normalizeCardFields352()` copied `answer` into `educational_objective`, `quick_recall`, and `level_2_three_second_exposure` after import. Current PHASE2 fix makes optional learning fields source-preserving in both live normalizers and bumps SW to `cozy-arcade-PHASE2-v41`. Validate with `/private/tmp/cozy_live_upload_glitch_retest.mjs` or equivalent real-file-chooser upload, not direct function injection.
 **Next tasks (2026-06-19, ~6:30pm):**
 1. **Re-test FQ-ALGO-8** (wrong auto-select rated 'good') — fix applied (see below), but the underlying race trigger was never pinned down, so this is a safety-net fix, not a proven root-cause fix. `CODEX_PROMPT_13` is now mostly superseded but worth running once more specifically to try reproducing the original sequence against the fix.
@@ -118,7 +120,31 @@ iOS1 scaffold is done — remaining iOS steps (`npx cap add ios` → `npx cap sy
 | DOMAIN-BIONIC (window.bionic\|\|bionic) in domain render | ✅ source-confirmed | f345dda |
 | STATE-B deck restore (atlas sysmap → canonical deck key) | ✅ fixed | 98b5254 |
 
-### Current Task: deploy blocked on git auth (2026-06-23) — code is fixed and committed, just not pushed everywhere yet
+### Current Task: PHASE2 browser retest at v49 (`main` 2ff95d2) confirms most prior fixes live; reveal ownership instrumentation is next (2026-06-24)
+
+Codex ran a full local Chrome retest (real Upload → Solo → reveal → Space advance, iPhone-sized viewport, Domain mode) against current `main`/v49 — **explicitly not the older v46/`fee324a` handoff below; the auth block described there resolved the same evening (two more commits, `43f6a93`/`2ff95d2`, landed after that entry was written).**
+
+**Confirmed fixed/live now:**
+1. `#homeTopBtn` — computed `display:none`, `pointer-events:none`, rect 0x0 at startup and in-game. Re-confirms the 06-23 specificity fix independently.
+2. Stale visible reveal after Space — fixed. Previous-card diagnosis does not stay visible after advance.
+3. Duplicate board-trigger rendering — did not reproduce this round (one `.boardTrigger350`, one occurrence).
+4. "Gate Completed"→"Learning Moment" title flip — did not reproduce, title stayed `GATE COMPLETED`.
+5. `#runner` tap interception — fixed at both 390x844 and 375x667; `pointer-events:none`, choice centers unblocked.
+6. Gates: `runFSRSValidation()` 17/17, `runCozySmokeTests()` 6/6, no page errors.
+
+**Still present, ranked (see `OPEN_DIFFERENTIALS.md` for full detail):**
+1. **REVEAL-TRIGGER-CHURN remains top priority** — 89 reveal-subtree mutations for one normal reveal even though content is now correct; reveal is still multi-writer, no single idempotent owner.
+2. Hidden reveal content still mutates to the next card's trigger/board text after Space while the panel is hidden — not user-visible now, but proves reveal state isn't fully inert post-advance.
+3. `window.current` is unreliable as a validation signal (observed null/absent while rendered DOM was correct) — future diagnostics should bind to rendered DOM + fixture IDs, or the card object at selection time, not `window.current`. Re-read the 06-22 "window.current disagrees with rendered question" finding through this lens — may have been an absent-probe artifact, not a real desync.
+4. Domain orb normal click is unstable under Playwright automation (3s timeout, forced click works, reveal renders correctly) — possible touch-target/moving-target UX risk, not confirmed user-facing. See `OPEN_DIFFERENTIALS.md` `DOMAIN-TIMER`.
+5. Console noise: only `/favicon.ico` 404, non-blocking.
+
+**Next recommended work (not yet started):**
+- Do NOT add another reveal wrapper, and do NOT re-fix homeTopBtn or runner pointer-events — both are browser-confirmed fixed at v49.
+- Reveal ownership instrumentation: count and label every writer to `#soloRevealTitle`, `#soloRevealDx`, `#soloTrigger`, `.boardTrigger350`, `.oneThing350`, `#soloRevealRatings`. Goal: one idempotent reveal render owner, or at minimum suppress writes once reveal has settled. `CODEX_PROMPT_17` already queues this — updated with this exact element list, ready to send.
+- Separately inspect Domain orb animation/clickability — if real user taps prove unreliable, consider reducing motion on pointerdown or expanding the stable hit zone. Not yet queued as its own prompt.
+
+### Prior Task: deploy blocked on git auth (2026-06-23) — RESOLVED same evening, kept for history
 
 **Git push is currently broken with an auth error** ("Invalid username or token" then "could not read Username... Device not configured") — confirmed by BOTH Claude's and Codex's independent push attempts (including Codex's "escalation" retry), all hitting the identical error. This rules out a sandbox-specific issue — the credential itself is genuinely invalid at the account level. User is refreshing it; do not keep retrying the push blindly in the meantime. Status as of right now:
 - PHASE2 `main`: 2 commits ahead of `origin/main` (`915df4d` docs, `1dc3983` Codex's CSS specificity correction).
@@ -128,6 +154,8 @@ iOS1 scaffold is done — remaining iOS steps (`npx cap add ios` → `npx cap sy
 **First thing once auth is restored:** `git push origin main` (PHASE2) → `git push origin main:public --force` (PHASE2) → `git push origin main` (PHASE1) → verify both live via the SW-version curl check before doing anything else.
 
 Two fixes landed today (committed, partially pushed — see above): (1) Codex's live test confirmed actual stale cross-card reveal content (not just churn) after Space-advance — `wrappedAdvance` now explicitly clears/hides the reveal panel (dx/trigger/board text + their idempotency dataset keys) right before the next card renders. Did NOT attempt Codex's other suggestion (reveal() capturing the answered-card identity explicitly) — that needs touching `selectSolo`'s own ~11-layer chain plus a new cross-script global, which is the exact "add another wrapper" anti-pattern Codex's feedback warned against; deferred to live instrumentation (`CODEX_PROMPT_17`). (2) Fixed the homeTopBtn CSS cascade bug Codex's screenshot cross-check confirmed live (inline `display:none`, computed `display:grid`, a real clickable box) — added one final, unambiguous `!important` kill-rule at the absolute end of the file rather than untangling the existing cascade conflict. Neither fix is live-browser-validated yet.
+
+**RESOLVED (confirmed 2026-06-24):** auth was fixed, all three pushes completed (`43f6a93`/`2ff95d2` on top of these). PHASE2 `main`==`public` at v49, PHASE1 `main` at v85. Both fixes above are now live-browser-validated — see Current Task above for the full retest.
 
 ### Prior Task: REVEAL-TRIGGER-CHURN consolidation (2026-06-22) — not started, now top-ranked by live evidence
 
