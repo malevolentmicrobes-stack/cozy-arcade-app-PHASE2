@@ -5949,7 +5949,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     }catch(_){}
     const arr=(typeof cards!=='undefined'&&Array['isArray'](cards))?cards:[];
     if(!arr.length) return null;
-    const nextIdx=((Number(index)||0)+1)%arr.length;
+    const nextIdx=(Number(index)||0)%arr.length;
     return arr[nextIdx]||null;
   }
   function showPulseToast(title,body,color){
@@ -5966,16 +5966,9 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 
   function checkKnowledgePulse(n,card,personaId){
     const persona=PERSONAS.find(p=>p.id===personaId)||getActivePersona();
-    if(n>0 && n%5===0){
-      const sys=systemOf351(card);
-      const acc=(window.sessionSystemAccuracy||{})[sys]||{correct:n,total:n};
-      const pct=acc.total>0?Math.round((acc.correct/acc.total)*100):100;
-      showPulseToast(KNOWLEDGE_PULSE.five, formatPersona351(persona.five_correct_message,{system:sys,pct:pct,n:n}), 'cyan');
-    }
-    else if(n>0 && n%10===0){
-      const next=peekNextCard();
-      const preview=next&&next.board_trigger?clean(next.board_trigger).slice(0,120)+'...':'Next board trigger is ready.';
-      showPulseToast(KNOWLEDGE_PULSE.ten, persona.ten_correct_message+'\n\n'+preview, 'blue');
+    if(n>0 && n%50===0){
+      const sigil=clean(card&&card.one_thing)||clean(card&&card.quick_recall)||'One signal anchored.';
+      showPulseToast(KNOWLEDGE_PULSE.fifty, persona.fifty_correct_message+'\n\n'+sigil, 'gold');
     }
     else if(n>0 && n%25===0){
       const weak=getWeakestSystem();
@@ -5984,9 +5977,16 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
         showPulseToast(KNOWLEDGE_PULSE.twentyFive, formatPersona351(persona.weak_system_message,{system:weak.system,pct:pct,n:n}), 'gold');
       }
     }
-    else if(n>0 && n%50===0){
-      const sigil=clean(card&&card.one_thing)||clean(card&&card.quick_recall)||'One signal anchored.';
-      showPulseToast(KNOWLEDGE_PULSE.fifty, persona.fifty_correct_message+'\n\n'+sigil, 'gold');
+    else if(n>0 && n%10===0){
+      const next=peekNextCard();
+      const preview=next&&next.board_trigger?clean(next.board_trigger).slice(0,120)+'...':'Next board trigger is ready.';
+      showPulseToast(KNOWLEDGE_PULSE.ten, persona.ten_correct_message+'\n\n'+preview, 'blue');
+    }
+    else if(n>0 && n%5===0){
+      const sys=systemOf351(card);
+      const acc=(window.sessionSystemAccuracy||{})[sys]||{correct:n,total:n};
+      const pct=acc.total>0?Math.round((acc.correct/acc.total)*100):100;
+      showPulseToast(KNOWLEDGE_PULSE.five, formatPersona351(persona.five_correct_message,{system:sys,pct:pct,n:n}), 'cyan');
     }
   }
   window.checkKnowledgePulse=checkKnowledgePulse;
