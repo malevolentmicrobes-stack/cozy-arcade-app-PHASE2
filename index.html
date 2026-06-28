@@ -5766,7 +5766,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 .shadowAnswerClock351{margin-top:14px;color:#9feaff;font-family:Orbitron,monospace;letter-spacing:.12em;font-size:12px}
 #domainReady351{display:none!important;opacity:0!important;visibility:hidden!important;position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:95;font-family:Orbitron,'DM Sans',system-ui,sans-serif;font-weight:950;letter-spacing:.12em;color:rgba(210,250,255,.88);background:rgba(3,8,24,.72);border:1px solid rgba(103,232,249,.30);border-radius:999px;padding:8px 13px;font-size:11px;pointer-events:none;text-align:center;box-shadow:0 0 20px rgba(103,232,249,.12)}
 #domainReady351.hidden{display:none!important}
-.pulseToast351{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(3,8,24,.94);border:1px solid #67e8f9;border-radius:18px;padding:14px 22px;font-family:'DM Sans',system-ui,sans-serif;font-weight:900;text-align:center;z-index:30000;max-width:min(640px,88vw);box-shadow:0 22px 70px rgba(0,0,0,.45),0 0 34px rgba(103,232,249,.14);animation:pulseToastIn351 .28s ease both;white-space:pre-wrap}
+.pulseToast351{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(3,8,24,.94);border:1px solid #67e8f9;border-radius:18px;padding:14px 22px;font-family:'DM Sans',system-ui,sans-serif;font-weight:900;text-align:center;z-index:30000;max-width:min(640px,88vw);box-shadow:0 22px 70px rgba(0,0,0,.45),0 0 34px rgba(103,232,249,.14);animation:pulseToastIn351 .28s ease both;white-space:pre-wrap;pointer-events:none}
 .pulseToast351 .pulseTitle351{font-family:Orbitron,monospace;letter-spacing:.18em;color:#67e8f9;font-size:12px;margin-bottom:6px;text-transform:uppercase}
 .pulseToast351 .pulseBody351{color:#e6f8ff;font-size:15px;line-height:1.45}
 .pulseToast351.gold{border-color:#ffd166}.pulseToast351.gold .pulseTitle351{color:#ffd166}
@@ -5940,12 +5940,20 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     return weakest;
   }
   function peekNextCard(){
+    try {
+      if(typeof window.cardPool==='function'&&window.cardPool.__cozyStableRandom351){
+        const pool=window.cardPool();
+        if(Array.isArray(pool)&&pool.length)
+          return pool[(typeof index!=='undefined'?Number(index)||0:0)%pool.length]||null;
+      }
+    }catch(_){}
     const arr=(typeof cards!=='undefined'&&Array['isArray'](cards))?cards:[];
     if(!arr.length) return null;
     const nextIdx=((Number(index)||0)+1)%arr.length;
     return arr[nextIdx]||null;
   }
   function showPulseToast(title,body,color){
+    document.querySelectorAll('.pulseToast351').forEach(t=>{try{t.remove();}catch(_){}});
     const el=document.createElement('div');
     el.className='pulseToast351 '+(color==='gold'?'gold':color==='red'?'red':'cyan');
     const safeTitle=escapeHTML(title||'Energy Shift');
