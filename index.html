@@ -5678,9 +5678,6 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       }
     }
   }, true);
-  const mo = new MutationObserver(()=>{ ensureFullDropdown('solo'); ensureFullDropdown('domain'); });
-  mo.observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
-  document.addEventListener('DOMContentLoaded',()=>{ ensureFullDropdown('solo'); ensureFullDropdown('domain'); });
 })();
 </script>
 
@@ -5769,7 +5766,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 .shadowAnswerClock351{margin-top:14px;color:#9feaff;font-family:Orbitron,monospace;letter-spacing:.12em;font-size:12px}
 #domainReady351{display:none!important;opacity:0!important;visibility:hidden!important;position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:95;font-family:Orbitron,'DM Sans',system-ui,sans-serif;font-weight:950;letter-spacing:.12em;color:rgba(210,250,255,.88);background:rgba(3,8,24,.72);border:1px solid rgba(103,232,249,.30);border-radius:999px;padding:8px 13px;font-size:11px;pointer-events:none;text-align:center;box-shadow:0 0 20px rgba(103,232,249,.12)}
 #domainReady351.hidden{display:none!important}
-.pulseToast351{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(3,8,24,.94);border:1px solid #67e8f9;border-radius:18px;padding:14px 22px;font-family:'DM Sans',system-ui,sans-serif;font-weight:900;text-align:center;z-index:30000;max-width:min(640px,88vw);box-shadow:0 22px 70px rgba(0,0,0,.45),0 0 34px rgba(103,232,249,.14);animation:pulseToastIn351 .28s ease both;white-space:pre-wrap}
+.pulseToast351{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(3,8,24,.94);border:1px solid #67e8f9;border-radius:18px;padding:14px 22px;font-family:'DM Sans',system-ui,sans-serif;font-weight:900;text-align:center;z-index:30000;max-width:min(640px,88vw);box-shadow:0 22px 70px rgba(0,0,0,.45),0 0 34px rgba(103,232,249,.14);animation:pulseToastIn351 .28s ease both;white-space:pre-wrap;pointer-events:none}
 .pulseToast351 .pulseTitle351{font-family:Orbitron,monospace;letter-spacing:.18em;color:#67e8f9;font-size:12px;margin-bottom:6px;text-transform:uppercase}
 .pulseToast351 .pulseBody351{color:#e6f8ff;font-size:15px;line-height:1.45}
 .pulseToast351.gold{border-color:#ffd166}.pulseToast351.gold .pulseTitle351{color:#ffd166}
@@ -5943,12 +5940,20 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     return weakest;
   }
   function peekNextCard(){
+    try {
+      if(typeof window.cardPool==='function'&&window.cardPool.__cozyStableRandom351){
+        const pool=window.cardPool();
+        if(Array.isArray(pool)&&pool.length)
+          return pool[(typeof index!=='undefined'?Number(index)||0:0)%pool.length]||null;
+      }
+    }catch(_){}
     const arr=(typeof cards!=='undefined'&&Array['isArray'](cards))?cards:[];
     if(!arr.length) return null;
-    const nextIdx=((Number(index)||0)+1)%arr.length;
+    const nextIdx=(Number(index)||0)%arr.length;
     return arr[nextIdx]||null;
   }
   function showPulseToast(title,body,color){
+    document.querySelectorAll('.pulseToast351').forEach(t=>{try{t.remove();}catch(_){}});
     const el=document.createElement('div');
     el.className='pulseToast351 '+(color==='gold'?'gold':color==='red'?'red':'cyan');
     const safeTitle=escapeHTML(title||'Energy Shift');
@@ -5961,27 +5966,27 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 
   function checkKnowledgePulse(n,card,personaId){
     const persona=PERSONAS.find(p=>p.id===personaId)||getActivePersona();
-    if(n>0 && n%5===0){
-      const sys=systemOf351(card);
-      const acc=(window.sessionSystemAccuracy||{})[sys]||{correct:n,total:n};
-      const pct=acc.total>0?Math.round((acc.correct/acc.total)*100):100;
-      showPulseToast(KNOWLEDGE_PULSE.five, formatPersona351(persona.five_correct_message,{system:sys,pct:pct,n:n}), 'cyan');
+    if(n>0 && n%50===0){
+      const sigil=clean(card&&card.one_thing)||clean(card&&card.quick_recall)||'One signal anchored.';
+      showPulseToast(KNOWLEDGE_PULSE.fifty, persona.fifty_correct_message+'\n\n'+sigil, 'gold');
     }
-    if(n>0 && n%10===0){
-      const next=peekNextCard();
-      const preview=next&&next.board_trigger?clean(next.board_trigger).slice(0,120)+'...':'Next board trigger is ready.';
-      showPulseToast(KNOWLEDGE_PULSE.ten, persona.ten_correct_message+'\n\n'+preview, 'blue');
-    }
-    if(n>0 && n%25===0){
+    else if(n>0 && n%25===0){
       const weak=getWeakestSystem();
       if(weak){
         const pct=Math.round((weak.correct/weak.total)*100);
         showPulseToast(KNOWLEDGE_PULSE.twentyFive, formatPersona351(persona.weak_system_message,{system:weak.system,pct:pct,n:n}), 'gold');
       }
     }
-    if(n>0 && n%50===0){
-      const sigil=clean(card&&card.one_thing)||clean(card&&card.quick_recall)||'One signal anchored.';
-      showPulseToast(KNOWLEDGE_PULSE.fifty, persona.fifty_correct_message+'\n\n'+sigil, 'gold');
+    else if(n>0 && n%10===0){
+      const next=peekNextCard();
+      const preview=next&&next.board_trigger?clean(next.board_trigger).slice(0,120)+'...':'Next board trigger is ready.';
+      showPulseToast(KNOWLEDGE_PULSE.ten, persona.ten_correct_message+'\n\n'+preview, 'blue');
+    }
+    else if(n>0 && n%5===0){
+      const sys=systemOf351(card);
+      const acc=(window.sessionSystemAccuracy||{})[sys]||{correct:n,total:n};
+      const pct=acc.total>0?Math.round((acc.correct/acc.total)*100):100;
+      showPulseToast(KNOWLEDGE_PULSE.five, formatPersona351(persona.five_correct_message,{system:sys,pct:pct,n:n}), 'cyan');
     }
   }
   window.checkKnowledgePulse=checkKnowledgePulse;
@@ -8754,7 +8759,7 @@ Rules:
     const raw=clean(value);
     const key=oneThingStableKey351(card,raw);
     const store=window.__cozyOneThingExpandedState351||(window.__cozyOneThingExpandedState351={});
-    const longEnough=raw.length>160||el.dataset.oneThingMeasuredLong351==='1';
+    const longEnough=raw.length>160||(el.dataset.oneThingStableKey===key&&el.dataset.oneThingMeasuredLong351==='1');
     const expanded=longEnough?store[key]==='1':true;
     el.dataset.oneThingStableKey=key;
     el.dataset.oneThingOverflowSignature=raw;
@@ -8914,7 +8919,7 @@ Rules:
     }
     let one=root.querySelector('.oneThing350'); if(!one){one=document.createElement('div'); one.className='oneThing350'; board.insertAdjacentElement('afterend',one);}
     if(one.querySelector('textarea,.oneThingEdit351')) one.style.display='block';
-    else renderOneThingStable351(one,card,false);
+    else{renderOneThingStable351(one,card,false); requestAnimationFrame(()=>{if(typeof fixStableOneThingDropdown351==='function') fixStableOneThingDropdown351();});}
     const fullBox=root.querySelector('.fullDropdown350');
     // Never rewrite open fullDropdown350 — would reset scroll position and destroy UP TO CLOSE handler
   }
@@ -8933,7 +8938,7 @@ Rules:
   }
   const previousReveal=window.reveal;
   if(typeof previousReveal==='function'){
-    window.reveal=reveal=function(which,ok){const out=previousReveal.apply(this,arguments); setTimeout(()=>renderRevealSections(which),0); return out;};
+    window.reveal=reveal=function(which,ok){const out=previousReveal.apply(this,arguments); renderRevealSections(which); return out;};
   }
   const previousFullCard=window.fullCard;
   window.fullCard=fullCard=function(){if(!current) return previousFullCard&&previousFullCard(); document.getElementById('modalTitle').textContent=sourceAnswer(current); document.getElementById('modalText').textContent=sourceFull(current); document.getElementById('modal').classList.remove('hidden');};
@@ -8941,7 +8946,7 @@ Rules:
   setTimeout(wire,100);
   setTimeout(wire,600);
   setTimeout(wire,1600);
-  setInterval(()=>{cleanHero(); updateImportButtons(); patchPromptAi(); const active=(!document.getElementById('soloReveal')?.classList.contains('hidden'))?'solo':(!document.getElementById('domainReveal')?.classList.contains('hidden')?'domain':''); if(active) renderRevealSections(active);},900);
+  setInterval(()=>{cleanHero(); updateImportButtons(); patchPromptAi();},900);
 })();
 </script>
 <style id="cozy-public-v18-drawer-css">
@@ -9963,11 +9968,12 @@ function fixCozyV24SigilsAndOneThingOverflow() {
     if (el.querySelector('textarea')) return;
     const text = el.querySelector('.oneThingText351');
     const signature = (text || el).textContent.trim();
+    if (el.classList.contains('oneThingDropdown351')) return;
     const isLong = el.scrollHeight > 90 || signature.length > 180;
     el.dataset.oneThingOverflowSignature = signature;
     el.dataset.oneThingMeasuredLong351 = isLong ? '1' : '0';
     el.classList.toggle('oneThingLong351', isLong);
-    if (el.classList.contains('oneThingDropdown351')) {
+    if (false) {
       el.querySelector('.oneThingFade351')?.remove();
       return;
     }
@@ -9994,7 +10000,6 @@ function fixCozyV24SigilsAndOneThingOverflow() {
   else run();
   setTimeout(run, 250);
   setTimeout(run, 900);
-  new MutationObserver(run).observe(document.body, { childList: true, subtree: true });
 })();
 </script>
 <style id="cozy-v24-random-one-thing-hotfix-css">
@@ -10260,9 +10265,6 @@ function fixOneThingEditorOverflow351() {
   else run();
   setTimeout(run, 300);
   setTimeout(run, 1000);
-  new MutationObserver(() => {
-    fixOneThingEditorOverflow351();
-  }).observe(document.body, { childList: true, subtree: true });
 })();
 </script>
 <script id="cozy-canonical-display-title-js">
@@ -10655,8 +10657,6 @@ function fixStableOneThingDropdown351() {
       if (key) store[key] = expanded ? '1' : '0';
       fixStableOneThingDropdown351();
     }, true);
-    if (document.body) new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true });
-    setInterval(fixStableOneThingDropdown351, 500);
   }
 
   document.querySelectorAll('.oneThing350').forEach(el => {
@@ -12340,6 +12340,22 @@ function fixStableOneThingDropdown351() {
   display: none !important;
 }
 
+/* HUD-ICON-BLANK fix: icon glyph must paint at every breakpoint, not just inside
+   the media query below — buttons carry no text node, only data-hud-icon. */
+.hudIconButton371::before {
+  content: attr(data-hud-icon);
+  font-size: 17px;
+  line-height: 1;
+}
+
+/* OLD-SETTINGS-LEAK fix: HUD settings button is now the sole in-game settings
+   owner; legacy #gearBtn must stay hidden during gameplay at every breakpoint,
+   not just inside the media query below. Home/settings screens are unaffected
+   since cozyGameShellActive371 is only added during gameplay. */
+body.cozyGameShellActive371 #gearBtn {
+  display: none !important;
+}
+
 @media (max-width: 900px), (orientation: landscape) and (max-height: 560px) {
   #home.screen {
     padding: calc(14px + var(--safe-top)) 12px calc(18px + var(--safe-bottom)) !important;
@@ -12449,8 +12465,16 @@ function fixStableOneThingDropdown351() {
   }
 
   .hudActions371 {
-    grid-template-columns: minmax(70px, 1fr) 36px 36px 36px !important;
-    max-width: 260px !important;
+    flex: 0 0 auto !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 5px !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+  .hudActions371 button[data-home] {
+    display: none !important;
   }
 
   .gameHud .hudGroup:empty {
@@ -14444,6 +14468,7 @@ if(typeof priorSelect==='function' && !priorSelect.__cozyRatingPath20260603){
 var priorAdvance=window.advance || (typeof advance!=='undefined'?advance:null);
 if(typeof priorAdvance==='function' && !priorAdvance.__cozyRatingPath20260603){
   var wrappedAdvance=function(which){
+    if(performance.now()-(window.__cozyLastAdvanceAt351||0)<350) return;
     try{ window.__cozyLastAdvanceAt351=performance.now(); }catch(_){}
     var revealOpen=visible(q(which==='domain'?'domainReveal':'soloReveal'));
     var card;
@@ -14469,6 +14494,7 @@ if(typeof priorAdvance==='function' && !priorAdvance.__cozyRatingPath20260603){
         var dxEl351=q(which==='domain'?'domainDx':'soloRevealDx'); if(dxEl351) dxEl351.textContent='';
         var triggerEl351=q(which==='domain'?'domainObj':'soloTrigger'); if(triggerEl351){ triggerEl351.innerHTML=''; delete triggerEl351.dataset.revealSectionsSig; delete triggerEl351.dataset.v350Key; }
         var boardEl351=revealRoot351.querySelector('.boardTrigger350'); if(boardEl351){ boardEl351.innerHTML=''; boardEl351.style.display='none'; delete boardEl351.dataset.boardSig; }
+        var oneEl351=revealRoot351.querySelector('.oneThing350'); if(oneEl351&&!oneEl351.querySelector('textarea,.oneThingEdit351')){delete oneEl351.dataset.oneThingMeasuredLong351; delete oneEl351.dataset.oneThingStableRenderSig; oneEl351.innerHTML='';}
       }
     }catch(_){}
     return priorAdvance.apply(this,arguments);
@@ -14639,4 +14665,51 @@ document.addEventListener('keydown',function(ev){
 </script>
 <style id="cozy-hometopbtn-final-kill-20260623">button#homeTopBtn.homeTopBtn,#homeTopBtn.homeTopBtn,button#homeTopBtn,#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important;pointer-events:none!important;opacity:0!important;width:0!important;height:0!important;min-width:0!important;min-height:0!important;overflow:hidden!important}</style>
 <style id="cozy-runner-tapblock-fix-20260623">#runner.hunter{pointer-events:none!important}</style>
+<style id="vReveal-mobile-budget-20260625">
+/* Mobile portrait: hide promptBox + soloTrack during reveal */
+@media (max-width: 900px) {
+  .gameMain371:has(#soloReveal:not(.hidden)) > .promptBox,
+  .gameMain371:has(#soloReveal:not(.hidden)) > .soloTrack {
+    display: none !important;
+  }
+  .gameMain371:has(#domainReveal:not(.hidden)) > .promptBox,
+  .gameMain371:has(#domainReveal:not(.hidden)) > .domainTitle,
+  .gameMain371:has(#domainReveal:not(.hidden)) > .orbArena {
+    display: none !important;
+  }
+  /* Rating bar always reachable — sticks to bottom of reveal scroll container */
+  #soloReveal:not(.hidden) .ratingBar,
+  #domainReveal:not(.hidden) .ratingBar {
+    position: sticky !important;
+    bottom: 0 !important;
+    background: rgba(3,8,20,.97) !important;
+    z-index: 2 !important;
+    padding: 8px 0 4px !important;
+    margin-top: 4px !important;
+  }
+}
+/* Short landscape: hide gameplay elements + cap trigger height + sticky ratings */
+@media (orientation: landscape) and (max-height: 560px) {
+  .gameMain371:has(.reveal:not(.hidden)) > .promptBox,
+  .gameMain371:has(.reveal:not(.hidden)) > .soloTrack,
+  .gameMain371:has(.reveal:not(.hidden)) > .orbArena,
+  .gameMain371:has(.reveal:not(.hidden)) > .domainTitle {
+    display: none !important;
+  }
+  #soloReveal:not(.hidden) .trigger,
+  #domainReveal:not(.hidden) .trigger {
+    max-height: 80px !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+  }
+  #soloReveal:not(.hidden) .ratingBar,
+  #domainReveal:not(.hidden) .ratingBar {
+    position: sticky !important;
+    bottom: 0 !important;
+    background: rgba(3,8,20,.97) !important;
+    z-index: 2 !important;
+    padding: 4px 0 !important;
+  }
+}
+</style>
 </body></html>

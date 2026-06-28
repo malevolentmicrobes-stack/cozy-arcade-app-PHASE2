@@ -17,7 +17,9 @@ Rules:
 
 **File convention (added 2026-06-19):** active/queued `CODEX_PROMPT_N_*.md` files live at repo root — there should only ever be a small, current set. Once a prompt's fix lands (commit) or its diagnostic report is received and acted on, move it to `docs/archive/codex_prompts/` (`git mv` if tracked, `mv` if not yet committed). Don't leave completed prompts at root — that's how this got to 12 files needing a cleanup pass today.
 
-**Current SW (2026-06-19, ~6:30pm):** PHASE2 `cozy-arcade-PHASE2-v36` (commit `34697f4`) | PHASE1 `cozy-arcade-v72` (commit `02e4d23`)
+**Current SW (2026-06-24, confirmed via direct git fetch + sw.js read, not just this doc):** PHASE2 `cozy-arcade-PHASE2-v49` (commit `43f6a93`, `main`==`public`) | PHASE1 `cozy-arcade-v85` (commit `450c084`). Both repos fully pushed, working trees clean. See "Current Task" below for the 2026-06-24 retest against this exact build.
+
+**Current SW (2026-06-19, ~6:30pm) — superseded, kept for history:** PHASE2 `cozy-arcade-PHASE2-v36` (commit `34697f4`) | PHASE1 `cozy-arcade-v72` (commit `02e4d23`)
 **2026-06-22 Codex correction:** PHASE2 sparse-card pollution was still live after `e5e6f6d`. Real Upload button/browser validation found two confirmed mutators: old `normalizeLimitlessCard()` still treated `back`/`answer`/`output` as soft learning-field fallbacks, and `normalizeCardFields352()` copied `answer` into `educational_objective`, `quick_recall`, and `level_2_three_second_exposure` after import. Current PHASE2 fix makes optional learning fields source-preserving in both live normalizers and bumps SW to `cozy-arcade-PHASE2-v41`. Validate with `/private/tmp/cozy_live_upload_glitch_retest.mjs` or equivalent real-file-chooser upload, not direct function injection.
 **Next tasks (2026-06-19, ~6:30pm):**
 1. **Re-test FQ-ALGO-8** (wrong auto-select rated 'good') — fix applied (see below), but the underlying race trigger was never pinned down, so this is a safety-net fix, not a proven root-cause fix. `CODEX_PROMPT_13` is now mostly superseded but worth running once more specifically to try reproducing the original sequence against the fix.
@@ -118,7 +120,65 @@ iOS1 scaffold is done — remaining iOS steps (`npx cap add ios` → `npx cap sy
 | DOMAIN-BIONIC (window.bionic\|\|bionic) in domain render | ✅ source-confirmed | f345dda |
 | STATE-B deck restore (atlas sysmap → canonical deck key) | ✅ fixed | 98b5254 |
 
-### Current Task: deploy blocked on git auth (2026-06-23) — code is fixed and committed, just not pushed everywhere yet
+### Current Task: shared transition lock applied for card flashing, awaiting Codex retest (2026-06-24)
+
+Codex's expanded `PROMPT_17` run (real deck, iPhone viewport, both repos) found the real mechanism: 19 separate `keydown` listeners in this file; for Enter/Space during a Solo reveal at least 5 independent paths (`advanceReveal`@3178, `continueReveal`@1279/3278/6810, `clickContinue`@5653, base handler@432) can each call `advance()` on one keystroke, because `stopImmediatePropagation` is globally shimmed to a no-op during reveal-open (FQ-ALGO-9). Three of those already had their own local debounce lock, but the locks don't share state, so cross-path double-firing wasn't actually prevented. Claude verified this directly against source (not just Codex's prose) and found one additional open question Codex's report didn't flag: the raw instrumentation log shows the cascade firing ~6ms *before* the harness's own recorded Space keydown — most likely Playwright IPC latency, not confirmed.
+
+**Applied (user's explicit choice, lowest-risk option over full listener consolidation):** PHASE2 `562facd` / PHASE1 `0057270` — one guard line at the top of `wrappedAdvance` (the single funnel all 5 paths already call through), reusing the existing `__cozyLastAdvanceAt351` timestamp as one shared 350ms lock. No wrapper added, no listener removed. **NOT YET LIVE-VALIDATED.** Next: Codex re-run the same `PROMPT_17` harness against this fix.
+
+### Prior Task: card flashing reconfirmed after HUD fix — ruled out as related, live instrumentation is next (2026-06-24)
+
+User reconfirmed visible card flashing after the HUD-ICON-BLANK/OLD-SETTINGS-LEAK fix below landed. That fix touched only `.hudIconButton371::before` and `#gearBtn` CSS — confirmed unrelated, do not credit it with fixing flashing. This belongs to the existing D4-MUTATION/REVEAL-TRIGGER-CHURN/REVEAL-FIRST-FRAME family (still open/mitigated, never fully consolidated — see `OPEN_DIFFERENTIALS.md`). Per the project's own rule (matching outcome depends on runtime event order across multiple independently-installed writers → needs live instrumentation, no static guess), expanded `CODEX_PROMPT_17` same day: its `MutationObserver` now also watches `#soloQuestion`/`#choiceRow`/`.promptBox` (the live question card, not just `#soloReveal`) and logs target selector + old/new text + call stack per mutation, run against a real uploaded deck on an iPhone-size viewport. **Not yet run.** Goal: find the first writer that mutates content after paint, then consolidate to one idempotent owner or suppress post-settle writes — no new wrapper layer.
+
+### Prior Task: HUD-ICON-BLANK / OLD-SETTINGS-LEAK (a)+(b) fixed in both repos, browser-validated by user (2026-06-24)
+
+Added unconditional (outside any media query) versions of the icon-paint rule and the in-game `#gearBtn` hide rule, in both repos. PHASE2 `b571eb3`, PHASE1 `80cf287` (sw v49→v50, v85→v86). User browser-validated desktop, short-landscape, and iPhone breakpoints in both repos: icons paint, exactly one settings control visible. One combined commit per repo, not split — user's explicit call, since both rules were validated together as one HUD-ownership fix, not two independent ones. **Not touched, still open:** PHASE2's HUD settings button still renders offscreen on iPhone (`rect x=-27, w=34`, re-confirmed in this same retest); PHASE1's unconditional `vHUD-polish-2` home-button-hide block. Full status in `OPEN_DIFFERENTIALS.md`'s row.
+
+### Prior Task: HUD-ICON-BLANK / OLD-SETTINGS-LEAK corrected after Codex's cross-repo browser probe — PHASE1 ≠ PHASE2, do not copy-paste the fix (2026-06-24)
+
+**Codex independently browser-probed both repos (real Chrome, real uploaded deck, three breakpoints) before this commit got pushed, and caught a real inaccuracy in the entry below — re-verified directly by Claude before accepting, not just taken on Codex's word.** Claude's prior commit (`38b44f5`) said "both findings hold identically in PHASE1 at the matching line numbers" — **that's wrong.** PHASE2's icon/gear media gate is `@media (max-width:900px), (orientation:landscape) and (max-height:560px)` (an OR); PHASE1's equivalent is `@media (max-width:900px)` only — confirmed via direct `sed` read of both files, no landscape clause in PHASE1 at all. Practical effect: PHASE2 is only broken at desktop-normal/portrait (its OR-clause saves it at short-landscape); **PHASE1 stays broken at short-landscape too.** Lesson for future cross-repo claims: matching line numbers is not proof of matching behavior — diff the actual rule content, not just confirm both repos have a hit at roughly the same line. Full correction, plus two new subfindings, is in `OPEN_DIFFERENTIALS.md`'s `HUD-ICON-BLANK / OLD-SETTINGS-LEAK` row:
+- **PHASE2-only:** HUD settings button renders partially offscreen on iPhone viewport (`rect x=-27, w=34`), browser-measured, root cause not yet pinned (candidate area: `.hudActions371` rules at `:12438/:12451/:12800/:12804`).
+- **PHASE1-only:** an unconditional (not media-gated at all) `<style id="vHUD-polish-2">` block (`:14518-14521`) permanently hides PHASE1's in-HUD home/exit button — PHASE2 has no equivalent. Plausibly related to `COZY-HOME-DUPE-MOBILE` (not confirmed causally).
+
+**Also reconfirmed, not contradicted:** the blank-icon + dual-settings bug itself is real in both repos at desktop-normal (1028x768) — browser-measured, not just static theory. REVEAL-TRIGGER-CHURN mutation counts re-measured much higher under a real-uploaded-deck/iPhone-viewport probe (PHASE2 493/620, PHASE1 457/589 — at-reveal/post-advance) than today's earlier desktop figure (89) — different test conditions, not a contradiction; logged both in `OPEN_DIFFERENTIALS.md`. Still no code changed — this is all analysis/doc correction. **Do not push `38b44f5` (or this follow-up commit) as final without re-reading the corrected `OPEN_DIFFERENTIALS.md` row first** — the fix recommendation for (a) the icon rule now explicitly warns against copying PHASE2's exact media condition onto PHASE1.
+
+### Prior Task: HUD-ICON-BLANK / OLD-SETTINGS-LEAK found and source-verified, fix not yet applied (2026-06-24) — superseded by the correction above
+
+User reviewed the prior retest writeup and gave explicit sign-off + a new finding. **Accepted, don't reopen without new evidence:** runner click interception, PHASE2 homeTopBtn CSS cascade, Space-advance stale-visible-reveal — all closed in `OPEN_DIFFERENTIALS.md`. **Confirmed correct priority call:** REVEAL-TRIGGER-CHURN stays top priority as a real bug, not cosmetic.
+
+**New item, explicitly NOT to be bundled under the closed homeTopBtn task** (same HUD-shell breakpoint neighborhood, different root cause): `HUD-ICON-BLANK` (in-game icon buttons render blank — screenshot "Undo" text is the native title-attribute tooltip, not app text) + `OLD-SETTINGS-LEAK` (legacy `#gearBtn` floating circle can render alongside the newer in-HUD settings button). Claude source-verified every line number from the writeup before logging — all checked out or were corrected to the actual line:
+- `.hudIconButton371::before` (PHASE2 `:12500`, PHASE1 `:12486`) is the only icon-paint rule in either file, and it's confined inside `@media (max-width:900px), (orientation:landscape) and (max-height:560px)` — no base/unconditional rule exists. That's the actual reason the icon is blank outside that one breakpoint, not just "doesn't apply at this breakpoint" as originally phrased.
+- The `body.cozyGameShellActive371 #gearBtn` hide rule (PHASE2 `:12506-12508`, PHASE1 `:12492`) is gated inside the *same* media query — so on normal desktop-width portrait, `#gearBtn` never hides during gameplay, coexisting with the new HUD settings proxy (`:12989`).
+- `window.undoReview` (PHASE2 `:13403`, PHASE1 `:13300`) is unrelated to either bug — confirmed not implicated.
+Full writeup with both recommended fixes (icon rule needs to move/duplicate outside the media gate; settings ownership needs a product-intent pick between `#gearBtn` and the HUD proxy) is in `OPEN_DIFFERENTIALS.md`'s `HUD-ICON-BLANK / OLD-SETTINGS-LEAK` row. **Not yet fixed — analysis only.**
+
+**Pages deploy status (2026-06-24):** PHASE2 switched its Pages source from `public` to `main` (the `public` branch split had no privacy/curation purpose — confirmed both repos are public on GitHub regardless, and `public`'s file tree was just a lagging mirror of `main`). Confirmed live at v49. The `git push origin main:public --force` step is retired for PHASE2 — don't include it in future deploy instructions. **PHASE1 is still stuck on `cozy-arcade-v65`** (local `main` is at `v85`) despite `.nojekyll` being present and one Pages-settings re-save attempt — a same-value re-save (`main`→`main`) likely didn't register as a change. Next step: toggle source to "None" (or another branch), save, wait, switch back to `main`, save — a genuine value change, not yet tried.
+
+### Prior Task: PHASE2 browser retest at v49 (`main` 2ff95d2) confirms most prior fixes live; reveal ownership instrumentation is next (2026-06-24)
+
+Codex ran a full local Chrome retest (real Upload → Solo → reveal → Space advance, iPhone-sized viewport, Domain mode) against current `main`/v49 — **explicitly not the older v46/`fee324a` handoff below; the auth block described there resolved the same evening (two more commits, `43f6a93`/`2ff95d2`, landed after that entry was written).**
+
+**Confirmed fixed/live now:**
+1. `#homeTopBtn` — computed `display:none`, `pointer-events:none`, rect 0x0 at startup and in-game. Re-confirms the 06-23 specificity fix independently.
+2. Stale visible reveal after Space — fixed. Previous-card diagnosis does not stay visible after advance.
+3. Duplicate board-trigger rendering — did not reproduce this round (one `.boardTrigger350`, one occurrence).
+4. "Gate Completed"→"Learning Moment" title flip — did not reproduce, title stayed `GATE COMPLETED`.
+5. `#runner` tap interception — fixed at both 390x844 and 375x667; `pointer-events:none`, choice centers unblocked.
+6. Gates: `runFSRSValidation()` 17/17, `runCozySmokeTests()` 6/6, no page errors.
+
+**Still present, ranked (see `OPEN_DIFFERENTIALS.md` for full detail):**
+1. **REVEAL-TRIGGER-CHURN remains top priority** — 89 reveal-subtree mutations for one normal reveal even though content is now correct; reveal is still multi-writer, no single idempotent owner.
+2. Hidden reveal content still mutates to the next card's trigger/board text after Space while the panel is hidden — not user-visible now, but proves reveal state isn't fully inert post-advance.
+3. `window.current` is unreliable as a validation signal (observed null/absent while rendered DOM was correct) — future diagnostics should bind to rendered DOM + fixture IDs, or the card object at selection time, not `window.current`. Re-read the 06-22 "window.current disagrees with rendered question" finding through this lens — may have been an absent-probe artifact, not a real desync.
+4. Domain orb normal click is unstable under Playwright automation (3s timeout, forced click works, reveal renders correctly) — possible touch-target/moving-target UX risk, not confirmed user-facing. See `OPEN_DIFFERENTIALS.md` `DOMAIN-TIMER`.
+5. Console noise: only `/favicon.ico` 404, non-blocking.
+
+**Next recommended work (not yet started):**
+- Do NOT add another reveal wrapper, and do NOT re-fix homeTopBtn or runner pointer-events — both are browser-confirmed fixed at v49.
+- Reveal ownership instrumentation: count and label every writer to `#soloRevealTitle`, `#soloRevealDx`, `#soloTrigger`, `.boardTrigger350`, `.oneThing350`, `#soloRevealRatings`. Goal: one idempotent reveal render owner, or at minimum suppress writes once reveal has settled. `CODEX_PROMPT_17` already queues this — updated with this exact element list, ready to send.
+- Separately inspect Domain orb animation/clickability — if real user taps prove unreliable, consider reducing motion on pointerdown or expanding the stable hit zone. Not yet queued as its own prompt.
+
+### Prior Task: deploy blocked on git auth (2026-06-23) — RESOLVED same evening, kept for history
 
 **Git push is currently broken with an auth error** ("Invalid username or token" then "could not read Username... Device not configured") — confirmed by BOTH Claude's and Codex's independent push attempts (including Codex's "escalation" retry), all hitting the identical error. This rules out a sandbox-specific issue — the credential itself is genuinely invalid at the account level. User is refreshing it; do not keep retrying the push blindly in the meantime. Status as of right now:
 - PHASE2 `main`: 2 commits ahead of `origin/main` (`915df4d` docs, `1dc3983` Codex's CSS specificity correction).
@@ -128,6 +188,8 @@ iOS1 scaffold is done — remaining iOS steps (`npx cap add ios` → `npx cap sy
 **First thing once auth is restored:** `git push origin main` (PHASE2) → `git push origin main:public --force` (PHASE2) → `git push origin main` (PHASE1) → verify both live via the SW-version curl check before doing anything else.
 
 Two fixes landed today (committed, partially pushed — see above): (1) Codex's live test confirmed actual stale cross-card reveal content (not just churn) after Space-advance — `wrappedAdvance` now explicitly clears/hides the reveal panel (dx/trigger/board text + their idempotency dataset keys) right before the next card renders. Did NOT attempt Codex's other suggestion (reveal() capturing the answered-card identity explicitly) — that needs touching `selectSolo`'s own ~11-layer chain plus a new cross-script global, which is the exact "add another wrapper" anti-pattern Codex's feedback warned against; deferred to live instrumentation (`CODEX_PROMPT_17`). (2) Fixed the homeTopBtn CSS cascade bug Codex's screenshot cross-check confirmed live (inline `display:none`, computed `display:grid`, a real clickable box) — added one final, unambiguous `!important` kill-rule at the absolute end of the file rather than untangling the existing cascade conflict. Neither fix is live-browser-validated yet.
+
+**RESOLVED (confirmed 2026-06-24):** auth was fixed, all three pushes completed (`43f6a93`/`2ff95d2` on top of these). PHASE2 `main`==`public` at v49, PHASE1 `main` at v85. Both fixes above are now live-browser-validated — see Current Task above for the full retest.
 
 ### Prior Task: REVEAL-TRIGGER-CHURN consolidation (2026-06-22) — not started, now top-ranked by live evidence
 

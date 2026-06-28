@@ -3,6 +3,33 @@
 **Diagnostic only. Do not fix anything until the report comes back. Fix only the
 first confirmed writer conflict — do not patch all reveal functions blindly.**
 
+**Update 2026-06-24 (later same day) — user reconfirmed visible card flashing
+AFTER today's unrelated HUD fix (`b571eb3`/`80cf287`, icon-paint + gearBtn-hide
+only). That fix is confirmed NOT the cause — this is the same
+REVEAL-TRIGGER-CHURN/D4-MUTATION family, still open. Per the user's direct
+ask, the observer below now also watches `#soloQuestion`/`#choiceRow`/
+`.promptBox` (the live question card, not just the reveal panel) since the
+flashing symptom was never confirmed to be reveal-panel-only, and now logs
+target selector + old/new text + call stack per mutation, not just a count.
+Goal unchanged: find the first writer that mutates content after paint, then
+consolidate to one idempotent owner or suppress post-settle writes. Do not
+add another wrapper layer to do this.**
+
+**Update 2026-06-24 (full retest against `main` 2ff95d2/v49, supersedes the older
+v46/`fee324a` framing below):** duplicate board-trigger rendering and the "Gate
+Completed"→"Learning Moment" title flip did NOT reproduce on a normal card this
+round, and stale-visible-dx-after-Space is now confirmed fixed. Don't treat
+"didn't reproduce" as "fixed for good" — re-check under the original 06-22
+repro conditions (board-trigger-only card, longer dwell) during this
+instrumentation pass, not just a fresh normal-card flow. Mutation count
+re-measured at **89** for one normal reveal — still high, still the reason this
+prompt exists. New, sharper finding to fold in: hidden reveal content still
+mutates to the next card's trigger/board text after Space while the panel is
+hidden — log writes even while `#soloReveal` is hidden, don't assume "hidden"
+means "inert." Also: `window.current` was observed null/absent (not just
+disagreeing) while rendered DOM was correct — log whether `window.current` is
+even defined at each `[INSTR]` point, don't only compare its value.
+
 ## Static groundwork already done (verify, don't re-derive)
 
 Read the source directly before this prompt so the instrumentation targets the
@@ -73,18 +100,32 @@ Inject before any user action:
     window[name] = function(...args) {
       console.log(`[INSTR] ${name}`, {
         t: performance.now(), args,
-        currentQid: window.current?.qid_unique || window.current?.qid,
+        currentDefined: 'current' in window, currentQid: window.current?.qid_unique || window.current?.qid,
         soloQuestionText: document.getElementById('soloQuestion')?.textContent?.slice(0,60),
         soloRevealTitle: document.getElementById('soloRevealTitle')?.textContent,
+        soloRevealDx: document.getElementById('soloRevealDx')?.textContent?.slice(0,60),
         soloTrigger: document.getElementById('soloTrigger')?.textContent?.slice(0,60),
         boardTrigger: document.querySelector('.boardTrigger350')?.textContent?.slice(0,60),
+        oneThing: document.querySelector('.oneThing350')?.textContent?.slice(0,60),
+        soloRevealRatings: document.getElementById('soloRevealRatings')?.textContent?.slice(0,60),
+        revealHidden: document.getElementById('soloReveal')?.hidden ?? document.getElementById('soloReveal')?.style.display === 'none',
         stack: new Error().stack.split('\n').slice(1,4).join(' | ')
       });
       return orig.apply(this, args);
     };
   });
-new MutationObserver(muts => console.log('[MUT]', performance.now(), muts.length))
-  .observe(document.getElementById('soloReveal'), {childList:true, subtree:true, characterData:true});
+['#soloReveal','#soloQuestion','#choiceRow','.promptBox','.boardTrigger350','.oneThing350']
+  .forEach(sel => {
+    const el = document.querySelector(sel);
+    if (!el) return;
+    new MutationObserver(muts => muts.forEach(m => console.log('[MUT]', performance.now(), sel, {
+      type: m.type,
+      target: m.target.nodeName + (m.target.className ? '.' + m.target.className : ''),
+      oldText: (m.oldValue || '').slice(0, 60),
+      newText: (m.target.textContent || '').slice(0, 60),
+      stack: new Error().stack.split('\n').slice(1, 4).join(' | ')
+    }))).observe(el, {childList: true, subtree: true, characterData: true, characterDataOldValue: true});
+  });
 ```
 
 Then run exactly this flow once, logging every `[INSTR]`/`[MUT]` line with
@@ -99,4 +140,17 @@ what `current`/rendered-text state it saw, and whether the title/board content
 it wrote matches what was already on screen. Flag the exact moment (if any)
 `currentQid` stops matching `soloQuestionText`'s card, and the exact moment (if
 any) the title flips after the initial reveal with no logged user action in
-between.
+between. Also flag: any `[INSTR]` entry where `revealHidden` is true but the
+function still wrote new dx/trigger/board/oneThing/ratings text (proves the
+hidden-but-still-mutating finding from 2026-06-24), and any entry where
+`currentDefined` is false (proves `window.current` is absent rather than just
+disagreeing).
+
+**Run the flow on an iPhone-size viewport with a real uploaded deck** (matches
+the user's exact repro conditions for the flashing report). State explicitly:
+the first `[MUT]` entry that fires after the user's last input with no
+further input in between (the candidate root cause of visible flashing), and
+whether it targets the reveal panel, the live question card, or both. End
+with one of: (a) one specific writer to make idempotent or remove, or (b) "no
+single writer found, needs another pass" — do not guess past what the log
+shows.
