@@ -5678,9 +5678,6 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       }
     }
   }, true);
-  const mo = new MutationObserver(()=>{ ensureFullDropdown('solo'); ensureFullDropdown('domain'); });
-  mo.observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
-  document.addEventListener('DOMContentLoaded',()=>{ ensureFullDropdown('solo'); ensureFullDropdown('domain'); });
 })();
 </script>
 
@@ -8754,7 +8751,7 @@ Rules:
     const raw=clean(value);
     const key=oneThingStableKey351(card,raw);
     const store=window.__cozyOneThingExpandedState351||(window.__cozyOneThingExpandedState351={});
-    const longEnough=raw.length>160||el.dataset.oneThingMeasuredLong351==='1';
+    const longEnough=raw.length>160||(el.dataset.oneThingStableKey===key&&el.dataset.oneThingMeasuredLong351==='1');
     const expanded=longEnough?store[key]==='1':true;
     el.dataset.oneThingStableKey=key;
     el.dataset.oneThingOverflowSignature=raw;
@@ -14489,6 +14486,7 @@ if(typeof priorAdvance==='function' && !priorAdvance.__cozyRatingPath20260603){
         var dxEl351=q(which==='domain'?'domainDx':'soloRevealDx'); if(dxEl351) dxEl351.textContent='';
         var triggerEl351=q(which==='domain'?'domainObj':'soloTrigger'); if(triggerEl351){ triggerEl351.innerHTML=''; delete triggerEl351.dataset.revealSectionsSig; delete triggerEl351.dataset.v350Key; }
         var boardEl351=revealRoot351.querySelector('.boardTrigger350'); if(boardEl351){ boardEl351.innerHTML=''; boardEl351.style.display='none'; delete boardEl351.dataset.boardSig; }
+        var oneEl351=revealRoot351.querySelector('.oneThing350'); if(oneEl351) delete oneEl351.dataset.oneThingMeasuredLong351;
       }
     }catch(_){}
     return priorAdvance.apply(this,arguments);
