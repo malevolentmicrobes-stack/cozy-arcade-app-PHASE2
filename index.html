@@ -5978,9 +5978,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       }
     }
     else if(n>0 && n%10===0){
-      const next=peekNextCard();
-      const preview=next&&next.board_trigger?clean(next.board_trigger).slice(0,120)+'...':'Next board trigger is ready.';
-      showPulseToast(KNOWLEDGE_PULSE.ten, persona.ten_correct_message+'\n\n'+preview, 'blue');
+      window.__cozyPendingBoardTriggerToast351={title:KNOWLEDGE_PULSE.ten,prefix:persona.ten_correct_message};
     }
     else if(n>0 && n%5===0){
       const sys=systemOf351(card);
@@ -14497,7 +14495,12 @@ if(typeof priorAdvance==='function' && !priorAdvance.__cozyRatingPath20260603){
         var oneEl351=revealRoot351.querySelector('.oneThing350'); if(oneEl351&&!oneEl351.querySelector('textarea,.oneThingEdit351')){delete oneEl351.dataset.oneThingMeasuredLong351; delete oneEl351.dataset.oneThingStableRenderSig; oneEl351.innerHTML='';}
       }
     }catch(_){}
-    return priorAdvance.apply(this,arguments);
+    var out=priorAdvance.apply(this,arguments);
+    try{
+      var pbt=window.__cozyPendingBoardTriggerToast351;
+      if(pbt){window.__cozyPendingBoardTriggerToast351=null;var nc;try{nc=current;}catch(_){}var btPreview=nc&&nc.board_trigger?clean(nc.board_trigger).slice(0,120)+'...':'Next board trigger is ready.';if(typeof window.showPulseToast==='function') window.showPulseToast(pbt.title,pbt.prefix+'\n\n'+btPreview,'blue');}
+    }catch(_){}
+    return out;
   };
   wrappedAdvance.__cozyRatingPath20260603=true;
   window.advance=advance=wrappedAdvance;
