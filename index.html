@@ -14494,7 +14494,7 @@ if(typeof priorAdvance==='function' && !priorAdvance.__cozyRatingPath20260603){
         var dxEl351=q(which==='domain'?'domainDx':'soloRevealDx'); if(dxEl351) dxEl351.textContent='';
         var triggerEl351=q(which==='domain'?'domainObj':'soloTrigger'); if(triggerEl351){ triggerEl351.innerHTML=''; delete triggerEl351.dataset.revealSectionsSig; delete triggerEl351.dataset.v350Key; }
         var boardEl351=revealRoot351.querySelector('.boardTrigger350'); if(boardEl351){ boardEl351.innerHTML=''; boardEl351.style.display='none'; delete boardEl351.dataset.boardSig; }
-        var oneEl351=revealRoot351.querySelector('.oneThing350'); if(oneEl351) delete oneEl351.dataset.oneThingMeasuredLong351;
+        var oneEl351=revealRoot351.querySelector('.oneThing350'); if(oneEl351&&!oneEl351.querySelector('textarea,.oneThingEdit351')){delete oneEl351.dataset.oneThingMeasuredLong351; delete oneEl351.dataset.oneThingStableRenderSig; oneEl351.innerHTML='';}
       }
     }catch(_){}
     return priorAdvance.apply(this,arguments);
