@@ -5972,19 +5972,19 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       const pct=acc.total>0?Math.round((acc.correct/acc.total)*100):100;
       showPulseToast(KNOWLEDGE_PULSE.five, formatPersona351(persona.five_correct_message,{system:sys,pct:pct,n:n}), 'cyan');
     }
-    if(n>0 && n%10===0){
+    else if(n>0 && n%10===0){
       const next=peekNextCard();
       const preview=next&&next.board_trigger?clean(next.board_trigger).slice(0,120)+'...':'Next board trigger is ready.';
       showPulseToast(KNOWLEDGE_PULSE.ten, persona.ten_correct_message+'\n\n'+preview, 'blue');
     }
-    if(n>0 && n%25===0){
+    else if(n>0 && n%25===0){
       const weak=getWeakestSystem();
       if(weak){
         const pct=Math.round((weak.correct/weak.total)*100);
         showPulseToast(KNOWLEDGE_PULSE.twentyFive, formatPersona351(persona.weak_system_message,{system:weak.system,pct:pct,n:n}), 'gold');
       }
     }
-    if(n>0 && n%50===0){
+    else if(n>0 && n%50===0){
       const sigil=clean(card&&card.one_thing)||clean(card&&card.quick_recall)||'One signal anchored.';
       showPulseToast(KNOWLEDGE_PULSE.fifty, persona.fifty_correct_message+'\n\n'+sigil, 'gold');
     }
