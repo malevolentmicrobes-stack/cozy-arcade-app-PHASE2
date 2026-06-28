@@ -8938,7 +8938,7 @@ Rules:
   }
   const previousReveal=window.reveal;
   if(typeof previousReveal==='function'){
-    window.reveal=reveal=function(which,ok){const out=previousReveal.apply(this,arguments); setTimeout(()=>renderRevealSections(which),0); return out;};
+    window.reveal=reveal=function(which,ok){const out=previousReveal.apply(this,arguments); renderRevealSections(which); return out;};
   }
   const previousFullCard=window.fullCard;
   window.fullCard=fullCard=function(){if(!current) return previousFullCard&&previousFullCard(); document.getElementById('modalTitle').textContent=sourceAnswer(current); document.getElementById('modalText').textContent=sourceFull(current); document.getElementById('modal').classList.remove('hidden');};
