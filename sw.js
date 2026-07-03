@@ -1,5 +1,5 @@
 /* Cozy Arcade PHASE2 Service Worker — offline-first for ABIM study anywhere */
-const CACHE = 'cozy-arcade-PHASE2-v58';
+const CACHE = 'cozy-arcade-PHASE2-v61';
 const APP_SHELL = ['./', './index.html', './manifest.json'];
 
 self.addEventListener('install', event => {

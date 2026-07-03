@@ -314,6 +314,41 @@ OPEN_DIFFERENTIALS.md is always the authoritative source of truth for bug status
 
 ---
 
+## ADDENDUM 2026-06-28 — BOARD TRIGGER CLEAN + POOL TIMING FIX
+
+### SW STATE
+| Repo | SW | Key changes |
+|------|-----|-------------|
+| PHASE2 | **v60** | v59: board trigger clean fix; v60: wrappedSelect pool timing fix |
+| PHASE1 | **v95** | v95: wrappedSelect pool timing fix (same as PHASE2 v60) |
+
+### FIXES APPLIED THIS SESSION
+
+**v59 — PHASE2 only — Board Trigger clean inconsistency (index.html)**
+- Root cause: `ensureBoard` (line 6749) and live root (line 7128) used the IIFE-local `clean` (line 5824) which does NOT strip "NOT SPECIFIED IN SOURCE"; `renderRevealSections` used a different local `clean` (line 8649) that DOES strip it. Cards with placeholder text showed board trigger visible for 1 frame, then hidden.
+- Also: neither location set `board.dataset.boardSig`, causing `renderRevealSections` to re-render the board trigger on every reveal even when live root already rendered it correctly.
+- Fix: both locations now strip "NOT SPECIFIED IN SOURCE" inline before `safeBionic()`, AND set `board.dataset.boardSig = String(card.board_trigger||'')` to allow `renderRevealSections` to skip redundant re-renders.
+- Nephrolithiasis stuck-board-trigger bug confirmed resolved by this fix.
+
+**v60 — BOTH REPOS — wrappedSelect premature seenThisSession (index.html)**
+- Root cause: `wrappedSelect` (cozy-rating-path-rectifier, ~line 14458 PHASE2 / ~14893 PHASE1) called `rateOnce(card,rating)` synchronously at selection time. `rateOnce` → `rateCard` → `rate` → `wrappedRate` → `seenThisSession.add(card)`. This updated `seenThisSession` BEFORE `advance()` fired. When `advance()` ran and `nextCard()` rebuilt the filtered pool, the pool was already smaller by 1 card with `index` pointing to the pre-rebuild position — causing `current` to land on an unexpected card. Board trigger then showed that unexpected card's content ("stuck on an alternative question"). The surge review toast (n=10) also previewed the wrong card's board_trigger for the same reason.
+- Fix: replaced `if(!rateOnce(card,rating)) pendingFor(card,rating); else {...}` with `pendingFor(card,rating)`. `wrappedAdvance` already calls `rateOnce` correctly at line 14490 (before `priorAdvance.apply()`), committing the rating and updating `seenThisSession` at the correct pool-transition moment.
+- This worked before SM2 patches. This is why: pre-patch `selectSolo` never touched `seenThisSession`. SM2 patch introduced the synchronous rating at select time.
+
+### CARD STATE CONTEXT (deck session 2026-06-28)
+- RHEUM-003 = popliteal cyst card; state=review, last_rating=good, due 2026-07-01
+- Deck: 60 cards total — 28 new, 21 review, 11 relearning
+- "new-in-order"/"random new" + mixed relearning cards = pool rebuilds frequently = amplified the pool-index misalignment bug
+
+### VALIDATION REQUIRED BEFORE PUSH
+```
+window.runFSRSValidation()   // 17/17
+window.runCozySmokeTests()   // 6/6
+```
+Visual check: board trigger shows correct card's content immediately on reveal; n=10 surge review toast previews the NEXT card (not current or previous).
+
+---
+
 ### CLAUDE SESSION-END CHECKLIST (run before every response that ends a session)
 
 Claude runs these updates autonomously. Never ask the user to do this.
@@ -454,3 +489,36 @@ This extends the 2026-06-17 autonomous session protocol above. That protocol cov
 - If STEP 1's differential reveals the root cause is **not** what the prompt assumed.
 - If a fix would require touching index.html in a repo other than the one specified, or adding a new `<script>` block / new cardPool/nextCard wrapper.
 - If a validation step fails after the fix is applied — report STEP 1-3 findings, do not retry blindly or paper over with a second patch in the same session.
+
+---
+
+## ADDENDUM 2026-06-28 — Knowledge Pulse Toasts + oneThing Flash (v50→v56 / v86→v92)
+
+**Context:** Session continued oneThing350 multi-observer work from 2026-06-24. Codex review identified stale measurement carryover as the real bug (not the 5 static-analysis bugs Claude initially ranked). Three bugs fixed this session; one open.
+
+### What Changed
+
+| Commits | Bug | Root Cause | Fix |
+|---------|-----|-----------|-----|
+| PHASE2 v53 / PHASE1 v89 | Toast click-blocking in Domain mode | `pointer-events:none` on `.pulseToast351` was inside `.cozyGameShellActive371` guard; `renderDomain()` clears `body.className` mid-game | Moved `pointer-events:none` to base rule, unconditional |
+| PHASE2 v53 / PHASE1 v89 | Toast stacking | `showPulseToast()` appended without clearing prior toasts | Added `querySelectorAll('.pulseToast351').forEach(t=>t.remove())` at top of `showPulseToast()` |
+| PHASE2 v55 / PHASE1 v91 | Wrong milestone toast (SYSTEM SURGE instead of BOARD TRIGGER UNLOCKED at n=10) | `else if` chain was 5→10→25→50; `n=10` matched `n%5===0` first. Also: PHASE2 fallback `peekNextCard()` had `+1` index offset | Reordered to 50→25→10→5; fixed PHASE2 fallback index |
+| PHASE2 v56 / PHASE1 v92 | Prior card One Thing text flashing one frame on new reveal | `wrappedAdvance` cleared dataset flag but not `innerHTML`; `renderRevealSections()` deferred via `setTimeout(0)` leaves 1-frame stale DOM gap; `renderOneThingStable351` trusted stale measurement when card key changed | `wrappedAdvance` clears `innerHTML` + `oneThingStableRenderSig` (guarded vs. active textarea); measurement guard tightened to check `oneThingStableKey===key` |
+
+**Lesson burned in this session:** with `else if`, highest-specificity divisor must come first — `n%5` is always true when `n%10` is true, so 5 listed before 10 silently swallows the 10 case.
+
+### What Is Still Open
+
+**BOARD-TRIGGER-PREVIEW-TIMING (not yet browser-confirmed):** `peekNextCard()` reads the pre-advance pool. By the time the next card is actually selected, `poolKey()` has changed (includes `seenThisSession.size`, which updates inside `wrappedRate`), pool has rebuilt, and `index` reset to 0. The preview card shown in the n=10 toast likely ≠ actual next card. Needs browser harness: log `peekNextCard().id` vs `current.id` after advance at 9→10 correct, then decide strategy.
+
+**MULTI-OWNER-CLEANUP (Codex post-test recommendation, low urgency):** Competing card import normalizers, no single progress-merge owner, multiple independent reveal writers, unguarded localStorage deck restore (`cozy_arcade_limitless_cards_v1`, PHASE2 line ~8430). Documented in OPEN_DIFFERENTIALS.md. Do not fix opportunistically — scope as a dedicated cleanup pass.
+
+**5 remaining sources for prior-card/refresh/progress glitch (Codex post-test):** Fix is good for oneThing DOM specifically but broader glitch not closed. Codex flagged: (1) stale card object persisting across advance, (2) multiple competing reveal writers, (3) progress merge split between state/phase3State, (4) localStorage deck restore firing unconditionally, (5) pool rebuild timing. No single commit closes this family.
+
+### State at Handoff
+
+- SW: PHASE2 `cozy-arcade-PHASE2-v56` (commit `e21abcd`) | PHASE1 `cozy-arcade-v92` (commit `4b0ab35`)
+- Both repos: pushed, user-browser-validated, working trees clean
+- Validation gates still passing: `window.runFSRSValidation()` 17/17, `window.runCozySmokeTests()` 6/6
+- `runSRSValidation()` (obsolete SM-2) expected to fail — not a regression signal
+- Next Codex task if scoped: Board Trigger preview timing harness (log peek vs. actual at 9→10)

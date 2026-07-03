@@ -17,7 +17,9 @@ Rules:
 
 **File convention (added 2026-06-19):** active/queued `CODEX_PROMPT_N_*.md` files live at repo root — there should only ever be a small, current set. Once a prompt's fix lands (commit) or its diagnostic report is received and acted on, move it to `docs/archive/codex_prompts/` (`git mv` if tracked, `mv` if not yet committed). Don't leave completed prompts at root — that's how this got to 12 files needing a cleanup pass today.
 
-**Current SW (2026-06-24, confirmed via direct git fetch + sw.js read, not just this doc):** PHASE2 `cozy-arcade-PHASE2-v49` (commit `43f6a93`, `main`==`public`) | PHASE1 `cozy-arcade-v85` (commit `450c084`). Both repos fully pushed, working trees clean. See "Current Task" below for the 2026-06-24 retest against this exact build.
+**Current SW (2026-06-28, confirmed via direct sw.js read):** PHASE2 `cozy-arcade-PHASE2-v56` (commit `e21abcd`, `main`) | PHASE1 `cozy-arcade-v92` (commit `4b0ab35`, `main`). Both repos fully pushed, user-browser-validated. See "Current Task" below for 2026-06-28 session.
+
+**Current SW (2026-06-24, confirmed via direct git fetch + sw.js read, not just this doc) — superseded:** PHASE2 `cozy-arcade-PHASE2-v49` (commit `43f6a93`) | PHASE1 `cozy-arcade-v85` (commit `450c084`).
 
 **Current SW (2026-06-19, ~6:30pm) — superseded, kept for history:** PHASE2 `cozy-arcade-PHASE2-v36` (commit `34697f4`) | PHASE1 `cozy-arcade-v72` (commit `02e4d23`)
 **2026-06-22 Codex correction:** PHASE2 sparse-card pollution was still live after `e5e6f6d`. Real Upload button/browser validation found two confirmed mutators: old `normalizeLimitlessCard()` still treated `back`/`answer`/`output` as soft learning-field fallbacks, and `normalizeCardFields352()` copied `answer` into `educational_objective`, `quick_recall`, and `level_2_three_second_exposure` after import. Current PHASE2 fix makes optional learning fields source-preserving in both live normalizers and bumps SW to `cozy-arcade-PHASE2-v41`. Validate with `/private/tmp/cozy_live_upload_glitch_retest.mjs` or equivalent real-file-chooser upload, not direct function injection.
@@ -120,7 +122,23 @@ iOS1 scaffold is done — remaining iOS steps (`npx cap add ios` → `npx cap sy
 | DOMAIN-BIONIC (window.bionic\|\|bionic) in domain render | ✅ source-confirmed | f345dda |
 | STATE-B deck restore (atlas sysmap → canonical deck key) | ✅ fixed | 98b5254 |
 
-### Current Task: shared transition lock applied for card flashing, awaiting Codex retest (2026-06-24)
+### Current Task: Knowledge Pulse toasts + oneThing prior-card flash fixed; Board Trigger preview timing still open (2026-06-28)
+
+**Session 2026-06-28 — v50→v56 / v86→v92 patch bundle (user-browser-validated):**
+
+Three bugs fixed across both repos:
+
+1. **Toast click-blocking** (PHASE2 v53 / PHASE1 v89): `pointer-events:none` moved from under `.cozyGameShellActive371` guard to base `.pulseToast351` rule — `renderDomain()` clears `body.className`, stripping the class mid-game.
+
+2. **Milestone priority order** (PHASE2 v55 / PHASE1 v91): `checkKnowledgePulse()` `else if` chain reordered 50→25→10→5 (was 5→10→25→50). At `n%10`, the old order matched `n%5` first → showed SYSTEM SURGE instead of BOARD TRIGGER UNLOCKED. Also fixed PHASE2 fallback `+1` index offset in `peekNextCard()` (PHASE1 had already been corrected earlier).
+
+3. **oneThing prior-card flash** (PHASE2 v56 / PHASE1 v92): `wrappedAdvance` now clears `innerHTML` + `oneThingStableRenderSig` on advance (guarded against active textarea). `renderOneThingStable351` stale-measurement guard tightened: trusts `oneThingMeasuredLong351` only when `oneThingStableKey` matches current card.
+
+**Still open:**
+- BOARD-TRIGGER-PREVIEW-TIMING: `peekNextCard()` reads the pre-advance pool. `poolKey()` includes `seenThisSession.size`, which updates inside `wrappedRate`, so the pool rebuilds and `index` resets to 0 before the next card is actually selected. Preview card id ≠ actual next card at n=10. Needs browser harness to confirm and then decide strategy (pre-compute vs. skip preview).
+- MULTI-OWNER-CLEANUP: One import owner, one progress-merge owner, one reveal-render owner (Codex recommendation). Gate localStorage deck restore (`cozy_arcade_limitless_cards_v1`, PHASE2 line 8430). Documented, not yet assigned.
+
+### Prior Task: shared transition lock applied for card flashing, awaiting Codex retest (2026-06-24)
 
 Codex's expanded `PROMPT_17` run (real deck, iPhone viewport, both repos) found the real mechanism: 19 separate `keydown` listeners in this file; for Enter/Space during a Solo reveal at least 5 independent paths (`advanceReveal`@3178, `continueReveal`@1279/3278/6810, `clickContinue`@5653, base handler@432) can each call `advance()` on one keystroke, because `stopImmediatePropagation` is globally shimmed to a no-op during reveal-open (FQ-ALGO-9). Three of those already had their own local debounce lock, but the locks don't share state, so cross-path double-firing wasn't actually prevented. Claude verified this directly against source (not just Codex's prose) and found one additional open question Codex's report didn't flag: the raw instrumentation log shows the cascade firing ~6ms *before* the harness's own recorded Space keydown — most likely Playwright IPC latency, not confirmed.
 
