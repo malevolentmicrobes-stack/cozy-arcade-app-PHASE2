@@ -5422,7 +5422,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     const p=promptFor(c), a=revealFor(c), d=choiceFor(c) || ('Imported card '+(i+1));
     c.id=c.id || (i+1); c.qid=c.qid || c.original_qid || String(c.id);
     c.presentation=p; c.prompt=p; c.clinical_vignette_summary=c.clinical_vignette_summary || p;
-    c.educational_objective=c.educational_objective||((a&&a!==d)?a:''); c.answer=a; c.quick_recall=c.quick_recall||((a&&a!==d)?a:'');
+    c.educational_objective=c.educational_objective||''; c.answer=a; c.quick_recall=c.quick_recall||'';
     c.diagnosis=d; c.system=c.system || c.sys || c.subject || ''; c.sys=c.sys || c.system;
     if(!Array['isArray'](c.tags)){c.tags=c.tags?String(c.tags).split(/[|;,]/).map(clean).filter(Boolean):[c.system,c.test,d].filter(Boolean);}
     return c;
