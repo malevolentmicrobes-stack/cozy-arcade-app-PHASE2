@@ -2233,7 +2233,7 @@ body:not(.hideContinueHint175158) .continueHint175158{display:block!important;ma
   function relabelMainFilters(){
     document.querySelectorAll('option,button,span,small,div,label').forEach(el=>{
       if(!el.childElementCount && el.textContent){
-        el.textContent=el.textContent
+        const next=el.textContent
           .replace(/Flagged: pinned \+ No Idea/g,'Pinned + No Idea')
           .replace(/Review deck: flagged \/ missed \/ hard/g,'Review deck: pinned / missed / hard')
           .replace(/Flagged \/ pinned only/g,'Pinned only')
@@ -2241,6 +2241,7 @@ body:not(.hideContinueHint175158) .continueHint175158{display:block!important;ma
           .replace(/flagged/g,'pinned')
           .replace(/Flagged/g,'Pinned')
           .replace(/^Flag$/,'Pin');
+        if(next!==el.textContent) el.textContent=next;
       }
     });
   }
@@ -2541,12 +2542,13 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   function pinLanguage(){
     document.querySelectorAll('option,button,span,small,div,label').forEach(el=>{
       if(el.childElementCount || !el.textContent) return;
-      el.textContent=el.textContent
+      const next=el.textContent
         .replace(/flagged \/ missed \/ hard/gi,'pinned / missed / hard')
         .replace(/flagged cards/gi,'pinned cards')
         .replace(/flagged/gi,'pinned')
         .replace(/Flagged/g,'Pinned')
         .replace(/^Flag$/,'Pin');
+      if(next!==el.textContent) el.textContent=next;
     });
   }
 
@@ -6786,7 +6788,8 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       if(_insertAnchor) _insertAnchor.insertAdjacentElement('afterend',box);
       else btn.closest('.controls')?.insertAdjacentElement('afterend',box);
     }
-    btn.textContent=box.classList.contains('hidden')?'Full Card ▼':'Full Card ▲';
+    const _fullLabel351=box.classList.contains('hidden')?'Full Card ▼':'Full Card ▲';
+    if(btn.textContent!==_fullLabel351) btn.textContent=_fullLabel351;
     btn.dataset.v350='1';
     btn.onclick=e=>{
       if(e){e.preventDefault(); e.stopPropagation();}
@@ -7097,7 +7100,8 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   function refreshPinButtons(){
     const pinned=!!((state||{})[cardKey(current)]&&(state||{})[cardKey(current)].pinned);
     document.querySelectorAll('[data-rate="pin"]').forEach(btn=>{
-      btn.textContent=pinned?'Unpin':'Pin';
+      const _pinLabel351=pinned?'Unpin':'Pin';
+      if(btn.textContent!==_pinLabel351) btn.textContent=_pinLabel351;
       btn.classList.toggle('pinActive350',pinned);
       if(false && !btn.dataset.pin350){
         btn.dataset.pin350='1';
