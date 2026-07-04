@@ -1,4 +1,8 @@
-name: Deploy to GitHub Pages
+name: Sync main to public (GitHub Pages)
+
+# Pages is configured to deploy from the `public` branch, not `main`.
+# This keeps that setting as-is and just mirrors main -> public on every
+# push, so nobody has to remember to run `git push origin main:public` by hand.
 
 on:
   push:
@@ -6,35 +10,20 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: false
+  contents: write
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout main
         uses: actions/checkout@v4
-
-      - name: Remove VCS metadata from artifact
-        run: rm -rf .git
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          ref: main
+          fetch-depth: 0
 
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Push main to public
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git push origin HEAD:public --force
