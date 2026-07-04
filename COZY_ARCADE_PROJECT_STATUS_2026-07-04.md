@@ -36,8 +36,19 @@
 
 ---
 
+## ADVANCE-LOCK-SELF-CANCEL — emergency, same day, fixed and live-confirmed
+Switching Pages to `main` exposed a real regression already sitting on `main` for weeks: Space/Continue hid the reveal panel but never dealt the next card. Root cause: `bindFinalRatings()` set a redundant pre-lock before calling `advance()`, and `wrappedAdvance`'s shared 350ms lock checked/set unconditionally even on non-reveal calls, letting stray calls poison the timestamp right before the real press arrived. Fixed both repos (PHASE2 `933a74e`, PHASE1 `3361061`, v64→v65/v99→v100). User played it live and confirmed. Full incident + prevention lesson in OPEN_DIFFERENTIALS.md `ADVANCE-LOCK-SELF-CANCEL`.
+
+## REVEAL-TRIGGER-CHURN — root cause found and fixed same day
+Weeks of "multi-writer reveal architecture" investigation only had half the picture. Live MutationObserver + stack-trace instrumentation (real Upload-button flow) found the actual majority contributor: two undocumented `setInterval` sweeps (`relabelMainFilters()` 1200ms, `pinLanguage()` 1000ms) walking the entire document and unconditionally rewriting `.textContent` even when unchanged, plus two more unconditional writers (`ensureFull()`, `refreshPinButtons()`) on the existing 250ms reveal-open interval. Added write-if-changed guards to all four — same idempotency pattern already used elsewhere in this file. Measured: 58→10 writes reveal-open, 49→12 post-advance, both repos, confirmed live not just local. Re-tested the "stale content while hidden" question directly on live — no drift found. PHASE2 `c013ff6` (v65→v66), PHASE1 `49475dc` (v100→v101). Full writeup in OPEN_DIFFERENTIALS.md `REVEAL-TRIGGER-CHURN`.
+
+**What's still open in the reveal chain:** the underlying architecture (at least 5 confirmed-live wrapper layers for the solo-answer path — lines 2485/9751/9413/8946/7133, verified today by live stack trace, NOT the "1 root + 3 chain" the 06-19 docs claimed) is unconsolidated. Domain-mode and other call sites not yet verified against the same trace. See RECTIFIER_PLAN's 2026-07-04 addendum for the full plan if/when this gets tackled.
+
+## Why so many errors today — read this before assuming any doc/memory claim is current
+Four separate incidents in one session, each with the same root shape: something was declared true (deploy fixed, advance fixed, reveal chain mapped) without live re-verification, and stayed wrong for days-to-weeks before someone actually checked. Full pattern analysis in `RECTIFIER_PLAN_2026_05_26.md`'s 2026-07-04 addendum. Short version: curl/instrument/trace before declaring anything done, every time, regardless of what a prior session recorded.
+
 ## Open, unrelated to today's work (carried forward, see OPEN_DIFFERENTIALS.md for full detail)
-- `REVEAL-TRIGGER-CHURN` — top-ranked real bug, multi-writer reveal architecture, needs a dedicated consolidation pass.
-- HUD settings button offscreen on iPhone (PHASE2); PHASE1's unconditional home-button-hide CSS rule.
+- HUD settings button offscreen on iPhone (PHASE2) superseded — corrected finding: PHASE1 has duplicate anonymous Home buttons partially offscreen instead; gear/Settings visibility confirmed fine both repos.
 - `BOARD-TRIGGER-PREVIEW-TIMING`, `MULTI-OWNER-CLEANUP`, `FQ-ALGO-6/K`, `FQ-ALGO-7B`, `DOMAIN-RECORD-ZERO` — lower priority, deliberately deferred.
 - `ANSWER-SELECT-HEADLESS` — headless-Chrome-only artifact, not confirmed user-visible, low priority.
+- `RENDER-NULL-CURRENT` — real defensive gap (`renderSolo` reads `current.system` with no null guard), confirmed via forced test only, not naturally reproduced. Low priority.

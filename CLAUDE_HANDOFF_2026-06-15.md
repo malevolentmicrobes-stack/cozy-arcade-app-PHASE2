@@ -4,6 +4,8 @@
 
 **Rule #2, added 2026-07-04 after this exact mistake wasted a full day twice: never report a fix as "live"/"deployed" on trust — verify with a live curl every time, even if a doc says it was already confirmed.** A 2026-06-24 doc entry (`PAGES-SOURCE-BRANCH` in OPEN_DIFFERENTIALS.md) claimed Pages Source had been switched to `main` and verified live. It hadn't actually stuck (or silently reverted) and nobody re-checked for 10 days — `main` advanced 15+ commits with zero live effect the whole time. Before ever saying "this is live now": `curl -s https://malevolentmicrobes-stack.github.io/<repo>/sw.js | grep CACHE` and compare to local. Full incident + the permanent fix (a `.github/workflows/pages.yml` safety-net workflow that keeps `public` synced to `main` regardless of which branch Pages Source actually points to) is in OPEN_DIFFERENTIALS.md's `DEPLOY-STALE-GATE` entry — read it once, then apply the rule automatically forever.
 
+**Rule #3, added 2026-07-04, generalizes Rule #2: "verified" in any doc (including this one, OPEN_DIFFERENTIALS.md, RECTIFIER_PLAN) is a timestamp, not a permanent fact.** Same session that fixed deploy also fixed a real live-breaking bug (`ADVANCE-LOCK-SELF-CANCEL`) that had sat inert on `main` for weeks because deploy was stale — and separately caught this Claude repeating a 06-19 "dead code" claim about the `reveal()` chain that turned out to be incomplete (missed an entire live layer) when actually re-checked. Read `RECTIFIER_PLAN_2026_05_26.md`'s 2026-07-04 pre-mortem before starting any work that touches deploy config, the `reveal()`/`advance()` chains, or anything a prior session called "confirmed" — re-run the check yourself first.
+
 ---
 
 ## WHO YOU ARE
