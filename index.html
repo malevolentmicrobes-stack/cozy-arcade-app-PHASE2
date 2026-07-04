@@ -5424,7 +5424,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     c.presentation=p; c.prompt=p; c.clinical_vignette_summary=c.clinical_vignette_summary || p;
     c.educational_objective=c.educational_objective||''; c.answer=a; c.quick_recall=c.quick_recall||'';
     c.diagnosis=d; c.system=c.system || c.sys || c.subject || ''; c.sys=c.sys || c.system;
-    if(!Array['isArray'](c.tags)){c.tags=c.tags?String(c.tags).split(/[|;,]/).map(clean).filter(Boolean):[c.system,c.test,d].filter(Boolean);}
+    if(!Array['isArray'](c.tags)){c.tags=c.tags?String(c.tags).split(/[|;,]/).map(clean).filter(Boolean):[c.system,c.test].filter(Boolean);}
     return c;
   }
   function normalizeDeck(){
@@ -8408,7 +8408,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     const clinical=first(c.clinical_vignette,c.clinical_vignette_summary,presentation,'');
     const reveal=first(c.back,c.answer,c.educational_objective,c.educational_obj,c.quick_recall,c.board_trigger,c.output,c.diagnosis,'');
     const quick=first(c.quick_recall,'');
-    const tags=Array['isArray'](c.tags)?c.tags.join('; '):clean(first(c.tags,[system,c.test,c.diagnosis].filter(Boolean).join('; ')));
+    const tags=Array['isArray'](c.tags)?c.tags.join('; '):clean(first(c.tags,[system,c.test].filter(Boolean).join('; ')));
     const cardType=clean(first(c.card_type,c.cardType,c.type,'Imported'));
     const source=clean(first(c.source,c.source_file,c.source_sheet,c.bundle_namespace,'Imported deck'));
     Object.assign(c,{
@@ -8698,7 +8698,7 @@ Rules:
     const recall=first(c.quick_recall,'');
     const treatment=first(c.treatment,'');
     const nextStep=first(c.next_step,'');
-    const tags=Array['isArray'](c.tags)?c.tags.join('; '):first(c.tags_export,c.tags,[sys,c.test,diagnosis].filter(Boolean).join('; '));
+    const tags=Array['isArray'](c.tags)?c.tags.join('; '):first(c.tags_export,c.tags,[sys,c.test].filter(Boolean).join('; '));
     Object.assign(c,{
       id, card_id:first(c.card_id,id), cardId:first(c.cardId,id), json_id:first(c.json_id,id),
       qid_unique:qid, qid, original_qid:first(c.original_qid,qid), legacy_id:first(c.legacy_id,id),
