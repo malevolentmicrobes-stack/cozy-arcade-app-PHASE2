@@ -13,6 +13,24 @@ Rules:
 
 ---
 
+## DEPLOY VERIFICATION — READ THIS BEFORE TRUSTING ANY "LIVE" CLAIM
+
+**Current SW, live-confirmed via direct curl 2026-07-04 (not just local/docs):** PHASE2 `cozy-arcade-PHASE2-v64` (commit `a1fea48`, `main`) | PHASE1 `cozy-arcade-v99` (commit `5ed3f60`, `main`). Both Pages Sources are now `main` directly (PHASE2's Source was corrected 2026-07-04; see `PAGES-SOURCE-BRANCH`/`DEPLOY-STALE-GATE` in OPEN_DIFFERENTIALS.md for the full incident).
+
+**This exact class of failure — declaring a fix "live" without checking — has cost a full day twice now (once ~a week before 2026-07-04, then again on 2026-07-04 itself).** Root cause both times: a doc/session claimed a GitHub Pages Settings change had been made and verified, nobody re-checked it empirically afterward, and it was either never true or silently reverted. `main` advanced 15+ commits over 10+ days with zero live effect while everyone trusted the stale claim.
+
+**Standing rule, no exceptions:** before reporting any fix as "live" or "deployed," run all three of:
+```
+git show origin/public:sw.js | grep CACHE
+git show origin/main:sw.js | grep CACHE
+curl -s https://malevolentmicrobes-stack.github.io/<repo>/sw.js | grep CACHE
+```
+Whichever branch's content matches the curl result is the *actual* live Source — regardless of what Settings claims or what any doc says was done. A doc saying "Pages source was switched" is not proof it stuck.
+
+**Safety net now in place (keep running indefinitely, explicit user decision 2026-07-04):** both repos run `.github/workflows/pages.yml` ("Sync main to public") on every push to `main` — force-pushes `main` into `public` automatically. This means even if a Pages Source setting silently reverts back to `public` again, live can never be more than one push behind, because `public` is now always kept current too.
+
+---
+
 ## Codex Agent Instructions — 2026-06-17 (updated end-of-day)
 
 **File convention (added 2026-06-19):** active/queued `CODEX_PROMPT_N_*.md` files live at repo root — there should only ever be a small, current set. Once a prompt's fix lands (commit) or its diagnostic report is received and acted on, move it to `docs/archive/codex_prompts/` (`git mv` if tracked, `mv` if not yet committed). Don't leave completed prompts at root — that's how this got to 12 files needing a cleanup pass today.

@@ -1,6 +1,8 @@
 # Claude Handoff — Cozy Arcade PHASE2
-**Date:** 2026-06-15, updated 2026-06-17 | For: Claude (new session) or any AI agent
+**Date:** 2026-06-15, updated 2026-07-04 | For: Claude (new session) or any AI agent
 **Rule #1: Do not write a single line of code until you have completed Steps 1–4 below.**
+
+**Rule #2, added 2026-07-04 after this exact mistake wasted a full day twice: never report a fix as "live"/"deployed" on trust — verify with a live curl every time, even if a doc says it was already confirmed.** A 2026-06-24 doc entry (`PAGES-SOURCE-BRANCH` in OPEN_DIFFERENTIALS.md) claimed Pages Source had been switched to `main` and verified live. It hadn't actually stuck (or silently reverted) and nobody re-checked for 10 days — `main` advanced 15+ commits with zero live effect the whole time. Before ever saying "this is live now": `curl -s https://malevolentmicrobes-stack.github.io/<repo>/sw.js | grep CACHE` and compare to local. Full incident + the permanent fix (a `.github/workflows/pages.yml` safety-net workflow that keeps `public` synced to `main` regardless of which branch Pages Source actually points to) is in OPEN_DIFFERENTIALS.md's `DEPLOY-STALE-GATE` entry — read it once, then apply the rule automatically forever.
 
 ---
 
