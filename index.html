@@ -2659,7 +2659,6 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
         if(Date.now() < finalAdvanceLockUntil) return;
         const r = btn.dataset.rate;
         if(r === 'continue'){
-          finalAdvanceLockUntil = Date.now() + 220;
           advance(which);
           return;
         }
@@ -2668,7 +2667,6 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
           if(typeof toast==='function') toast('Pinned');
           return;
         }
-        finalAdvanceLockUntil = Date.now() + 220;
         advance(which);
       };
     });
@@ -14470,9 +14468,9 @@ if(typeof priorSelect==='function' && !priorSelect.__cozyRatingPath20260603){
 var priorAdvance=window.advance || (typeof advance!=='undefined'?advance:null);
 if(typeof priorAdvance==='function' && !priorAdvance.__cozyRatingPath20260603){
   var wrappedAdvance=function(which){
-    if(performance.now()-(window.__cozyLastAdvanceAt351||0)<350) return;
-    try{ window.__cozyLastAdvanceAt351=performance.now(); }catch(_){}
     var revealOpen=visible(q(which==='domain'?'domainReveal':'soloReveal'));
+    if(revealOpen && performance.now()-(window.__cozyLastAdvanceAt351||0)<350) return;
+    if(revealOpen){ try{ window.__cozyLastAdvanceAt351=performance.now(); }catch(_){} }
     var card;
     try{ card=current; }catch(_){}
     var id=cardIdFor(card);
