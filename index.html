@@ -5422,7 +5422,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     const p=promptFor(c), a=revealFor(c), d=choiceFor(c) || ('Imported card '+(i+1));
     c.id=c.id || (i+1); c.qid=c.qid || c.original_qid || String(c.id);
     c.presentation=p; c.prompt=p; c.clinical_vignette_summary=c.clinical_vignette_summary || p;
-    c.educational_objective=a; c.answer=a; c.quick_recall=c.quick_recall || a;
+    c.educational_objective=c.educational_objective||((a&&a!==d)?a:''); c.answer=a; c.quick_recall=c.quick_recall||((a&&a!==d)?a:'');
     c.diagnosis=d; c.system=c.system || c.sys || c.subject || ''; c.sys=c.sys || c.system;
     if(!Array['isArray'](c.tags)){c.tags=c.tags?String(c.tags).split(/[|;,]/).map(clean).filter(Boolean):[c.system,c.test,d].filter(Boolean);}
     return c;
@@ -8736,7 +8736,7 @@ Rules:
       ['NEXT STEP',c.next_step],
       explSplit?['EXPLANATION',expl]:['EXPLANATION / WHY NOT OTHERS',expl||wno],
       explSplit?['WHY NOT OTHERS',wno]:null,
-      ['CLOZE SOURCE',(c.cloze_enabled&&c.cloze_source_text)?c.cloze_source_text:''],
+      ['CLOZE SOURCE',(c.cloze_enabled&&c.cloze_source_text)?String(c.cloze_source_text).replace(/\{\{c\d+::(.*?)(::.*?)?\}\}/g,'$1').trim():''],
       ['TAGS',c.tags]
     ].filter(Boolean).filter(x=>clean(x[1])).map(x=>x[0]+':\n'+x[1]).join('\n\n');
   }
