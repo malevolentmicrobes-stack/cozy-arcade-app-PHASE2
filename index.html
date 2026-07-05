@@ -2330,9 +2330,11 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 .hudHome1751511,.hudHome1751512{order:-10!important;margin-right:4px!important;}
 .hud .hudGroup:last-child{padding-right:62px!important;}
 #soloPause,#domainPause{font-size:0!important;}
-#soloPause::after,#domainPause::after{content:'Ⅱ';font-size:18px;font-family:Orbitron,'DM Sans',system-ui,sans-serif;font-weight:950;}
 #solo .hud [data-home],#domain .hud [data-home]{font-size:0!important;}
-#solo .hud [data-home]::after,#domain .hud [data-home]::after{content:'×';font-size:21px;font-family:Orbitron,'DM Sans',system-ui,sans-serif;font-weight:950;}
+/* ::after content:'Ⅱ'/'×' rules removed 2026-07-05 — duplicated the icon glyph
+   already painted by the newer .hudIconButton371::before{content:attr(data-hud-icon)}
+   system, causing a visible double-icon glitch on Pause and Exit buttons.
+   Same fix as PHASE1 (2026-07-04). */
 /* Knowledge Expansion game: avoid title/card overlap without changing orb mechanics. */
 .domainTitle{top:10px!important;font-size:clamp(23px,3.0vw,44px)!important;letter-spacing:.18em!important;z-index:34!important;}
 .domain .promptBox{top:80px!important;max-height:30vh!important;}
