@@ -6,6 +6,8 @@
 
 **Rule #3, added 2026-07-04, generalizes Rule #2: "verified" in any doc (including this one, OPEN_DIFFERENTIALS.md, RECTIFIER_PLAN) is a timestamp, not a permanent fact.** Same session that fixed deploy also fixed a real live-breaking bug (`ADVANCE-LOCK-SELF-CANCEL`) that had sat inert on `main` for weeks because deploy was stale — and separately caught this Claude repeating a 06-19 "dead code" claim about the `reveal()` chain that turned out to be incomplete (missed an entire live layer) when actually re-checked. Read `RECTIFIER_PLAN_2026_05_26.md`'s 2026-07-04 pre-mortem before starting any work that touches deploy config, the `reveal()`/`advance()` chains, or anything a prior session called "confirmed" — re-run the check yourself first.
 
+**Rule #4, added 2026-07-05: "pushed" is not a claim, it's a SHA comparison.** A "pushed" report turned out false the very next day (local HEAD one full commit ahead of `origin/main`) — curl-ing live conflates two separate gates (reached GitHub? redeployed to CDN?) into one check, exactly what let this slip through. Never say "pushed"/"confirmed" without running: `git -C <repo> ls-remote origin main` and `git -C <repo> rev-parse HEAD`, and checking the two SHAs are byte-identical. Not equal = not pushed, say so plainly. Always use `git -C <repo-path>`, never `cd <path> && git ...`. Full checklist in OPEN_DIFFERENTIALS.md's `GIT-PUSH-VERIFY-GATE` entry.
+
 ---
 
 ## WHO YOU ARE
