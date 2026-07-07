@@ -6719,6 +6719,12 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
     return Math.max(3,Math.min(15,n));
   }
 
+  function shadowAnswerHoldSeconds351(){
+    let n=5;
+    try{n=Number(localStorage.getItem('cozyShadowAnswerHoldSeconds351')||5)||5;}catch(e){}
+    return Math.max(2,Math.min(15,n));
+  }
+
   function applyQuestionSeconds351(){
     const n=questionSeconds351();
     try{if(!shadowActive351){timerMax=n; timer=n;}}catch(e){}
@@ -7166,7 +7172,7 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
       clearTimeout(shadowAnswerTimer351);
       let clock=root.querySelector('.shadowAnswerClock351');
       if(!clock){clock=document.createElement('div'); clock.className='shadowAnswerClock351'; ratings.insertAdjacentElement('afterend',clock);}
-      let left=2;
+      let left=shadowAnswerHoldSeconds351();
       clock.textContent='Shadow auto-advance in '+left+'s';
       const tick=()=>{
         if(!visible(root) || !shadowActive351) return;
@@ -9236,6 +9242,10 @@ Rules:
       const legacyTimer = q('soloTimerInput');
       if(legacyTimer) legacyTimer.value = timing.value;
     }
+    const shadowHold = q('drawerShadowAnswerHold351');
+    if(shadowHold){
+      try{ localStorage.setItem('cozyShadowAnswerHoldSeconds351', shadowHold.value); }catch(_){}
+    }
     try{ if(typeof toast === 'function') toast('Settings applied'); }catch(_){}
     updateDrawer351();
   }
@@ -9293,11 +9303,58 @@ Rules:
             </div>
           </div>
         </details>
+        <details class="drawerPanel351" id="advancedSettings351">
+          <summary>Advanced Settings</summary>
+          <div class="htpBody351">
+            <div class="htpSection351">
+              <span class="htpLabel351">Shadow Dungeon</span>
+              <label>Answer view before auto-advance</label>
+              <select id="drawerShadowAnswerHold351"><option value="2">2 seconds</option><option value="3">3 seconds</option><option value="4">4 seconds</option><option value="5">5 seconds</option><option value="6">6 seconds</option><option value="7">7 seconds</option><option value="8">8 seconds</option><option value="9">9 seconds</option><option value="10">10 seconds</option><option value="11">11 seconds</option><option value="12">12 seconds</option><option value="13">13 seconds</option><option value="14">14 seconds</option><option value="15">15 seconds</option></select>
+              <div class="htpRow351">Shadow Dungeon only. How long the answer/reveal stays up before auto-advancing to the next card. Default (5s) unchanged unless you pick a different value.</div>
+            </div>
+            <div class="htpSection351">
+              <span class="htpLabel351">Clear Local State</span>
+              <div class="drawerActions351" style="margin-top:6px">
+                <button class="btn red" id="drawerClearProgress351" type="button">🗑️ Clear Progress Only</button>
+                <button class="btn red" id="drawerClearDeckProgress351" type="button">🗑️ Clear Deck + Progress</button>
+              </div>
+              <div id="drawerClearConfirm351" class="hidden" style="margin-top:10px">
+                <p id="drawerClearConfirmText351" style="margin:0 0 10px">Are you sure? This will remove local progress.</p>
+                <button class="btn primary" id="drawerClearAccept351" type="button">Accept</button>
+                <button class="btn" id="drawerClearCancel351" type="button">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </details>
       </div>
       <div class="drawerFooter351">Cozy Arcade Board Prep - LIMITLESS - Public Blank - v18</div>`;
     document.body.appendChild(drawer);
     q('closeDrawer351').onclick = closeDrawer351;
     q('drawerApply351').onclick = applyDrawer351;
+    q('drawerClearCancel351').onclick = function(){ q('drawerClearConfirm351').classList.add('hidden'); };
+    q('drawerClearAccept351').onclick = function(){
+      var mode = q('drawerClearConfirm351').dataset.mode;
+      if(mode === 'deckProgress'){
+        if(typeof window.clearAllLocalDeckAndProgress === 'function') window.clearAllLocalDeckAndProgress();
+      } else {
+        if(typeof window.clearAllLocalProgress === 'function') window.clearAllLocalProgress();
+      }
+      q('drawerClearConfirm351').classList.add('hidden');
+      try{ if(typeof toast === 'function') toast(mode === 'deckProgress' ? 'Local deck + progress cleared' : 'Local progress cleared'); }catch(_){}
+      updateDrawer351();
+    };
+    q('drawerClearProgress351').onclick = function(e){
+      e.stopPropagation();
+      q('drawerClearConfirm351').dataset.mode = 'progress';
+      q('drawerClearConfirmText351').textContent = 'Are you sure? This will remove local progress.';
+      q('drawerClearConfirm351').classList.remove('hidden');
+    };
+    q('drawerClearDeckProgress351').onclick = function(e){
+      e.stopPropagation();
+      q('drawerClearConfirm351').dataset.mode = 'deckProgress';
+      q('drawerClearConfirmText351').textContent = 'Are you sure? This will remove the local deck AND local progress.';
+      q('drawerClearConfirm351').classList.remove('hidden');
+    };
     q('importFile351').onchange = function(){
       var file = this.files && this.files[0];
       if(!file) return;
@@ -9352,6 +9409,11 @@ Rules:
     if(q('drawerBionic351') && !q('cozySettingsDrawer351')?.classList.contains('open')){
       const saved = localStorage.getItem('bionicOn_v1751523');
       q('drawerBionic351').checked = saved === null ? false : saved === '1';
+    }
+    if(q('drawerShadowAnswerHold351') && !q('cozySettingsDrawer351')?.classList.contains('open')){
+      const saved = localStorage.getItem('cozyShadowAnswerHoldSeconds351') || '5';
+      const sel = q('drawerShadowAnswerHold351');
+      sel.value = sel.querySelector('option[value="' + saved + '"]') ? saved : '5';
     }
   }
 
@@ -11072,6 +11134,20 @@ function fixStableOneThingDropdown351() {
     window.phase3State = phase3State;
     window.cozyPhase3Session = session;
   }
+
+  window.clearAllLocalProgress = function(){
+    try{ phase3State.progress = {}; }catch(_){}
+    try{ savePhase3State(); }catch(_){}
+    try{ localStorage.removeItem('soloStudyingState_v1757'); }catch(_){}
+    try{ if(typeof updateKpis==='function') updateKpis(); }catch(_){}
+  };
+
+  window.clearAllLocalDeckAndProgress = function(){
+    window.clearAllLocalProgress();
+    try{ localStorage.removeItem('cozy_arcade_limitless_cards_v1'); }catch(_){}
+    try{ localStorage.removeItem('cozy_arcade_limitless_meta_v1'); }catch(_){}
+    try{ if('indexedDB' in window) indexedDB.deleteDatabase('cozy_arcade_deck_idb_v1'); }catch(_){}
+  };
 
   function hasMoreSrsData(candidate, existing) {
     if (!existing) return true;
