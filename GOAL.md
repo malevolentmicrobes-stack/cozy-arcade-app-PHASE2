@@ -223,3 +223,4 @@ Run in order — do not proceed to P7 until all pass:
 | 2026-05-28 | How to Play drawer + ArrowDown glitch fix | ✅ `a4712f1`, `7d809ef` |
 | 2026-05-28 | Advanced Merge dropdown → status chips (3 repos) | ✅ `e7e6ccf` |
 | 2026-06-15 | Render glitch root-cause audit (Codex browser verified) | 🔍 Analysis only — FQ-RENDER-1–4 identified, no code changes |
+| 2026-07-07 | Again relearning pool/browser fix | ✅ Solo + Knowledge Expansion Again loop; Shadow Dungeon due/random/review browser-verified |

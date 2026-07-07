@@ -11417,7 +11417,24 @@ function fixStableOneThingDropdown351() {
       updated_at: now.toISOString()
     });
     if (rating === 'again') console.log('[SRS] again fired for', cardId, next);
-    if(rating==='again'){session.seenThisSession.delete(cardId);try{if(Array.isArray(session.pool)){const _i=session.pool.findIndex(c=>canonicalCardId(c)===cardId);if(_i>0){const[_c]=session.pool.splice(_i,1);session.pool.unshift(_c);}else if(_i===-1&&window.cards){const _c=window.cards.find(c=>canonicalCardId(c)===cardId);if(_c)session.pool.unshift(_c);}}}catch(_){}}
+    if (rating === 'again') {
+      session.seenThisSession.delete(cardId);
+      session.buriedToday.delete(cardId);
+      session.poolKey = '';
+      try { index = 0; } catch (_) {}
+      try {
+        if (Array.isArray(session.pool)) {
+          const _i = session.pool.findIndex(c => canonicalCardId(c) === cardId);
+          if (_i >= 0) {
+            const [_c] = session.pool.splice(_i, 1);
+            session.pool.unshift(_c);
+          } else if (window.cards) {
+            const _c = window.cards.find(c => canonicalCardId(c) === cardId);
+            if (_c) session.pool.unshift(_c);
+          }
+        }
+      } catch (_) {}
+    }
   }
 
   function shuffleCards(arr) {
@@ -11575,27 +11592,48 @@ function fixStableOneThingDropdown351() {
       if (ad !== bd) return ad - bd;
       return String(pa.last_seen_at || '').localeCompare(String(pb.last_seen_at || ''));
     };
+    const isRelearningNow = card => {
+      const p = progress(card);
+      return !!(p && !p.suspended && !p.buried && (isDue(p) || p.stage === 'relearning' || p.repair_point || p.rating === 'again' || p.last_rating === 'again'));
+    };
+    const dueRelearningFirst = rest => {
+      const seen = new Set();
+      const lead = arr.filter(isRelearningNow).sort(dueSort);
+      return lead.concat(rest || []).filter(card => {
+        const id = canonicalCardId(card);
+        if (seen.has(id)) return false;
+        seen.add(id);
+        return true;
+      });
+    };
+    const isDueOrRelearning = card => {
+      const p = progressForCard(card);
+      return (isDue(p) || p.stage === 'relearning' || p.repair_point || p.rating === 'again' || p.last_rating === 'again') && !p.suspended && !p.buried && p.rating !== 'bury' && p.last_rating !== 'bury';
+    };
+    const reviewDeckFilter = card => {
+      const p = progressForCard(card);
+      return isReviewCandidate(card) && (p.pinned || p.stage === 'relearning' || p.repair_point || p.rating === 'again' || p.last_rating === 'again' || isDue(p) || !hasFutureDue(p));
+    };
 
-	    if (selected === 'new_only') {
-	      arr = arr.filter(isNewCard);
-	    } else if (selected === 'new_first') {
-	      arr = [
-	        ...arr.filter(isNewCard),
-	        ...arr.filter(c => isDue(progress(c)) && isReviewedCard(c)),
-	        ...arr.filter(c => !isDue(progress(c)) && progress(c).stage === 'relearning')
-	      ];
-	    } else if (selected === 'random_all') {
-	      arr = shuffleCards(arr);
-	    } else if (selected === 'random_new') {
-	      arr = shuffleCards(arr.filter(isNewCard));
-	    } else if (selected === 'reviewed_first') {
-	      arr = [
-	        ...arr.filter(c => isReviewedCard(c) && isDue(progress(c))).sort(dueSort),
-	        ...arr.filter(isNewCard)
-	      ];
+    if (selected === 'new_only') {
+      arr = dueRelearningFirst(arr.filter(isNewCard));
+    } else if (selected === 'new_first') {
+      arr = dueRelearningFirst([
+        ...arr.filter(isNewCard),
+        ...arr.filter(c => isDue(progress(c)) && isReviewedCard(c)),
+        ...arr.filter(c => !isDue(progress(c)) && progress(c).stage === 'relearning')
+      ]);
+    } else if (selected === 'random_all') {
+      arr = shuffleCards(arr);
+    } else if (selected === 'random_new') {
+      arr = dueRelearningFirst(shuffleCards(arr.filter(isNewCard)));
+    } else if (selected === 'reviewed_first') {
+      arr = dueRelearningFirst([
+        ...arr.filter(c => isReviewedCard(c) && isDue(progress(c))).sort(dueSort),
+        ...arr.filter(isNewCard)
+      ]);
     } else if (selected === 'due') {
-      arr = arr.filter(c => { const p=progressForCard(c); return isDue(p) && !p.suspended && !p.buried && p.rating!=='bury' && p.last_rating!=='bury'; });
-      arr = [...arr].sort((a, b) => {
+      arr = arr.filter(isDueOrRelearning).sort((a, b) => {
         const ta = Date.parse(progress(a).next_due_at || '');
         const tb = Date.parse(progress(b).next_due_at || '');
         if (isNaN(ta) && isNaN(tb)) return 0;
@@ -11603,24 +11641,24 @@ function fixStableOneThingDropdown351() {
         if (isNaN(tb)) return -1;
         return ta - tb;
       });
-	    } else if (selected === 'review_deck') {
-	      arr = applyStudyFiltersPhase3(normalizeDeckIdentities()).filter(c => { const p=progressForCard(c); return !p.suspended && !p.buried && p.rating!=='bury' && p.last_rating!=='bury'; }).filter(c => {
-	        const p = progressForCard(c);
-	        return isReviewCandidate(c) && (p.pinned || isDue(p) || !hasFutureDue(p));
-	      }).sort((a, b) => {
-	        const pa = progress(a), pb = progress(b);
-	        const score = p => (p.pinned ? 0 : p.repair_point ? 1 : 2);
-        if (score(pa) !== score(pb)) return score(pa) - score(pb);
-        return String(pa.last_seen_at || '').localeCompare(String(pb.last_seen_at || ''));
-      });
+    } else if (selected === 'review_deck') {
+      arr = applyStudyFiltersPhase3(normalizeDeckIdentities())
+        .filter(c => { const p = progressForCard(c); return !p.suspended && !p.buried && p.rating !== 'bury' && p.last_rating !== 'bury'; })
+        .filter(reviewDeckFilter)
+        .sort((a, b) => {
+          const pa = progress(a), pb = progress(b);
+          const score = p => (p.pinned ? 0 : p.repair_point ? 1 : 2);
+          if (score(pa) !== score(pb)) return score(pa) - score(pb);
+          return String(pa.last_seen_at || '').localeCompare(String(pb.last_seen_at || ''));
+        });
       return arr;
     } else if (selected === 'pinned') {
       arr = arr.filter(c => progress(c).pinned);
-	    } else if (selected === 'hard') {
-	      arr = arr.filter(c => {
-	        const p = progress(c);
-	        return (p.repair_point || p.rating === 'hard' || p.rating === 'again');
-	      });
+    } else if (selected === 'hard') {
+      arr = arr.filter(c => {
+        const p = progress(c);
+        return (p.repair_point || p.rating === 'hard' || p.rating === 'again');
+      });
     } else if (selected === 'tagged') {
       const tag = selectedTagPhase3();
       if (!tag || tag === 'all') arr = arr.filter(c => tagsForPhase3(c).length);
@@ -11628,7 +11666,7 @@ function fixStableOneThingDropdown351() {
       arr = applyStudyFiltersPhase3(normalizeDeckIdentities()).filter(c => progressForCard(c).suspended);
     }
 
-	    if (!arr.length && ['new_only', 'pinned', 'hard', 'tagged', 'suspended'].includes(selected)) return [];
+    if (!arr.length && ['new_only', 'pinned', 'hard', 'tagged', 'suspended'].includes(selected)) return [];
 
     if (selected === 'random_new' && arr.length) {
       const active = arr.filter(c => !isSessionBlockedCard(c));
@@ -11645,11 +11683,21 @@ function fixStableOneThingDropdown351() {
     if (scheduledModes.includes(selected)) {
       const refreshed = applyStudyFiltersPhase3(basePlayableCards());
       if (selected === 'new_first') {
-        return [
-          ...refreshed.filter(isNewCard),
-          ...refreshed.filter(c => isDue(progress(c)) && isReviewedCard(c)),
-          ...refreshed.filter(c => !isDue(progress(c)) && progress(c).stage === 'relearning')
-        ];
+        const seen = new Set();
+        const lead = refreshed.filter(c => {
+          const p = progress(c);
+          return p && !p.suspended && !p.buried && (isDue(p) || p.stage === 'relearning' || p.repair_point || p.rating === 'again' || p.last_rating === 'again');
+        }).sort(dueSort);
+        return lead.concat(
+          refreshed.filter(isNewCard),
+          refreshed.filter(c => isDue(progress(c)) && isReviewedCard(c)),
+          refreshed.filter(c => !isDue(progress(c)) && progress(c).stage === 'relearning')
+        ).filter(card => {
+          const id = canonicalCardId(card);
+          if (seen.has(id)) return false;
+          seen.add(id);
+          return true;
+        });
       }
       if (selected === 'reviewed_first') {
         return [
@@ -11657,17 +11705,16 @@ function fixStableOneThingDropdown351() {
           ...refreshed.filter(isNewCard)
         ];
       }
-	      if (selected === 'due') {
-	        const dueOnly = refreshed.filter(c => { const p=progressForCard(c); return isDue(p) && !p.suspended && !p.buried && p.rating!=='bury' && p.last_rating!=='bury'; });
-	        if (dueOnly.length) return dueOnly;
-	        const pinnedFallback = refreshed.filter(c => { const p=progressForCard(c); return p && p.pinned && !p.suspended && !p.buried; });
-	        return pinnedFallback;
-	      }
+      if (selected === 'due') {
+        const dueOnly = refreshed.filter(isDueOrRelearning);
+        if (dueOnly.length) return dueOnly;
+        const pinnedFallback = refreshed.filter(c => { const p = progressForCard(c); return p && p.pinned && !p.suspended && !p.buried; });
+        return pinnedFallback;
+      }
       if (selected === 'review_deck') {
-        return applyStudyFiltersPhase3(normalizeDeckIdentities()).filter(c => { const p=progressForCard(c); return !p.suspended && !p.buried && p.rating!=='bury' && p.last_rating!=='bury'; }).filter(c => {
-          const p = progressForCard(c);
-	          return isReviewCandidate(c) && (p.pinned || isDue(p) || !hasFutureDue(p));
-        });
+        return applyStudyFiltersPhase3(normalizeDeckIdentities())
+          .filter(c => { const p = progressForCard(c); return !p.suspended && !p.buried && p.rating !== 'bury' && p.last_rating !== 'bury'; })
+          .filter(reviewDeckFilter);
       }
     }
     const base = applyStudyFiltersPhase3(basePlayableCards())
