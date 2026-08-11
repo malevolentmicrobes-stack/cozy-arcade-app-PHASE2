@@ -13343,8 +13343,14 @@ body.cozyGameShellActive371 #gearBtn {
 /* soloTrack nudged 10px for clearance — dead weight inside shell (shell uses flex, inset:auto) */
 .soloTrack{inset:240px 0 0!important;}
 @media(max-width:760px){.soloTrack{inset:220px 0 0!important;}}
-/* Bionic contrast — bold first-letters bright white, base text dimmed blue-gray */
-:root[data-cozy-bionic="1"] .promptText,:root[data-cozy-bionic="1"] .promptText *:not(b){color:rgba(160,200,255,0.62)!important;font-weight:500!important;}
+/* Bionic contrast — bold first-letters bright white, base text dimmed blue-gray.
+   Suffix contrast raised 2026-08-11 (color only): at PHASE2's smaller prompt size
+   the old rgba(160,200,255,.62) suffix read as a mismatched font rather than a
+   reading-emphasis effect. Prefix left unchanged. No font-weight declaration here
+   on purpose — #solo/#domain .promptText (~line 5724) is a higher-specificity ID
+   selector that pins weight:900 regardless, so a weight value in this rule would
+   be dead code; measured suffix/prefix luma gap dropped ~133.8 to ~67.5. */
+:root[data-cozy-bionic="1"] .promptText,:root[data-cozy-bionic="1"] .promptText *:not(b){color:rgba(215,230,255,0.82)!important;}
 :root[data-cozy-bionic="1"] .promptText b{color:#ffffff!important;font-weight:950!important;}
 
 /* Shell positioning fix — converts absolute to relative for shell flow on all sizes */
