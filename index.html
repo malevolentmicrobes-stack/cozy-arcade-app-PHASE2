@@ -5617,6 +5617,18 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
   // Capture arrow keys before older handlers: up/down/left/right work for both games; Enter/Space selects.
   window.addEventListener('keydown', function(e){
     if(document.activeElement&&(/^(TEXTAREA|INPUT|SELECT)$/i.test(document.activeElement.tagName)||document.activeElement.isContentEditable)) return;
+    const endEl=document.getElementById('end');
+    if(endEl && !endEl.classList.contains('hidden') && (e.key==='Enter' || e.key===' ' || e.code==='Space')){
+      e.preventDefault(); e.stopImmediatePropagation();
+      const btn=document.getElementById('endContinue');
+      if(btn) btn.click();
+      return;
+    }
+    const soloReveal=document.getElementById('soloReveal');
+    const domainReveal=document.getElementById('domainReveal');
+    if((e.key==='Enter' || e.key===' ' || e.code==='Space') &&
+       ((soloReveal && !soloReveal.classList.contains('hidden')) ||
+        (domainReveal && !domainReveal.classList.contains('hidden')))) return;
     if(!['solo','domain'].includes(mode) || paused) return;
     const key=e.key;
     if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Enter',' '].includes(key)){ e.preventDefault(); e.stopImmediatePropagation(); }
