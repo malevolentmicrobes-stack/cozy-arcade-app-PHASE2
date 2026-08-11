@@ -3755,6 +3755,69 @@ button#homeTopBtn,.homeTopBtn{display:none!important;visibility:hidden!important
 })();
 </script>
 
+<!-- v17.5.16.5 — runner faces direction of travel, not side of screen.
+     The old dir-left/dir-right classes (syncRunner() above) are side-of-screen
+     and drive a hidden SVG pose system (dedup patch above hides all #runner
+     children) — visually dead. The live visible runner is the sprite-strip
+     background-image on #runner.hunter itself (cozy-v24-patch-js), which has
+     no facing logic at all. This patch adds that, independent of dir-left/
+     dir-right so it can't collide with the other systems that already own
+     those class names (three-pose runner, domainRunner162, idleRunner).
+     Facing persists between lanes when there's no direction change (e.g.
+     idling at lane0 keeps whatever facing the last actual move set) — there
+     is no canonical "default" direction to reset to, so this is intentional,
+     not a missed reset. -->
+<style id="v175165-runner-facing-css">
+/* Flip must be composed into a keyframe set, not applied as a plain
+   transform — #runner.hunter already runs an animation shorthand every
+   frame (narutoSpriteBob), and a running animation's per-frame transform
+   overrides any transform set outside it. Values below are copied from
+   narutoSpriteBob's own keyframes with scaleX(-1) inserted. Only the
+   @keyframes declaration lives in this stylesheet — the animation-shorthand
+   switch itself is written as an inline style by the JS below, matching
+   enforceRunnerSprite() (cozy-v24-patch-js) which is the actual owner of
+   #runner's inline style and sets its own animation with !important; an
+   ordinary stylesheet rule here, even with more classes/!important, cannot
+   beat that inline declaration. */
+@keyframes narutoSpriteBobFlip351{
+  from{transform:translateX(-50%) scaleX(-1) translateY(0) scale(1);}
+  to{transform:translateX(-50%) scaleX(-1) translateY(-5px) scale(1);}
+}
+</style>
+<script id="v175165-runner-facing-js">
+(function(){
+  if(window.__cozyRunnerFacing351) return;
+  window.__cozyRunnerFacing351 = true;
+  var ANIM_NORMAL='runnerSprint 420ms steps(4) infinite, narutoSpriteBob .34s ease-in-out infinite alternate';
+  var ANIM_FLIP='runnerSprint 420ms steps(4) infinite, narutoSpriteBobFlip351 .34s ease-in-out infinite alternate';
+  function laneOf(el){
+    var m=/\blane([0-3])\b/.exec(el.className||'');
+    return m ? parseInt(m[1],10) : null;
+  }
+  function applyFacing(oldLane,newLane,r){
+    if(!r || oldLane===null || newLane===null || oldLane===newLane) return;
+    var facingLeft=newLane<oldLane;
+    r.classList.toggle('faceLeft351', facingLeft);
+    r.style.setProperty('animation', facingLeft?ANIM_FLIP:ANIM_NORMAL, 'important');
+  }
+  function hook(){
+    var orig=window.moveHunter;
+    if(typeof orig!=='function' || orig.__runnerFacing351) return;
+    var wrapped=function(){
+      var r=document.getElementById('runner');
+      var oldLane=r?laneOf(r):null;
+      var out=orig.apply(this,arguments);
+      applyFacing(oldLane, r?laneOf(r):null, r);
+      return out;
+    };
+    wrapped.__runnerFacing351=true;
+    window.moveHunter=wrapped;
+  }
+  hook();
+  setTimeout(hook,120); setTimeout(hook,600);
+})();
+</script>
+
 
 
 <!-- v17.5.16.4 - pause dedupe + Shadow Dungeon pinned/wrong timing patch
