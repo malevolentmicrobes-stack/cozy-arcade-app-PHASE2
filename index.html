@@ -9572,40 +9572,6 @@ Rules:
 #runner.hunter.rank-monarch {
   filter: drop-shadow(0 0 40px rgba(255,255,255,.90)) drop-shadow(0 0 70px rgba(255,209,102,.65)) drop-shadow(0 0 100px rgba(124,58,237,.55)) drop-shadow(0 24px 40px rgba(0,0,0,.55)) !important;
 }
-#spriteLevelPill {
-  position: absolute;
-  bottom: calc(100% + 4px);
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: Orbitron, monospace;
-  font-size: 10px;
-  letter-spacing: .14em;
-  white-space: nowrap;
-  pointer-events: none;
-  z-index: 35;
-  text-shadow: 0 0 10px currentColor;
-}
-#spriteLevelPill.rank-e {
-  color: #67e8f9;
-}
-#spriteLevelPill.rank-d {
-  color: #a78bfa;
-}
-#spriteLevelPill.rank-b {
-  color: #7c3aed;
-}
-#spriteLevelPill.rank-a {
-  color: #ffd166;
-}
-#spriteLevelPill.rank-s {
-  color: #fb5876;
-}
-#spriteLevelPill.rank-apex {
-  color: #b2f5ff;
-}
-#spriteLevelPill.rank-monarch {
-  color: #ffffff;
-}
 #promptAiPanel351 {
   background: rgba(103,232,249,.06);
   border: 1px solid rgba(103,232,249,.30);
@@ -9727,42 +9693,14 @@ Rules:
     return 'rank-monarch';
   }
 
-  function labelFor(lv, rank) {
-    if (rank === 'rank-d') return `LV ${lv} · D`;
-    if (rank === 'rank-b') return `LV ${lv} · B`;
-    if (rank === 'rank-a') return 'LV 60 · A';
-    if (rank === 'rank-s') return `LV ${lv} · S`;
-    if (rank === 'rank-apex') return `LV ${lv} · APEX`;
-    if (rank === 'rank-monarch') return `LV ${lv} · MONARCH`;
-    return `LV ${lv}`;
-  }
-
-  function ensureLevelPill() {
-    const runner = document.getElementById('runner');
-    if (!runner || !runner.parentNode) return null;
-    let pill = document.getElementById('spriteLevelPill');
-    if (!pill) {
-      pill = document.createElement('div');
-      pill.id = 'spriteLevelPill';
-      runner.parentNode.insertBefore(pill, runner);
-    }
-    return pill;
-  }
-
   window.__updateSpriteLvl = function() {
     const lv = getLevel();
     const rank = rankFor(lv);
     const runner = document.getElementById('runner');
-    const pill = ensureLevelPill();
 
     if (runner) {
       runner.classList.remove(...RANKS);
       runner.classList.add(rank);
-    }
-    if (pill) {
-      pill.classList.remove(...RANKS);
-      pill.classList.add(rank);
-      pill.textContent = labelFor(lv, rank);
     }
   };
 
@@ -9847,7 +9785,6 @@ Rules:
   function boot() {
     activateV24Style();
     enforceRunnerSprite();
-    ensureLevelPill();
     window.__updateSpriteLvl();
     watchDrawerCreation();
     watchDrawer();
